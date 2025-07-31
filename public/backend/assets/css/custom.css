@@ -1,0 +1,31 @@
+.error-input {
+    display: block;
+    width: 100%;
+    margin-top: 0.3rem;
+    font-size: 85%;
+    color: var(--bs-form-invalid-color);
+}
+.total_datas{
+    float:left;
+}
+.dataTables_length {
+   display:none; 
+}
+.dataTables_filter {
+    float:right;
+    margin-bottom: 2%;
+}
+.dataTables_paginate {
+    float:right;
+}
+/* .navbar-detached {
+    box-shadow: none !important;
+    background: #f5f5f9 !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+} */
+.admin-logo {
+    background: #000; padding: 4px 8px;
+}

@@ -1,0 +1,126 @@
+@extends('layouts.admin')
+
+@section('title')
+    Admin | Categories
+@endsection
+
+@section('content')
+<div class="container-xxl flex-grow-1 container-p-y pt-0">
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Categories</span></h4>
+  <div class="row">
+    <div class="col-xl">
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Category @if(!empty($category)) Update @else Create @endif</h5>
+        </div>
+        <div class="card-body">
+          @if(Session::has('success'))
+              <div class="alert alert-success">
+              {{ Session::get('success') }}
+              </div>
+          @endif
+          @if(Session::has('error'))
+              <div class="alert alert-danger">
+              {{ Session::get('error') }}
+              </div>
+          @endif
+       
+          @if(!empty($category))
+             <form  action="{{route('categories.update',["category"=>$category->id])}}" method="POST" enctype="multipart/form-data">
+          @else
+             <form  action="{{route('categories.store')}}" method="POST" enctype="multipart/form-data">
+          @endif 
+
+          
+            {{ csrf_field() }}
+             <div class="mb-3">
+              <label class="form-label" for="title">Name<span class="text-danger">*</span></label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="name"
+                  id="slug-source"
+                  value="{{ $category->name ?? old('name') }}"
+                  placeholder="Name"/>
+              </div>
+              @if ($errors->has('name'))
+                <span class="text-danger text-left">{{ $errors->first('name') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="title">Slug<span class="text-danger">*</span></label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="slug"
+                  id="slug-target"
+                  value="{{ $category->slug ?? old('slug') }}"
+                  placeholder="slug"/>
+              </div>
+              @if ($errors->has('slug'))
+                <span class="text-danger text-left">{{ $errors->first('slug') }}</span>
+              @endif
+            </div>
+            
+            <div class="mb-3" style="display:none">
+              <label class="form-label" for="title">Type<span class="text-danger">*</span></label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                <input
+                  type="hidden"
+                  class="form-control"
+                  name="type"
+                  id="type"
+                  value="blogs"
+                  placeholder="Type"/>
+              </div>
+              @if ($errors->has('type'))
+                <span class="text-danger text-left">{{ $errors->first('type') }}</span>
+              @endif
+            </div>
+
+
+            @if(!empty($category))
+             @method('PUT')
+            @endif
+            <div class="d-flex pt-3 justify-content-end">
+            <a href="{{route('categories.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>  
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+@endsection
+@section('scripts')
+<script>
+  $("#slug-source").keyup(function() {
+      var Text = $(this).val();
+      Text = slugify(Text);
+      $("#slug-target").val(Text);        
+  });
+
+  $("#slug-source").blur(function() {
+      var Text = $(this).val();
+      Text = slugify(Text);
+      $("#slug-target").val(Text);        
+  });
+  
+function slugify(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+  str = str.toLowerCase(); // convert string to lowercase
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+           .replace(/\s+/g, '-') // replace spaces with hyphens
+           .replace(/-+/g, '-'); // remove consecutive hyphens
+  return str.replace(/^-+|-+$/g, '');
+}
+</script
+@endsection
