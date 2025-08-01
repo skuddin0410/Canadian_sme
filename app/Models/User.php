@@ -119,5 +119,10 @@ class User extends Authenticatable implements JWTSubject
             ->where('is_default', 1);
     }
 
+    public function loginLogs()
+    {
+        return $this->hasMany(\App\Models\UserLogin::class);
+    }
+
     protected $appends = ['full_name'];
 }
