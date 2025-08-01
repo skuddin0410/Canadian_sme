@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('transaction_id')->nullable()->index();
             $table->text('response')->nullable();
             $table->string('status')->default('init')->comment('init, success, failed')->nullable()->index();
+            $table->dropIndex(['transaction_id']);
+            $table->renameColumn('transaction_id', 'reference');
+            $table->index('reference');
+            $table->decimal('amount', 10, 2)->after('response')->default(0.00)->nullable()->index();
             $table->timestamps();
         });
     }

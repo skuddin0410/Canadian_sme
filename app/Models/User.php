@@ -9,12 +9,15 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes, HasRoles;
-
+    use  Auditable;
+    use AutoHtmlDecode;
     /**
      * Define the default guard for this model.
      */
@@ -42,12 +45,7 @@ class User extends Authenticatable implements JWTSubject
         'zipcode',
         'city',
         'state',
-        'country',
-        'google_id',
-        'meta_id',
-        'referral_coupon',
-        'referral_percentage',
-        'kyc_verified',
+        'country'
     ];
 
     /**
@@ -102,14 +100,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'users')
             ->where('file_type', 'photo')
-            ->whereNotNull('file_name');
-    }
-
-    public function background()
-    {
-        return $this->hasOne(Drive::class, 'table_id', 'id')
-            ->where('table_type', 'users')
-            ->where('file_type', 'background')
             ->whereNotNull('file_name');
     }
 

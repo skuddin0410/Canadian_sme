@@ -17,6 +17,14 @@ return new class extends Migration
             $table->unsignedBigInteger('table_id')->nullable()->index();
             $table->enum('table_type', ['payments', 'withdrawals'])->nullable()->index();
             $table->decimal('amount', 10, 2)->default(0.00)->nullable()->index();
+            $table->string('table_type')->comment('wallets, payments, withdrawals')->nullable()->change();
+            $table->string('type')->after('table_type')->default('winning')->comment('winning, referral, redeem, pay, deposit, withdraw')->nullable()->index();
+
+            $table->string('journal_type')->after('type')->default('debit')->comment('debit, credit')->nullable()->index();
+            $table->dropIndex(['type']);
+            $table->renameColumn('type', 'purpose');
+            $table->index('purpose');
+
             $table->timestamps();
         });
     }
