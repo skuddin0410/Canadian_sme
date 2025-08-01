@@ -17,9 +17,9 @@
             <div class="card-body">
               <div class="media d-flex justify-content-center">
                 <div class="emdia-body text-left">
-                  <h6 class="success text-white">Total Users: {{$usersCount ?? 0}}</h6><br>
+                 <!--  <h6 class="success text-white">Total Users: {{$usersCount ?? 0}}</h6><br>
                   <h6 class="success text-white">Total Orders: {{$order ?? 0}}</h6><br>
-                  <h6 class="success text-white">Earnings: {{config('app.currency_sign')}}{{$summary[0]->balance ?? 0}}</h6>
+                  <h6 class="success text-white">Earnings: {{config('app.currency_sign')}}{{$summary[0]->balance ?? 0}}</h6> -->
                 </div>
               </div>
             </div>
@@ -35,9 +35,9 @@
                   <i class="icon-pointer danger font-large-2 float-left"></i>
                 </div> --}}
                 <div class="media-body text-left">
-                  <h6 class="success text-white">Total Giveaway : {{$giveawayCount ?? 0}}</h6><br>
+                <!--   <h6 class="success text-white">Total Giveaway : {{$giveawayCount ?? 0}}</h6><br>
                   <h6 class="success text-white">Giveaway purchased: {{$giveawayOrderCount ?? 0}}</h6><br>
-                  <h6 class="success text-white">Earnings: {{$orderAmountGiveaway ?? 0}}</h6>
+                  <h6 class="success text-white">Earnings: {{$orderAmountGiveaway ?? 0}}</h6> -->
                 </div>
               </div>
             </div>
@@ -53,9 +53,9 @@
                   <i class="icon-pencil primary font-large-2 float-left"></i>
                 </div> --}}
                 <div class="media-body text-left">
-                  <h6 class="success text-white">Total Quiz : {{$quizCount ?? 0}}</h6><br>
+                  <!-- <h6 class="success text-white">Total Quiz : {{$quizCount ?? 0}}</h6><br>
                   <h6 class="success text-white">Quiz Attempts: {{$quizOrderCount ?? 0}}</h6><br>
-                  <h6 class="success text-white">Earnings: {{$orderAmountQuiz ?? 0}}</h6>
+                  <h6 class="success text-white">Earnings: {{$orderAmountQuiz ?? 0}}</h6> -->
                 </div>
               </div>
             </div>
@@ -72,7 +72,7 @@
                 </div> --}}
                 <div class="media-body text-left">
                 
-                  <h6 class="success text-white">Spinner played : {{$spinnerOrderCount ?? 0}}</h6><br>
+                  <!-- <h6 class="success text-white">Spinner played : {{$spinnerOrderCount ?? 0}}</h6><br> -->
                  
                 </div>
               </div>
@@ -81,7 +81,7 @@
         </div>
       </div>
     </div>
-
+<!-- 
     <div class="row pt-2">
       <div class="col-6">
         <div class="card">
@@ -103,9 +103,9 @@
         </div>
       </div>
       
-    </div>
+    </div> -->
 
-    <div class="row pt-2">
+<!--     <div class="row pt-2">
       <div class="col-12">
         <div class="card">
           <div class="card-content">
@@ -115,7 +115,7 @@
            </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </section>
 </div>
 

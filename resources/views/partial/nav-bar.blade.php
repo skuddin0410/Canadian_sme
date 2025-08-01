@@ -10,15 +10,12 @@
 
 	<div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 			<div class="flex-grow-1">
-				Hi,{{Auth::user()->name ?? '' }}
-				@if(Auth::user()->referral_coupon)
+				Hi,{{Auth::user()->full_name ?? '' }}
+				@if(Auth::user())
 				<br>
-				 <span> Referral coupon : <small class="text-muted">{{Auth::user()->referral_coupon ?? ''}}</small></span>
-				 <span style="margin-left:5px">@if(Auth::user()->referral_percentage)
-					 Referral percentage : <small class="text-muted">{{Auth::user()->referral_percentage .' %'?? ''}}</small>
-				   @endif</span>
-				@endif
-				
+				 <span> Login as a : <small class="text-muted">{{Auth::user()->getRoleNames()->first() ?? ''}}</small></span>
+				 
+				 @endif
 			</div>
 		
 		<ul class="navbar-nav flex-row align-items-center ms-auto">

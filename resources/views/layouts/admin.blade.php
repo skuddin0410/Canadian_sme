@@ -63,7 +63,10 @@
         @if(Auth::user()->hasRole('Admin'))
             @include('partial.admin-side-bar')
         @endif    
- 
+        
+        @if(Auth::user()->hasRole('Exhibitor Admin'))
+           @include('partial.exhibitor-side-bar')
+        @endif 
         <!-- / Menu -->
         <!-- Layout container -->
         <div class="layout-page">
