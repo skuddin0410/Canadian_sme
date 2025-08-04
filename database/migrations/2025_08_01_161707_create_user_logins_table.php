@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('faqs', function (Blueprint $table) {
+        Schema::create('user_logins', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable()->index();
-            $table->text('description')->nullable();
-            $table->bigInteger('order')->after('description')->default(1)->nullable()->index();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('ip_address')->nullable();
+            $table->string('user_agent')->nullable();
+            $table->timestamp('logged_in_at')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('faqs');
+        Schema::dropIfExists('user_logins');
     }
 };

@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class Event extends Model
 {
     use HasFactory;
+    use  Auditable;
+    use AutoHtmlDecode;
 
     protected $fillable = [
         'title',
