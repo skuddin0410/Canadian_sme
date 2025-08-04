@@ -26,9 +26,9 @@
       <link
         href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet" />
-
+     
       <link rel="stylesheet" href="{{asset('backend/assets/vendor/fonts/boxicons.css')}}" />
-
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
       <!-- Core CSS -->
       <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/core.css')}}" class="template-customizer-core-css" />
       <link rel="stylesheet" href="{{asset('backend/assets/vendor/css/theme-default.css')}}" class="template-customizer-theme-css" />
@@ -45,7 +45,7 @@
       <link href="{{asset('backend/plugins/datatable/jquery.dataTables.min.css?v='.time())}}" rel="stylesheet" />  -->
       <link href="{{asset('backend/plugins/datatable/fixedColumns.dataTables.min.css?v='.time())}}" rel="stylesheet" />
       <!-- Page CSS -->
-
+      
       <!-- Helpers -->
       <script src="{{asset('backend/assets/vendor/js/helpers.js')}}"></script>
       <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
@@ -60,7 +60,7 @@
       <div class="layout-container">
         <!-- Menu -->
 
-        @if(Auth::user()->hasRole('Admin'))
+        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
             @include('partial.admin-side-bar')
         @endif    
         

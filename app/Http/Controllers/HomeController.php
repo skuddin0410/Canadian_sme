@@ -4,16 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Giveaway;
-use App\Models\Quiz;
-use App\Models\Wallet;
-use App\Models\Order;
-use App\Models\Transaction;
+use App\Models\Event;
 
 use Validator;
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use App\Models\Payment;
+use App\Models\AuditLog;
+use App\Models\UserLogin;
 
 class HomeController extends Controller
 {
@@ -43,21 +41,16 @@ class HomeController extends Controller
             || Auth::user()->hasRole('Support Staff Or Helpdesk')
             || Auth::user()->hasRole('Registration Desk')) {
             
-            $usersCount = null;
-            $giveawayCount = null;
-            $quizCount = null;
-            $order =null; 
-            $summary = null; 
-            $giveawayOrderCount = null; 
-            $quizOrderCount = null; 
-            $spinnerOrderCount = null; 
-            
-            $orderAmountGiveaway = null; 
-            $orderAmountQuiz = null; 
-            
-            $usersStateWiseCounts =null;
+            $evntCount = Event::count();
+            $userCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Admin"]);
+                })->count();
 
-            return view('home',compact('usersCount','giveawayCount','quizCount','order','summary','giveawayOrderCount','quizOrderCount','spinnerOrderCount','usersStateWiseCounts','orderAmountGiveaway','orderAmountQuiz'));
+            $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
+            $loginlogs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
+
+            return view('home',compact('evntCount','userCount','logs','loginlogs'));
         }
 
         if (Auth::user()->hasRole('Affiliate Manager')) {
