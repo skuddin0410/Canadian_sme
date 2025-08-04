@@ -275,81 +275,27 @@
               <div class="input-group input-group-merge">
                 <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
                 <select class="form-control" name="user_type">
-                 <option value="User" {{ old('user_type') =='User' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='User' ? 'selected' : '' }}>User</option> 
-                 {{-- <option value="Affiliate" {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Affiliate' ? 'selected' : '' }}  {{ old('user_type') =='Affiliate' ? 'selected' : '' }}>Affiliate</option> --}}
+                 <option value="">Please Select Role</option> 
+                 <option value="Event Admin" {{ old('user_type') =='Event Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Event Admin' ? 'selected' : '' }}>Event Admin</option> 
+
+                  <option value="Exhibitor Admin" {{ old('user_type') =='Exhibitor Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Admin' ? 'selected' : '' }}>Exhibitor Admin</option> 
+
+                  <option value="Exhibitor Representative" {{ old('user_type') =='Exhibitor Representative' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Representative' ? 'selected' : '' }}>Exhibitor Representative</option> 
+
+                  <option value="Attendee" {{ old('user_type') =='Attendee' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Attendee' ? 'selected' : '' }}>Attendee</option> 
+
+                  <option value="Speaker" {{ old('user_type') =='Speaker' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Speaker' ? 'selected' : '' }}>Speaker</option> 
+
+                  <option value="Support Staff Or Helpdesk" {{ old('user_type') =='Support Staff Or Helpdesk' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Support Staff Or Helpdesk' ? 'selected' : '' }}>Support Staff Or Helpdesk</option> 
+
+                  <option value="Registration Desk" {{ old('user_type') =='Registration Desk' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Registration Desk' ? 'selected' : '' }}>Registration Desk</option> 
+                 
                 </select>
+
               </div>
             </div>
           </div>
-          
-          <div class="col-6">  
-             <div class="row">
-               <label class="form-label" for="title">Aadhaar Image<span class="text-danger">(Allowed file size : {{config('app.adhaar_image_size')." KB and allowed file type ".config('app.image_mime_types') }}) </span> </label> 
-
-               <div class="col-9 mb-3">
-                <label class="form-label" for="title">Fornt Side Image</label>
-                <div class="input-group input-group-merge">
-                  <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                  <input
-                    type="file"
-                    class="form-control"
-                    name="frontimage"
-                    id="frontimage"/>
-                </div>
-                @if ($errors->has('frontimage'))
-                  <span class="text-danger text-left">{{ $errors->first('frontimage') }}</span>
-                @endif
-              </div>
-               <div class="col-3 mb-3">
-                 <div class="input-group input-group-merge">
-                  @if(!empty($user->photo) && $user->photo->file_path)
-                  <img src="{{asset($user->photo->file_path)  ?? ''}}" alt="Post Image" height="60px;">
-                  @endif
-                </div>
-              </div>
-               
-              <div class="col-9 mb-3">
-                <label class="form-label" for="title">Back Side Image</label>
-                <div class="input-group input-group-merge">
-                  <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                  <input
-                    type="file"
-                    class="form-control"
-                    name="image"
-                    id="image"/>
-                </div>
-                @if ($errors->has('image'))
-                  <span class="text-danger text-left">{{ $errors->first('image') }}</span>
-                @endif
-              </div>
-               <div class="col-3 mb-3">
-                 <div class="input-group input-group-merge">
-                  @if(!empty($user->background) && $user->background->file_path)
-                  <img src="{{asset($user->background->file_path)  ?? ''}}" alt="Post Image" height="60px;">
-                  @endif
-                </div>
-              </div>
-             </div>
-           </div>
-            <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">Password<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="password"
-                  class="form-control"
-                  name="password"
-                  id="password"
-                  value=""
-                  autocomplete="off"
-                  placeholder="Password"/>
-              </div>
-              @if ($errors->has('password'))
-                <span class="text-danger text-left">{{ $errors->first('password') }}</span>
-              @endif
-            </div> 
-          </div>
+         
           <div class="col-12">
             <div class="mb-3">
               <div class="d-flex pt-3 justify-content-end">
