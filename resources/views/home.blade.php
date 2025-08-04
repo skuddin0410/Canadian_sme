@@ -95,10 +95,10 @@
                     <h5 class="card-title">Manage Registrations</h5>
                     <p class="card-text text-muted">Handle event registrations and participant management</p>
                     <div class="d-grid gap-2">
-                      <a href="#" class="btn btn-success">
+                      <a href="{{route('users.create')}}" class="btn btn-success">
                         <i class="bi bi-person-add me-2"></i>New Registration
                       </a>
-                      <a href="#" class="btn btn-outline-success btn-sm">
+                      <a href="{{route('users.index')}}" class="btn btn-outline-success btn-sm">
                         <i class="bi bi-people me-2"></i>View All Registrations
                       </a>
                     </div>
@@ -108,7 +108,7 @@
             </div>
 
             <!-- Additional Quick Actions Row -->
-            <div class="row mt-3">
+            <!--<div class="row mt-3">
               <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-2">
                 <div class="d-grid">
                   <a href="#" class="btn btn-outline-info">
@@ -137,7 +137,7 @@
                   </button>
                 </div>
               </div>
-            </div>
+            </div>--->
           </div>
         </div>
       </div>
@@ -200,7 +200,7 @@
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <i class="bi bi-alarm text-primary me-2"></i>
-                    <strong>{{ $log->user ? $log->user->full_name : 'System' }}: Logged</strong>
+                    <strong>{{ $log->user ? $log->user->full_name : 'System' }} Logged</strong>
                    On  {{ $log->created_at->format('M d, Y') }}, {{ $log->created_at->format('h:i A') }}
                   </div>
                   <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
