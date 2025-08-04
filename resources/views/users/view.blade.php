@@ -90,13 +90,45 @@ Admin | User Details
                           </li>  
                         </ul>
                     </div>
-                
+
                  <div class="d-flex pt-3 justify-content-end">
                   @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') )    
                       <a href="{{route("users.edit",["user"=> $user->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
                   @endif    
                       <a href="{{route("users.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
                 </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    @if(!empty($user->loginLogs))  
+                    <div class="card">
+                      <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                          <i class="bi bi-box-arrow-in-right"></i> Login Activity
+                        </h4>
+                        
+                      </div>
+                      <div class="card-body">
+
+                        <div class="list-group list-group-flush">
+                            @foreach($user->loginLogs as $log)
+
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                              <div>
+                                <i class="bi bi-alarm text-primary me-2"></i>
+                                <strong>Logged</strong>
+                               On  {{ $log->created_at->format('M d, Y') }}, {{ $log->created_at->format('h:i A') }}
+                              </div>
+                              <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
+                            </div>
+                            @endforeach
+                          
+                        </div>
+                      </div>
+                    </div>
+                    @endif
+                    </div>
                 </div>
               </div>
           </div>
