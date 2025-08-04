@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Drive;
+use Illuminate\Support\Facades\Storage;
 
 
 class CompanyController extends Controller
@@ -40,7 +42,9 @@ class CompanyController extends Controller
 
  public function details()
 {
-    $company = Company::where('user_id', Auth::id())->first();
+    $company = Company::with('certificationFile')
+    ->where('user_id', Auth::id())
+    ->first();
     if (!$company) {
         return redirect()->route('company.create')->with('info', 'Please add your company information.');
     }
@@ -66,24 +70,7 @@ class CompanyController extends Controller
     }
 
     return view('company.index');
-        //  if ($request->ajax() && $request->ajax_request == true) {
-        //     $companies = Company::where('user_id', Auth::id())->orderBy('id', 'DESC');
-
-        //     if ($request->search) {
-        //         $companies = $companies->where('name', 'like', '%' . $request->search . '%');
-        //     }
-
-        //     $companies = $companies->paginate($request->get('perPage', 10));
-
-        //     $data['html'] = view('company.table', compact('companies'))->render();
-        //     return response($data);
-        // }
-
-        // return view('company.index');
-
        
-        // $companies = Company::with('user')->latest()->paginate(10);
-        // return view('company.index', compact('companies'));
    
     }
 
@@ -111,48 +98,31 @@ class CompanyController extends Controller
             'location'      => 'required|string|max:255',
             'email'         => 'required|email|max:255',
             'phone'         => 'required|string|max:20',
-            // 'description'   => 'required|string',
-            // 'website'       => 'required|url',
-            // 'linkedin'      => 'nullable|url',
-            // 'twitter'       => 'nullable|url',
-            // 'facebook'      => 'nullable|url',
-            // 'certifications'=> 'nullable|string',
+            'description'   => 'required|string',
+            'website'       => 'required|url',
+            'linkedin'      => 'required|url',
+            'twitter'       => 'required|url',
+            'facebook'      => 'required|url',
+            'certifications'=> 'required|string',
+            'certification_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
-        //    $request->validate([
-        //     'name' => 'required|string|max:255',
-        // ]);
-
-        // $company = Company::create([
-        //     'user_id' => auth()->id(),
-        //     'name' => $request->name,
-        //     'industry' => $request->industry,
-        //     'size' => $request->size,
-        //     'location' => $request->location,
-        //     'email' => $request->email,
-        //     'phone' => $request->phone,
-        //     'description' => $request->description,
-        //     'website' => $request->website,
-        //     'linkedin' => $request->linkedin,
-        //     'twitter' => $request->twitter,
-        //     'facebook' => $request->facebook,
-        //     'certifications' => $request->certifications,
-        // ]);
         if ($validator->fails()) {
+              dd($validator->errors()->all());
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         $company = new Company();
         $company->user_id = Auth::id();
-        $company->fill($request->only(['name', 'industry', 'size', 'location', 'email' , 'phone']));
-
-        // if ($request->hasFile('logo')) {
-        //     $file = $request->file('logo');
-        //     $path = $file->store('uploads/companies', 'public');
-        //     $company->logo = $path;
-        // }
-
-        $company->save();
+        $company->fill($request->only(['name', 'industry', 'size', 'location', 'email' , 'phone' , 'description' , 'website' ,  'linkedin', 'twitter', 'facebook' , 'certifications']));
+     if ($request->hasFile('certification_image')) {
+        // dd($request->hasFile('certification_image'));
+        $file = $request->file('certification_image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('certifications', $filename, 'public');
+        $company->certification_image = $filePath;
+    }
+     $company->save();
 
 
         return redirect()->route('company.show', $company)->with('success', 'Company created.');
@@ -182,41 +152,7 @@ class CompanyController extends Controller
         return view('company.edit', compact('company'));
     }
 
-    // /**
-    //  * Update the specified resource in storage.
-    //  */
-    public function update(Request $request, Company $company)
-    {
-        //
-        if ($company->user_id !== Auth::id()) {
-            abort(403);
-        }
-        $validator = Validator::make($request->all(), [
-            'name'          => 'required|string|max:255',
-            'industry'      => 'nullable|string|max:255',
-            'size'          => 'nullable|string|max:255',
-            'location'      => 'nullable|string|max:255',
-            'email'         => 'nullable|email|max:255',
-            'phone'         => 'nullable|string|max:20',
-            'description'   => 'nullable|string',
-            'website'       => 'nullable|url',
-            'linkedin'      => 'nullable|url',
-            'twitter'       => 'nullable|url',
-            'facebook'      => 'nullable|url',
-            'certifications'=> 'nullable|string',
-        ]);
-         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $company->update($request->only([
-            'name', 'industry', 'size', 'location', 'email', 'phone',
-            'description', 'website', 'linkedin', 'twitter', 'facebook', 'certifications'
-        ]));
-
-        // $company->update($request->all());
-        return redirect()->back()->with('success', 'Company details has been updated successfully.');
-    }
+  
 
     // /**
     //  * Remove the specified resource from storage.
@@ -239,69 +175,87 @@ class CompanyController extends Controller
     $company = Company::where('user_id', auth()->id())->firstOrFail();
     return view('company.description', compact('company'));
 }
-public function updateDescription(Request $request)
-{
-    $request->validate([
-        'description' => 'nullable|string',
-    ]);
+  // /**
+    //  * Update the specified resource in storage.
+    //  */
+    public function update(Request $request, Company $company)
+    {
+        //
+        // dd($request->hasFile('certification_image'));
+        if ($company->user_id !== Auth::id()) {
+            abort(403);
+        }
+        $validator = Validator::make($request->all(), [
+            'name'          => 'required|string|max:255',
+            'industry'      => 'nullable|string|max:255',
+            'size'          => 'nullable|string|max:255',
+            'location'      => 'nullable|string|max:255',
+            'email'         => 'nullable|email|max:255',
+            'phone'         => 'nullable|string|max:20',
+            'description'   => 'nullable|string',
+            'website'       => 'nullable|url',
+            'linkedin'      => 'nullable|url',
+            'twitter'       => 'nullable|url',
+            'facebook'      => 'nullable|url',
+            'certifications'=> 'nullable|string',
+            'certification_image' => 'nullable|image|max:2048',
+        ]);
+         if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
-    $company->description = $request->description;
-    $company->save();
-
-    return redirect()->route('company.description')->with('success', 'Description updated successfully.');
-}
-public function websites()
-{
-    $company = Company::where('user_id', auth()->id())->first();
-
-    if (!$company) {
-        return redirect()->route('company.create')->with('error', 'Please create your company first.');
+        $company->update($request->only([
+            'name', 'industry', 'size', 'location', 'email', 'phone',
+            'description', 'website', 'linkedin', 'twitter', 'facebook', 'certifications'
+        ]));
+         // Handle image upload
+    if ($request->file("certification_image")) {
+        $uploadPath = 'certifications';
+        $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certification_image', $idForUpdate = $company->id);
     }
 
-    return view('company.websites', compact('company'));
-}
+        // $company->update($request->all());
+        return redirect()->back()->with('success', 'Company details has been updated successfully.');
+    }
+   public function logoForm()
+    {
+        $company = Company::with('certificationFile')->where('user_id', Auth::id())->firstOrFail();
 
-public function updateWebsites(Request $request)
-{
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
+        $logo = Drive::where('table_id', $company->id)
+            ->where('table_type', 'companies')
+            ->where('file_type', 'company_logo')
+            ->first();
 
-    $request->validate([
-        'website' => 'nullable|url|max:255',
-        'linkedin' => 'nullable|url|max:255',
-        'twitter' => 'nullable|url|max:255',
-        'facebook' => 'nullable|url|max:255',
-    ]);
-
-    $company->update($request->only(['website', 'linkedin', 'twitter', 'facebook']));
-
-    return redirect()->route('company.websites')->with('success', 'Website links updated successfully.');
-}
-public function certifications()
-{
-    $company = Company::where('user_id', auth()->id())->first();
-
-    if (!$company) {
-        return redirect()->route('company.create')->with('error', 'Please create your company first.');
+        return view('company.branding.logo', compact('company', 'logo'));
     }
 
-    return view('company.certifications', compact('company'));
-}
+    public function uploadLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|mimes:png,jpg,jpeg,svg,pdf|max:5120', // max 5MB
+        ]);
 
-public function updateCertifications(Request $request)
-{
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
+        $company = Company::where('user_id', Auth::id())->firstOrFail();
 
-    $request->validate([
-        'certifications' => 'nullable|string|max:1000'
-    ]);
+        // Remove old logo if exists
+        Drive::where('table_id', $company->id)
+            ->where('table_type', 'companies')
+            ->where('file_type', 'company_logo')
+            ->delete();
 
-    $company->update([
-        'certifications' => $request->certifications,
-    ]);
+        $file = $request->file('logo');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('branding/logos', $fileName, 'public');
 
-    return redirect()->route('company.certifications')->with('success', 'Certifications updated successfully.');
-}
+        Drive::create([
+            'table_id'   => $company->id,
+            'table_type' => 'companies',
+            'file_type'  => 'company_logo',
+            'file_name'  => $filePath,
+            // 'original_name' => $file->getClientOriginalName(),
+        ]);
 
+        return redirect()->back()->with('success', 'Logo uploaded successfully.');
+    }
 
 }

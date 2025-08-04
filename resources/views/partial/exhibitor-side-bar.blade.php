@@ -61,27 +61,36 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('company/description') ? 'active' : '' }}">
-                    <a href="{{ route('company.description') }}" class="menu-link">
-                        <div data-i18n="Description">Description</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('company/websites') ? 'active' : '' }}">
-                    <a href="{{ route('company.websites') }}" class="menu-link">
-                        <div data-i18n="Websites">Websites</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->is('company/certifications') ? 'active' : '' }}">
-                    <a href="{{route('company.certifications')}}" class="menu-link">
-                        <div data-i18n="Certifications">Certifications</div>
-                    </a>
-                </li>
                 <li class="menu-item {{ request()->is('company/contacts') ? 'active' : '' }}">
                     <a href="{{ route('company.contacts') }}" class="menu-link">
                         <div data-i18n="Contact">Contact</div>
                     </a>
                 </li>
+                 {{-- Branding and Media Submenu --}}
+        <li class="menu-item {{ request()->is('company/branding*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <div data-i18n="Branding & Media">Branding & Media</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('company/branding/logo') ? 'active' : '' }}">
+                    <a href="" class="menu-link">
+                        <div data-i18n="Logo Upload">Logo Management</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('company/branding/banner') ? 'active' : '' }}">
+                    <a href="" class="menu-link">
+                        <div data-i18n="Banner Upload">Guidelines</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('company/branding/gallery') ? 'active' : '' }}">
+                    <a href="" class="menu-link">
+                        <div data-i18n="Gallery">Gallery</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
 
             </ul>
         </li>
