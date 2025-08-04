@@ -20,6 +20,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::resource('events', App\Http\Controllers\EventController::class);
 
     Route::get('users/export/', '\App\Http\Controllers\UserController@export')->name('user_export');
+    Route::post('users/import/', '\App\Http\Controllers\UserController@importUser')->name('user_import');
 
     Route::resource('users', App\Http\Controllers\UserController::class);
 

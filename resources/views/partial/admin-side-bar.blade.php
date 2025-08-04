@@ -19,15 +19,7 @@
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Dashboard</div>
             </a>
-        </li>
-        @if(Auth::user()->hasRole('Affiliate Manager'))
-            <li class="menu-item {{ request()->is('affiliate/users') ? 'active open' : '' }}">
-                <a href="{{ route('affiliate.users') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                    <div data-i18n="Users">Users</div>
-                </a>
-            </li>
-        @endif   
+        </li>  
         
         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
          <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
@@ -94,42 +86,12 @@
                    </a>
                 </li>
                 @endif
-          {{--       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-                <li class="menu-item {{ request()->is('users/kyc') ? 'active open' : '' }}">
-                   <a href="{{ url('users/kyc') }}" class="menu-link">
-                    <div data-i18n="Users">KYC Uploaded Users</div>
-                   </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-                <li class="menu-item {{ request()->is('users/kyc/required') ? 'active open' : '' }}">
-                    <a href="{{ url('users/kyc/required') }}" class="menu-link">
-                        <div data-i18n="Categories">Pending KYC</div>
-                    </a>
-                </li>
-                @endif --}} 
             </ul>
         </li>
         @endif
-{{--         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('affiliates*') ? 'active open' : '' }} {{ request()->is('affiliates*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Affiliate Managers">Affiliate Managers</div>
-            </a>
-            <ul class="menu-sub">
-                
-                <li class="menu-item {{ request()->is('affiliates') ? 'active open' : '' }}">
-                   <a href="{{ url('affiliates') }}" class="menu-link">
-                    <div data-i18n="affiliates">Lists</div>
-                   </a>
-                </li>
-            </ul>
-        </li> 
-        @endif --}}
         
         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('admin-users*') ? 'active open' : '' }}">
+     {{--    <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('admin-users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="Admin Users">Admin Users</div>
@@ -142,7 +104,7 @@
                    </a>
                 </li>
             </ul>
-        </li>          
+        </li>           --}}
         @endif
         
         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))

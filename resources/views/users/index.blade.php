@@ -14,14 +14,19 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0"> User List</h5>
 
-                    <div class="row justify-content-end" style="width:302px">
-                        @if(Auth::user()->hasRole('Admin')) 
-                        <div class="col-6 text-end" style="margin-left:-37px"> 
+                    <div class="row justify-content-end" style="width:345px">
+                        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin')) 
+                        <div class="col-6 text-end"> 
                             <a href="{{route('user_export')}}" class="dt-button create-new btn btn-primary"><span class="d-none d-sm-inline-block">Export User</span></a> 
+                        </div> 
+                        <div class="col-6 text-end"> 
+                        <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#bulkImportModal">
+                          <i class="bi bi-upload me-2"></i>Bulk Import
+                        </a>
                         </div>
                         @endif
-                        @if(Auth::user()->hasRole('Admin'))
-                        <div class="col-6 text-end ml-5" style="padding: none!important"> 
+                        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                        <div class="col-12 text-end ml-5 mt-2" style="padding: none!important"> 
 							<a href="{{route('users.create')}}" class="dt-button create-new btn btn-primary">
 								<span>
 									<span class="d-none d-sm-inline-block">Add User</span>
@@ -34,7 +39,7 @@
                 <div class="col-12 text-right">
                 <form action="#" method="GET" id="users-filter">        
                     <div class="row padding-none">
-                        <div class="col-1"> </div>
+                        <div class="col-2"> </div>
                         <div class="col-2"> 
                             <div class="mb-3">
                             <input
@@ -58,7 +63,7 @@
                             />
                             </div>
                         </div>
-                        <div class="col-2">
+                        <div class="col-4">
                             <input
                               type="text"
                               class="form-control"
@@ -67,18 +72,6 @@
                               id="search"
                               placeholder="Search"/>  
                         </div>          
-                        <div class="col-3">  
-                         <div class="mb-3">
-                          <div class="input-group input-group-merge padding-none">
-                            <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
-                            <select class="form-control" name="kyc" id="kyc">
-                              <option value="">Please select user type</option>    
-                              <option value="verified">KYC Verified</option>
-                              <option value="pending">KYC Pending</option>
-                            </select>
-                          </div>
-                        </div>
-                        </div>
                         <div class="col-2 text-center">
                            <button type="button" class="btn btn-outline-primary btn-pill reset-filter">Reset</button>
                            <button type="button" class="btn btn-primary filter">Filter</button>
@@ -107,6 +100,55 @@
 			</div>
 		</div>
     </div>
+</div>
+
+<!-- Bulk Import Modal -->
+<div class="modal fade" id="bulkImportModal" tabindex="-1" aria-labelledby="bulkImportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bulkImportModalLabel">
+          <i class="bi bi-upload me-2"></i>Bulk Import Data
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{route('user_import')}}" method="POST" enctype="multipart/form-data">
+          @csrf
+          <div class="mb-3">
+            <label for="importType" class="form-label">Import Type</label>
+            <select class="form-select" id="importType" name="role" required>
+              <option value="">Select role...</option>
+              <option value="Event Admin" >Event Admin</option> 
+
+                  <option value="Exhibitor Admin">Exhibitor Admin</option> 
+
+                  <option value="Exhibitor Representative">Exhibitor Representative</option> 
+
+                  <option value="Attendee">Attendee</option> 
+
+                  <option value="Speaker">Speaker</option> 
+
+                  <option value="Support Staff Or Helpdesk">Support Staff Or Helpdesk</option> 
+
+                  <option value="Registration Desk">Registration Desk</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="importFile" class="form-label">Choose File</label>
+            <input type="file" class="form-control" id="importFile" name="file" accept=".csv,.xlsx" required>
+            <div class="form-text">Supported formats: CSV, Excel (.xlsx, .xls)</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-upload me-2"></i>Import Data
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 @endsection
 

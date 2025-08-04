@@ -216,45 +216,6 @@
   </section>
 </div>
 
-<!-- Bulk Import Modal -->
-<div class="modal fade" id="bulkImportModal" tabindex="-1" aria-labelledby="bulkImportModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="bulkImportModalLabel">
-          <i class="bi bi-upload me-2"></i>Bulk Import Data
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="#" method="POST" enctype="multipart/form-data">
-          @csrf
-          <div class="mb-3">
-            <label for="importType" class="form-label">Import Type</label>
-            <select class="form-select" id="importType" name="import_type" required>
-              <option value="">Select import type...</option>
-              <option value="events">Events</option>
-              <option value="users">Users</option>
-              <option value="registrations">Registrations</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="importFile" class="form-label">Choose File</label>
-            <input type="file" class="form-control" id="importFile" name="import_file" accept=".csv,.xlsx" required>
-            <div class="form-text">Supported formats: CSV, Excel (.xlsx)</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-upload me-2"></i>Import Data
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
 <style>
 .card {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
