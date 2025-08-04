@@ -42,6 +42,20 @@ public function certificationFile()
         ->where('table_type', 'companies')
         ->where('file_type', 'company_logo');
 }
+public function mediaGallery()
+{
+    return $this->hasMany(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'companies')
+        ->where('file_type', 'media_gallery')
+        ->whereNotNull('file_name');
+}
+public function videos()
+{
+    return $this->hasMany(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'companies')
+        ->where('file_type', 'company_video');
+}
+
 
 
 

@@ -258,4 +258,153 @@ class CompanyController extends Controller
         return redirect()->back()->with('success', 'Logo uploaded successfully.');
     }
 
+    // app/Http/Controllers/ExhibitorAdmin/CompanyController.php
+
+// public function uploadMedia(Request $request)
+// {
+//     $request->validate([
+//         'media_files.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+//     ]);
+
+//     $company = Company::where('user_id', auth()->id())->firstOrFail();
+
+//     if ($request->hasFile('media_files')) {
+//         foreach ($request->file('media_files') as $file) {
+//             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+//             $path = $file->storeAs('company/media', $filename, 'public');
+
+//             Drive::create([
+//                 'table_id'   => $company->id,
+//                 'table_type' => 'companies',
+//                 'file_type'  => 'media_gallery',
+//                 'file_name'  => $path,
+//             ]);
+//         }
+//     }
+
+//     return back()->with('success', 'Media files uploaded successfully.');
+// }
+public function mediaGallery()
+{
+    $company = Company::with('mediaGallery')
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
+
+    return view('company.branding.media-gallery', compact('company'));
+}
+
+public function uploadMedia(Request $request)
+{
+    $request->validate([
+        'media_files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    ]);
+
+    $company = Company::where('user_id', auth()->id())->firstOrFail();
+
+    if ($request->hasFile('media_files')) {
+        foreach ($request->file('media_files') as $file) {
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('companies/media', $filename, 'public');
+
+            Drive::create([
+                'table_type' => 'companies',
+                'table_id' => $company->id,
+                'file_type' => 'media_gallery',
+                'file_name' => $filePath,
+            ]);
+        }
+    }
+
+    return redirect()->route('company.media.gallery')->with('success', 'Media uploaded successfully.');
+}
+// public function deleteMedia($id)
+// {
+//     $media = Drive::where('id', $id)
+//         ->where('table_type', 'companies')
+//         ->where('file_type', 'company_gallery')
+//         ->firstOrFail();
+
+//     // Delete file from storage
+//     if ($media->file_name && Storage::disk('public')->exists($media->file_name)) {
+//         Storage::disk('public')->delete($media->file_name);
+//     }
+
+//     // Delete database record
+//     $media->delete();
+
+//     return redirect()->back()->with('success', 'Image deleted successfully.');
+// }
+public function deleteMedia($id)
+{
+    $media = Drive::where('id', $id)
+        ->where('table_type', 'companies')
+        ->where('file_type', 'media_gallery')
+        ->first();
+
+    if (!$media) {
+        return redirect()->back()->with('error', 'Image not found or invalid.');
+    }
+
+    if ($media->file_name && Storage::disk('public')->exists($media->file_name)) {
+        Storage::disk('public')->delete($media->file_name);
+    }
+
+    $media->delete();
+
+    return redirect()->back()->with('success', 'Image deleted successfully.');
+}
+public function videoGallery()
+{
+    $company = Company::with('videos')->where('user_id', auth()->id())->firstOrFail();
+    return view('company.branding.video-gallery', compact('company'));
+}
+public function uploadVideo(Request $request)
+{
+    $request->validate([
+        'videos.*' => 'mimes:mp4,webm,ogg|max:51200' // 50 MB max
+    ]);
+
+    $company = Company::where('user_id', auth()->id())->firstOrFail();
+
+    if ($request->hasFile('videos')) {
+        foreach ($request->file('videos') as $video) {
+            $filename = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+            $path = $video->storeAs('companies/videos', $filename, 'public');
+
+            Drive::create([
+                'table_id'   => $company->id,
+                'table_type' => 'companies',
+                'file_type'  => 'company_video',
+                'file_name'  => $path,
+            ]);
+        }
+    }
+
+    return back()->with('success', 'Videos uploaded successfully.');
+}
+public function deleteVideo($id)
+{
+    $video = Drive::where('id', $id)
+        ->where('table_type', 'companies')
+        ->where('file_type', 'company_video')
+        ->first();
+
+    if (!$video) {
+        return back()->with('error', 'Video not found or already deleted.');
+    }
+
+    // Delete file from storage
+    if ($video->file_name && \Storage::disk('public')->exists($video->file_name)) {
+        \Storage::disk('public')->delete($video->file_name);
+    }
+
+    $video->delete();
+
+    return back()->with('success', 'Video deleted successfully.');
+}
+
+
+
+
+
 }

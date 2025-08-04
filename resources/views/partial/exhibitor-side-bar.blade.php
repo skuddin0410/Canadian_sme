@@ -28,12 +28,19 @@
             </a>
         </li>
 
-         <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
+         {{-- <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
             <a href="#" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="Coupons">Booth Management</div>
             </a>
+        </li> --}}
+        <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
+            <a href="{{ route('booths.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store-alt"></i>
+                    <div data-i18n="Booth Management">Booth Management</div>
+            </a>
         </li>
+
         
         <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
             <a href="#" class="menu-link">
@@ -73,7 +80,7 @@
             </a>
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->is('company/branding/logo') ? 'active' : '' }}">
-                    <a href="" class="menu-link">
+                    <a href="{{route('company.branding.logo')}}" class="menu-link">
                         <div data-i18n="Logo Upload">Logo Management</div>
                     </a>
                 </li>
@@ -85,10 +92,21 @@
                 </li>
 
                 <li class="menu-item {{ request()->is('company/branding/gallery') ? 'active' : '' }}">
-                    <a href="" class="menu-link">
+                    <a href="{{ route('company.media.gallery') }}" class="menu-link">
                         <div data-i18n="Gallery">Gallery</div>
                     </a>
                 </li>
+                 <li class="menu-item {{ request()->is('company/videos') ? 'active' : '' }}">
+                    <a href="{{ route('company.videos.gallery') }}" class="menu-link">
+                        <div data-i18n="Gallery">Video Gallery</div>
+                    </a>
+                </li>
+               <li class="menu-item {{ request()->is('trainings') ? 'active' : '' }}">
+                <a href="{{ route('trainings.index') }}" class="menu-link">
+                    <div data-i18n="Marketing Materials">Marketing Materials</div>
+                </a>
+               </li>
+
             </ul>
         </li>
 
