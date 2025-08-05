@@ -15,15 +15,7 @@
 
   <form action="{{ route('booths.store') }}" method="POST">
     @csrf
-    {{-- <div class="mb-3">
-      <label>Company</label>
-      <select name="company_id" class="form-control" required>
-        <option value="">Select Company</option>
-        @foreach($companies as $company)
-          <option value="{{ $company->id }}">{{ $company->name }}</option>
-        @endforeach
-      </select>
-    </div> --}}
+   
 
     <div class="mb-3">
       <label>Booth Title</label>

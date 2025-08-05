@@ -13,32 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-//     public function details(Request $request)
-// {
-//     if ($request->ajax() && $request->ajax_request == true) {
-//         $companies = Company::where('user_id', auth()->id())->orderBy('id', 'DESC');
-
-//         $perPage = $request->get('perPage', 10);
-//         $pageNo = $request->get('page', 1);
-//         $offset = $perPage * ($pageNo - 1);
-
-//         $totalRecords = $companies->count();
-//         $companies = $companies->offset($offset)->limit($perPage)->get();
-
-//         $companies = new \Illuminate\Pagination\LengthAwarePaginator($companies, $totalRecords, $perPage, $pageNo, [
-//             'path' => $request->url(),
-//             'query' => $request->query(),
-//         ]);
-
-//         $html = view('company.table', compact('companies'))->render();
-//         return response()->json(['html' => $html, 'offset' => $offset, 'pageNo' => $pageNo]);
-//     }
-
-//     return view('company.index');
-// }
+  
 
  public function details()
 {
@@ -108,7 +83,7 @@ class CompanyController extends Controller
         ]);
 
         if ($validator->fails()) {
-              dd($validator->errors()->all());
+            //   dd($validator->errors()->all());
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -187,17 +162,17 @@ class CompanyController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'name'          => 'required|string|max:255',
-            'industry'      => 'nullable|string|max:255',
-            'size'          => 'nullable|string|max:255',
-            'location'      => 'nullable|string|max:255',
-            'email'         => 'nullable|email|max:255',
-            'phone'         => 'nullable|string|max:20',
-            'description'   => 'nullable|string',
-            'website'       => 'nullable|url',
-            'linkedin'      => 'nullable|url',
+            'industry'      => 'required|string|max:255',
+            'size'          => 'required|string|max:255',
+            'location'      => 'required|string|max:255',
+            'email'         => 'required|email|max:255',
+            'phone'         => 'required|string|max:20',
+            'description'   => 'required|string',
+            'website'       => 'required|url',
+            'linkedin'      => 'required|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
-            'certifications'=> 'nullable|string',
+            'certifications'=> 'required|string',
             'certification_image' => 'nullable|image|max:2048',
         ]);
          if ($validator->fails()) {
@@ -258,32 +233,7 @@ class CompanyController extends Controller
         return redirect()->back()->with('success', 'Logo uploaded successfully.');
     }
 
-    // app/Http/Controllers/ExhibitorAdmin/CompanyController.php
-
-// public function uploadMedia(Request $request)
-// {
-//     $request->validate([
-//         'media_files.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-//     ]);
-
-//     $company = Company::where('user_id', auth()->id())->firstOrFail();
-
-//     if ($request->hasFile('media_files')) {
-//         foreach ($request->file('media_files') as $file) {
-//             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-//             $path = $file->storeAs('company/media', $filename, 'public');
-
-//             Drive::create([
-//                 'table_id'   => $company->id,
-//                 'table_type' => 'companies',
-//                 'file_type'  => 'media_gallery',
-//                 'file_name'  => $path,
-//             ]);
-//         }
-//     }
-
-//     return back()->with('success', 'Media files uploaded successfully.');
-// }
+   
 public function mediaGallery()
 {
     $company = Company::with('mediaGallery')
@@ -317,23 +267,7 @@ public function uploadMedia(Request $request)
 
     return redirect()->route('company.media.gallery')->with('success', 'Media uploaded successfully.');
 }
-// public function deleteMedia($id)
-// {
-//     $media = Drive::where('id', $id)
-//         ->where('table_type', 'companies')
-//         ->where('file_type', 'company_gallery')
-//         ->firstOrFail();
 
-//     // Delete file from storage
-//     if ($media->file_name && Storage::disk('public')->exists($media->file_name)) {
-//         Storage::disk('public')->delete($media->file_name);
-//     }
-
-//     // Delete database record
-//     $media->delete();
-
-//     return redirect()->back()->with('success', 'Image deleted successfully.');
-// }
 public function deleteMedia($id)
 {
     $media = Drive::where('id', $id)

@@ -23,7 +23,8 @@
       <div class="col-md-3">
         <input type="text" name="phone" class="form-control" placeholder="Phone">
       </div>
-      <div class="col-md-12 text-end">
+    
+        <div class="col-md-3">
         <button type="submit" class="btn btn-primary">Add Contact</button>
       </div>
     </div>

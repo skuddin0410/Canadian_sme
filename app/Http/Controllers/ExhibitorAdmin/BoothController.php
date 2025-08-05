@@ -40,10 +40,10 @@ class BoothController extends Controller
         //
          $request->validate([
             // 'company_id' => 'required|exists:companies,id',
-            'title' => 'nullable|string|max:255',
+            'title' => 'required|string|max:255',
             'booth_number' => 'required|string|max:50',
-            'size' => 'nullable|string|max:50',
-            'location_preferences' => 'nullable|string',
+            'size' => 'required|string|max:50',
+            'location_preferences' => 'required|string',
         ]);
 
         Booth::create($request->all());
