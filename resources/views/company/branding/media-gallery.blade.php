@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
 
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Company /</span> Media Gallery</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Company /</span> Image Gallery</h4>
 
   @if(Session::has('success'))
     <div class="alert alert-success">{{ Session::get('success') }}</div>
@@ -12,7 +12,7 @@
   {{-- Upload Form --}}
   
   <div class="card mb-4">
-    <div class="card-header">Upload Media</div>
+    <div class="card-header">Upload Image</div>
     <div class="card-body">
       <form method="POST" action="{{ route('company.media.upload') }}" enctype="multipart/form-data">
         @csrf

@@ -46,7 +46,7 @@ class TrainingController extends Controller
             'material_name' => 'required|string',
             'material_description' => 'required|string',
             'youtube_link' => [
-            'nullable',
+            'required',
             'regex:/^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/'
         ]
         ]);

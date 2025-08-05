@@ -35,10 +35,16 @@
             <div class="col-md-6 mb-4">
               <div class="border rounded p-2 text-center">
                 {{-- Clickable thumbnail to open modal --}}
-                <a href="#videoModal" class="video-popup" data-bs-toggle="modal" data-bs-target="#videoModal" data-src="{{ asset('storage/' . $video->file_name) }}">
+                {{-- <a href="#videoModal" class="video-popup" data-bs-toggle="modal" data-bs-target="#videoModal" data-src="{{ asset('storage/' . $video->file_name) }}">
                   <video width="100%" height="auto" muted>
                     <source src="{{ asset('storage/' . $video->file_name) }}" type="video/mp4">
                   </video>
+                </a> --}}
+                <a href="#videoModal" class="video-popup" data-bs-toggle="modal" data-bs-target="#videoModal" data-src="{{ asset('storage/' . $video->file_name) }}">
+                    <video width="100%" height="auto" controls preload="metadata">
+                    <source src="{{ asset('storage/' . $video->file_name) }}" type="video/mp4">
+                   Your browser does not support the video tag.
+                   </video>
                 </a>
 
                 <p class="small text-muted text-break mt-2">{{ basename($video->file_name) }}</p>
@@ -70,7 +76,9 @@
       </div>
 
       <div class="modal-body p-0 text-center">
-        <video id="modalVideo" controls style="width: 100%; height: auto;">
+        {{-- <video id="modalVideo" controls style="width: 100%; height: auto;"> --}}
+            <video id="modalVideo" controls muted style="width: 100%; height: auto;">
+
           <source id="modalSource" src="" type="video/mp4">
           Your browser does not support HTML5 video.
         </video>
@@ -106,15 +114,27 @@
       });
     });
 
+    // function loadVideo(url) {
+    //   videoSource.src = url;
+    //   modalVideo.load();
+    //   setTimeout(() => {
+    //     modalVideo.play().catch(err => {
+    //       console.warn("Autoplay blocked:", err);
+    //     });
+    //   }, 200);
+    // }
     function loadVideo(url) {
-      videoSource.src = url;
-      modalVideo.load();
-      setTimeout(() => {
-        modalVideo.play().catch(err => {
-          console.warn("Autoplay blocked:", err);
-        });
-      }, 200);
-    }
+  videoSource.src = url;
+  modalVideo.load();
+
+  // Wait until metadata is loaded before trying to play
+  modalVideo.onloadedmetadata = function () {
+    modalVideo.play().catch(err => {
+      console.warn("Autoplay blocked:", err);
+    });
+  };
+}
+
 
     videoModal.addEventListener('hidden.bs.modal', function () {
       modalVideo.pause();

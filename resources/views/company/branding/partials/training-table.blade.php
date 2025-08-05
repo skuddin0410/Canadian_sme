@@ -7,7 +7,7 @@
           <th>Description</th>
           <th>YouTube</th>
           <th>File</th>
-          <th>Uploaded</th>
+          {{-- <th>Uploaded</th> --}}
           <th>Actions</th>
         </tr>
       </thead>
@@ -32,12 +32,12 @@
                 ])->first();
               @endphp
               @if($file)
-                <a href="{{ asset('storage/' . $file->file_name) }}" target="_blank">Download</a>
+                <a href="{{ asset('storage/' . $file->file_name) }}" target="_blank">View file</a>
               @else
                 
               @endif
             </td>
-            <td>{{ $material->created_at->format('d M Y') }}</td>
+            {{-- <td>{{ $material->created_at->format('d M Y') }}</td> --}}
             <td>
               <div class="d-flex gap-2">
                 <a href="{{ route('trainings.show', $material->id) }}" class="btn btn-sm btn-icon btn-primary" title="View"><i class="bx bx-show"></i></a>
