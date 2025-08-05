@@ -48,7 +48,7 @@ class HomeController extends Controller
                 })->count();
 
             $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
-            $loginlogs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
+            $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
 
             return view('home',compact('evntCount','userCount','logs','loginlogs'));
         }

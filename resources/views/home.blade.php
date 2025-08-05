@@ -199,11 +199,12 @@
                 @foreach($loginlogs as $log)
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                   <div>
-                    <i class="bi bi-alarm text-primary me-2"></i>
+                    
+                    <i class="bi bi-info-circle text-primary me-2"></i>
                     <strong>{{ $log->user ? $log->user->full_name : 'System' }} Logged</strong>
                    On  {{ $log->created_at->format('M d, Y') }}, {{ $log->created_at->format('h:i A') }}
                   </div>
-                  <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
+                  <small class="text-muted"><i class="bi bi-alarm text-primary me-2"></i>{{ $log->created_at->diffForHumans() }}</small>
                 </div>
                 @endforeach
               @endif

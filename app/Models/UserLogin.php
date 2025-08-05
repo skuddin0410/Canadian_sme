@@ -15,6 +15,6 @@ class UserLogin extends Model
 
     public function user()
     {
-        return $this->morphTo();
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }
