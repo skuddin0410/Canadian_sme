@@ -19,6 +19,11 @@
 
       <!-- Favicon -->
       <link rel="icon" type="image/x-icon" href="{{asset('backend/assets/img/favicon/favicon.ico')}}" />
+      <!-- Lightbox2 CSS -->
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+
 
       <!-- Fonts -->
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -88,5 +93,10 @@
 
     @include('partial.script')
       @yield('scripts')
+      <!-- Lightbox2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
   </body>
 </html>
