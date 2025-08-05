@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable()->index();
             $table->text('description')->nullable();
-            $table->bigInteger('order')->after('description')->default(1)->nullable()->index();
+            $table->bigInteger('order')->default(1)->nullable()->index();
             $table->timestamps();
         });
     }
