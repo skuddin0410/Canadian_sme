@@ -80,6 +80,7 @@
 
 
           <div class="content-wrapper">
+            @include('partial.error')
             @yield('content')
     
           @include('partial.footer')

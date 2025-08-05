@@ -2,6 +2,23 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Email;
+
+Route::get('/email/open/{id}', function ($id) {
+    $email = Email::find($id);
+    if ($email && !$email->opened_at) {
+        $email->opened_at = now();
+        $email->save();
+    }
+
+    // Return a transparent 1x1 pixel
+    return response(
+        base64_decode(
+            'R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='
+        )
+    )->header('Content-Type', 'image/gif');
+});
+
 
 Route::get('/', function () {
     return redirect()->route('login');

@@ -9,7 +9,6 @@ use App\Models\Wallet;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Drive;
 use Storage;
-use App\Mail\KycMail;
 use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Pagination\Paginator;
@@ -22,6 +21,9 @@ use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon;
+
+use App\Models\Email;
+use App\Mail\TrackedEmail;
 
 class UserController extends Controller
 {
@@ -400,5 +402,32 @@ class UserController extends Controller
         ]);
         Excel::import(new UsersImport($request->role), $request->file('file'));
         return back();
+    }
+
+    public function sendTrackedEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect(route('users.index'))->withInput()
+                ->withErrors($validator);
+        }
+
+        $user = User::where('id',$request->user_id)->first();
+
+        $email = Email::create([
+            'user_id' => $user->id,
+            'subject' => 'Welcome to our platform!',
+            'body' => 'We are glad to have you here. Enjoy our services.',
+            'email' => $user->email,
+        ]);
+
+        // Send email
+        Mail::to($user->email)->send(new TrackedEmail($email));
+        return response()->json(['message' => 'Email sent and tracked.']);
     }
 }

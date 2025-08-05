@@ -21,6 +21,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
 
     Route::get('users/export/', '\App\Http\Controllers\UserController@export')->name('user_export');
     Route::post('users/import/', '\App\Http\Controllers\UserController@importUser')->name('user_import');
+    Route::post('sendmail', '\App\Http\Controllers\UserController@sendTrackedEmail')->name('sendmail_to_user');
 
     Route::resource('users', App\Http\Controllers\UserController::class);
 
