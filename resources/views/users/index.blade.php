@@ -34,7 +34,7 @@
                         @endif
                     </div>
 				</div>
-                <div class="col-12 text-right">
+                <div class="col-12 text-right mb-3">
                 <form action="#" method="GET" id="users-filter">        
                     <div class="row padding-none">
                         <div class="col-2"> </div>
@@ -230,8 +230,9 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    window.openModal = function(user_id) {
-      document.getElementById('user_id').value = user_id;
+    window.openModal = function(el) {
+      document.getElementById('user_id').value = el.getAttribute('data-id');
+      document.getElementById('fullname').innerHTML = '<i class="bi bi-person me-2"> '+el.getAttribute('data-email');
       new bootstrap.Modal(document.getElementById('sendMailModal')).show();
     }
   });

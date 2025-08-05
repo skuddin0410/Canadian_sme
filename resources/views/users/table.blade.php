@@ -83,7 +83,7 @@
            @endif 
 
 				<div class="col-3 p-1">	
-				  <a href="#" class="btn btn-sm btn-icon item-edit" onclick="openModal({{$user->id}})"><i class="bx bxs-envelope"></i></a>
+				  <a href="#" class="btn btn-sm btn-icon item-edit" data-id="{{ $user->id }}" data-email="{{ $user->email }}" onclick="openModal(this)"><i class="bx bxs-envelope"></i></a>
 				</div>
                
        </th>
@@ -132,6 +132,7 @@
       <div class="modal-header">
         <h5 class="modal-title" id="sendMailModalLabel">
           <i class="bi bi-envelope me-2"></i>Send Email
+          <br><small id="fullname"></small>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
