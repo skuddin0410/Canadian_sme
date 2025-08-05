@@ -20,6 +20,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::resource('events', App\Http\Controllers\EventController::class);
 
     Route::get('users/export/', '\App\Http\Controllers\UserController@export')->name('user_export');
+    Route::post('users/import/', '\App\Http\Controllers\UserController@importUser')->name('user_import');
 
     Route::resource('users', App\Http\Controllers\UserController::class);
 
@@ -29,4 +30,10 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::any('testimonials/{id}/order/{order}', '\App\Http\Controllers\TestimonialController@order');
     
     Route::any('home/settings/', '\App\Http\Controllers\SettingController@indexHome')->name('indexHome');
+
+    Route::prefix('audit')->group(function () {
+        Route::get('/', [App\Http\Controllers\AuditController::class, 'index'])->name('audit.index');
+        Route::get('/{log}', [App\Http\Controllers\AuditController::class, 'show'])->name('audit.show');
+        Route::get('/entity/{entityType}/{entityId}', [App\Http\Controllers\AuditController::class, 'entityLogs'])->name('audit.edit');
+    });
 });

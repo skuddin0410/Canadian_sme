@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->bigInteger('order')->after('type')->default(1)->nullable()->index();
+        Schema::table('companies', function (Blueprint $table) {
+            //
+             $table->string('certification_image')->nullable()->after('certifications');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropColumn('order');
+        Schema::table('companies', function (Blueprint $table) {
+            //
         });
     }
 };

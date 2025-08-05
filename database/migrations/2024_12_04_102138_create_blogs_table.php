@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('meta_title')->nullable()->index();
             $table->text('meta_description')->nullable();
             $table->string('meta_keywords')->nullable()->index();
+            $table->unsignedBigInteger('created_by')->after('meta_keywords')->nullable()->index();
             $table->timestamps();
         });
     }

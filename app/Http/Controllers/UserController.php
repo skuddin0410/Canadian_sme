@@ -19,6 +19,7 @@ use DataTables;
 use DB;
 use App\Models\Order;
 use App\Exports\UsersExport;
+use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon;
 
@@ -37,7 +38,7 @@ class UserController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["User"]);
+                    $q->whereIn("name", ["Event Admin",'Exhibitor Admin','Exhibitor Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
                 })->orderBy('created_at', 'DESC');
 
             if ($request->search) {
@@ -159,33 +160,10 @@ class UserController extends Controller
         }
         if ($request->input('page', '') == 'pending') {
             return view('users.pending.view', ['user' => $user]);
-        }
-
-        $orders = Order::query()
-            ->when(Order::where('table_type', 'giveaways')->exists(), function ($query) {
-                $query->with(['giveaway', 'giveaway.photo']);
-            })
-            ->when(Order::where('table_type', 'quizzes')->exists(), function ($query) {
-                $query->with(['quiz', 'quiz.photo']);
-            })
-            ->when(Order::where('table_type', 'spinners')->exists(), function ($query) {
-                $query->with(['spinner']);
-            })
-            ->where('user_id', $user->id)
-            ->latest()
-            ->get();
-
-        $giveawayCount = Order::where('table_type', 'giveaways')
-                    ->where('user_id', $user->id)
-                    ->count(); 
-        $quizCount = Order::where('table_type', 'quizzes')
-                    ->where('user_id', $user->id)
-                    ->count(); 
-        $spinnerCount = Order::where('table_type', 'spinners')
-                    ->where('user_id', $user->id)
-                    ->count();                              
-        $totalCount = $giveawayCount + $quizCount + $spinnerCount;
-        return view('users.view', compact('user','orders','giveawayCount','quizCount','spinnerCount','totalCount'));
+        };
+        $user->load('loginLogs');
+                              
+        return view('users.view', compact('user'));
     }
 
     /**
@@ -413,5 +391,14 @@ class UserController extends Controller
     public function export() 
     {
         return Excel::download(new UsersExport, 'users_'.Carbon\Carbon::now()->timestamp.'.xlsx');
+    }
+
+    public function importUser(Request $request){
+        $request->validate([
+          'file' => 'required|file|mimes:csv,xls,xlsx',
+          'role' =>'required'
+        ]);
+        Excel::import(new UsersImport($request->role), $request->file('file'));
+        return back();
     }
 }
