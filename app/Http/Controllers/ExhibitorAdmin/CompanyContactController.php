@@ -13,11 +13,16 @@ class CompanyContactController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-         $company = Company::where('user_id', auth()->id())->firstOrFail();
+    $company = Company::where('user_id', auth()->id())->firstOrFail();
     $contacts = $company->contacts()->get();
+    // Return partial view if it's an AJAX request
+    if ($request->ajax()) {
+        $html = view('company.partials.contacts-table', compact('contacts'))->render();
+        return response()->json(['html' => $html]);
+    }
 
     return view('company.contacts', compact('company', 'contacts'));
     }
@@ -28,6 +33,8 @@ class CompanyContactController extends Controller
     public function create()
     {
         //
+         return view('company.contacts-create');
+
         
     }
 
@@ -37,18 +44,18 @@ class CompanyContactController extends Controller
     public function store(Request $request)
     {
         //
-         $company = Company::where('user_id', auth()->id())->firstOrFail();
+       $company = Company::where('user_id', auth()->id())->firstOrFail();
 
     $request->validate([
-        // 'type' => 'required|string|max:255',
         'name' => 'required|string|max:255',
-        'email' => 'nullable|email',
-        'phone' => 'nullable|string|max:20',
+        'email' => 'required|email',
+        'phone' => 'required|string|max:20',
     ]);
 
-    $company->contacts()->create($request->only(['type', 'name', 'email', 'phone']));
+    $company->contacts()->create($request->only(['name', 'email', 'phone']));
 
-    return redirect()->route('company.contacts')->with('success', 'Contact added.');
+    return redirect()->route('company.contacts')->with('success', 'Contact added successfully.');
+   
     }
 
     /**
@@ -80,12 +87,28 @@ class CompanyContactController extends Controller
      */
     public function destroy(string $id)
     {
-        //
-         if ($contact->company->user_id !== auth()->id()) {
-        abort(403);
-    }
+         $contact = CompanyContact::findOrFail($id);
 
-    $contact->delete();
-    return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
+        if ($contact->company->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $contact->delete();
+
+        if ($request->ajax()) {
+            $company = Company::where('user_id', auth()->id())->firstOrFail();
+            $contacts = $company->contacts()->get();
+            $html = view('company.partials.contacts-table', compact('contacts'))->render();
+            return response()->json(['success' => true, 'html' => $html]);
+        }
+
+        return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
+        //
+    //      if ($contact->company->user_id !== auth()->id()) {
+    //     abort(403);
+    // }
+
+    // $contact->delete();
+    // return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
     }
 }

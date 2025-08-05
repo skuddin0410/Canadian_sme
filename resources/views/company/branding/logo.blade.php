@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-  <h4 class="py-3 mb-4">Company Branding / Logo Upload</h4>
+  <h4 class="py-3 mb-4">Branding & Media / Logo Upload</h4>
 
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -10,25 +10,16 @@
 
   <form action="{{ route('company.branding.logo.upload') }}" method="POST" enctype="multipart/form-data">
     @csrf
-
-    {{-- <div class="mb-3">
-      <label for="logo" class="form-label">Upload Logo (PNG, JPG, SVG, PDF)</label>
-      <input type="file" name="logo" id="logo" class="form-control" accept=".png,.jpg,.jpeg,.svg,.pdf" required>
-
-      @if($logo)
-        <div class="mt-3">
-          <strong>Previously Uploaded:</strong> {{ basename($logo->file_name) }}<br>
-          @if(Str::endsWith($logo->file_name, ['.jpg', '.jpeg', '.png', '.svg']))
-            <img src="{{ asset('storage/' . $logo->file_name) }}" alt="Company Logo" style="max-width: 200px;">
-          @else
-            <a href="{{ asset('storage/' . $logo->file_name) }}" target="_blank">View PDF</a>
-          @endif
-        </div>
-      @endif
-    </div> --}}
-    <div class="mb-3">
+    <div class="row align-items-center mb-3">
+      <div class="col-md-6">
   <label for="logo" class="form-label">Upload Company Logo</label>
   <input type="file" name="logo" id="logo" class="form-control" accept="image/*">
+  </div>
+
+  <div class="col-md-3 mt-4">
+   <button type="submit" class="btn btn-primary">Upload</button>
+  </div>
+</div>
 
   {{-- Display Uploaded Logo --}}
   @if ($company->logoFile && $company->logoFile->file_name)
@@ -51,7 +42,7 @@
 </div>
 
 
-    <button type="submit" class="btn btn-primary">Upload Logo</button>
+   
   </form>
 </div>
 @endsection

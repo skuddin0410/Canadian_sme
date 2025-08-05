@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+  
   <h4 class="mb-4">Add Booth</h4>
   @if ($errors->any())
     <div class="alert alert-danger">
@@ -37,7 +38,7 @@
       <textarea name="location_preferences" class="form-control" rows="3"></textarea>
     </div>
 
-    <button class="btn btn-primary">Save Booth</button>
+    <button class="btn btn-primary">Save</button>
      <a href="{{ route('booths.index') }}" class="btn btn-secondary">Cancel</a>
   </form>
 </div>

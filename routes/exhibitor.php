@@ -3,8 +3,16 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;  
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 use App\Http\Controllers\ExhibitorAdmin\CompanyController;
+use App\Http\Controllers\ExhibitorAdmin\PricingController;
+use App\Http\Controllers\ExhibitorAdmin\ProductController;
+use App\Http\Controllers\ExhibitorAdmin\ServiceController;
 use App\Http\Controllers\ExhibitorAdmin\TrainingController;
 use App\Http\Controllers\ExhibitorAdmin\CompanyContactController;
+use App\Http\Controllers\ExhibitorAdmin\ProductCategoryController;
+use App\Http\Controllers\ExhibitorAdmin\ServiceCategoryController;
+use App\Http\Controllers\ExhibitorAdmin\ProductTechnicalSpecController;
+use App\Http\Controllers\ExhibitorAdmin\PublicProductServiceController;
+
 
 Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () {
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
@@ -18,6 +26,7 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::get('company/certifications', [CompanyController::class, 'certifications'])->name('company.certifications');
     Route::put('company/certifications', [CompanyController::class, 'updateCertifications'])->name('company.certifications.update');
     Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts');
+    Route::get('company/contacts/create', [CompanyContactController::class, 'create'])->name('company.contacts.create');
     Route::post('company/contacts', [CompanyContactController::class, 'store'])->name('company.contacts.store');
     Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
 
@@ -42,7 +51,48 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::resource('company', CompanyController::class);
     Route::resource('booths', BoothController::class);
 
+    // Product Categories
+    Route::resource('product-categories', ProductCategoryController::class)->except(['show']);
+    
+    // Service Categories
+    Route::resource('service-categories', ServiceCategoryController::class)->except(['show']);
+    
+    // Products
+    Route::resource('products', ProductController::class);
+
+    // Product Technical Specifications
+    Route::prefix('products/{product}')->name('products.')->group(function () {
+        Route::post('technical-specs', [ProductTechnicalSpecController::class, 'store'])->name('specs.store');
+        Route::put('technical-specs/{spec}', [ProductTechnicalSpecController::class, 'update'])->name('specs.update');
+        Route::delete('technical-specs/{spec}', [ProductTechnicalSpecController::class, 'destroy'])->name('specs.destroy');
+    });
+    
+    // Product Pricing
+    Route::prefix('products/{product}')->name('products.')->group(function () {
+        Route::post('pricing', [PricingController::class, 'storeProductPricing'])->name('pricing.store');
+        Route::put('pricing/{pricing}', [PricingController::class, 'updateProductPricing'])->name('pricing.update');
+        Route::delete('pricing/{pricing}', [PricingController::class, 'destroyProductPricing'])->name('pricing.destroy');
+    });
+    
+    // Services
+    Route::resource('services', ServiceController::class);
+    
+    // Service Pricing
+    Route::prefix('services/{service}')->name('services.')->group(function () {
+        Route::post('pricing', [PricingController::class, 'storeServicePricing'])->name('pricing.store');
+        Route::put('pricing/{pricing}', [PricingController::class, 'updateServicePricing'])->name('pricing.update');
+        Route::delete('pricing/{pricing}', [PricingController::class, 'destroyServicePricing'])->name('pricing.destroy');
+    });
+
 	
+});
+
+// Public Routes
+Route::prefix('catalog')->name('catalog.')->group(function () {
+    Route::get('products', [PublicProductServiceController::class, 'products'])->name('products');
+    Route::get('products/{slug}', [PublicProductServiceController::class, 'productDetail'])->name('products.show');
+    Route::get('services', [PublicProductServiceController::class, 'services'])->name('services');
+    Route::get('services/{slug}', [PublicProductServiceController::class, 'serviceDetail'])->name('services.show');
 });
 
 Route::group(['middleware' => ['webauth', 'role:Exhibitor Representative']], function () {
