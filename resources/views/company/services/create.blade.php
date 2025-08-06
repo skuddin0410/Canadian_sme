@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container">
     <form action="{{ route('services.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
