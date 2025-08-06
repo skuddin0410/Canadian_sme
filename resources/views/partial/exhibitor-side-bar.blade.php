@@ -63,7 +63,7 @@
 
 
         <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
-            <a href="" class="menu-link">
+            <a href="{{ route('booths.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store-alt"></i>
                     <div data-i18n="Booth Management">Booth Management</div>
             </a>
@@ -173,7 +173,7 @@
             <ul class="menu-sub">
 
                 <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
-                    <a href="{{ route('company.details') }}" class="menu-link">
+                    <a href="{{ route('company.create') }}" class="menu-link">
                         <div data-i18n="Details">Details</div>
                     </a>
                 </li>

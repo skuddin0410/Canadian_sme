@@ -85,6 +85,16 @@
                     <div data-i18n="Users">All Users</div>
                    </a>
                 </li>
+                <li class="menu-item {{ request()->is('exhibitor-users') ? 'active open' : '' }}">
+                   <a href="{{ url('exhibitor-users') }}" class="menu-link">
+                    <div data-i18n="Users">Exhibitor</div>
+                   </a>
+                </li>
+                <li class="menu-item {{ request()->is('speaker') ? 'active open' : '' }}">
+                   <a href="{{ url('speaker') }}" class="menu-link">
+                    <div data-i18n="Users">Speaker</div>
+                   </a>
+                </li>
                 @endif
             </ul>
         </li>

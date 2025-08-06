@@ -3,14 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Spatie\Permission\Traits\HasRoles;
+use App\Models\Company;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use Spatie\Permission\Traits\HasRoles;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -33,11 +34,14 @@ class User extends Authenticatable implements JWTSubject
         'lastname',
         'email',
         'email_verified_at',
+        'website_url',
+        'linkedin_url',
         'mobile',
         'mobile_verified_at',
         'username',
         'password',
         'remember_token',
+        'is_approve',
         'dob',
         'gender',
         'place',
@@ -70,6 +74,7 @@ class User extends Authenticatable implements JWTSubject
             'mobile_verified_at' => 'datetime',
             'password' => 'hashed',
             'dob' => 'date',
+            'is_approve' => 'boolean',
         ];
     }
 
@@ -92,6 +97,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->name . ' ' . $this->lastname;
     }
+    public function company()
+{
+    return $this->hasOne(Company::class);
+}
+
 
 
 

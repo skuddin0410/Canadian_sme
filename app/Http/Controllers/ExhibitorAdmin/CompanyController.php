@@ -112,7 +112,7 @@ class CompanyController extends Controller
         if ($company->user_id !== Auth::id()) {
             abort(403);
         }
-        return view('company.show', compact('company'));
+        return view('company.details', compact('company'));
     }
 
     // /**
