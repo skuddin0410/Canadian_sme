@@ -20,9 +20,6 @@ class CompanyController extends Controller
     $company = Company::with('certificationFile')
     ->where('user_id', Auth::id())
     ->first();
-    if (!$company) {
-        return redirect()->route('company.create')->with('info', 'Please add your company information.');
-    }
 
     return view('company.details', compact('company'));
 }
@@ -30,7 +27,6 @@ class CompanyController extends Controller
 
     public function index(Request $request)
     {
-        //
         if ($request->ajax() && $request->ajax_request == true) {
         $companies = Company::where('user_id', Auth::id())->orderBy('id', 'DESC');
 
@@ -49,20 +45,11 @@ class CompanyController extends Controller
    
     }
 
-    // /**
-    //  * Show the form for creating a new resource.
-    //  */
     public function create()
-    {
-        //
-         
+    { 
         return view('company.create');
-    
     }
 
-    // /**
-    //  * Store a newly created resource in storage.
-    //  */
     public function store(Request $request)
     {
         //
@@ -83,7 +70,6 @@ class CompanyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            //   dd($validator->errors()->all());
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -91,7 +77,6 @@ class CompanyController extends Controller
         $company->user_id = Auth::id();
         $company->fill($request->only(['name', 'industry', 'size', 'location', 'email' , 'phone' , 'description' , 'website' ,  'linkedin', 'twitter', 'facebook' , 'certifications']));
      if ($request->hasFile('certification_image')) {
-        // dd($request->hasFile('certification_image'));
         $file = $request->file('certification_image');
         $filename = time() . '_' . $file->getClientOriginalName();
         $filePath = $file->storeAs('certifications', $filename, 'public');
@@ -99,25 +84,10 @@ class CompanyController extends Controller
     }
      $company->save();
 
-
-        return redirect()->route('company.show', $company)->with('success', 'Company created.');
+        return redirect()->back()->with('success', 'Company created.');
     }
 
-    // /**
-    //  * Display the specified resource.
-    //  */
-    public function show(Company $company)
-    {
-        //
-        if ($company->user_id !== Auth::id()) {
-            abort(403);
-        }
-        return view('company.details', compact('company'));
-    }
 
-    // /**
-    //  * Show the form for editing the specified resource.
-    //  */
     public function edit(Company $company)
     {
         //
@@ -128,10 +98,6 @@ class CompanyController extends Controller
     }
 
   
-
-    // /**
-    //  * Remove the specified resource from storage.
-    //  */
     public function destroy(Company $company)
     {
         //
@@ -142,21 +108,15 @@ class CompanyController extends Controller
         $company->delete();
 
         return redirect()->route('company.index')->with('success', 'Company deleted successfully.');
-        // $company->delete();
-        // return redirect()->route('company.index')->with('success', 'Company deleted.');
     }
     public function editDescription()
-{
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
-    return view('company.description', compact('company'));
-}
-  // /**
-    //  * Update the specified resource in storage.
-    //  */
+    {
+      $company = Company::where('user_id', auth()->id())->firstOrFail();
+      return view('company.description', compact('company'));
+    }
+
     public function update(Request $request, Company $company)
     {
-        //
-        // dd($request->hasFile('certification_image'));
         if ($company->user_id !== Auth::id()) {
             abort(403);
         }
@@ -175,6 +135,7 @@ class CompanyController extends Controller
             'certifications'=> 'required|string',
             'certification_image' => 'nullable|image|max:2048',
         ]);
+        
          if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -183,13 +144,13 @@ class CompanyController extends Controller
             'name', 'industry', 'size', 'location', 'email', 'phone',
             'description', 'website', 'linkedin', 'twitter', 'facebook', 'certifications'
         ]));
-         // Handle image upload
-    if ($request->file("certification_image")) {
-        $uploadPath = 'certifications';
-        $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certification_image', $idForUpdate = $company->id);
-    }
 
-        // $company->update($request->all());
+         // Handle image upload
+        if ($request->file("certification_image")) {
+            $uploadPath = 'certifications';
+            $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certification_image', $idForUpdate = $company->id);
+        }
+
         return redirect()->back()->with('success', 'Company details has been updated successfully.');
     }
    public function logoForm()
