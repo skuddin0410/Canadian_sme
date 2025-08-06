@@ -2,6 +2,23 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Email;
+
+Route::get('/email/open/{id}', function ($id) {
+    $email = Email::find($id);
+    if ($email && !$email->opened_at) {
+        $email->opened_at = now();
+        $email->save();
+    }
+
+    // Return a transparent 1x1 pixel
+    return response(
+        base64_decode(
+            'R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='
+        )
+    )->header('Content-Type', 'image/gif');
+});
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -10,20 +27,10 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::group(['middleware' => 'auth:web'], function () {
-    Route::get('account-information', [App\Http\Controllers\HomeController::class, 'accountInfo'])->name('change.account.information');
-    Route::post('account-information', [App\Http\Controllers\HomeController::class, 'accountInformation'])->name('change.account.information.post');
-
-    Route::get('change-password', [App\Http\Controllers\HomeController::class, 'changeAccountPassword'])->name('admin.change.password');
-    Route::post('change-password', [App\Http\Controllers\HomeController::class, 'changePassword'])->name('admin.change.password.post');
-
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-   require __DIR__.'/admin.php';
+   require __DIR__.'/common.php'; //used by all users in web
+   require __DIR__.'/admin.php';  //Admin and Event Admin 
    require __DIR__.'/exhibitor.php';
    require __DIR__.'/speaker.php';
    require __DIR__.'/attendee.php';
    require __DIR__.'/helpdesk.php';
-
-   
-
 });

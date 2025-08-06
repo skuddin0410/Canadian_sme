@@ -142,6 +142,14 @@
                         <div data-i18n="Site Settings">Home page settings</div>
                     </a>
                 </li>
+
+                <li class="menu-item {{ request()->is('home/settings') ? 'active open' : '' }}">
+                    <a href="{{ route('roles.matrix') }}" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                        <div data-i18n="Site Settings">Permission Matrix</div>
+                    </a>
+                </li>
+                
             </ul>
 
          </li> 
