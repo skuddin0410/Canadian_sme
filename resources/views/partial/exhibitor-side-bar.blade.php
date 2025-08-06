@@ -21,12 +21,6 @@
             </a>
         </li> 
 
-         {{-- <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Coupons">Products & Services</div>
-            </a>
-        </li> --}}
         <li class="menu-item {{ request()->is('catalog*') || request()->is('service*') || request()->is('pricing*') || request()->is('technical-specs*') ? 'active open' : '' }}">
     <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -34,11 +28,6 @@
     </a>
 
     <ul class="menu-sub">
-        {{-- <li class="menu-item {{ request()->is('catalog*') ? 'active' : '' }}">
-            <a href="{{ route('catalog.products') }}" class="menu-link">
-                <div data-i18n="Catalog">Catalog</div>
-            </a>
-        </li> --}}
           <li class="menu-item {{ request()->is('products*') ? 'active' : '' }}">
             <a href="{{ route('products.index') }}" class="menu-link">
                 <div data-i18n="Products">Products</div>
@@ -61,7 +50,6 @@
     </ul>
 </li>
 
-
         <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
             <a href="" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store-alt"></i>
@@ -69,49 +57,6 @@
             </a>
         </li>
 
-        
-        {{-- <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Coupons">Branding & Media</div>
-            </a>
-        </li> --}}
-           {{-- <li class="menu-item {{ request()->is('company/branding*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Branding & Media">Branding & Media</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('/branding/logo') ? 'active' : '' }}">
-                    <a href="{{route('company.branding.logo')}}" class="menu-link">
-                        <div data-i18n="Logo Upload">Logo Management</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('company/branding/banner') ? 'active' : '' }}">
-                    <a href="" class="menu-link">
-                        <div data-i18n="Banner Upload">Guidelines</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('company/branding/gallery') ? 'active' : '' }}">
-                    <a href="{{ route('company.media.gallery') }}" class="menu-link">
-                        <div data-i18n="Gallery">Gallery</div>
-                    </a>
-                </li>
-                 <li class="menu-item {{ request()->is('company/videos') ? 'active' : '' }}">
-                    <a href="{{ route('company.videos.gallery') }}" class="menu-link">
-                        <div data-i18n="Gallery">Video Gallery</div>
-                    </a>
-                </li>
-               <li class="menu-item {{ request()->is('trainings') ? 'active' : '' }}">
-                <a href="{{ route('trainings.index') }}" class="menu-link">
-                    <div data-i18n="Marketing Materials">Marketing Materials</div>
-                </a>
-               </li>
-
-            </ul>
-        </li> --}}
         <li class="menu-item {{ request()->is('company/branding*') || request()->is('trainings') ? 'active open' : '' }}">
     <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -158,13 +103,7 @@
 </li>
 
 
-        
-        {{-- <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Coupons">Company</div>
-            </a>
-        </li> --}}
+    
         <li class="menu-item {{ request()->is('company*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-building-house"></i>
