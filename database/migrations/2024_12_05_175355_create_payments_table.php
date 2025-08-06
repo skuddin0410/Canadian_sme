@@ -14,13 +14,11 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable()->index();
-            $table->string('transaction_id')->nullable()->index();
+            $table->string('reference')->nullable()->index();
             $table->text('response')->nullable();
             $table->string('status')->default('init')->comment('init, success, failed')->nullable()->index();
-            $table->dropIndex(['transaction_id']);
-            $table->renameColumn('transaction_id', 'reference');
-            $table->index('reference');
-            $table->decimal('amount', 10, 2)->after('response')->default(0.00)->nullable()->index();
+          
+            $table->decimal('amount', 10, 2)->default(0.00)->nullable()->index();
             $table->timestamps();
         });
     }

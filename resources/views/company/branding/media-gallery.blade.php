@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
 
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Company /</span> Image Gallery</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Branding & Media /</span> Image Gallery</h4>
 
   @if(Session::has('success'))
     <div class="alert alert-success">{{ Session::get('success') }}</div>
@@ -11,23 +11,25 @@
 
   {{-- Upload Form --}}
   
-  <div class="card mb-4">
-    <div class="card-header">Upload Image</div>
-    <div class="card-body">
-      <form method="POST" action="{{ route('company.media.upload') }}" enctype="multipart/form-data">
-        @csrf
-        <div class="row">
-
+<div class="card mb-4">
+  <div class="card-header">Upload Image</div>
+  <div class="card-body">
+    <form method="POST" action="{{ route('company.media.upload') }}" enctype="multipart/form-data">
+      @csrf
+      <div class="row align-items-end">
         <div class="col-md-6">
           <label for="media_files" class="form-label">Choose Images</label>
           <input type="file" name="media_files[]" class="form-control" accept="image/*" multiple>
         </div>
-    </div>
 
-        <button type="submit" class="btn btn-primary">Upload</button>
-      </form>
-    </div>
+        <div class="col-md-3 mt-4 mt-md-0">
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+      </div>
+    </form>
   </div>
+</div>
+
 
   {{-- Media Gallery --}}
   {{-- <div class="card">

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('table_id')->nullable()->index();
             $table->string('table_type')->default('giveaways')->comment('giveaways, quizzes, spinners')->nullable()->index();
             $table->decimal('amount', 10, 2)->default(0.00)->nullable()->index();
-            $table->string('winning_type')->after('amount')->default('none')->comment('none, amount, coupon, prize, link')->nullable()->index();
-            $table->string('winning')->after('winning_type')->nullable()->index();
+            $table->string('winning_type')->default('none')->comment('none, amount, coupon, prize, link')->nullable()->index();
+            $table->string('winning')->nullable()->index();
             $table->timestamps();
         });
     }

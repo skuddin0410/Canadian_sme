@@ -3,7 +3,9 @@
 @section('content')
 <div class="container">
   <h4 class="mb-4">Booth Listings</h4>
+  <div class="mb-3">
    <a href="{{ route('booths.create') }}" class="btn btn-primary">+ Add Booth</a>
+  </div>
 
   <div id="booth-table-container">
     @include('company.booths.partials.booth-table')

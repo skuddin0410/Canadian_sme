@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name')->nullable()->index();
             $table->string('slug')->nullable()->index();
             $table->string('type')->nullable()->index();
-            $table->bigInteger('order')->after('type')->default(1)->nullable()->index();
+            $table->bigInteger('order')->default(1)->nullable()->index();
             $table->timestamps();
         });
     }

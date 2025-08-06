@@ -21,21 +21,49 @@
             </a>
         </li> 
 
-         <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Coupons">Products & Servicest</div>
-            </a>
-        </li>
-
          {{-- <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
             <a href="#" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Coupons">Booth Management</div>
+                <div data-i18n="Coupons">Products & Services</div>
             </a>
         </li> --}}
+        <li class="menu-item {{ request()->is('catalog*') || request()->is('service*') || request()->is('pricing*') || request()->is('technical-specs*') ? 'active open' : '' }}">
+    <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+        <div data-i18n="Products & Services">Products & Services</div>
+    </a>
+
+    <ul class="menu-sub">
+        {{-- <li class="menu-item {{ request()->is('catalog*') ? 'active' : '' }}">
+            <a href="{{ route('catalog.products') }}" class="menu-link">
+                <div data-i18n="Catalog">Catalog</div>
+            </a>
+        </li> --}}
+          <li class="menu-item {{ request()->is('products*') ? 'active' : '' }}">
+            <a href="{{ route('products.index') }}" class="menu-link">
+                <div data-i18n="Products">Products</div>
+            </a>
+        </li>
+
+        <li class="menu-item {{ request()->is('service*') ||  request()->is('service-categories*') ? 'active' : '' }} }}">
+            <a href="{{ route('services.index') }}" class="menu-link">
+                <div data-i18n="Service">Service</div>
+            </a>
+        </li>
+
+      
+
+        <li class="menu-item {{ request()->is('technical-specs*') ? 'active' : '' }}">
+            <a href="{{ route('products.index') }}" class="menu-link">
+                <div data-i18n="Technical Specs">Technical Specs</div>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
         <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
-            <a href="{{ route('booths.index') }}" class="menu-link">
+            <a href="" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store-alt"></i>
                     <div data-i18n="Booth Management">Booth Management</div>
             </a>

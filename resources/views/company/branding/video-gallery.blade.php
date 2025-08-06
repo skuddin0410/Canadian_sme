@@ -15,12 +15,15 @@
       <form method="POST" action="{{ route('company.videos.upload') }}" enctype="multipart/form-data">
         @csrf
 
-        <div class="mb-3 col-md-6">
+        <div class="row align-items-end">
+        <div class="col-md-6">
           <label for="videos" class="form-label">Select Videos</label>
           <input type="file" name="videos[]" class="form-control" accept="video/*" multiple>
         </div>
-
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <div class="col-md-3 mt-4 mt-md-0">
+          <button type="submit" class="btn btn-primary">Upload</button>
+           </div>
+      </div>
       </form>
     </div>
   </div>

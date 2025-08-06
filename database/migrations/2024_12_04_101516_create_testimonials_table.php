@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name')->nullable()->index();
             $table->tinyInteger('rating')->nullable()->index();
             $table->text('message')->nullable();
-            $table->bigInteger('order')->after('message')->default(1)->nullable()->index();
-            $table->string('status')->after('order')->default('init')->comment('init, success, failed')->nullable()->index();
+            $table->bigInteger('order')->default(1)->nullable()->index();
+            $table->string('status')->default('init')->comment('init, success, failed')->nullable()->index();
             $table->timestamps();
         });
     }
