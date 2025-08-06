@@ -97,13 +97,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->name . ' ' . $this->lastname;
     }
-    public function company()
-{
-    return $this->hasOne(Company::class);
-}
-
-
-
 
     public function photo()
     {
