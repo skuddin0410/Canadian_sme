@@ -15,7 +15,7 @@ class UsersExport implements FromCollection,WithHeadings
     {
          $user = User::select('name','lastname',"email","mobile","dob","gender","place","street","zipcode","city","state","country")
         ->whereHas("roles", function ($q) {
-            $q->whereIn("name", ["User"]);
+            $q->whereIn("name", ["Event Admin",'Exhibitor Admin','Exhibitor Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
         })->get()->makeHidden(['full_name']);
 
         return $user;

@@ -45,7 +45,7 @@
 		<th>Gender</th>
 		<th>State</th>
 		<th>Country</th>
-		<th width="8%">Action</th>
+		<th width="10%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -62,25 +62,30 @@
 		<th>{{$user->country ?? ''}}</th> 
 		<th>
 			<div class="row">
-			<div class="col-4 p-1">	
+			<div class="col-3 p-1">	
 				<a href="{{ route("users.show",["user"=> $user->id ]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
             </div>
 
-			@if(Auth::user()->hasRole('Admin'))
-		    <div class="col-4 p-1">	
+			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+		    <div class="col-3 p-1">	
 			<a href="{{ route("users.edit",["user"=> $user->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
             </div>
 			@endif
 
-			@if(Auth::user()->hasRole('Admin'))
-            <div class="col-4 p-1">
-			<form action="{{ route('users.destroy', $user->id) }}" method="post">
+			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') )
+       <div class="col-3 p-1">
+			       <form action="{{ route('users.destroy', $user->id) }}" method="post">
               @csrf
               @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-icon btn-danger delete" onclick="return confirm('Are you sure you want to delete?')"><i class="bx bxs-trash"></i></button>
+              <button type="submit" class="btn btn-sm btn-icon delete" onclick="return confirm('Are you sure you want to delete?')"><i class="bx bxs-trash"></i></button>
             </form>
 		   </div>
            @endif 
+
+				<div class="col-3 p-1">	
+				  <a href="#" class="btn btn-sm btn-icon item-edit" data-id="{{ $user->id }}" data-email="{{ $user->email }}" onclick="openModal(this)"><i class="bx bxs-envelope"></i></a>
+				</div>
+               
        </th>
 	</tr>
 	@endforeach
@@ -119,3 +124,40 @@
 	        </div>
 	    @endif
 	</div>
+
+<div class="modal fade" id="sendMailModal" tabindex="-1" aria-labelledby="sendMailModalLabel" aria-hidden="true">
+<form action="{{route('sendmail_to_user')}}" method="POST" enctype="multipart/form-data">	
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sendMailModalLabel">
+          <i class="bi bi-envelope me-2"></i>Send Email
+          <br><small id="fullname"></small>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+          @csrf
+          <input type="hidden" name="user_id" id="user_id" value="{{old('user_id')}}" />
+          <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" name="subject" class="form-control" value="{{old('subject')}}" id="subject">
+          </div>
+
+          <div class="mb-3">
+                <label for="body" class="form-label">Body</label>
+                <textarea name="body" class="form-control" value="{{old('body')}}" required></textarea>
+          </div>
+
+          <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-envelope me-2"></i>Send Email
+                </button>
+          </div>
+      </div>
+    </div>
+  </div>
+</form>  
+</div>

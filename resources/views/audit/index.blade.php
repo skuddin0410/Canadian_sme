@@ -128,7 +128,7 @@
                                         <div class="me-2">
                                             @if($log->user)
                                                 <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 12px;">
-                                                    {{ substr($log->user->name, 0, 2) }}
+                                                    {{ substr($log->user->full_name, 0, 2) }}
                                                 </div>
                                             @else
                                                 <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
@@ -137,7 +137,7 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <div class="fw-medium">{{ $log->user ? $log->user->name : 'System' }}</div>
+                                            <div class="fw-medium">{{ $log->user ? $log->user->full_name : 'System' }}</div>
                                             <small class="text-muted">{{ $log->user ? $log->user->email : 'Automated process' }}</small>
                                         </div>
                                     </div>

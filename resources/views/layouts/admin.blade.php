@@ -56,6 +56,9 @@
       <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
       <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
       <script src="{{asset('backend/assets/js/config.js')}}"></script>
+
+      <script src="https://cdn.tiny.cloud/1/svsicmdojxq1j88fchr7d66cbfndgngknh06cgapmgeskqsl/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
   </head>
 
   <body>
@@ -80,6 +83,7 @@
 
 
           <div class="content-wrapper">
+            @include('partial.error')
             @yield('content')
     
           @include('partial.footer')
@@ -97,6 +101,34 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script type="text/javascript">
+ tinymce.init({
+    selector: '#description',
+    readonly: false,
+    width: '100%',
+    height: 300,
+    plugins: 'code image link lists table preview',
+    toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
+    menubar: false,
+    branding: false,
 
+    
+    
+  });
+</script>
   </body>
-</html>
+</html><script type="text/javascript">
+ tinymce.init({
+    selector: '#description',
+    readonly: false,
+    width: '100%',
+    height: 300,
+    plugins: 'code image link lists table preview',
+    toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
+    menubar: false,
+    branding: false,
+
+    
+    
+  });
+</script>
