@@ -21,14 +21,14 @@
             </a>
         </li> 
 
-        <li class="menu-item {{ request()->is('catalog*') || request()->is('service*') || request()->is('pricing*') || request()->is('technical-specs*') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->is('products*') ||  request()->is('service*') ? 'active open' : '' }}">
     <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
         <div data-i18n="Products & Services">Products & Services</div>
     </a>
 
     <ul class="menu-sub">
-          <li class="menu-item {{ request()->is('products*') ? 'active' : '' }}">
+          <li class="menu-item {{ request()->is('products*') ? 'active open' : '' }}">
             <a href="{{ route('products.index') }}" class="menu-link">
                 <div data-i18n="Products">Products</div>
             </a>
@@ -43,7 +43,7 @@
       
 
         <li class="menu-item {{ request()->is('technical-specs*') ? 'active' : '' }}">
-            <a href="{{ route('products.index') }}" class="menu-link">
+            <a href="#" class="menu-link">
                 <div data-i18n="Technical Specs">Technical Specs</div>
             </a>
         </li>
@@ -57,7 +57,7 @@
         </a>
     </li>
 
-    <li class="menu-item {{ request()->is('company/branding*') || request()->is('trainings') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->is('branding/logo*') || request()->is('trainings*') || request()->is('company/media-gallery*') || request()->is('company/videos*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
             <div data-i18n="Branding & Media">Branding & Media</div>
