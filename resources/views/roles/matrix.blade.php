@@ -1,8 +1,12 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container">
-    <h4>Role Permission Matrix</h4>
+<div class="container flex-grow-1 container-p-y pt-0">
+    <h4 class="py-3 mb-4">Role Permission Matrix</h4>
+
+    <div class="row">
+    <div class="col-xl">
+    <div class="card mb-4">   
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -29,6 +33,9 @@
             @endforeach
         </tbody>
     </table>
+    </div>
+    </div>
+</div>
 </div>
 
 <script>
