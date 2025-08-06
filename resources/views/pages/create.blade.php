@@ -168,8 +168,43 @@
                 <span class="text-danger text-left">{{ $errors->first('meta_keywords') }}</span>
               @endif
             </div>
+            
+            <div class="mb-3">
+              <label class="form-label" for="title">Status<span class="text-danger">*</span></label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                <select class="form-control" name="status" id="status"  onchange="toggleScheduledFields()">
+                    @foreach(['publish', 'draft', 'scheduled'] as $status)
+                        <option value="{{ $status }}" @selected(old('status', $e->status ?? '') === $status)>
+                            {{ ucfirst($status) }}
+                        </option>
+                    @endforeach
+                </select>
+              </div>
+              @if ($errors->has('status'))
+                <span class="text-danger text-left">{{ $errors->first('status') }}</span>
+              @endif
+            </div>
 
+          <div id="scheduledFields" class="mb-3">
+            <div class="row">
+              <div class="col-md-6">
+                  <label for="start_date" class="form-label">Scheduled Start Date<span class="text-danger">*</span></label>
+                  <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}" class="form-control">
+                @if ($errors->has('start_date'))
+                <span class="text-danger text-left">{{ $errors->first('start_date') }}</span>
+               @endif
+              </div>
+              <div class="col-md-6">
+                  <label for="end_date" class="form-label">Scheduled End Date<span class="text-danger">*</span></label>
+                  <input type="date" id="end_date" name="end_date" value="{{ old('end_date') }}" class="form-control">
 
+                  @if ($errors->has('end_date'))
+                     <span class="text-danger text-left">{{ $errors->first('end_date') }}</span>
+                  @endif
+              </div>
+            </div>  
+          </div>
 
           <div class="d-flex pt-3 justify-content-end">
              <a href="{{route('pages.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
@@ -207,5 +242,22 @@ function slugify(str) {
   return str.replace(/^-+|-+$/g, '');
 }
 </script>
+<script>
+    function toggleScheduledFields() {
+        const visibility = document.getElementById('status').value;
+        const scheduledFields = document.getElementById('scheduledFields');
+        if (visibility === 'scheduled') {
+            scheduledFields.classList.remove('d-none');
+        } else {
+            scheduledFields.classList.add('d-none');
+        }
+    }
+
+    // Optional: auto-run if editing form with scheduled pre-selected
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleScheduledFields();
+    });
+</script>
+
 
 @endsection

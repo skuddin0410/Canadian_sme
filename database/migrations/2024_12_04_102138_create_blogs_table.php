@@ -22,6 +22,9 @@ return new class extends Migration
             $table->text('meta_description')->nullable();
             $table->string('meta_keywords')->nullable()->index();
             $table->unsignedBigInteger('created_by')->nullable()->index();
+            $table->enum('status', ['publish', 'draft', 'scheduled'])->default('publish');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->timestamps();
         });
     }

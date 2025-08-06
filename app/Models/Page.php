@@ -15,6 +15,9 @@ class Page extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'status',
+        'start_date',
+        'end_date'
     ];
 
     public function photo()

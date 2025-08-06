@@ -21,11 +21,11 @@
                 <tr>
                     <td>{{ $permission->name }}</td>
                     @foreach($roles as $role)
+
                         <td class="text-center">
                             <input type="checkbox"
-                                   data-role-id="{{ $role->id }}"
-                                   data-permission-id="{{ $permission->id }}"
-                                   class="perm-toggle"
+                                   disabled
+                                   class="{{ $role->hasPermissionTo($permission->name) ? 'border-success' : 'border-danger' }}"
                                    {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
                         </td>
                     @endforeach

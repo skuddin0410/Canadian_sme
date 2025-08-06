@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AccountManagerPermissionSeeder extends Seeder
 {
@@ -80,17 +82,18 @@ class AccountManagerPermissionSeeder extends Seeder
          'survey:create',
          'survey:edit',
          'survey:delete',
-
         ];
-        
-        $getAdminRoleId = DB::table('roles')->where('name','Account Manager')->first();
-        $adminRoleId =  $getAdminRoleId->id;
-        $getAdminPermissionIds = DB::table('permissions')->whereIn('name',$adminPermission)->pluck('id');
-        $rolePerMissionArray = [];
-        foreach($getAdminPermissionIds as $val){
-            $arr =array('permission_id'=> $val, 'role_id'=> $adminRoleId );
-            array_push($rolePerMissionArray,$arr);
+
+        foreach ($adminPermission  as $permissionName) {
+         Permission::create(['name' => $permissionName, 'guard_name'=>'web']);
         }
-        DB::table('permission_role')->insert($rolePerMissionArray);
+
+        $adminRole = Role::where('name', 'Admin')->first(); 
+        $adminRole->givePermissionTo($adminPermission);
+
+        $adminEventRole = Role::where('name', 'Event Admin')->first(); 
+        $adminEventRole->givePermissionTo($adminPermission);
+
+
     }
 }
