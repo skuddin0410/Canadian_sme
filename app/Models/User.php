@@ -114,5 +114,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(\App\Models\UserLogin::class);
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class,'id','user_id');
+    }
+
     protected $appends = ['full_name'];
 }

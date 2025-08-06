@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\Booth;
 use App\Models\Company;
 
+use Illuminate\Support\Facades\Validator;
+use DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use DataTables;
+
 class BoothController extends Controller
 {
     /**
@@ -14,12 +21,39 @@ class BoothController extends Controller
      */
     public function index(Request $request)
     {
-        //
-        $booths = Booth::with('company')->latest()->paginate(10);
-        if ($request->ajax()) {
-        return view('company.booths.partials.booth-table', compact('booths'))->render();
-    }
-        return view('company.booths.index', compact('booths'));
+
+        $perPage = (int) $request->input('perPage', 20);
+        $pageNo = (int) $request->input('page', 1);
+        $offset = $perPage * ($pageNo - 1);
+
+      if($request->ajax() && $request->ajax_request == true){
+        $booths = Booth::with('company')->orderBy('id','DESC');
+
+        if($request->search){
+            $booths = $booths->where(function($query) use($request){
+                    $query->where('name', 'LIKE', '%'. $request->search .'%');
+                });
+        }
+
+
+        $boothsCount = clone $booths;
+        $totalRecords = $boothsCount->count(DB::raw('DISTINCT(booths.id)'));  
+        $booths = $booths->offset($offset)->limit($perPage)->get();       
+        $booths = new LengthAwarePaginator($booths, $totalRecords, $perPage, $pageNo, [
+                  'path'  => $request->url(),
+                  'query' => $request->query(),
+                ]);
+        $data['offset'] = $offset;
+        $data['pageNo'] = $pageNo;
+        $booths->setPath(route('booths.index'));
+        $data['html'] = view('company.booths.table', compact('booths', 'perPage'))
+                  ->with('i', $pageNo * $perPage)
+                  ->render();
+
+         return response($data);                                              
+        }   
+                   
+        return view('company.booths.index');
     }
 
     /**
@@ -39,7 +73,7 @@ class BoothController extends Controller
     {
         //
          $request->validate([
-            // 'company_id' => 'required|exists:companies,id',
+            'company_id' => 'required|exists:companies,id',
             'title' => 'required|string|max:255',
             'booth_number' => 'required|string|max:50',
             'size' => 'required|string|max:50',
@@ -81,7 +115,7 @@ class BoothController extends Controller
         $booth = Booth::findOrFail($id);
 
         $request->validate([
-            // 'company_id' => 'required|exists:companies,id',
+            'company_id' => 'required|exists:companies,id',
             'title' => 'required|string|max:255',
             'booth_number' => 'required|string|max:50',
             'size' => 'required|string|max:50',
