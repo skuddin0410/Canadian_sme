@@ -4,12 +4,6 @@
     Admin | Testimonials
 @endsection
 @section('content')
-<style>
-  .ql-editor{
-      width: 100%;
-   }
- </style>
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">Testimonials</span></h4>
   <div class="row">
@@ -56,16 +50,15 @@
             </div>
             <div class="mb-3">
               <label class="form-label" for="description">Message<span class="text-danger">*</span></label>
-              <input type="hidden" name="description" id="description" value="{{ $testimonial->message ?? old('description') }}">
               <div class="input-group input-group-merge" id="quill-editor" style="height: 300px;">
                 <textarea
                   type="text"
-                  name="quil-description"
-                  id="quil-description"
+                  name="description"
+                  id="description"
                   class="form-control"
                   placeholder="Testimonial Message"
                   rows="8" cols="50"
-                ></textarea>
+                >{{ $testimonial->message ?? old('description') }}</textarea>
               </div>
               @if ($errors->has('description'))
                 <span class="text-danger text-left">{{ $errors->first('description') }}</span>
@@ -132,30 +125,4 @@
     </div>
   </div>
 </div>
-@endsection
-@section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-<script type="text/javascript">
-     var form = document.querySelector("form");
-    document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('quil-description')) {
-            var editor = new Quill('#quill-editor', {
-                theme: 'snow',
-                modules: { 
-                  toolbar: [['link']] 
-                }
-            });
-            var quillEditor = document.getElementById('quil-description');
-            editor.on('text-change', function() {
-              if(editor.root.innerHTML == '<p><br></p>'){
-                $('#description').val('');
-              }else{
-                $('#description').val(editor.root.innerHTML);
-              }  
-            });
-            editor.root.innerHTML = $('#description').val();
-          
-        }
-    });
-</script>
 @endsection
