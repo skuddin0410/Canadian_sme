@@ -104,7 +104,7 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {   
-       
+    
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:events,slug,' . $event->id,
@@ -121,6 +121,8 @@ class EventController extends Controller
         ]);
 
         $event->update($validated);
+        $event->tags = $request->tags;
+        $event->save();
         $uploadPath = 'events';
         if($request->file("image")){
           $this->imageUpload($request->file("image"),$uploadPath,$event->id,'events','photo',$idForUpdate=$event->id);   
