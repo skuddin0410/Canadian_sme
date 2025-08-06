@@ -4,11 +4,6 @@
     Admin | CMD Page Edit
 @endsection
 @section('content')
-<style>.ql-editor{
-  width: 100%;
-}
-</style>
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">CMS/</span>Page</h4>
   <div class="row">
@@ -68,16 +63,16 @@
             </div>
             <div class="mb-3">
               <label class="form-label" for="title">Description<span class="text-danger">*</span></label>
-              <input type="hidden" name="description" id="description" value="{{ $page->description ?? old('description') }}">
-              <div class="input-group input-group-merge" id="quill-editor" style="height: 300px;">
+              <div class="input-group input-group-merge" id="quill-editor">
                 <textarea
                   type="text"
-                  name="quil-description"
-                  id="quil-description"
+                  name="description"
+                  id="description"
                   class="form-control"
                   placeholder="Post Description"
-                  rows="8" cols="50"
-                ></textarea>
+                  rows="8" 
+                  cols="50"
+                >{{ $page->description ?? old('description') }}</textarea>
               </div>
               @if ($errors->has('description'))
                 <span class="text-danger text-left">{{ $errors->first('description') }}</span>
@@ -142,16 +137,15 @@
 
             <div class="mb-3">
               <label class="form-label" for="meta_description">Meta description</label>
-              <input type="hidden" name="meta_description" id="meta_description" value="{{ $page->meta_description ?? old('meta_description') }}">
               <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
                 <textarea
                   type="text"
-                  name="quil-description1"
-                  id="quil-description1"
+                  name="meta_description"
+                  id="meta_description"
                   class="form-control"
                   placeholder="Post description"
                   rows="8" cols="50"
-                ></textarea>
+                >{{ $page->meta_description ?? old('meta_description') }}</textarea>
 
               </div>
               @if ($errors->has('meta_description'))
@@ -212,53 +206,5 @@ function slugify(str) {
            .replace(/-+/g, '-'); // remove consecutive hyphens
   return str.replace(/^-+|-+$/g, '');
 }
-</script>
-
-<script type="text/javascript">
-     var form = document.querySelector("form");
-    document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('quil-description')) {
-            var editor = new Quill('#quill-editor', {
-                theme: 'snow',
-                modules: { 
-                  toolbar: [['link']] 
-                }
-            });
-            var quillEditor = document.getElementById('quil-description');
-            editor.on('text-change', function() {
-              if(editor.root.innerHTML == '<p><br></p>'){
-                $('#description').val('');
-              }else{
-                $('#description').val(editor.root.innerHTML);
-              }  
-            });
-            editor.root.innerHTML = $('#description').val();
-          
-        }
-    });
-</script>
-
-<script type="text/javascript">
-     var form = document.querySelector("form");
-    document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('quil-description1')) {
-            var editor = new Quill('#quill-editor1', {
-                theme: 'snow',
-                modules: { 
-                  toolbar: [] 
-                }
-            });
-            var quillEditor = document.getElementById('quil-description1');
-            editor.on('text-change', function() {
-              $('#meta_description').val(editor.root.innerHTML);
-            });
-            editor.on('editor-change', function() {
-              $('#meta_description').val(editor.root.innerHTML);
-            });
-
-            editor.root.innerHTML = $('#meta_description').val();
-          
-        }
-    });
 </script>
 @endsection
