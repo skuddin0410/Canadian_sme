@@ -115,7 +115,7 @@ class BoothController extends Controller
         $booth = Booth::findOrFail($id);
 
         $request->validate([
-            'company_id' => 'required|exists:companies,id',
+            // 'company_id' => 'required|exists:companies,id',
             'title' => 'required|string|max:255',
             'booth_number' => 'required|string|max:50',
             'size' => 'required|string|max:50',

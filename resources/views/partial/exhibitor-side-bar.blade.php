@@ -56,6 +56,31 @@
                 <div data-i18n="Booth Management">Booth Management</div>
         </a>
     </li>
+    <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('users*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                <div data-i18n="Blogs">Site Users</div>
+            </a>
+            <ul class="menu-sub">
+               <li class="menu-item {{ request()->is('exhibitor-representative') || request()->is('users') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <div data-i18n="Team">Team</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('exhibitor-representative') ? 'active' : '' }}">
+                        <a href="{{ url('representative-users') }}" class="menu-link">
+                            <div data-i18n="Exhibitor Representative">Exhibitor Representative</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">
+                        <a href="{{ url('attendee-users') }}" class="menu-link">
+                            <div data-i18n="Attendee">Attendee</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            </ul>
+    </li>
 
     <li class="menu-item {{ request()->is('branding/logo*') || request()->is('trainings*') || request()->is('company/media-gallery*') || request()->is('company/videos*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">

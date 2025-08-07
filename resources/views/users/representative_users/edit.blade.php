@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin | Edit Speaker
+    Admin | Edit Exhibitor Representative Data
 @endsection
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Speaker /</span> Edit</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Exhibitor Representative /</span> Edit</h4>
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Edit Speaker</h5>
+          <h5 class="mb-0">Edit Exhibitor Representative</h5>
         </div>
         <div class="card-body">
           @if(Session::has('success'))
@@ -22,7 +22,7 @@
           @endif
 
           <form 
-            action="{{ route('speaker.update', $user->id) }}" 
+            action="{{ route('representative-users.update', $user->id) }}" 
             method="POST" 
             enctype="multipart/form-data"
           >
@@ -149,8 +149,8 @@
                 <div class="mb-3">
                   <label class="form-label">Role <span class="text-danger">*</span></label>
                   <select class="form-control" name="user_type" required>
-                    <option value="Speaker" {{ old('user_type', $user->roles[0]->name ?? '') == 'Speaker' ? 'selected' : '' }}>Speaker</option>
-                    
+                   
+                    <option value="Exhibitor Representative" {{ old('user_type', $user->roles[0]->name ?? '') == 'Exhibitor Representative' ? 'selected' : '' }}>Exhibitor Representative</option>
                   </select>
                 </div>
               </div>
@@ -182,7 +182,7 @@
               {{-- Submit --}}
               <div class="col-12">
                 <div class="d-flex justify-content-end pt-3">
-                  <a href="{{ route('speaker.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
+                  <a href="{{ route('representative-users.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
                   <button type="submit" class="btn btn-primary">Update</button>
                 </div>
               </div>

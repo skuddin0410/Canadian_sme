@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Wallet;
+use App\Models\Booth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Drive;
 use Storage;
@@ -155,9 +156,11 @@ class ExhibitorUserController extends Controller
     {
         //  $exhibitor_user = User::findOrFail($exhibitor_user->id);
         // dd($exhibitor_user->is_approve); // should return true or false
+        $exhibitor_user->load('booths');
+          $booths = Booth::all(); 
 
                               
-        return view('users.exhibitor_users.view', ['user' => $exhibitor_user]);
+        return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $booths]);
     }
 
     /**
@@ -248,4 +251,32 @@ public function approve($id)
     {
         //
     }
+    public function assignBoothForm($id)
+{
+    $user = User::with('company')->findOrFail($id);
+    $booths = Booth::all(); // Or filter by availability
+
+    return view('users.exhibitor_users.show', compact('user', 'booths'));
+}
+public function assignBooth(Request $request, $id)
+{
+    $user = User::with('company')->findOrFail($id);
+    $boothId = $request->input('booth_id');
+
+    $request->validate([
+        'booth_id' => 'required|exists:booths,id',
+    ]);
+
+    $booth = Booth::findOrFail($boothId);
+
+    // Assign booth to user's company
+    if (!$user->company) {
+    return redirect()->back()->with('error', 'User does not have an associated company.');
+}
+    $booth->company_id = $user->company->id;
+    $booth->save();
+
+    return redirect()->route('exhibitor-users.show', $user->id)
+        ->with('success', 'Booth assigned successfully.');
+}
 }

@@ -33,7 +33,6 @@
   margin: 10px 0 10px 0;
 }
 </style>
-
 <table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
 	<tr>
@@ -42,7 +41,6 @@
 		<th>User name</th>
 		<th>Email</th>
 		<th>Mobile</th>
-		<th>Status</th>
 		{{-- <th>Referral coupon</th> --}}
 		<th>Created At</th>
 		<th width="8%">Action</th>
@@ -56,27 +54,31 @@
 		<th style="text-transform:none">{{$user->username ?? ''}}</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
-		<th>
-             @if($user->is_approve)
-                <span class="badge bg-success">Approved</span>
-             @else
-                <span class="badge bg-warning">Pending</span>
-             @endif
-       </th>
-
 		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}
 		<th>{{dateFormat($user->created_at) ?? '' }}</th>
-		<th>
-			<div class="row">
-			<div class="col-4 p-1">	
-				<a href="{{ route('exhibitor-users.show', ['exhibitor_user' => $user->id]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
-            </div>
-		    <div class="col-4 p-1">	
-			<a href="{{ route('exhibitor-users.edit', ['exhibitor_user' => $user->id]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            </div>
-       </th>
-	   
-	   
+		
+         <th>
+  <div class="d-flex gap-2">
+    {{-- View --}}
+    <a href="{{ route('attendee-users.show', $user->id) }}" class="btn btn-sm btn-icon btn-primary" title="View">
+      <i class="bx bx-show"></i>
+    </a>
+
+    {{-- Edit --}}
+    <a href="{{ route('attendee-users.edit', $user->id) }}" class="btn btn-sm btn-icon item-edit" title="Edit">
+      <i class="bx bx-edit-alt"></i>
+    </a>
+
+    {{-- Delete --}}
+    <form action="{{ route('attendee-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this representative user?');">
+      @csrf
+      @method('DELETE')
+      <button class="btn btn-sm btn-danger btn-icon" type="submit" title="Delete">
+        <i class="bx bx-trash"></i>
+      </button>
+    </form>
+  </div>
+</th>
 	</tr>
 	@endforeach
 	@if(count($users) <=0)
