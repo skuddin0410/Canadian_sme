@@ -135,7 +135,7 @@
             <ul class="menu-sub">
 
                 <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
-                    <a href="{{ route('company.create') }}" class="menu-link">
+                    <a href="{{ route('company.details') }}" class="menu-link">
                         <div data-i18n="Details">Details</div>
                     </a>
                 </li>
