@@ -23,8 +23,14 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
     Route::resource('events', App\Http\Controllers\EventController::class);
 
+    Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
+    Route::post('/assign-permission', [App\Http\Controllers\RoleController::class, 'assignPermission'])->name('roles.assign.permission');
+    Route::get('/roles/create', [App\Http\Controllers\RoleController::class, 'create']);
+    Route::post('/roles', [App\Http\Controllers\RoleController::class, 'store']);
+
     Route::get('users/export/', '\App\Http\Controllers\UserController@export')->name('user_export');
     Route::post('users/import/', '\App\Http\Controllers\UserController@importUser')->name('user_import');
+    Route::post('sendmail', '\App\Http\Controllers\UserController@sendTrackedEmail')->name('sendmail_to_user');
 
     Route::resource('users', App\Http\Controllers\UserController::class);
     Route::get('/representatives', [UserController::class, 'representativeIndex'])

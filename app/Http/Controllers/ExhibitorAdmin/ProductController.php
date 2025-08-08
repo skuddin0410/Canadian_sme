@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use DataTables;
+
 class ProductController extends Controller
 {
     /**
@@ -18,27 +23,58 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        //
-         $query = Product::with(['category', 'creator'])
-            ->when($request->category_id, function($q, $categoryId) {
-                return $q->where('category_id', $categoryId);
-            })
-            ->when($request->search, function($q, $search) {
-                return $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-            })
-            ->when($request->status, function($q, $status) {
-                return $status === 'active' ? $q->active() : $q->where('is_active', false);
-            });
+        $perPage = (int) $request->input('perPage', 20);
+        $pageNo = (int) $request->input('page', 1);
+        $offset = $perPage * ($pageNo - 1);
 
-        $products = $query->orderBy('sort_order')
-                         ->orderBy('name')
-                         ->paginate(15);
-                        //  dd($products);
+      if($request->ajax() && $request->ajax_request == true){
+        $products = Product::with(['category', 'creator'])->orderBy('id','DESC');
+        if($request->category_id){
+            $products = $products->where(function($query) use($request){
+                    $query->where('category_id', $request->category_id);
+                });
+        }
 
-        $categories = ProductCategory::active()->orderBy('name')->get();
+        if($request->search){
+            $products = $products->where(function($query) use($request){
+                    $query->where('name', 'LIKE', '%'. $request->search .'%')
+                    ->orWhere('description', 'like', '%'. $request->search .'%');
+                });
+        }
+       
+        if(!empty($request->status) && $request->status == 'active'){
+            
+            $products = $products->where(function($query) use($request){
+                    $query->where('is_active', 1);
+                });
+        }
 
-        return view('company.products.index', compact('products', 'categories'));
+        if( !empty($request->status) && $request->status == 'inactive'){
+            
+            $products = $products->where(function($query) use($request){
+                    $query->where('is_active', 0);
+                });
+        }
+
+        $productsCount = clone $products;
+        $totalRecords = $productsCount->count(DB::raw('DISTINCT(products.id)'));  
+        $products = $products->offset($offset)->limit($perPage)->get();       
+        $products = new LengthAwarePaginator($products, $totalRecords, $perPage, $pageNo, [
+                  'path'  => $request->url(),
+                  'query' => $request->query(),
+                ]);
+        $data['offset'] = $offset;
+        $data['pageNo'] = $pageNo;
+        $products->setPath(route('products.index'));
+        $data['html'] = view('company.products.table', compact('products', 'perPage'))
+                  ->with('i', $pageNo * $perPage)
+                  ->render();
+
+         return response($data);                                              
+        }
+        $categories = ProductCategory::active()->orderBy('name')->get();   
+                   
+        return view('company.products.index',["categories"=>$categories]);
     }
 
     /**
@@ -59,6 +95,7 @@ class ProductController extends Controller
 {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
+        'price' => 'required|numeric|gte:0',
         'description' => 'required|string',
         'category_id' => 'nullable|exists:products_categories,id',
         'features' => 'nullable|string',
@@ -67,18 +104,12 @@ class ProductController extends Controller
         'sort_order' => 'integer|min:0',
         'meta_title' => 'nullable|string|max:255',
         'meta_description' => 'nullable|string|max:500',
+        'meta_keywords' => 'nullable|string|max:500',
         'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
     ]);
 
     // Parse string inputs to arrays
-    $validated['features'] = $request->filled('features')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('features')))
-        : [];
-
-    $validated['benefits'] = $request->filled('benefits')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('benefits')))
-        : [];
 
     $validated['slug'] = Str::slug($validated['name']);
     $validated['created_by'] = Auth::id();
@@ -110,7 +141,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         //
-        $product->load(['category', 'technicalSpecs', 'pricingTiers.active', 'creator', 'updater']);
+        $product->load(['category', 'technicalSpecs', 'creator', 'updater']);
         return view('company.products.show', compact('product'));
     }
 
@@ -132,28 +163,19 @@ class ProductController extends Controller
         //
          $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'price' => 'required|numeric|gte:0',
             'description' => 'required|string',
             'category_id' => 'nullable|exists:products_categories,id',
-            'features' => 'nullable|array',
-            'benefits' => 'nullable|array',
+            'features' => 'nullable|string',
+            'benefits' => 'nullable|string',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-             'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-           'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-            // 'image_url' => 'nullable|url',
-            // 'gallery_images' => 'nullable|array',
-            // 'gallery_images.*' => 'url'
+            'meta_keywords' => 'nullable|string|max:500',
+            'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
-        // Parse string inputs to arrays
-    $validated['features'] = $request->filled('features')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('features')))
-        : [];
-
-    $validated['benefits'] = $request->filled('benefits')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('benefits')))
-        : [];
 
         if ($validated['name'] !== $product->name) {
             $validated['slug'] = Str::slug($validated['name']);

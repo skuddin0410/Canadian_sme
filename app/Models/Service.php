@@ -16,6 +16,7 @@ class Service extends Model
 
     protected $fillable = [
         'name',
+        'price',
         'slug',
         'description',
         'capabilities',
@@ -26,6 +27,7 @@ class Service extends Model
         'duration',
         'meta_title',
         'meta_description',
+        'meta_keywords',
         'image_url',
         'gallery_images',
         'created_by',
@@ -33,10 +35,7 @@ class Service extends Model
     ];
 
     protected $casts = [
-        'capabilities' => 'array',
-        'deliverables' => 'array',
-        'gallery_images' => 'array',
-        'is_active' => 'boolean',
+        'gallery_images' => 'array'
     ];
 
     protected $dates = ['deleted_at'];
@@ -45,11 +44,6 @@ class Service extends Model
     public function category()
     {
         return $this->belongsTo(ServiceCategory::class);
-    }
-
-    public function pricingTiers()
-    {
-        return $this->hasMany(ServicePricing::class);
     }
 
     public function creator()

@@ -25,7 +25,7 @@ Admin | Testimonial Details
               </div>
               <div class="card-body">
                 <div class="d-flex pt-3 justify-content-end">
-                  @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Content Manager'))	
+                  @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))	
                       <a href="{{route("testimonials.edit",["testimonial"=> $testimonial->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
                   @endif   
                       <a href="{{route("testimonials.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
@@ -59,7 +59,7 @@ Admin | Testimonial Details
  
                   </ul>
                   <div class="d-flex pt-3 justify-content-end">
-                    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Content Manager'))	
+                    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))	
                       <a href="{{route("testimonials.edit",["testimonial"=> $testimonial->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
                     @endif 
                       <a href="{{route("testimonials.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>

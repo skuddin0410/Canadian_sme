@@ -62,12 +62,12 @@
 			<a href="{{ route("events.show",["event"=> $event->id]) }}" class="btn btn-sm btn-icon btn-primary"><i class="bx bx-show"></i></a>
 		    </div>
 		    <div class="col-4 p-1">
-			@if(Auth::user()->hasRole('Admin'))		
+			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
 			  <a href="{{ route("events.edit",["event"=> $event->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
             @endif
 			</div>
             <div class="col-4 p-1">
-			@if(Auth::user()->hasRole('Admin'))		
+			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
 			<form action="{{ route('events.destroy', $event->id) }}" method="post">
               @csrf
               @method('DELETE')

@@ -9,7 +9,6 @@ use App\Models\Wallet;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Drive;
 use Storage;
-use App\Mail\KycMail;
 use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Pagination\Paginator;
@@ -22,6 +21,9 @@ use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon;
+
+use App\Models\Email;
+use App\Mail\TrackedEmail;
 
 class UserController extends Controller
 {
@@ -58,12 +60,7 @@ class UserController extends Controller
                 });
             }
 
-            if ($kyc == 'verified') {
-                $users = $users->where('kyc_verified', 1);
-            }
-            if ($kyc == 'pending') {
-                $users = $users->where('kyc_verified', 0);
-            }
+
 
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
@@ -235,11 +232,6 @@ class UserController extends Controller
             ->withSuccess('User deleted successfully');
     }
 
-   
-
-  
-
-  
     public function export() 
     {
         return Excel::download(new UsersExport, 'users_'.Carbon\Carbon::now()->timestamp.'.xlsx');
@@ -271,4 +263,33 @@ public function attendeeIndex()
     return view('users.attendee_users.index', compact('users'));
 }
 
+
+    public function sendTrackedEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect(route('users.index'))->withInput()
+                ->withErrors($validator);
+        }
+
+        $user = User::where('id',$request->user_id)->first();
+
+        $email = Email::create([
+            'user_id' => $user->id,
+            'subject' => $request->subject,
+            'body' => $request->body,
+            'email' => $user->email
+        ]);
+        $emailId = $user->email;
+        //$emailId = 'subhabrata06.dapl@gmail.com';
+        Mail::to($emailId)->send(new TrackedEmail($email));
+        
+        return redirect(route('users.index'))
+            ->withSuccess('Email sent successfully');
+    }
 }

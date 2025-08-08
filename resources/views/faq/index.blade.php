@@ -14,7 +14,7 @@
 				    <h5 class="mb-0">Faq Lists</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
 						<div class="dt-buttons"> 
-                            @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Content Manager'))	
+                            @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))	
 							<a href="{{route('faqs.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
 								<span><i class="bx bx-plus me-sm-1"></i> 
 									<span class="d-none d-sm-inline-block">Add faq</span>
