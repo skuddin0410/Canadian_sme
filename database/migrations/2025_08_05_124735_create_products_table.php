@@ -16,8 +16,8 @@ return new class extends Migration
     $table->string('name');
     $table->string('slug')->unique();
     $table->longText('description');
-    $table->json('features')->nullable();
-    $table->json('benefits')->nullable();
+    $table->string('features')->nullable();
+    $table->string('benefits')->nullable();
     $table->unsignedBigInteger('category_id')->nullable();
     $table->unsignedBigInteger('user_id')->nullable();       
     $table->unsignedBigInteger('company_id')->nullable();    

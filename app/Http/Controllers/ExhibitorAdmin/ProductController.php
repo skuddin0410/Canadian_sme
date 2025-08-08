@@ -93,13 +93,6 @@ class ProductController extends Controller
     ]);
 
     // Parse string inputs to arrays
-    $validated['features'] = $request->filled('features')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('features')))
-        : [];
-
-    $validated['benefits'] = $request->filled('benefits')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('benefits')))
-        : [];
 
     $validated['slug'] = Str::slug($validated['name']);
     $validated['created_by'] = Auth::id();
@@ -164,14 +157,6 @@ class ProductController extends Controller
             'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
-        // Parse string inputs to arrays
-    $validated['features'] = $request->filled('features')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('features')))
-        : [];
-
-    $validated['benefits'] = $request->filled('benefits')
-        ? array_filter(preg_split('/\r\n|\r|\n/', $request->input('benefits')))
-        : [];
 
         if ($validated['name'] !== $product->name) {
             $validated['slug'] = Str::slug($validated['name']);

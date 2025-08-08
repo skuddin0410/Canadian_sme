@@ -36,8 +36,8 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'features' => 'array',
-        'benefits' => 'array',
+        //'features' => 'array',
+        //'benefits' => 'array',
         'gallery_images' => 'array',
         'is_active' => 'boolean',
     ];
