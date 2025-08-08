@@ -37,7 +37,7 @@ class Company extends Model
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'companies')
-            ->where('file_type', 'company_logo');
+            ->where('file_type', 'logo');
     }
     public function mediaGallery()
     {

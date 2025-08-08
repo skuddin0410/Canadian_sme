@@ -76,6 +76,10 @@ class CompanyController extends Controller
             $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications');
         }
 
+        if ($request->file("logo")) {
+            $this->imageUpload($request->file("logo"), 'logo', $company->id, 'companies', 'logo');
+        }
+
      $company->save();
 
         return redirect()->back()->with('success', 'Company created.');
@@ -144,6 +148,11 @@ class CompanyController extends Controller
             $uploadPath = 'certifications';
             $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications', $idForUpdate = $company->id);
         }
+
+        if ($request->file("logo")) {
+            $this->imageUpload($request->file("logo"), 'logo', $company->id, 'companies', 'logo', $idForUpdate = $company->id);
+        }
+
 
         return redirect()->back()->with('success', 'Company details has been updated successfully.');
     }
