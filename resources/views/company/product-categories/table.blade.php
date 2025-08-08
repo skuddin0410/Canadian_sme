@@ -22,13 +22,13 @@
                 <td>
                     <div class="d-flex gap-2">
                         {{-- View --}}
-                        <a href="" 
+                        <a href="{{ route('product-categories.show', ['product_category' => $category->id]) }}" 
                            class="btn btn-sm btn-icon btn-primary" title="View">
                             <i class="bx bx-show"></i>
                         </a>
 
                         {{-- Edit --}}
-                        <a href="" 
+                        <a href="{{ route('product-categories.edit', ['product_category' => $category->id]) }}" 
                            class="btn btn-sm btn-icon item-edit" title="Edit">
                             <i class="bx bx-edit-alt"></i>
                         </a>

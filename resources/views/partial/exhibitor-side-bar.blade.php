@@ -51,7 +51,7 @@
             <ul class="menu-sub">
               
                 <li class="menu-item {{ request()->is('service-categories*') ? 'active' : '' }}">
-                    <a href="" class="menu-link">
+                    <a href="{{route('service-categories.index')}}" class="menu-link">
                         <div data-i18n="Service Categories">Service Categories</div>
                     </a>
                 </li>
