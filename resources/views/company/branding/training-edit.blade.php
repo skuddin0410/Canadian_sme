@@ -30,10 +30,13 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Attached File</label><br>
-          @if($file)
-            <a href="{{ asset('storage/' . $file->file_name) }}" target="_blank">View</a><br><br>
+          <label class="form-label">Attached File:
+
+          @if($training->material && $training->material->file_name)
+                <a href="{{$training->material->file_path  }}" target="_blank"><i class="fa fa-file" style="font-size:20px;"></i></a>
           @endif
+        </label><br>
+          
           <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp">
         </div>
 

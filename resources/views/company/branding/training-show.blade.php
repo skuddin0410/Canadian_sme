@@ -8,16 +8,14 @@
     <div class="card-body">
       <h5>{{ $training->material_name }}</h5>
 
-      <p class="mb-3">{{ $training->material_description }}</p>
+      <p class="mb-3">{!! $training->material_description !!}</p>
 
       @if ($training->youtube_link)
         <p><strong>YouTube:</strong> <a href="{{ $training->youtube_link }}" target="_blank">{{ $training->youtube_link }}</a></p>
       @endif
 
-      @if ($file)
-        <p><strong>File:</strong> 
-          <a href="{{ asset('storage/' . $file->file_name) }}" target="_blank">View file</a>
-        </p>
+      @if($training->material && $training->material->file_name)
+        <p><strong>File:</strong> <a href="{{$training->material->file_path  }}" target="_blank"><i class="fa fa-file"></i></a> </p>
       @endif
 
       <p><small><strong>Uploaded on:</strong> {{ $training->created_at->format('d M Y') }}</small></p>

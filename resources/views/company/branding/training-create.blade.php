@@ -22,15 +22,17 @@
         <div class="row">
           <div class="mb-3 col-md-6">
             <label class="form-label">Material Name</label>
-            <input type="text" name="material_name" class="form-control" required>
+            <input type="text" name="material_name" value="{{old('material_name')}}" class="form-control" required>
           </div>
           <div class="mb-3 col-md-6">
             <label class="form-label">YouTube Link (optional)</label>
-            <input type="url" name="youtube_link" class="form-control">
+            <input type="url" name="youtube_link" value="{{old('youtube_link')}}" class="form-control">
           </div>
           <div class="mb-3 col-12">
             <label class="form-label">Material Description</label>
-            <textarea name="material_description" class="form-control" rows="3" required></textarea>
+            <textarea name="material_description" id="description" class="form-control" rows="3" required>
+              {{old('material_description')}}
+            </textarea>
           </div>
           <div class="mb-3 col-md-6">
             <label class="form-label">Attach File (PDF/Image/Doc)</label>
