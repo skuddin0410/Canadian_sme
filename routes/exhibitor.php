@@ -24,9 +24,6 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
 
 
-
-    Route::get('/branding/logo', [CompanyController::class, 'logoForm'])->name('company.branding.logo');
-    Route::post('/branding/logo', [CompanyController::class, 'uploadLogo'])->name('company.branding.logo.upload');
     
     Route::get('/company/media-gallery', [CompanyController::class, 'mediaGallery'])->name('company.media.gallery');
     Route::post('/company/media-upload', [CompanyController::class, 'uploadMedia'])->name('company.media.upload');

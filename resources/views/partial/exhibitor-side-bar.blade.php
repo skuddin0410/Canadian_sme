@@ -87,13 +87,6 @@
         </a>
         <ul class="menu-sub">
 
-            {{-- Logo Management --}}
-            <li class="menu-item {{ request()->is('branding/logo') ? 'active' : '' }}">
-                <a href="{{ route('company.branding.logo') }}" class="menu-link">
-                    <div data-i18n="Logo Upload">Logo Management</div>
-                </a>
-            </li>
-
             {{-- Guidelines (you can update this route when implemented) --}}
             <li class="menu-item {{ request()->is('company/branding/banner') ? 'active' : '' }}">
                 <a href="#" class="menu-link">

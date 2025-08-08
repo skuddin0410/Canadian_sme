@@ -156,54 +156,7 @@ class CompanyController extends Controller
 
         return redirect()->back()->with('success', 'Company details has been updated successfully.');
     }
-   public function logoForm()
-    {
-        $company = Company::with('certificationFile')->where('user_id', Auth::id())->first();
 
-        $company = Company::where('user_id', auth()->id())->first();
-        if(empty($company)){
-          return redirect()->route('company.details')->with('success', 'Update Company details first.');
-        }
-
-        $logo = Drive::where('table_id', $company->id)
-            ->where('table_type', 'companies')
-            ->where('file_type', 'company_logo')
-            ->first();
-
-        return view('company.branding.logo', compact('company', 'logo'));
-    }
-
-    public function uploadLogo(Request $request)
-    {
-        $request->validate([
-            'logo' => 'required|mimes:png,jpg,jpeg,svg,pdf|max:5120', // max 5MB
-        ]);
-
-        $company = Company::where('user_id', Auth::id())->first();
-        if(empty($company)){
-          return redirect()->route('company.details')->with('success', 'Update Company details first.');
-        }
-
-        // Remove old logo if exists
-        Drive::where('table_id', $company->id)
-            ->where('table_type', 'companies')
-            ->where('file_type', 'company_logo')
-            ->delete();
-
-        $file = $request->file('logo');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs('branding/logos', $fileName, 'public');
-
-        Drive::create([
-            'table_id'   => $company->id,
-            'table_type' => 'companies',
-            'file_type'  => 'company_logo',
-            'file_name'  => $filePath,
-            // 'original_name' => $file->getClientOriginalName(),
-        ]);
-
-        return redirect()->back()->with('success', 'Logo uploaded successfully.');
-    }
 
    
 public function mediaGallery()
