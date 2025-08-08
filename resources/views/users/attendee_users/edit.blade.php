@@ -165,19 +165,7 @@
               </div>
 
               {{-- Images --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Profile Photo</label>
-                  <input type="file" class="form-control" name="frontimage">
-                </div>
-              </div>
-
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Background Image</label>
-                  <input type="file" class="form-control" name="image">
-                </div>
-              </div>
+              
 
               {{-- Submit --}}
               <div class="col-12">

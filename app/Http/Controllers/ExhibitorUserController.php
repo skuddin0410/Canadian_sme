@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Wallet;
-use App\Models\Booth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Drive;
-use Storage;
-use App\Mail\KycMail;
-use Illuminate\Support\Facades\Mail;
-
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use DataTables;
 use DB;
+use Carbon;
+// use Storage;
+use DataTables;
+use App\Models\User;
+use App\Mail\KycMail;
+use App\Models\Booth;
+use App\Models\Drive;
 use App\Models\Order;
+use App\Models\Wallet;
+
+use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class ExhibitorUserController extends Controller
 {
@@ -37,6 +39,7 @@ class ExhibitorUserController extends Controller
         $offset = $perPage * ($pageNo - 1);
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
+        
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
@@ -78,6 +81,9 @@ class ExhibitorUserController extends Controller
 
             return response($data);
         }
+         $users = User::role('Exhibitor Representative')
+            ->where('created_by', auth()->id())
+            ->get();
 
         return view('users.exhibitor_users.index', ["kyc" => ""]);
     }
@@ -98,8 +104,7 @@ class ExhibitorUserController extends Controller
     {
         //
          $validator = Validator::make($request->all(), [
-            'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-            'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+          
             'username' => 'required|string|unique:users,username',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -138,12 +143,7 @@ class ExhibitorUserController extends Controller
         $user->save();
         $user->assignRole($request->user_type);
 
-        if ($request->file("frontimage")) {
-            $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
-        }
-        if ($request->file("image")) {
-            $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
-        }
+      
         return redirect(route('exhibitor-users.index'))
             ->withSuccess('Exhibitor User data has been saved successfully');
 
@@ -154,13 +154,15 @@ class ExhibitorUserController extends Controller
      */
     public function show(User $exhibitor_user, Request $request)
     {
-        //  $exhibitor_user = User::findOrFail($exhibitor_user->id);
-        // dd($exhibitor_user->is_approve); // should return true or false
+       
         $exhibitor_user->load('booths');
-          $booths = Booth::all(); 
+        $booths = Booth::all(); 
+        $companies = Company::with('certificationFile','logoFile', 'mediaGallery', 'videos')
+        ->where('user_id',$exhibitor_user->id)
+        ->get();
 
                               
-        return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $booths]);
+        return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $booths,'companies' => $companies]);
     }
 
     /**
@@ -178,8 +180,7 @@ class ExhibitorUserController extends Controller
    public function update(Request $request, User $exhibitor_user)
 {
     $validator = Validator::make($request->all(), [
-        'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+       
         'username' => 'required|string|unique:users,username,' . $exhibitor_user->id,
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -222,13 +223,7 @@ class ExhibitorUserController extends Controller
     $exhibitor_user->syncRoles([]);
     $exhibitor_user->assignRole($request->user_type);
 
-    if ($request->file("frontimage")) {
-        $this->imageUpload($request->file("frontimage"), 'users', $exhibitor_user->id, 'users', 'photo', $exhibitor_user->id);
-    }
-
-    if ($request->file("image")) {
-        $this->imageUpload($request->file("image"), 'users', $exhibitor_user->id, 'users', 'background', $exhibitor_user->id);
-    }
+   
 
     return redirect(route('exhibitor-users.index'))
         ->withSuccess('User data has been updated successfully.');

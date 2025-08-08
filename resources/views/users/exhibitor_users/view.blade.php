@@ -68,6 +68,73 @@ Admin | Exhibitor User Details
                                     
                                 </ul>
                             </div>
+                            <div class="col-4">
+     
+
+    @forelse($companies as $company)
+            {{-- Company Logo --}}
+            @if($company->logoFile)
+               <span class="fw-medium me-2"> <img src="{{ Storage::url($company->logoFile->file_name) }}" class="card-img-top"
+                    alt="Company Logo" style="height: 100px; object-fit: cover;"></span>
+            @endif
+
+            <div class="mt-2">
+                <h5>{{ $company->name }}</h5>
+                <p class="mb-1"><strong>Industry:</strong> {{ $company->industry }}</p>
+                <p class="mb-1"><strong>Size:</strong> {{ $company->size }}</p>
+                <p class="mb-1"><strong>Location:</strong> {{ $company->location }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ $company->email }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ $company->phone }}</p>
+                <p class="mb-1"><strong>Certifications:</strong>
+                    {{ $company->certifications ?? '-' }}</p>
+
+                {{-- Certification Image --}}
+                @if($company->certificationFile)
+                    <div class="mt-3">
+                        <h6>Certification</h6>
+                        <img src="{{ Storage::url($company->certificationFile->file_name) }}"
+                            alt="Certification" class="img-fluid rounded"
+                            style="max-height: 150px; object-fit: cover;">
+                    </div>
+                @endif
+
+                {{-- Media Gallery --}}
+                @if($company->mediaGallery->count())
+                    <div class="mt-3">
+                        <h6>Media Gallery</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($company->mediaGallery as $media)
+                                <img src="{{ Storage::url($media->file_name) }}" alt="Gallery Image"
+                                    class="rounded" style="width: 70px; height: 70px; object-fit: cover;">
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Videos --}}
+                @if($company->videos->count())
+                    <div class="mt-3">
+                        <h6>Videos</h6>
+                        @foreach($company->videos as $video)
+                            <video controls style="width: 100%; max-height: 200px;">
+                                <source src="{{ Storage::url($video->file_name) }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        @endforeach
+                    </div>
+                @endif
+
+
+            </div>
+
+            {{-- <div class="card-footer text-muted">
+                Created on {{ $company->created_at->format('d M Y') }}
+            </div> --}}
+       
+    @empty
+        <p class="text-muted">No companies registered by this exhibitor.</p>
+    @endforelse
+                            </div>
                         </div>
                     </div>
 
@@ -130,10 +197,6 @@ Admin | Exhibitor User Details
 
 
                 </div>
-            </div>
-            
 
-    </div>
-    </div>
 </div>
 @endsection

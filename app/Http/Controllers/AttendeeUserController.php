@@ -60,6 +60,10 @@ class AttendeeUserController extends Controller
                     
                 });
             }
+              // Filter by exhibitor_id if provided
+          if ($request->has('exhibitor_id')) {
+          $query->where('created_by_exhibitor_id', $request->exhibitor_id);
+    }
 
            
 
@@ -101,8 +105,7 @@ class AttendeeUserController extends Controller
     {
         //
         $validator = Validator::make($request->all(), [
-        'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+       
         'username' => 'required|string|unique:users,username',
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -149,12 +152,7 @@ class AttendeeUserController extends Controller
 
     $user->assignRole($request->user_type);
 
-    if ($request->file("frontimage")) {
-        $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
-    }
-    if ($request->file("image")) {
-        $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
-    }
+   
 
     return redirect(route('attendee-users.index'))
         ->withSuccess('Attendee data has been saved successfully');
@@ -192,8 +190,7 @@ class AttendeeUserController extends Controller
          $user = User::findOrFail($id);
 
     $validator = Validator::make($request->all(), [
-        'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+        
         'username' => 'required|string|unique:users,username,' . $user->id,
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -242,13 +239,7 @@ class AttendeeUserController extends Controller
     $user->syncRoles([]);
     $user->assignRole($request->user_type);
 
-    if ($request->file("frontimage")) {
-        $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo', $user->id);
-    }
-
-    if ($request->file("image")) {
-        $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background', $user->id);
-    }
+   
 
     return redirect(route('attendee-users.index'))->withSuccess('Attendee data has been updated successfully.');
 

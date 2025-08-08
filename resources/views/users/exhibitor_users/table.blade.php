@@ -74,6 +74,25 @@
 		    <div class="col-4 p-1">	
 			<a href="{{ route('exhibitor-users.edit', ['exhibitor_user' => $user->id]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
             </div>
+			 <!-- Representative Users Index -->
+        <div class="col-4 p-1">    
+            <a href="{{ route('representative-users.index', ['exhibitor_id' => $user->id]) }}" class="btn btn-sm btn-icon item-representative">
+                <i class="bx bxs-user-detail"></i>
+            </a>
+        </div>
+
+        <!-- Attendee Users Index (filtered by exhibitor) -->
+        <div class="col-4 p-1">    
+            <a href="{{ route('attendee-users.index', ['exhibitor_id' => $user->id]) }}" class="btn btn-sm btn-icon item-attendee">
+                <i class="bx bxs-group"></i>
+            </a>
+        </div>
+			{{-- <div class="col-4 p-1">	
+			<a href="{{ route('representative-users.index' }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
+            </div>
+			 <div class="col-4 p-1">	
+			<a href="{{ route('attendee-users.index'}}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
+            </div> --}}
        </th>
 	   
 	   

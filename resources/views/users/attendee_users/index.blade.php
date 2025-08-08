@@ -13,6 +13,9 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0"> Attendee List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
+                         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                          <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
+                          @endif
                            @if(auth()->user()->hasRole('Exhibitor Admin'))
 						<div class="dt-buttons"> 
                              <a href="{{route('attendee-users.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">

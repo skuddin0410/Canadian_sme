@@ -33,6 +33,11 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::post('sendmail', '\App\Http\Controllers\UserController@sendTrackedEmail')->name('sendmail_to_user');
 
     Route::resource('users', App\Http\Controllers\UserController::class);
+    Route::get('/representatives', [UserController::class, 'representativeIndex'])
+    ->name('users.representative');
+
+Route::get('/attendees', [UserController::class, 'attendeeIndex'])
+    ->name('users.attendee');
 
     Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
     'exhibitor-users' => 'exhibitor_user',

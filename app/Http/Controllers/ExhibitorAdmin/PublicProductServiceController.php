@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class PublicProductServiceController extends Controller
 {
-    //
+    
      public function products(Request $request)
     {
         $query = Product::active()->with(['category', 'pricingTiers' => function($q) {

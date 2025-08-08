@@ -96,8 +96,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-            'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
             'username' => 'required|string|unique:users,username',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -110,7 +108,8 @@ class UserController extends Controller
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
-            'password' => 'required|string|min:8'
+            // 'password' => 'required|string|min:8',
+            
 
         ]);
         if ($validator->fails()) {
@@ -132,16 +131,11 @@ class UserController extends Controller
         $user->state = $request->state;
         $user->country = $request->country;
         $user->place = $request->place;
-        $user->password = Hash::make($request->password);
+        // $user->password = Hash::make($request->password);
         $user->save();
         $user->assignRole($request->user_type);
 
-        if ($request->file("frontimage")) {
-            $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
-        }
-        if ($request->file("image")) {
-            $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
-        }
+     
         return redirect(route('users.index'))
             ->withSuccess('User data has been saved successfully');
     }
@@ -251,6 +245,24 @@ class UserController extends Controller
         Excel::import(new UsersImport($request->role), $request->file('file'));
         return back();
     }
+    public function representativeIndex()
+{
+    $users = User::role('Exhibitor Representative')
+        ->where('created_by', auth()->id())
+        ->get();
+
+    return view('users.representative_users.index', compact('users'));
+}
+
+public function attendeeIndex()
+{
+    $users = User::role('attendee')
+        ->where('created_by', auth()->id())
+        ->get();
+
+    return view('users.attendee_users.index', compact('users'));
+}
+
 
     public function sendTrackedEmail(Request $request)
     {
