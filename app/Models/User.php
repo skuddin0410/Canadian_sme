@@ -3,14 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Spatie\Permission\Traits\HasRoles;
+use App\Models\Booth;
+use App\Models\Company;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use Spatie\Permission\Traits\HasRoles;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -33,11 +36,14 @@ class User extends Authenticatable implements JWTSubject
         'lastname',
         'email',
         'email_verified_at',
+        'website_url',
+        'linkedin_url',
         'mobile',
         'mobile_verified_at',
         'username',
         'password',
         'remember_token',
+        'is_approve',
         'dob',
         'gender',
         'place',
@@ -70,6 +76,7 @@ class User extends Authenticatable implements JWTSubject
             'mobile_verified_at' => 'datetime',
             'password' => 'hashed',
             'dob' => 'date',
+            'is_approve' => 'boolean',
         ];
     }
 
@@ -87,13 +94,25 @@ class User extends Authenticatable implements JWTSubject
     // {
     //     return $this->attributes['password'] = bcrypt($value);
     // }
+    // In App\Models\User.php
+
+public function booths()
+{
+    return $this->hasManyThrough(
+        Booth::class,
+        Company::class,
+        'user_id',      // Foreign key on Company (Company.user_id → User.id)
+        'company_id',   // Foreign key on Booth (Booth.company_id → Company.id)
+        'id',           // Local key on User (User.id)
+        'id'            // Local key on Company (Company.id)
+    );
+}
+
 
     public function getFullNameAttribute()
     {
         return $this->name . ' ' . $this->lastname;
     }
-
-
 
     public function photo()
     {
@@ -113,6 +132,21 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(\App\Models\UserLogin::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class,'user_id','id');
+    }
+  protected function approvalStatusLabel(): Attribute
+    {
+        return Attribute::get(fn () => $this->is_approve ? 'Approved' : 'Pending Approval');
+    }
+
+    protected function approvalStatusClass(): Attribute
+    {
+        return Attribute::get(fn () => $this->is_approve ? 'success' : 'warning');
+    }
+
 
     protected $appends = ['full_name'];
 }

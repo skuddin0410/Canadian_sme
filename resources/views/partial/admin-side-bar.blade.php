@@ -85,6 +85,33 @@
                     <div data-i18n="Users">All Users</div>
                    </a>
                 </li>
+                <li class="menu-item {{ request()->is('exhibitor-users') ? 'active open' : '' }}">
+                   <a href="{{ url('exhibitor-users') }}" class="menu-link">
+                    <div data-i18n="Users">Exhibitor</div>
+                   </a>
+                </li>
+                <li class="menu-item {{ request()->is('speaker') ? 'active open' : '' }}">
+                   <a href="{{ url('speaker') }}" class="menu-link">
+                    <div data-i18n="Users">Speaker</div>
+                   </a>
+                </li>
+                <li class="menu-item {{ request()->is('exhibitor-representative') || request()->is('users') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <div data-i18n="Team">Team</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('exhibitor-representative') ? 'active' : '' }}">
+                        <a href="{{ url('representative-users') }}" class="menu-link">
+                            <div data-i18n="Exhibitor Representative">Exhibitor Representative</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">
+                        <a href="{{ url('attendee-users') }}" class="menu-link">
+                            <div data-i18n="Attendee">Attendee</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
                 @endif
             </ul>
         </li>

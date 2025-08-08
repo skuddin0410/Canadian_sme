@@ -18,17 +18,7 @@
         </div>
         <div class="card-body row">
             <div class="col-md-4">
-                {{-- @if($product->image_url)
-                    <img src="{{ asset($product->image_url) }}" class="img-fluid mb-3" alt="{{ $product->name }}">
-                @endif
-
-                @if($product->gallery_images)
-                    <div class="d-flex flex-wrap gap-2">
-                        @foreach($product->gallery_images as $img)
-                            <img src="{{ asset($img) }}" style="width: 80px; height: 80px; object-fit: cover;" class="rounded border">
-                        @endforeach
-                    </div>
-                @endif --}}
+                
                  {{-- Main Image --}}
         @if($product->image_url)
             <img src="{{ asset('storage/' . $product->image_url) }}" class="img-fluid mb-3" alt="{{ $product->name }}">
@@ -111,5 +101,6 @@
             </div>
         </div>
     </div>
+    
 </div>
 @endsection
