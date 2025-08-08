@@ -40,8 +40,6 @@
             </a>
         </li>
 
-      
-
         <li class="menu-item {{ request()->is('technical-specs*') ? 'active' : '' }}">
             <a href="#" class="menu-link">
                 <div data-i18n="Technical Specs">Technical Specs</div>
@@ -141,13 +139,10 @@
                 </li>
 
                 <li class="menu-item {{ request()->is('company/contacts') ? 'active' : '' }}">
-                    <a href="{{ route('company.contacts') }}" class="menu-link">
+                    <a href="{{ route('company.contacts.index') }}" class="menu-link">
                         <div data-i18n="Contact">Contact</div>
                     </a>
                 </li>
-                 {{-- Branding and Media Submenu --}}
-
-
             </ul>
         </li>
 

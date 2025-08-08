@@ -16,11 +16,10 @@ class CompanyController extends Controller
   
 
  public function details()
-{
+{   
     $company = Company::with('certificationFile','mediaGallery', 'logoFile','videos')
     ->where('user_id', Auth::id())
     ->first();
-
     return view('company.details', compact('company'));
 }
 
@@ -71,12 +70,12 @@ class CompanyController extends Controller
         $company = new Company();
         $company->user_id = Auth::id();
         $company->fill($request->only(['name', 'industry', 'size', 'location', 'email' , 'phone' , 'description' , 'website' ,  'linkedin', 'twitter', 'facebook' , 'certifications']));
-     if ($request->hasFile('certification_image')) {
-        $file = $request->file('certification_image');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs('certifications', $filename, 'public');
-        $company->certification_image = $filePath;
-    }
+
+        if ($request->file("certification_image")) {
+            $uploadPath = 'certifications';
+            $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications');
+        }
+
      $company->save();
 
         return redirect()->back()->with('success', 'Company created.');
@@ -143,14 +142,19 @@ class CompanyController extends Controller
          // Handle image upload
         if ($request->file("certification_image")) {
             $uploadPath = 'certifications';
-            $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certification_image', $idForUpdate = $company->id);
+            $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications', $idForUpdate = $company->id);
         }
 
         return redirect()->back()->with('success', 'Company details has been updated successfully.');
     }
    public function logoForm()
     {
-        $company = Company::with('certificationFile')->where('user_id', Auth::id())->firstOrFail();
+        $company = Company::with('certificationFile')->where('user_id', Auth::id())->first();
+
+        $company = Company::where('user_id', auth()->id())->first();
+        if(empty($company)){
+          return redirect()->route('company.details')->with('success', 'Update Company details first.');
+        }
 
         $logo = Drive::where('table_id', $company->id)
             ->where('table_type', 'companies')
@@ -166,7 +170,10 @@ class CompanyController extends Controller
             'logo' => 'required|mimes:png,jpg,jpeg,svg,pdf|max:5120', // max 5MB
         ]);
 
-        $company = Company::where('user_id', Auth::id())->firstOrFail();
+        $company = Company::where('user_id', Auth::id())->first();
+        if(empty($company)){
+          return redirect()->route('company.details')->with('success', 'Update Company details first.');
+        }
 
         // Remove old logo if exists
         Drive::where('table_id', $company->id)
@@ -194,7 +201,10 @@ public function mediaGallery()
 {
     $company = Company::with('mediaGallery')
         ->where('user_id', auth()->id())
-        ->firstOrFail();
+        ->first();
+    if(empty($company)){
+      return redirect()->route('company.details')->with('success', 'Update Company details first.');
+    }    
 
     return view('company.branding.media-gallery', compact('company'));
 }
@@ -205,7 +215,10 @@ public function uploadMedia(Request $request)
         'media_files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
     ]);
 
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
+    $company = Company::where('user_id', auth()->id())->first();
+    if(empty($company)){
+      return redirect()->route('company.details')->with('success', 'Update Company details first.');
+    }
 
     if ($request->hasFile('media_files')) {
         foreach ($request->file('media_files') as $file) {
@@ -245,7 +258,11 @@ public function deleteMedia($id)
 }
 public function videoGallery()
 {
-    $company = Company::with('videos')->where('user_id', auth()->id())->firstOrFail();
+    $company = Company::with('videos')->where('user_id', auth()->id())->first();
+    if(empty($company)){
+      return redirect()->route('company.details')->with('success', 'Update Company details first.');
+    }
+
     return view('company.branding.video-gallery', compact('company'));
 }
 public function uploadVideo(Request $request)
@@ -254,7 +271,11 @@ public function uploadVideo(Request $request)
         'videos.*' => 'mimes:mp4,webm,ogg|max:51200' // 50 MB max
     ]);
 
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
+    $company = Company::where('user_id', auth()->id())->first();
+
+    if(empty($company)){
+      return redirect()->route('company.details')->with('success', 'Update Company details first.');
+    }
 
     if ($request->hasFile('videos')) {
         foreach ($request->file('videos') as $video) {

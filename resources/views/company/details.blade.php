@@ -80,9 +80,7 @@
             
             <small id="selected-file-name" class="form-text text-muted mt-1"></small>
              @if ($company && $company->certificationFile && $company->certificationFile->file_name) <div class="mt-2">
-              <strong>Previously Uploaded:</strong> {{ basename($company->certificationFile->file_name) }}
-              <br>
-              <img src="{{ asset('storage/' . $company->certificationFile->file_name) }}" alt="Certification Image" width="200" class="mt-2">
+              <img src="{{ asset($company->certificationFile->file_path) }}" alt="Certification Image" width="200" class="mt-2">
             </div> @endif
           </div>
           <div class="mt-3">
