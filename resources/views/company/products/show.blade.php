@@ -32,6 +32,12 @@ Admin | Product Details
                 <span class="fw-medium me-2">Title:</span>
                 <span>{{ $product->name }}</span>
               </li>
+
+              <li class="mb-3">
+                <span class="fw-medium me-2">Price:</span>
+                <span>{{config('app.currency_sign')}} {{ $product->price }}</span>
+              </li>
+
               <li class="mb-3">
                 <span class="fw-medium me-2">Description:</span>
                 <span>{!! $product->description !!}</span>

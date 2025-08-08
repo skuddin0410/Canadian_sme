@@ -40,7 +40,6 @@
                 </div>
             </div>
            </div>
-
            <div class="col-6">
              <div class="mb-3">
               <label class="form-label" for="title">Status<span class="text-danger">*</span></label>
@@ -61,17 +60,30 @@
             </div>
             </div>
 
+            <div class="col-12">
+                <div class="mb-3">
+                   <label class="form-label">Product Price <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text">{{config('app.currency_sign')}}</span>
+                    <input type="text" name="price" value="{{ old('price') }}" class="form-control" required>
+                      @if ($errors->has('price'))
+                        <span class="text-danger text-left">{{ $errors->first('price') }}</span>
+                      @endif
+                </div>
+            </div>
+           </div>
+
 
 
             <div class="mb-3">
               <label class="form-label" for="description">Description<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge" id="quill-editor" style="height: 300px;">
+              <div class="input-group input-group-merge" style="height: 300px;">
                 <textarea
                   type="text"
                   name="description"
                   id="description"
                   class="form-control"
-                  placeholder="Post Description"
+                  placeholder="Product Description"
                   rows="8" cols="50"
                 >{{ old('description') }}</textarea>
               </div>
@@ -87,9 +99,9 @@
                   type="text"
                   name="features"
                   class="form-control"
-                  placeholder="Features Description"
+                  placeholder="Eneter Feature"
                   rows="8" cols="50"
-                >{{ is_array(old('features')) ? implode("\n", old('features')) : '' }}</textarea>
+                >{{  old('features') }}</textarea>
               </div>
             </div>
 
@@ -100,9 +112,9 @@
                   type="text"
                   name="benefits"
                   class="form-control"
-                  placeholder="Benefits Description"
+                  placeholder="Enter Benefit"
                   rows="8" cols="50"
-                >{{ is_array(old('benefits')) ? implode("\n", old('benefits')) : '' }}</textarea>
+                >{{  old('benefits') }}</textarea>
               </div>
             </div>
 
@@ -161,10 +173,10 @@
               <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
                 <textarea
                   type="text"
-                   name="quil-description1"
-                  id="quil-description1"
+                   name="meta_description"
+                  id="meta_description"
                   class="form-control"
-                  placeholder="Product description"
+                  placeholder="Product meta description"
                   rows="8" cols="50"
                 >{{old('meta_description') }}</textarea>
 
@@ -184,7 +196,7 @@
                   name="meta_keywords"
                   id="meta_keywords"
                   value="{{ old('meta_keywords') }}"
-                  placeholder="Blog meta description"/>
+                  placeholder="Meta Keywords"/>
               </div>
               @if ($errors->has('meta_keywords'))
                 <span class="text-danger text-left">{{ $errors->first('meta_keywords') }}</span>

@@ -18,6 +18,7 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'price',
         'slug',
         'description',
         'features',
@@ -29,6 +30,7 @@ class Product extends Model
         'sort_order',
         'meta_title',
         'meta_description',
+        'meta_keywords',
         'image_url',
         'gallery_images',
         'created_by',

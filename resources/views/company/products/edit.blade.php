@@ -64,6 +64,19 @@ Admin | Add New Product
                 </div>
               </div>
 
+               <div class="col-12">
+                <div class="mb-3">
+                   <label class="form-label">Product Price <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text">{{config('app.currency_sign')}}</span>
+                    <input type="text" name="price" value="{{ old('price', $product->price) }}" class="form-control" required>
+                      @if ($errors->has('price'))
+                        <span class="text-danger text-left">{{ $errors->first('price') }}</span>
+                      @endif
+                </div>
+            </div>
+           </div>
+
               <div class="mb-3">
                 <label class="form-label" for="description">Description<span class="text-danger">*</span></label>
                 <div class="input-group input-group-merge" id="quill-editor" style="height: 300px;">
@@ -80,7 +93,7 @@ Admin | Add New Product
                 <label class="form-label" for="meta_title">Features (one per line)</label>
                 <div class="input-group input-group-merge">
                   <textarea type="text" name="features" class="form-control" placeholder="Features Description" rows="8"
-                    cols="50">{{ old('features', is_array($product->features) ? implode("\n", $product->features) : '') }}</textarea>
+                    cols="50">{{ old('features', $product->features) }}</textarea>
                 </div>
               </div>
 
@@ -88,7 +101,7 @@ Admin | Add New Product
                 <label class="form-label" for="meta_title">Benefits (one per line)</label>
                 <div class="input-group input-group-merge">
                   <textarea type="text" name="benefits" class="form-control" placeholder="Benefits Description" rows="8"
-                    cols="50">{{ old('benefits', is_array($product->benefits) ? implode("\n", $product->benefits) : '') }}</textarea>
+                    cols="50">{{ old('benefits', $product->benefits) }}</textarea>
                 </div>
               </div>
 
@@ -151,7 +164,7 @@ Admin | Add New Product
               <div class="mb-3">
                 <label class="form-label" for="meta_description">Meta description</label>
                 <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                  <textarea type="text" name="quil-description1" id="quil-description1" class="form-control"
+                  <textarea type="text" name="meta_description" id="meta_description" class="form-control"
                     placeholder="Meta description" rows="8" cols="50">{{ old('meta_description', $product->meta_description) }}</textarea>
 
                 </div>

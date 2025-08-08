@@ -95,6 +95,7 @@ class ProductController extends Controller
 {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
+        'price' => 'required|numeric|gte:0',
         'description' => 'required|string',
         'category_id' => 'nullable|exists:products_categories,id',
         'features' => 'nullable|string',
@@ -103,6 +104,7 @@ class ProductController extends Controller
         'sort_order' => 'integer|min:0',
         'meta_title' => 'nullable|string|max:255',
         'meta_description' => 'nullable|string|max:500',
+        'meta_keywords' => 'nullable|string|max:500',
         'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
     ]);
@@ -139,7 +141,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         //
-        $product->load(['category', 'technicalSpecs', 'pricingTiers.active', 'creator', 'updater']);
+        $product->load(['category', 'technicalSpecs', 'creator', 'updater']);
         return view('company.products.show', compact('product'));
     }
 
@@ -161,6 +163,7 @@ class ProductController extends Controller
         //
          $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'price' => 'required|numeric|gte:0',
             'description' => 'required|string',
             'category_id' => 'nullable|exists:products_categories,id',
             'features' => 'nullable|string',
@@ -169,6 +172,7 @@ class ProductController extends Controller
             'sort_order' => 'integer|min:0',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:500',
             'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);

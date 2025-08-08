@@ -25,47 +25,44 @@
                     <!-- Description -->
                     <div class="mb-3">
                         <label class="form-label">Description <span class="text-danger">*</span></label>
-                        <textarea name="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
+                        <textarea
+                          type="text"
+                          name="description"
+                          id="description"
+                          class="form-control"
+                          placeholder="Service Description"
+                          rows="8" cols="50"
+                        >{{ old('description') }}</textarea>
+
+                        @if ($errors->has('description'))
+                            <span class="text-danger text-left">{{ $errors->first('description') }}</span>
+                          @endif
                     </div>
 
-                    <!-- Capabilities -->
-                    {{-- <div class="mb-3">
-                        <label class="form-label">Capabilities <small class="text-muted">(one per line)</small></label>
-                        <textarea name="capabilities" class="form-control" rows="3">{{ old('capabilities') ? implode("\n", old('capabilities')) : '' }}</textarea>
-                    </div> --}}
-  
+                  
+                    <div class="mb-3">
+                       <label class="form-label">Product Price <span class="text-danger">*</span></label>
+                      <div class="input-group input-group-merge">
+                        <span id="title-icon" class="input-group-text">{{config('app.currency_sign')}}</span>
+                        <input type="text" name="price" value="{{ old('price') }}" class="form-control" required>
+                          @if ($errors->has('price'))
+                            <span class="text-danger text-left">{{ $errors->first('price') }}</span>
+                          @endif
+                    </div>
+                    </div>
+           
 
+                    <!-- Capabilities -->
+                    <div class="mb-3">
+                        <label class="form-label">Capabilities <small class="text-muted">(one per line)</small></label>
+                        <textarea name="capabilities" class="form-control" rows="3">{{ old('capabilities') }}</textarea>
+                    </div>
 
                     <!-- Deliverables -->
-                    {{-- <div class="mb-3">
+                    <div class="mb-3">
                         <label class="form-label">Deliverables <small class="text-muted">(one per line)</small></label>
-                        <textarea name="deliverables" class="form-control" rows="3">{{ old('deliverables') ? implode("\n", old('deliverables')) : '' }}</textarea>
-                    </div> --}}
-                    @php
-    $capabilities = old('capabilities');
-    if (is_string($capabilities)) {
-        $capabilities = preg_split('/\r\n|\r|\n/', $capabilities);
-    }
-
-    $deliverables = old('deliverables');
-    if (is_string($deliverables)) {
-        $deliverables = preg_split('/\r\n|\r|\n/', $deliverables);
-    }
-@endphp
-
-<!-- Capabilities -->
-<div class="mb-3">
-    <label class="form-label">Capabilities <small class="text-muted">(one per line)</small></label>
-    <textarea name="capabilities" class="form-control" rows="3">{{ is_array($capabilities) ? implode("\n", $capabilities) : '' }}</textarea>
-</div>
-
-<!-- Deliverables -->
-<div class="mb-3">
-    <label class="form-label">Deliverables <small class="text-muted">(one per line)</small></label>
-    <textarea name="deliverables" class="form-control" rows="3">{{ is_array($deliverables) ? implode("\n", $deliverables) : '' }}</textarea>
-</div>
-
-                    
+                        <textarea name="deliverables" class="form-control" rows="3">{{ old('deliverables') }}</textarea>
+                    </div>
 
                     <!-- Meta Title -->
                     <div class="mb-3">
@@ -76,36 +73,31 @@
                     <!-- Meta Description -->
                     <div class="mb-3">
                         <label class="form-label">Meta Description</label>
-                        <textarea name="meta_description" class="form-control" rows="2">{{ old('meta_description') }}</textarea>
+                        <textarea name="meta_description" class="form-control"
+                            rows="2">{{ old('meta_description') }}</textarea>
+                    </div>
+
+                     <div class="mb-3">
+                        <label class="form-label">Meta Keywords</label>
+                        <textarea name="meta_keywords" class="form-control"
+                            rows="3">{{ old('meta_keywords') }}</textarea>
                     </div>
                 </div>
 
                 <!-- Right Column -->
                 <div class="col-md-4">
-                    <!-- Category -->
-                    {{-- <div class="mb-3">
+                    <div class="mb-3">
                         <label class="form-label">Category</label>
                         <select name="category_id" class="form-select">
                             <option value="">-- Select Category --</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
+                            <option value="{{ $category->id }}"
+                                {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
                             @endforeach
                         </select>
-                    </div> --}}
-                    <div class="mb-3">
-    <label class="form-label">Category</label>
-    <select name="category_id" class="form-select">
-        <option value="">-- Select Category --</option>
-        @foreach($categories as $category)
-            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                {{ $category->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
-
+                    </div>
 
                     <!-- Duration -->
                     <div class="mb-3">
@@ -123,36 +115,25 @@
                     <div class="mb-3">
                         <label class="form-label">Status</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" {{ old('is_active', true) ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
+                                {{ old('is_active', true) ? 'checked' : '' }} value="1">
                             <label class="form-check-label" for="is_active">
                                 Active
                             </label>
                         </div>
                     </div>
                     <!-- Main Image Upload -->
-<div class="mb-3">
-    <label class="form-label">Main Image</label>
-    <input type="file" name="main_image" class="form-control" accept="image/*">
-</div>
+                    <div class="mb-3">
+                        <label class="form-label">Main Image</label>
+                        <input type="file" name="main_image" class="form-control" accept="image/*">
+                    </div>
 
-<!-- Gallery Image Upload -->
-<div class="mb-3">
-    <label class="form-label">Gallery Images <small>(multiple files allowed)</small></label>
-    <input type="file" name="gallery_images[]" class="form-control" accept="image/*" multiple>
-</div>
+                    <!-- Gallery Image Upload -->
+                    <div class="mb-3">
+                        <label class="form-label">Gallery Images <small>(multiple files allowed)</small></label>
+                        <input type="file" name="gallery_images[]" class="form-control" accept="image/*" multiple>
+                    </div>
 
-
-                    <!-- Image URL -->
-                    {{-- <div class="mb-3">
-                        <label class="form-label">Main Image URL</label>
-                        <input type="url" name="image_url" class="form-control" value="{{ old('image_url') }}">
-                    </div> --}}
-
-                    <!-- Gallery Images -->
-                    {{-- <div class="mb-3">
-                        <label class="form-label">Gallery Image URLs <small>(one per line)</small></label>
-                        <textarea name="gallery_images" class="form-control" rows="3">{{ old('gallery_images') ? implode("\n", old('gallery_images')) : '' }}</textarea>
-                    </div> --}}
                 </div>
             </div>
 

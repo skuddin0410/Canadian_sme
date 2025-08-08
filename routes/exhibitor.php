@@ -57,25 +57,9 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
         Route::put('technical-specs/{spec}', [ProductTechnicalSpecController::class, 'update'])->name('specs.update');
         Route::delete('technical-specs/{spec}', [ProductTechnicalSpecController::class, 'destroy'])->name('specs.destroy');
     });
-    
-    // Product Pricing
-    Route::prefix('products/{product}')->name('products.')->group(function () {
-        Route::post('pricing', [PricingController::class, 'storeProductPricing'])->name('pricing.store');
-        Route::put('pricing/{pricing}', [PricingController::class, 'updateProductPricing'])->name('pricing.update');
-        Route::delete('pricing/{pricing}', [PricingController::class, 'destroyProductPricing'])->name('pricing.destroy');
-    });
-    
     // Services
     Route::resource('services', ServiceController::class);
-    
-    // Service Pricing
-    Route::prefix('services/{service}')->name('services.')->group(function () {
-        Route::post('pricing', [PricingController::class, 'storeServicePricing'])->name('pricing.store');
-        Route::put('pricing/{pricing}', [PricingController::class, 'updateServicePricing'])->name('pricing.update');
-        Route::delete('pricing/{pricing}', [PricingController::class, 'destroyServicePricing'])->name('pricing.destroy');
-    });
 
-	
 });
 
 // Public Routes

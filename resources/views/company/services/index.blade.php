@@ -48,7 +48,7 @@
                 <table class="table table-striped align-middle">
                     <thead>
                         <tr>
-                            {{-- <th>Image</th> --}}
+                            <th>Image</th>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Status</th>
@@ -60,7 +60,7 @@
                     <tbody>
                         @forelse($services as $service)
                             <tr>
-                                {{-- <td>
+                             <td>
                                     @if($service->image_url)
                                         <img src="{{ asset($service->image_url) }}" alt="{{ $service->name }}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
                                     @else
@@ -68,7 +68,7 @@
                                             <i class="bx bx-image text-muted"></i>
                                         </div>
                                     @endif
-                                </td> --}}
+                                </td>
                                 <td>
                                     <strong>{{ $service->name }}</strong><br>
                                     <small class="text-muted">{{ Str::limit($service->description, 50) }}</small>
