@@ -221,7 +221,7 @@ Admin | Add New Product
               </div>
 
               <div class="d-flex pt-3 justify-content-end">
-                <a href="{{route('pages.index')}}"
+                <a href="{{route('products.index')}}"
                   class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
                 <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
               </div>

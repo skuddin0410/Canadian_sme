@@ -56,9 +56,6 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-
-          
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'price' => 'required|numeric|gte:0',
@@ -95,12 +92,7 @@ class ServiceController extends Controller
             }
             
             $service = Service::create($validated);
-
-
             return redirect()->route('services.index')->with('success', 'Service created successfully.');
-        } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'Service creation failed: ' . $e->getMessage());
-        }
     }
 
     /**
@@ -108,7 +100,7 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        $service->load(['category', 'pricingTiers.active', 'creator', 'updater']);
+        $service->load(['category','creator', 'updater']);
         return view('company.services.show', compact('service'));
     }
 
@@ -131,28 +123,43 @@ class ServiceController extends Controller
             'price' => 'required|numeric|gte:0',
             'description' => 'required|string',
             'category_id' => 'nullable|exists:service_categories,id',
-            'capabilities' => 'nullable|string',
-            'deliverables' => 'nullable|string',
             'duration' => 'nullable|string|max:255',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:500',
-            'image_url' => 'nullable|url',
+            'capabilities' => 'nullable|string|max:500',
+            'deliverables' => 'nullable|string|max:500',
+             'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gallery_images' => 'nullable|array',
-            'gallery_images.*' => 'url'
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($validated['name'] !== $service->name) {
             $validated['slug'] = Str::slug($validated['name']);
         }
 
+         if ($request->hasFile('main_image')) {
+            $validated['image_url'] = $request->file('main_image')->store('services/main', 'public');
+        }
+
+        // Upload gallery images
+        if ($request->hasFile('gallery_images')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery_images') as $img) {
+                $galleryPaths[] = $img->store('services/gallery', 'public');
+            }
+            $validated['gallery_images'] = $galleryPaths;
+        }
+
         $validated['updated_by'] = Auth::id();
 
         $service->update($validated);
 
-        return redirect()->route('services.show', $service)
+
+
+        return redirect()->route('services.index', $service)
             ->with('success', 'Service updated successfully.');
     }
 

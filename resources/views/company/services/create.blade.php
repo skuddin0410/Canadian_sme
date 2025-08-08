@@ -1,5 +1,7 @@
 @extends('layouts.admin')
-
+@section('title')
+    Admin | Add New Service
+@endsection
 @section('content')
 <div class="container">
     <form action="{{ route('services.store') }}" method="POST" enctype="multipart/form-data">
@@ -8,7 +10,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Add New Service</h4>
-                <a href="{{ route('services.index') }}" class="btn btn-secondary">
+                <a href="{{ route('services.index') }}" class="btn btn-primary">
                     <i class="bx bx-arrow-back"></i> Back to Services
                 </a>
             </div>
@@ -19,7 +21,10 @@
                     <!-- Name -->
                     <div class="mb-3">
                         <label class="form-label">Service Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                        <input type="text" name="name" class="form-control" value="{{ old('name') }}">
+                          @if ($errors->has('name'))
+                          <span class="text-danger text-left">{{ $errors->first('name') }}</span>
+                          @endif
                     </div>
 
                     <!-- Description -->
@@ -44,43 +49,53 @@
                        <label class="form-label">Product Price <span class="text-danger">*</span></label>
                       <div class="input-group input-group-merge">
                         <span id="title-icon" class="input-group-text">{{config('app.currency_sign')}}</span>
-                        <input type="text" name="price" value="{{ old('price') }}" class="form-control" required>
-                          @if ($errors->has('price'))
+                        <input type="text" name="price" value="{{ old('price') }}" class="form-control">
+                         
+                    </div>
+                     @if ($errors->has('price'))
                             <span class="text-danger text-left">{{ $errors->first('price') }}</span>
                           @endif
-                    </div>
                     </div>
            
 
                     <!-- Capabilities -->
                     <div class="mb-3">
                         <label class="form-label">Capabilities <small class="text-muted">(one per line)</small></label>
-                        <textarea name="capabilities" class="form-control" rows="3">{{ old('capabilities') }}</textarea>
+                        <textarea name="capabilities" class="form-control" rows="8" cols="50">{{ old('capabilities') }}</textarea>
+                        @if ($errors->has('capabilities'))
+                          <span class="text-danger text-left">{{ $errors->first('capabilities') }}</span>
+                        @endif
                     </div>
 
                     <!-- Deliverables -->
                     <div class="mb-3">
                         <label class="form-label">Deliverables <small class="text-muted">(one per line)</small></label>
-                        <textarea name="deliverables" class="form-control" rows="3">{{ old('deliverables') }}</textarea>
+                        <textarea name="deliverables" class="form-control" rows="8" cols="50">{{ old('deliverables') }}</textarea>
+                        @if ($errors->has('deliverables'))
+                          <span class="text-danger text-left">{{ $errors->first('deliverables') }}</span>
+                        @endif
                     </div>
 
                     <!-- Meta Title -->
                     <div class="mb-3">
                         <label class="form-label">Meta Title</label>
                         <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title') }}">
+                         @if ($errors->has('meta_title'))
+                          <span class="text-danger text-left">{{ $errors->first('meta_title') }}</span>
+                        @endif
                     </div>
 
                     <!-- Meta Description -->
                     <div class="mb-3">
                         <label class="form-label">Meta Description</label>
                         <textarea name="meta_description" class="form-control"
-                            rows="2">{{ old('meta_description') }}</textarea>
+                            rows="8" cols="50">{{ old('meta_description') }}</textarea>
                     </div>
 
                      <div class="mb-3">
                         <label class="form-label">Meta Keywords</label>
                         <textarea name="meta_keywords" class="form-control"
-                            rows="3">{{ old('meta_keywords') }}</textarea>
+                            rows="8" cols="50">{{ old('meta_keywords') }}</textarea>
                     </div>
                 </div>
 
@@ -103,6 +118,9 @@
                     <div class="mb-3">
                         <label class="form-label">Duration</label>
                         <input type="text" name="duration" class="form-control" value="{{ old('duration') }}">
+                         @if ($errors->has('duration'))
+                          <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
+                        @endif
                     </div>
 
                     <!-- Sort Order -->
@@ -138,7 +156,8 @@
             </div>
 
             <div class="card-footer d-flex justify-content-end">
-                <button type="submit" class="btn btn-success">
+                <a href="{{route('services.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">
                     <i class="bx bx-save"></i> Save Service
                 </button>
             </div>

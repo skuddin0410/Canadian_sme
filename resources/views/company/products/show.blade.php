@@ -6,7 +6,7 @@ Admin | Product Details
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Product/</span>Page</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Product/</span>Details</h4>
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
@@ -25,7 +25,7 @@ Admin | Product Details
             <a href="{{route("products.index")}}"
               class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
           </div>
-          <h5 class="pb-2 border-bottom mb-4">CMS Page Details</h5>
+          <h5 class="pb-2 border-bottom mb-4">Product Details</h5>
           <div class="info-container">
             <ul class="list-unstyled">
               <li class="mb-3">
