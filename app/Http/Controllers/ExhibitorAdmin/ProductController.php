@@ -155,17 +155,14 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'category_id' => 'nullable|exists:products_categories,id',
-            'features' => 'nullable|array',
-            'benefits' => 'nullable|array',
+            'features' => 'nullable|string',
+            'benefits' => 'nullable|string',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-             'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-           'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-            // 'image_url' => 'nullable|url',
-            // 'gallery_images' => 'nullable|array',
-            // 'gallery_images.*' => 'url'
+            'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         // Parse string inputs to arrays
     $validated['features'] = $request->filled('features')

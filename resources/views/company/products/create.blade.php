@@ -130,7 +130,9 @@
                   type="file"
                   class="form-control"
                   name="gallery_images[]"
-                  id="gallery_images"/>
+                  id="gallery_images"
+                  multiple
+                  />
               </div>
               @if ($errors->has('Main Image'))
                 <span class="text-danger text-left">{{ $errors->first('gallery_images') }}</span>
