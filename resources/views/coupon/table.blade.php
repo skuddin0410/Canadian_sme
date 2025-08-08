@@ -61,7 +61,7 @@
 	    <div class="col-4 p-1">
 			<a href="{{ route("coupons.show",["coupon"=> $coupon->id ]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
 		</div>
-	    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Content Manager'))			
+	    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))			
 		<div class="col-4 p-1">
 			<a href="{{ route("coupons.edit",["coupon"=> $coupon->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
 		</div>

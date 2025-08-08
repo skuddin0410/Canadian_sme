@@ -14,7 +14,14 @@ class RoleController extends Controller
      */
     public function matrix()
     {
-        $roles = Role::all();
+        $roles = Role::whereIn('name', [
+            'Event Admin',
+            'Exhibitor Admin',
+            'Support Staff Or Helpdesk',
+            'Registration Desk'
+        ])->with('permissions')->get();
+
+        // Get all permissions (or filter if needed)
         $permissions = Permission::all();
 
         return view('roles.matrix', compact('roles', 'permissions'));

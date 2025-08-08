@@ -21,23 +21,21 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        //
-      
         $query = Service::with(['category', 'creator'])
-            ->when($request->category_id, function($q, $categoryId) {
+            ->when($request->category_id, function ($q, $categoryId) {
                 return $q->where('category_id', $categoryId);
             })
-            ->when($request->search, function($q, $search) {
+            ->when($request->search, function ($q, $search) {
                 return $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             })
-            ->when($request->status, function($q, $status) {
+            ->when($request->status, function ($q, $status) {
                 return $status === 'active' ? $q->active() : $q->where('is_active', false);
             });
 
         $services = $query->orderBy('sort_order')
-                         ->orderBy('name')
-                         ->paginate(15);
+            ->orderBy('name')
+            ->paginate(15);
 
         $categories = ServiceCategory::active()->orderBy('name')->get();
 
@@ -49,20 +47,80 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        //
         $categories = ServiceCategory::active()->orderBy('name')->get();
         return view('company.services.create', compact('categories'));
-
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    try {
+    {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'price' => 'required|numeric|gte:0',
+                'description' => 'required|string',
+                'category_id' => 'nullable|exists:service_categories,id',
+                'duration' => 'nullable|string|max:255',
+                'is_active' => 'nullable|string',
+                'sort_order' => 'integer|min:0',
+                'meta_title' => 'nullable|string|max:255',
+                'meta_description' => 'nullable|string|max:500',
+                'meta_keywords' => 'nullable|string|max:500',
+                'capabilities' => 'nullable|string|max:500',
+                'deliverables' => 'nullable|string|max:500',
+                'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'gallery_images' => 'nullable|array',
+                'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ]);
+
+            $validated['slug'] = Str::slug($validated['name']);
+            $validated['created_by'] = Auth::id() ?? null;
+
+            // Upload main image
+            if ($request->hasFile('main_image')) {
+                $validated['image_url'] = $request->file('main_image')->store('services/main', 'public');
+            }
+
+            // Upload gallery images
+            if ($request->hasFile('gallery_images')) {
+                $galleryPaths = [];
+                foreach ($request->file('gallery_images') as $img) {
+                    $galleryPaths[] = $img->store('services/gallery', 'public');
+                }
+                $validated['gallery_images'] = $galleryPaths;
+            }
+            
+            $service = Service::create($validated);
+            return redirect()->route('services.index')->with('success', 'Service created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Service $service)
+    {
+        $service->load(['category','creator', 'updater']);
+        return view('company.services.show', compact('service'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Service $service)
+    {
+        $categories = ServiceCategory::active()->orderBy('name')->get();
+        return view('company.services.edit', compact('service', 'categories'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Service $service)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'price' => 'required|numeric|gte:0',
             'description' => 'required|string',
             'category_id' => 'nullable|exists:service_categories,id',
             'duration' => 'nullable|string|max:255',
@@ -70,25 +128,19 @@ class ServiceController extends Controller
             'sort_order' => 'integer|min:0',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'meta_keywords' => 'nullable|string|max:500',
+            'capabilities' => 'nullable|string|max:500',
+            'deliverables' => 'nullable|string|max:500',
+             'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        // Convert textareas to array
-        $validated['capabilities'] = $request->filled('capabilities')
-            ? array_filter(preg_split('/\r\n|\r|\n/', $request->capabilities))
-            : [];
+        if ($validated['name'] !== $service->name) {
+            $validated['slug'] = Str::slug($validated['name']);
+        }
 
-        $validated['deliverables'] = $request->filled('deliverables')
-            ? array_filter(preg_split('/\r\n|\r|\n/', $request->deliverables))
-            : [];
-
-        $validated['slug'] = Str::slug($validated['name']);
-        $validated['created_by'] = Auth::id() ?? null;
-
-        // Upload main image
-        if ($request->hasFile('main_image')) {
+         if ($request->hasFile('main_image')) {
             $validated['image_url'] = $request->file('main_image')->store('services/main', 'public');
         }
 
@@ -101,121 +153,14 @@ class ServiceController extends Controller
             $validated['gallery_images'] = $galleryPaths;
         }
 
-        // Create service
-        $service = Service::create($validated);
-        dd($service);
-
-        return redirect()->route('services.index')->with('success', 'Service created successfully.');
-    } catch (\Throwable $e) {
-        \Log::error('Service creation failed', ['error' => $e->getMessage()]);
-        return redirect()->back()->with('error', 'Service creation failed: ' . $e->getMessage());
-    }
-}
-
-//  public function store(Request $request)
-// {
-//     $validated = $request->validate([
-//         'name' => 'required|string|max:255',
-//         'description' => 'required|string',
-//         'category_id' => 'nullable|exists:service_categories,id',
-//         'duration' => 'nullable|string|max:255',
-//         'is_active' => 'boolean',
-//         'sort_order' => 'integer|min:0',
-//         'meta_title' => 'nullable|string|max:255',
-//         'meta_description' => 'nullable|string|max:500',
-//         'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-//         'gallery_images' => 'nullable|array',
-//         'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-//     ]);
-
-   
-//     $validated['capabilities'] = $request->filled('capabilities')
-//         ? array_filter(preg_split('/\r\n|\r|\n/', $request->capabilities))
-//         : [];
-
-//     $validated['deliverables'] = $request->filled('deliverables')
-//         ? array_filter(preg_split('/\r\n|\r|\n/', $request->deliverables))
-//         : [];
-
-   
-//     $validated['slug'] = Str::slug($validated['name']);
-//     $validated['created_by'] = Auth::id();
-
-  
-//     if ($request->hasFile('main_image')) {
-//         $path = $request->file('main_image')->store('services/main', 'public');
-//         $validated['image_url'] = $path;
-//     }
-
-    
-//     if ($request->hasFile('gallery_images')) {
-//         $galleryPaths = [];
-//         foreach ($request->file('gallery_images') as $img) {
-//             $galleryPaths[] = $img->store('services/gallery', 'public');
-//         }
-//         $validated['gallery_images'] = $galleryPaths;
-//     }
-
- 
-//     $service = Service::create($validated);
-
-//     return redirect()->route('services.index')
-//         ->with('success', 'Service created successfully.');
-// }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Service $service)
-    {
-        //
-         $service->load(['category', 'pricingTiers.active', 'creator', 'updater']);
-        return view('company.services.show', compact('service'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Service $service)
-    {
-        //
-        $categories = ServiceCategory::active()->orderBy('name')->get();
-        return view('company.services.edit', compact('service', 'categories'));
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Service $service)
-    {
-        //
-         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'nullable|exists:service_categories,id',
-            'capabilities' => 'nullable|array',
-            'deliverables' => 'nullable|array',
-            'duration' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer|min:0',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:500',
-            'image_url' => 'nullable|url',
-            'gallery_images' => 'nullable|array',
-            'gallery_images.*' => 'url'
-        ]);
-
-        if ($validated['name'] !== $service->name) {
-            $validated['slug'] = Str::slug($validated['name']);
-        }
-        
         $validated['updated_by'] = Auth::id();
 
         $service->update($validated);
 
-        return redirect()->route('services.show', $service)
-                        ->with('success', 'Service updated successfully.');
+
+
+        return redirect()->route('services.index', $service)
+            ->with('success', 'Service updated successfully.');
     }
 
     /**
@@ -223,28 +168,27 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        //
-         $service->delete();
+        $service->delete();
         return redirect()->route('services.index')
-                        ->with('success', 'Service deleted successfully.');
-
+            ->with('success', 'Service deleted successfully.');
     }
-     // API Methods for frontend
+
+    // API Methods for frontend
     public function apiIndex(Request $request)
     {
         $query = Service::active()
-            ->with(['category', 'pricingTiers' => function($q) {
+            ->with(['category', 'pricingTiers' => function ($q) {
                 $q->active()->orderBy('sort_order');
             }])
-            ->when($request->category, function($q, $category) {
-                return $q->whereHas('category', function($sq) use ($category) {
+            ->when($request->category, function ($q, $category) {
+                return $q->whereHas('category', function ($sq) use ($category) {
                     $sq->where('slug', $category);
                 });
             });
 
         $services = $query->orderBy('sort_order')
-                         ->orderBy('name')
-                         ->get();
+            ->orderBy('name')
+            ->get();
 
         return response()->json($services);
     }
@@ -252,7 +196,7 @@ class ServiceController extends Controller
     public function apiShow($slug)
     {
         $service = Service::active()
-            ->with(['category', 'pricingTiers' => function($q) {
+            ->with(['category', 'pricingTiers' => function ($q) {
                 $q->active()->orderBy('sort_order');
             }])
             ->where('slug', $slug)

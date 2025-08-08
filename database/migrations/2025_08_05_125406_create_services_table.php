@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-             $table->string('name');
+            $table->string('name');
+            $table->decimal('price', 10, 2)->nullable();
             $table->string('slug')->unique();
             $table->longText('description');
-            $table->json('capabilities')->nullable();
-            $table->json('deliverables')->nullable();
+            $table->text('capabilities')->nullable();
+            $table->text('deliverables')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->string('duration')->nullable();
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
+            $table->text('meta_keywords')->nullable();
+            
             $table->string('image_url')->nullable();
             $table->json('gallery_images')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();

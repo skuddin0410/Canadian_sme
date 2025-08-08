@@ -81,7 +81,10 @@ class PageController extends Controller
             'tags' => 'required',
             'description' => 'required|string',
             'meta_title'=>"nullable|max:255",
-            'meta_keywords'=>"nullable|max:255"
+            'meta_keywords'=>"nullable|max:255",
+            'status' => 'required',
+            'start_date' => 'required_unless:status,scheduled|date',
+            'end_date' => 'required_unless:status,scheduled|date'
         ]);
         if($validator->fails()){
             return redirect(route('pages.create'))->withInput()
@@ -100,6 +103,9 @@ class PageController extends Controller
         $page->created_by = \Auth::user()->id;
 
         $page->meta_keywords = $request->meta_keywords;
+        $page->status = $request->status;
+        $page->end_date = $request->end_date;
+        $page->start_date = $request->start_date;
         $page->save();
         if($request->file("image")){
          $this->imageUpload($request->file("image"),$uploadPath,$page->id,'pages','photo'); 
@@ -139,7 +145,10 @@ class PageController extends Controller
             'tags' => 'required',
             'description' => 'required|string',
             'meta_title'=>"nullable|max:255",
-            'meta_keywords'=>"nullable|max:255"
+            'meta_keywords'=>"nullable|max:255",
+            'status' => 'required',
+            'start_date' => 'required_unless:status,scheduled|date',
+            'end_date' => 'required_unless:status,scheduled|date'
         ]);
 
         if($validator->fails()){
@@ -157,6 +166,9 @@ class PageController extends Controller
         $page->meta_description = $request->meta_description ? strip_tags($request->meta_description): null;
         $page->meta_keywords = $request->meta_keywords;
         $page->created_by = \Auth::user()->id;
+        $page->status = $request->status;
+        $page->end_date = $request->end_date;
+        $page->start_date = $request->start_date;
         $page->save();
         if($request->file("image")){
           $this->imageUpload($request->file("image"),$uploadPath,$page->id,'pages','photo',$idForUpdate=$page->id);   

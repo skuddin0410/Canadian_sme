@@ -1,7 +1,12 @@
 @extends('layouts.admin')
-
+@section('title')
+    Admin | Service List
+@endsection
 @section('content')
-<div class="container-fluid">
+<div class="container flex-grow-1 container-p-y pt-0">
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Service/</span> List</h4>
+    <div class="row">
+    <div class="col-xl">    
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Services</h4>
@@ -11,7 +16,6 @@
         </div>
 
         <div class="card-body">
-            <!-- Filters -->
             <form method="GET" class="mb-4">
                 <div class="row">
                     <div class="col-md-3">
@@ -44,83 +48,111 @@
             </form>
 
             <!-- Services Table -->
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            {{-- <th>Image</th> --}}
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th>Sort Order</th>
-                            <th>Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($services as $service)
-                            <tr>
-                                {{-- <td>
-                                    @if($service->image_url)
-                                        <img src="{{ asset($service->image_url) }}" alt="{{ $service->name }}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
-                                    @else
-                                        <div class="bg-light text-center d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <i class="bx bx-image text-muted"></i>
-                                        </div>
-                                    @endif
-                                </td> --}}
-                                <td>
-                                    <strong>{{ $service->name }}</strong><br>
-                                    <small class="text-muted">{{ Str::limit($service->description, 50) }}</small>
-                                </td>
-                                <td>{{ $service->category->name ?? 'Uncategorized' }}</td>
-                                <td>
-                                    <span class="badge bg-{{ $service->is_active ? 'success' : 'secondary' }}">
-                                        {{ $service->is_active ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>{{ $service->sort_order }}</td>
-                                <td>
-                                    {{ $service->created_at->format('M d, Y') }}<br>
-                                    <small class="text-muted">by {{ $service->creator->name ?? 'System' }}</small>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <!-- View -->
-                                        <a href="{{ route('services.show', $service) }}" class="btn btn-sm btn-icon btn-primary" title="View">
-                                            <i class="bx bx-show"></i>
-                                        </a>
+               <div class="pt-0">
+                    @if(Session::has('success'))
+                    <div class="alert alert-success">
+                        {{ Session::get('success') }}
+                    </div>
+                    @endif
+                    @if(Session::has('error'))
+                    <div class="alert alert-danger">
+                        {{ Session::get('error') }}
+                    </div>
+                    @endif
+                    <div class="col text-center">
+                        <div class="spinner-border spinner-border-sm"></div>
+                    </div>
 
-                                        <!-- Edit -->
-                                        <a href="{{ route('services.edit', $service) }}" class="btn btn-sm btn-icon item-edit" title="Edit">
-                                            <i class="bx bx-edit-alt"></i>
-                                        </a>
+                    <div class="table-responsive mt-3" id="services-table">
 
-                                        <!-- Delete -->
-                                        <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" type="submit" title="Delete">
-                                                <i class="bx bx-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center text-muted">No services found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    </div>
+                </div>
 
-            <!-- Pagination -->
-            <div class="mt-3">
-                {{ $services->withQueryString()->links() }}
-            </div>
+          
         </div>
     </div>
+    </div>
+    </div>
 </div>
+@endsection
+@section('scripts')
+<script type="text/javascript">
+     function GetBlogList() {
+        $(".spinner-border").fadeIn(300);
+        $.ajax({
+            url: "{{route('services.index')}}",
+            type: 'get',
+            headers: {
+                'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+            },
+            data:{ajax_request:true},
+            dataType: "json",
+            success: function (data) {
+               $(document).find("#services-table").html(data.html);
+               $(".spinner-border").fadeOut(300);
+            },
+            error:function(data){
+               $(".spinner-border").fadeOut(300);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        GetBlogList();
+    });
+
+    jQuery(function($) {
+            $(document).on("click", ".custom_pagination .pagination-link", function(e) {
+                e.preventDefault();
+                $(document).ajaxSend(function() {
+                   $(".spinner-border").fadeIn(300);
+                });
+                $(this).parent().siblings('.page-item').removeAttr('aria-current');
+                $(this).parent().siblings('.page-item').removeClass('active');
+                var url = $(this).attr("href");
+                finalURL = url;
+                $(this).parent().addClass('active');
+                $(this).parent().attr('aria-current', 'page');
+                $.get(finalURL, function(data) {
+                    $(document).find("#services-table").html(data.html);
+                }).done(function() {
+                   $(".spinner-border").fadeOut(300);
+            });
+            return false;
+        })
+
+  });
+
+    $(document).on("click", ".filter", function(e) {
+        var search = $('#search').val();
+        var category_id = $('#category_id').val();
+        var is_active = $('#is_active').val();
+        if( search.trim() == '' && category_id.trim()== '' && is_active.trim() == ''){
+           return ;
+        } 
+       $(".spinner-border").fadeIn(300); 
+       $.ajax({
+            url: "{{route('services.index')}}" + '?' + $("#product-filter").serialize(),
+            type: 'GET',
+            headers: {
+                'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+            },
+            data: {
+                ajax_request: true
+            },
+            dataType: "json",
+            success: function(data) {
+                $(document).find("#services-table").html(data.html);
+                $(".spinner-border").fadeOut(300);
+            },
+            error: function(data) {
+                $(".spinner-border").fadeOut(300);
+            }
+        });
+    })
+    
+    $('.reset-filter').on('click', function() {
+      window.location.href = "{{route('services.index')}}";
+    });         
+</script>   
 @endsection

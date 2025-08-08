@@ -16,19 +16,15 @@ use App\Http\Controllers\ExhibitorAdmin\PublicProductServiceController;
 
 Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () {
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
-    // Handles showing the description editor
-    Route::get('company/description', [CompanyController::class, 'editDescription'])->name('company.description');
 
-// Handles updating the description
-    Route::post('company/description/update', [CompanyController::class, 'updateDescription'])->name('company.description.update');
-    Route::get('company/websites', [CompanyController::class, 'websites'])->name('company.websites');
-    Route::put('company/websites', [CompanyController::class, 'updateWebsites'])->name('company.websites.update');
-    Route::get('company/certifications', [CompanyController::class, 'certifications'])->name('company.certifications');
-    Route::put('company/certifications', [CompanyController::class, 'updateCertifications'])->name('company.certifications.update');
+
     Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts');
+    //..
     Route::get('company/contacts/create', [CompanyContactController::class, 'create'])->name('company.contacts.create');
     Route::post('company/contacts', [CompanyContactController::class, 'store'])->name('company.contacts.store');
     Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
+
+
 
     Route::get('/branding/logo', [CompanyController::class, 'logoForm'])->name('company.branding.logo');
     Route::post('/branding/logo', [CompanyController::class, 'uploadLogo'])->name('company.branding.logo.upload');
@@ -40,11 +36,6 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::get('/company/videos', [CompanyController::class, 'videoGallery'])->name('company.videos.gallery');
     Route::post('/company/videos/upload', [CompanyController::class, 'uploadVideo'])->name('company.videos.upload');
     Route::delete('/company/videos/{id}', [CompanyController::class, 'deleteVideo'])->name('company.videos.delete');
-
-     
-
-
-
 
 
     Route::resource('trainings', TrainingController::class);
@@ -66,25 +57,9 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
         Route::put('technical-specs/{spec}', [ProductTechnicalSpecController::class, 'update'])->name('specs.update');
         Route::delete('technical-specs/{spec}', [ProductTechnicalSpecController::class, 'destroy'])->name('specs.destroy');
     });
-    
-    // Product Pricing
-    Route::prefix('products/{product}')->name('products.')->group(function () {
-        Route::post('pricing', [PricingController::class, 'storeProductPricing'])->name('pricing.store');
-        Route::put('pricing/{pricing}', [PricingController::class, 'updateProductPricing'])->name('pricing.update');
-        Route::delete('pricing/{pricing}', [PricingController::class, 'destroyProductPricing'])->name('pricing.destroy');
-    });
-    
     // Services
     Route::resource('services', ServiceController::class);
-    
-    // Service Pricing
-    Route::prefix('services/{service}')->name('services.')->group(function () {
-        Route::post('pricing', [PricingController::class, 'storeServicePricing'])->name('pricing.store');
-        Route::put('pricing/{pricing}', [PricingController::class, 'updateServicePricing'])->name('pricing.update');
-        Route::delete('pricing/{pricing}', [PricingController::class, 'destroyServicePricing'])->name('pricing.destroy');
-    });
 
-	
 });
 
 // Public Routes
