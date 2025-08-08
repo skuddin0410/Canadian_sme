@@ -26,7 +26,7 @@
 
         <div class="mb-3">
           <label class="form-label">Material Description</label>
-          <textarea name="material_description" class="form-control" rows="3" required>{{ $training->material_description }}</textarea>
+          <textarea name="material_description" id="description" class="form-control" rows="3" required>{{ $training->material_description }}</textarea>
         </div>
 
         <div class="mb-3">
@@ -40,8 +40,12 @@
           <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp">
         </div>
 
-        <button type="submit" class="btn btn-primary">Update Material</button>
-        <a href="{{ route('trainings.index') }}" class="btn btn-secondary">Cancel</a>
+       
+
+        <div class="d-flex pt-3 justify-content-end">
+             <a href="{{route('trainings.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+          </div>
       </form>
     </div>
   </div>

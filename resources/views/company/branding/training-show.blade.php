@@ -6,6 +6,14 @@
 
   <div class="card">
     <div class="card-body">
+    <div class="d-flex pt-3 justify-content-end">
+      <a href="{{route("trainings.edit",["training"=> $training->id ])}}"
+        class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
+      <a href="{{route("trainings.index")}}"
+        class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
+    </div>
+      
+      <h5 class="pb-2 border-bottom mb-4">Traing Details</h5>
       <h5>{{ $training->material_name }}</h5>
 
       <p class="mb-3">{!! $training->material_description !!}</p>
@@ -20,7 +28,14 @@
 
       <p><small><strong>Uploaded on:</strong> {{ $training->created_at->format('d M Y') }}</small></p>
 
-      <a href="{{ route('trainings.index') }}" class="btn btn-secondary mt-3">Back to List</a>
+      <div class="d-flex pt-3 justify-content-end">
+
+        <a href="{{route("trainings.edit",["training"=> $training->id ])}}"
+          class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
+
+        <a href="{{route("trainings.index")}}"
+          class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
+      </div>
     </div>
   </div>
 </div>
