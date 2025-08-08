@@ -28,16 +28,34 @@
     </a>
 
     <ul class="menu-sub">
-          <li class="menu-item {{ request()->is('products*') ? 'active open' : '' }}">
-            <a href="{{ route('products.index') }}" class="menu-link">
+        
+        <li class="menu-item {{ request()->is('products*') || request()->is('product-categories*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <div data-i18n="Products">Products</div>
             </a>
+            <ul class="menu-sub">
+                
+                <li class="menu-item {{ request()->is('product-categories*') ? 'active' : '' }}">
+                    <a href="{{route('product-categories.index')}}" class="menu-link">
+                        <div data-i18n="Product Categories">Product Categories</div>
+                    </a>
+                </li>
+            </ul>
         </li>
 
-        <li class="menu-item {{ request()->is('service*') ||  request()->is('service-categories*') ? 'active' : '' }} }}">
-            <a href="{{ route('services.index') }}" class="menu-link">
-                <div data-i18n="Service">Service</div>
+         {{-- Services Dropdown --}}
+        <li class="menu-item {{ request()->is('service*') || request()->is('service-categories*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <div data-i18n="Services">Services</div>
             </a>
+            <ul class="menu-sub">
+              
+                <li class="menu-item {{ request()->is('service-categories*') ? 'active' : '' }}">
+                    <a href="" class="menu-link">
+                        <div data-i18n="Service Categories">Service Categories</div>
+                    </a>
+                </li>
+            </ul>
         </li>
 
       

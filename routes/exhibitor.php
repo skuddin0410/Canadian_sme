@@ -43,7 +43,7 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::resource('booths', BoothController::class);
 
     // Product Categories
-    Route::resource('product-categories', ProductCategoryController::class)->except(['show']);
+    Route::resource('product-categories', ProductCategoryController::class);
     
     // Service Categories
     Route::resource('service-categories', ServiceCategoryController::class)->except(['show']);
