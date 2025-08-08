@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use DataTables;
+
 class ProductController extends Controller
 {
     /**
@@ -18,9 +23,14 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        //
-         $query = Product::with(['category', 'creator'])
-            ->when($request->category_id, function($q, $categoryId) {
+       $perPage = (int) $request->input('perPage', 20);
+        $pageNo = (int) $request->input('page', 1);
+        $offset = $perPage * ($pageNo - 1);
+
+      if($request->ajax() && $request->ajax_request == true){
+        $products = Product::with(['category', 'creator'])->orderBy('id','DESC');
+
+        $products = $products->when($request->category_id, function($q, $categoryId) {
                 return $q->where('category_id', $categoryId);
             })
             ->when($request->search, function($q, $search) {
@@ -29,16 +39,27 @@ class ProductController extends Controller
             })
             ->when($request->status, function($q, $status) {
                 return $status === 'active' ? $q->active() : $q->where('is_active', false);
-            });
+        });
 
-        $products = $query->orderBy('sort_order')
-                         ->orderBy('name')
-                         ->paginate(15);
-                        //  dd($products);
+        $productsCount = clone $products;
+        $totalRecords = $productsCount->count(DB::raw('DISTINCT(products.id)'));  
+        $products = $products->offset($offset)->limit($perPage)->get();       
+        $products = new LengthAwarePaginator($products, $totalRecords, $perPage, $pageNo, [
+                  'path'  => $request->url(),
+                  'query' => $request->query(),
+                ]);
+        $data['offset'] = $offset;
+        $data['pageNo'] = $pageNo;
+        $products->setPath(route('products.index'));
+        $data['html'] = view('company.products.table', compact('products', 'perPage'))
+                  ->with('i', $pageNo * $perPage)
+                  ->render();
 
-        $categories = ProductCategory::active()->orderBy('name')->get();
-
-        return view('company.products.index', compact('products', 'categories'));
+         return response($data);                                              
+        }
+        $categories = ProductCategory::active()->orderBy('name')->get();   
+                   
+        return view('company.products.index',["categories"=>$categories]);
     }
 
     /**
