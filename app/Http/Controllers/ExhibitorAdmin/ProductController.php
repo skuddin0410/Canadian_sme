@@ -23,23 +23,38 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-       $perPage = (int) $request->input('perPage', 20);
+        $perPage = (int) $request->input('perPage', 20);
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
 
       if($request->ajax() && $request->ajax_request == true){
         $products = Product::with(['category', 'creator'])->orderBy('id','DESC');
+        if($request->category_id){
+            $products = $products->where(function($query) use($request){
+                    $query->where('category_id', $request->category_id);
+                });
+        }
 
-        $products = $products->when($request->category_id, function($q, $categoryId) {
-                return $q->where('category_id', $categoryId);
-            })
-            ->when($request->search, function($q, $search) {
-                return $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-            })
-            ->when($request->status, function($q, $status) {
-                return $status === 'active' ? $q->active() : $q->where('is_active', false);
-        });
+        if($request->search){
+            $products = $products->where(function($query) use($request){
+                    $query->where('name', 'LIKE', '%'. $request->search .'%')
+                    ->orWhere('description', 'like', '%'. $request->search .'%');
+                });
+        }
+       
+        if(!empty($request->status) && $request->status == 'active'){
+            
+            $products = $products->where(function($query) use($request){
+                    $query->where('is_active', 1);
+                });
+        }
+
+        if( !empty($request->status) && $request->status == 'inactive'){
+            
+            $products = $products->where(function($query) use($request){
+                    $query->where('is_active', 0);
+                });
+        }
 
         $productsCount = clone $products;
         $totalRecords = $productsCount->count(DB::raw('DISTINCT(products.id)'));  

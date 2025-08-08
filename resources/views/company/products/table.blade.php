@@ -82,7 +82,7 @@
                 <small class="text-muted">by {{ $product->creator->name ?? 'System' }}</small>
             </td>
 
-            <td>
+            <td width="5%">
                 <div class="d-flex gap-2">
                     {{-- View --}}
                     <a href="{{ route('products.show', $product) }}" class="btn btn-sm btn-icon btn-primary"

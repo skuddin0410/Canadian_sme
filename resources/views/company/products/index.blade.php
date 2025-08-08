@@ -26,7 +26,7 @@
                      <form action="#" method="GET" id="product-filter"> 
                         <div class="row padding-none">
                             <div class="col-md-3">
-                                <select name="category_id" class="form-control">
+                                <select name="category_id" class="form-control" id="category_id">
                                     <option value="">All Categories</option>
                                     @foreach($categories as $category)
                                     <option value="{{ $category->id }}"
@@ -37,7 +37,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <select name="status" class="form-control">
+                                <select name="status" class="form-control" id="is_active">
                                     <option value="">All Status</option>
                                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active
                                     </option>
@@ -47,11 +47,11 @@
                             </div>
                             <div class="col-md-4">
                                 <input type="text" name="search" class="form-control" placeholder="Search products..."
-                                    value="{{ request('search') }}">
+                                    value="{{ request('search') }}" id="search">
                             </div>
                             <div class="col-md-2 padding-none">
-                                <button type="submit" class="btn btn-outline-primary">Filter</button>
-                                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Clear</a>
+                                <button type="button" class="btn btn-outline-primary btn-pill reset-filter">Reset</button>
+                                <button type="button" class="btn btn-primary filter">Filter</button>
                             </div>
                         </div>
                     </form>
@@ -134,8 +134,9 @@
 
     $(document).on("click", ".filter", function(e) {
         var search = $('#search').val();
-        var category = $('#category').val();
-        if( search.trim() == '' && category.trim()== ''){
+        var category_id = $('#category_id').val();
+        var is_active = $('#is_active').val();
+        if( search.trim() == '' && category_id.trim()== '' && is_active.trim() == ''){
            return ;
         } 
        $(".spinner-border").fadeIn(300); 
