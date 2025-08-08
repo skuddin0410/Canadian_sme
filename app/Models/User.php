@@ -51,7 +51,8 @@ class User extends Authenticatable implements JWTSubject
         'zipcode',
         'city',
         'state',
-        'country'
+        'country',
+        'created_by'
     ];
 
     /**
@@ -132,6 +133,7 @@ public function booths()
     {
         return $this->hasMany(\App\Models\UserLogin::class);
     }
+    
 
     public function company()
     {
@@ -146,6 +148,7 @@ public function booths()
     {
         return Attribute::get(fn () => $this->is_approve ? 'success' : 'warning');
     }
+    
 
 
     protected $appends = ['full_name'];

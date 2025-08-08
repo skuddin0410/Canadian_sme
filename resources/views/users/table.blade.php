@@ -38,7 +38,7 @@
 	<tr>
 		<th>Name</th>
 		<th>User name</th>
-		{{-- <th>User Role</th> --}}
+		
 		<th>Email</th>
 		<th>Mobile</th>
 		<th>DOB</th>
@@ -60,28 +60,38 @@
 		<th>{{$user->gender ?? '' }}</th>
 		<th>{{$user->state ?? ''}}</th> 
 		<th>{{$user->country ?? ''}}</th> 
-		<th>
-			<div class="row">
-			<div class="col-4 p-1">	
-				<a href="{{ route("users.show",["user"=> $user->id ]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
-            </div>
+		<th class="text-center align-middle">
+    <div class="d-flex justify-content-center align-items-center gap-1">
+        <!-- Show -->
+        <a href="{{ route('users.show', ['user' => $user->id]) }}" 
+           class="btn btn-sm btn-icon p-1" 
+           title="View">
+            <i class="bx bxs-show" style="font-size: 1rem;"></i>
+        </a>
 
-			@if(Auth::user()->hasRole('Admin'))
-		    <div class="col-4 p-1">	
-			<a href="{{ route("users.edit",["user"=> $user->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            </div>
-			@endif
+        @if(Auth::user()->hasRole('Admin'))
+            <!-- Edit -->
+            <a href="{{ route('users.edit', ['user' => $user->id]) }}" 
+               class="btn btn-sm btn-icon p-1" 
+               title="Edit">
+                <i class="bx bxs-edit" style="font-size: 1rem;"></i>
+            </a>
 
-			@if(Auth::user()->hasRole('Admin'))
-            <div class="col-4 p-1">
-			<form action="{{ route('users.destroy', $user->id) }}" method="post">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-icon btn-danger delete" onclick="return confirm('Are you sure you want to delete?')"><i class="bx bxs-trash"></i></button>
+            <!-- Delete -->
+            <form action="{{ route('users.destroy', $user->id) }}" method="post" class="m-0 p-0">
+                @csrf
+                @method('DELETE')
+                <button type="submit" 
+                        class="btn btn-sm btn-icon btn-danger p-1 delete" 
+                        onclick="return confirm('Are you sure you want to delete?')" 
+                        title="Delete">
+                    <i class="bx bxs-trash" style="font-size: 1rem;"></i>
+                </button>
             </form>
-		   </div>
-           @endif 
-       </th>
+        @endif
+    </div>
+</th>
+
 	</tr>
 	@endforeach
 	@if(count($users) <=0)

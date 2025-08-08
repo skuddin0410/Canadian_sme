@@ -27,6 +27,11 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::post('users/import/', '\App\Http\Controllers\UserController@importUser')->name('user_import');
 
     Route::resource('users', App\Http\Controllers\UserController::class);
+    Route::get('/representatives', [UserController::class, 'representativeIndex'])
+    ->name('users.representative');
+
+Route::get('/attendees', [UserController::class, 'attendeeIndex'])
+    ->name('users.attendee');
 
     Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
     'exhibitor-users' => 'exhibitor_user',

@@ -99,8 +99,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-            'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
             'username' => 'required|string|unique:users,username',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -113,7 +111,8 @@ class UserController extends Controller
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
-            'password' => 'required|string|min:8'
+            // 'password' => 'required|string|min:8',
+            
 
         ]);
         if ($validator->fails()) {
@@ -135,16 +134,11 @@ class UserController extends Controller
         $user->state = $request->state;
         $user->country = $request->country;
         $user->place = $request->place;
-        $user->password = Hash::make($request->password);
+        // $user->password = Hash::make($request->password);
         $user->save();
         $user->assignRole($request->user_type);
 
-        if ($request->file("frontimage")) {
-            $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
-        }
-        if ($request->file("image")) {
-            $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
-        }
+     
         return redirect(route('users.index'))
             ->withSuccess('User data has been saved successfully');
     }
@@ -241,153 +235,11 @@ class UserController extends Controller
             ->withSuccess('User deleted successfully');
     }
 
-    public function referralUsers(Request $request)
-    {
-        $referrals = Wallet::with(['user', 'user.photo'])
-            ->where('table_id', $request->id)
-            ->where('table_type', 'users')
-            ->paginate(25);
-        return view('refferal.index', ['users' => $referrals]);
-    }
+   
 
-    public function kycUsers(Request $request)
-    {
-        $perPage = (int) $request->input('perPage', 20);
-        $pageNo = (int) $request->input('page', 1);
-        $offset = $perPage * ($pageNo - 1);
-        $search = $request->input('search', '');
-        $user_type = $request->input('user_type', '');
-        if ($request->ajax() && $request->ajax_request == true) {
-            $users = User::with("roles")->where('kyc_verified', 1)
-                ->whereHas("roles", function ($q) use ($user_type) {
-                    if (!$user_type) {
-                        $q->whereIn("name", ["User", "Affiliate"]);
-                    }
+  
 
-                    if ($user_type == 'User') {
-                        $q->where("name", "User");
-                    }
-
-                    if ($user_type == 'Affiliate') {
-                        $q->where("name", "Affiliate");
-                    }
-                })->whereHas('photo', function ($q) {
-                    $q->where('table_type', 'users')
-                        ->where('file_type', 'photo')
-                        ->whereNotNull('file_name');
-                })->whereHas('background', function ($q) {
-                    $q->where('table_type', 'users')
-                        ->where('file_type', 'background')
-                        ->whereNotNull('file_name');
-                })->orderBy('created_at', 'DESC');
-
-            if ($request->search) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('username', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
-                });
-            }
-
-            $usersCount = clone $users;
-            $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
-            $users = $users->offset($offset)->limit($perPage)->get();
-            $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
-                'path'  => $request->url(),
-                'query' => $request->query(),
-            ]);
-            $data['offset'] = $offset;
-            $data['pageNo'] = $pageNo;
-            $users->setPath(route('kyc-users'));
-            $data['html'] = view('users.kyc.table', compact('users', 'perPage'))
-                ->with('i', $pageNo * $perPage)
-                ->render();
-
-            return response($data);
-        }
-
-        return view('users.kyc.index', ["kyc" => "done"]);
-    }
-
-    public function kycRequiredUsers(Request $request)
-    {
-        $perPage = (int) $request->input('perPage', 20);
-        $pageNo = (int) $request->input('page', 1);
-        $offset = $perPage * ($pageNo - 1);
-        $search = $request->input('search', '');
-        $user_type = $request->input('user_type', '');
-        if ($request->ajax() && $request->ajax_request == true) {
-            $users = User::with("roles")->where('kyc_verified', 0)
-                ->whereHas("roles", function ($q) use ($user_type) {
-                    if (!$user_type) {
-                        $q->whereIn("name", ["User", "Affiliate"]);
-                    }
-
-                    if ($user_type == 'User') {
-                        $q->where("name", "User");
-                    }
-
-                    if ($user_type == 'Affiliate') {
-                        $q->where("name", "Affiliate");
-                    }
-                })->whereHas('photo', function ($q) {
-                    $q->where('table_type', 'users')
-                        ->where('file_type', 'photo')
-                        ->whereNotNull('file_name');
-                })->whereHas('background', function ($q) {
-                    $q->where('table_type', 'users')
-                        ->where('file_type', 'background')
-                        ->whereNotNull('file_name');
-                })->orderBy('created_at', 'DESC');
-
-            if ($request->search) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('username', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
-                });
-            }
-
-            $usersCount = clone $users;
-            $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
-            $users = $users->offset($offset)->limit($perPage)->get();
-            $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
-                'path'  => $request->url(),
-                'query' => $request->query(),
-            ]);
-            $data['offset'] = $offset;
-            $data['pageNo'] = $pageNo;
-            $users->setPath(route('kyc-users'));
-            $data['html'] = view('users.pending.table', compact('users', 'perPage'))
-                ->with('i', $pageNo * $perPage)
-                ->render();
-
-            return response($data);
-        }
-        return view('users.pending.index', ["kyc" => "required"]);
-    }
-
-    public function approveRejectKyc(Request $request)
-    {
-        $user = User::with('background')->where("id", $request->id)->first();
-        $user->kyc_verified = $request->status;
-        $user->save();
-        $user->reasons = $request->reasons ?? '';
-        if ($request->status == 0) {
-            $this->deleteFile($request->id, 'users');
-            $this->deleteFile($request->id, 'users', 'background');
-        }
-        Mail::to($user->email)->send(new KycMail($user));
-        if ($request->status == 0) {
-            return redirect(route('users.index'))
-                ->withSuccess('KYC has been rejected successfully');
-        }
-        return redirect(route('kyc-users', ["user" => $request->id]))
-            ->withSuccess('KYC has been approved successfully');
-    }
-
+  
     public function export() 
     {
         return Excel::download(new UsersExport, 'users_'.Carbon\Carbon::now()->timestamp.'.xlsx');
@@ -401,4 +253,22 @@ class UserController extends Controller
         Excel::import(new UsersImport($request->role), $request->file('file'));
         return back();
     }
+    public function representativeIndex()
+{
+    $users = User::role('Exhibitor Representative')
+        ->where('created_by', auth()->id())
+        ->get();
+
+    return view('users.representative_users.index', compact('users'));
+}
+
+public function attendeeIndex()
+{
+    $users = User::role('attendee')
+        ->where('created_by', auth()->id())
+        ->get();
+
+    return view('users.attendee_users.index', compact('users'));
+}
+
 }

@@ -17,7 +17,7 @@ class CompanyController extends Controller
 
  public function details()
 {
-    $company = Company::with('certificationFile')
+    $company = Company::with('certificationFile','mediaGallery', 'logoFile','videos')
     ->where('user_id', Auth::id())
     ->first();
 

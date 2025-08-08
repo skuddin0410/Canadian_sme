@@ -13,6 +13,9 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0"> Exhibitor Representative List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
+                         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                          <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
+                          @endif
                         @if(auth()->user()->hasRole('Exhibitor Admin'))
 						<div class="dt-buttons"> 
                             <a href="{{route('representative-users.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
@@ -44,11 +47,16 @@
                             placeholder="Search"/>  
                         </div>
                         </div>
+                        
+                            
                         <div class="col-2 text-center">
+                            
                            <button type="button" class="btn btn-outline-primary btn-pill reset-filter">Reset</button>
-                           <button type="button" class="btn btn-primary filter">Filter</button>
-                        </div>  
-                    </div>
+                           <button type="button" class="btn btn-primary filter">Filter</button> 
+                      
+                        
+                        </div>
+                       
                 </form>
                  </div>
 				<div class="card-body pt-0">

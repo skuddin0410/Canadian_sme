@@ -95,7 +95,7 @@
                     <div data-i18n="Users">Speaker</div>
                    </a>
                 </li>
-                <li class="menu-item {{ request()->is('exhibitor-representative') || request()->is('users') ? 'active open' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('exhibitor-representative') || request()->is('users') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <div data-i18n="Team">Team</div>
                 </a>
@@ -111,7 +111,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li> --}}
                 @endif
             </ul>
         </li>

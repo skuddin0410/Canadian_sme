@@ -97,8 +97,8 @@ class SpeakerController extends Controller
     {
         //
         $validator = Validator::make($request->all(), [
-        'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+        // 'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+        // 'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
         'username' => 'required|string|unique:users,username',
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -145,12 +145,12 @@ class SpeakerController extends Controller
 
     $user->assignRole($request->user_type);
 
-    if ($request->file("frontimage")) {
-        $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
-    }
-    if ($request->file("image")) {
-        $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
-    }
+    // if ($request->file("frontimage")) {
+    //     $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
+    // }
+    // if ($request->file("image")) {
+    //     $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
+    // }
 
     return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');
@@ -173,7 +173,7 @@ class SpeakerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        
      $user = User::findOrFail($id);
     return view('users.speaker.edit', compact('user'));
     }
@@ -183,12 +183,12 @@ class SpeakerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        
         $user = User::findOrFail($id);
 
     $validator = Validator::make($request->all(), [
-        'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+        // 'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
+        // 'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
         'username' => 'required|string|unique:users,username,' . $user->id,
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -237,13 +237,13 @@ class SpeakerController extends Controller
     $user->syncRoles([]);
     $user->assignRole($request->user_type);
 
-    if ($request->file("frontimage")) {
-        $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo', $user->id);
-    }
+    // if ($request->file("frontimage")) {
+    //     $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo', $user->id);
+    // }
 
-    if ($request->file("image")) {
-        $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background', $user->id);
-    }
+    // if ($request->file("image")) {
+    //     $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background', $user->id);
+    // }
 
     return redirect(route('speaker.index'))->withSuccess('Speaker data has been updated successfully.');
     }

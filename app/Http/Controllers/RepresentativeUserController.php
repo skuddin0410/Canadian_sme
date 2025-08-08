@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Wallet;
-use App\Models\Booth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Drive;
-use Storage;
-use App\Mail\KycMail;
-use Illuminate\Support\Facades\Mail;
-
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use DataTables;
 use DB;
+use Carbon;
+use Storage;
+use DataTables;
+use App\Models\User;
+use App\Mail\KycMail;
+use App\Models\Booth;
+use App\Models\Drive;
 use App\Models\Order;
+use App\Models\Wallet;
+
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 class RepresentativeUserController extends Controller
@@ -60,6 +61,9 @@ class RepresentativeUserController extends Controller
                     
                 });
             }
+            if ($request->has('exhibitor_id')) {
+                 $query->where('created_by_exhibitor_id', $request->exhibitor_id);
+            }
 
            
 
@@ -79,7 +83,14 @@ class RepresentativeUserController extends Controller
 
             return response($data);
         }
-        
+        //  $representatives = User::role('Exhibitor Representative')
+        //     ->where('created_by', Auth::id())
+        //     ->get();
+    //     $representatives = User::role('Exhibitor Representative')
+    //    ->whereHas('company', function ($q) {
+    //     $q->where('exhibitor_admin_id', auth()->id());
+    // })
+    // ->get();
 
         return view('users.representative_users.index', ["kyc" => ""]);
 
