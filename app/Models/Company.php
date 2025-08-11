@@ -11,12 +11,9 @@ use App\Traits\AutoHtmlDecode;
 
 class Company extends Model
 {
-    //
-      use  Auditable;
-      use AutoHtmlDecode;
-
- 
-
+    
+    use  Auditable;
+    use AutoHtmlDecode;
     protected $fillable = [
         'user_id','name', 'industry', 'size', 'location', 'email', 'phone',
         'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image'
@@ -26,35 +23,35 @@ class Company extends Model
         return $this->hasMany(CompanyContact::class);
     }
     public function user()
-{
+    {
     return $this->belongsTo(User::class);
-}
-public function certificationFile()
+    }
+    public function certificationFile()
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'companies')
-            ->where('file_type', 'certification_image')
+            ->where('file_type', 'certifications')
             ->whereNotNull('file_name');
     }
     public function logoFile()
-{
-    return $this->hasOne(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'company_logo');
-}
-public function mediaGallery()
-{
-    return $this->hasMany(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'media_gallery')
-        ->whereNotNull('file_name');
-}
-public function videos()
-{
-    return $this->hasMany(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'company_video');
-}
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'logo');
+    }
+    public function mediaGallery()
+    {
+        return $this->hasMany(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'media_gallery')
+            ->whereNotNull('file_name');
+    }
+    public function videos()
+    {
+        return $this->hasMany(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'company_video');
+    }
 
 
 

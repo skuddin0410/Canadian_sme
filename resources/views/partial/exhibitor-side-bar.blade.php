@@ -58,8 +58,6 @@
             </ul>
         </li>
 
-      
-
         <li class="menu-item {{ request()->is('technical-specs*') ? 'active' : '' }}">
             <a href="#" class="menu-link">
                 <div data-i18n="Technical Specs">Technical Specs</div>
@@ -77,27 +75,22 @@
     <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Blogs">Site Users</div>
+                <div data-i18n="Blogs">Team</div>
             </a>
+            
             <ul class="menu-sub">
-               <li class="menu-item {{ request()->is('exhibitor-representative') || request()->is('users') ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <div data-i18n="Team">Team</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item {{ request()->is('exhibitor-representative') ? 'active' : '' }}">
-                        <a href="{{ url('representative-users') }}" class="menu-link">
-                            <div data-i18n="Exhibitor Representative">Exhibitor Representative</div>
-                        </a>
-                    </li>
-                    <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">
-                        <a href="{{ url('attendee-users') }}" class="menu-link">
-                            <div data-i18n="Attendee">Attendee</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                <li class="menu-item {{ request()->is('exhibitor-representative') ? 'active' : '' }}">
+                    <a href="{{ url('representative-users') }}" class="menu-link">
+                        <div data-i18n="Exhibitor Representative">Exhibitor Representative</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">
+                    <a href="{{ url('attendee-users') }}" class="menu-link">
+                        <div data-i18n="Attendee">Attendee</div>
+                    </a>
+                </li>
             </ul>
+           
     </li>
 
     <li class="menu-item {{ request()->is('branding/logo*') || request()->is('trainings*') || request()->is('company/media-gallery*') || request()->is('company/videos*') ? 'active open' : '' }}">
@@ -106,13 +99,6 @@
             <div data-i18n="Branding & Media">Branding & Media</div>
         </a>
         <ul class="menu-sub">
-
-            {{-- Logo Management --}}
-            <li class="menu-item {{ request()->is('branding/logo') ? 'active' : '' }}">
-                <a href="{{ route('company.branding.logo') }}" class="menu-link">
-                    <div data-i18n="Logo Upload">Logo Management</div>
-                </a>
-            </li>
 
             {{-- Guidelines (you can update this route when implemented) --}}
             <li class="menu-item {{ request()->is('company/branding/banner') ? 'active' : '' }}">
@@ -159,13 +145,10 @@
                 </li>
 
                 <li class="menu-item {{ request()->is('company/contacts') ? 'active' : '' }}">
-                    <a href="{{ route('company.contacts') }}" class="menu-link">
+                    <a href="{{ route('company.contacts.index') }}" class="menu-link">
                         <div data-i18n="Contact">Contact</div>
                     </a>
                 </li>
-                 {{-- Branding and Media Submenu --}}
-
-
             </ul>
         </li>
 

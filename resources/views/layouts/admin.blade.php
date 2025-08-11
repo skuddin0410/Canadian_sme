@@ -45,16 +45,8 @@
       <!-- Alertify CSS -->
       <link href="{{asset('backend/plugins/alertify/alertify.css?v='.time())}}" rel="stylesheet" />
       <link rel="stylesheet" href="{{asset('backend/assets/css/custom.css')}}" />
-      <!-- Datatable CSS -->
-      <!-- <link href="{{asset('backend/plugins/datatable/dataTables.bootstrap4.min.css?v='.time())}}" rel="stylesheet" />
-      <link href="{{asset('backend/plugins/datatable/jquery.dataTables.min.css?v='.time())}}" rel="stylesheet" />  -->
       <link href="{{asset('backend/plugins/datatable/fixedColumns.dataTables.min.css?v='.time())}}" rel="stylesheet" />
-      <!-- Page CSS -->
-      
-      <!-- Helpers -->
       <script src="{{asset('backend/assets/vendor/js/helpers.js')}}"></script>
-      <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-      <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
       <script src="{{asset('backend/assets/js/config.js')}}"></script>
 
       <script src="https://cdn.tiny.cloud/1/svsicmdojxq1j88fchr7d66cbfndgngknh06cgapmgeskqsl/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
@@ -75,6 +67,15 @@
         @if(Auth::user()->hasRole('Exhibitor Admin'))
            @include('partial.exhibitor-side-bar')
         @endif 
+        
+        @if(Auth::user()->hasRole('Registration Desk'))
+           @include('partial.registration-desk-sidebar')
+        @endif 
+
+        @if(Auth::user()->hasRole('Support Staff Or Helpdesk'))
+           @include('partial.support-staff-side-bar')
+        @endif 
+
         <!-- / Menu -->
         <!-- Layout container -->
         <div class="layout-page">
@@ -89,8 +90,8 @@
           @include('partial.footer')
           <div class="content-backdrop fade"></div>
           </div>
-            </div>
-          </div>
+        </div>
+        </div>
 
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
@@ -117,7 +118,8 @@
   });
 </script>
   </body>
-</html><script type="text/javascript">
+</html>
+<script type="text/javascript">
  tinymce.init({
     selector: '#description',
     readonly: false,
@@ -127,8 +129,16 @@
     toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
     menubar: false,
     branding: false,
+  });
 
-    
-    
+  tinymce.init({
+    selector: '.editor2',
+    readonly: false,
+    width: '100%',
+    height: 300,
+    plugins: 'code image link lists table preview',
+    toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
+    menubar: false,
+    branding: false,
   });
 </script>

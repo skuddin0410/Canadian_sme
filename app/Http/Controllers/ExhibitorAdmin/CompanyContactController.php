@@ -15,10 +15,13 @@ class CompanyContactController extends Controller
      */
     public function index(Request $request)
     {
-        //
-    $company = Company::where('user_id', auth()->id())->firstOrFail();
+   
+    $company = Company::where('user_id', auth()->id())->first();
+    if(empty($company)){
+      return redirect()->route('company.details')->with('success', 'Update Company details first.');
+    }
+
     $contacts = $company->contacts()->get();
-    // Return partial view if it's an AJAX request
     if ($request->ajax()) {
         $html = view('company.partials.contacts-table', compact('contacts'))->render();
         return response()->json(['html' => $html]);
@@ -31,11 +34,8 @@ class CompanyContactController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        //
-         return view('company.contacts-create');
-
-        
+    {   
+        return view('company.contacts-create');
     }
 
     /**
@@ -43,28 +43,17 @@ class CompanyContactController extends Controller
      */
     public function store(Request $request)
     {
-        //
-       $company = Company::where('user_id', auth()->id())->firstOrFail();
-
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email',
-        'phone' => 'required|string|max:20',
-    ]);
-
-    $company->contacts()->create($request->only(['name', 'email', 'phone']));
-
-    return redirect()->route('company.contacts')->with('success', 'Contact added successfully.');
+        $company = Company::where('user_id', auth()->id())->firstOrFail();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|string|max:20',
+        ]);
+        $company->contacts()->create($request->only(['name', 'email', 'phone']));
+        return redirect()->route('company.contacts')->with('success', 'Contact added successfully.');
    
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -103,12 +92,5 @@ class CompanyContactController extends Controller
         }
 
         return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
-        //
-    //      if ($contact->company->user_id !== auth()->id()) {
-    //     abort(403);
-    // }
-
-    // $contact->delete();
-    // return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
     }
 }

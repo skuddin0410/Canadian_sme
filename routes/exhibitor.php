@@ -18,16 +18,12 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
 
 
-    Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts');
-    //..
+    Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts.index');
     Route::get('company/contacts/create', [CompanyContactController::class, 'create'])->name('company.contacts.create');
     Route::post('company/contacts', [CompanyContactController::class, 'store'])->name('company.contacts.store');
     Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
 
 
-
-    Route::get('/branding/logo', [CompanyController::class, 'logoForm'])->name('company.branding.logo');
-    Route::post('/branding/logo', [CompanyController::class, 'uploadLogo'])->name('company.branding.logo.upload');
     
     Route::get('/company/media-gallery', [CompanyController::class, 'mediaGallery'])->name('company.media.gallery');
     Route::post('/company/media-upload', [CompanyController::class, 'uploadMedia'])->name('company.media.upload');

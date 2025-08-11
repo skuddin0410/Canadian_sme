@@ -13,11 +13,21 @@
           @csrf 
           <div class="row">
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-12 mb-3">
               <label class="form-label">Company Name <span class="text-danger">*</span></label>
               <input type="text" name="name" value="{{ old('name', $company->name ?? '') }}" class="form-control" required>
             </div>
 
+            <div class="col-md-12 mb-3">
+              <label for="logo" class="form-label">Upload Company Logo<span class="text-danger">*</span></label>
+              <input type="file" name="logo" id="logo" class="form-control" accept="image/*">
+              
+              <small id="selected-file-name" class="form-text text-muted mt-1"></small>
+               @if ($company && $company->logoFile && $company->logoFile->file_name) <div class="mt-2">
+                <img src="{{ asset($company->logoFile->file_path) }}" alt="Certification Image" width="200" class="mt-2">
+              </div> @endif
+            </div>
+      
             <div class="col-md-6 mb-3">
               <label class="form-label">Industry <span class="text-danger">*</span></label>
               <input type="text" name="industry" value="{{ old('industry', $company->industry ?? '') }}" class="form-control">
@@ -80,9 +90,7 @@
             
             <small id="selected-file-name" class="form-text text-muted mt-1"></small>
              @if ($company && $company->certificationFile && $company->certificationFile->file_name) <div class="mt-2">
-              <strong>Previously Uploaded:</strong> {{ basename($company->certificationFile->file_name) }}
-              <br>
-              <img src="{{ asset('storage/' . $company->certificationFile->file_name) }}" alt="Certification Image" width="200" class="mt-2">
+              <img src="{{ asset($company->certificationFile->file_path) }}" alt="Certification Image" width="200" class="mt-2">
             </div> @endif
           </div>
           <div class="mt-3">
