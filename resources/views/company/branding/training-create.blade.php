@@ -22,25 +22,27 @@
         <div class="row">
           <div class="mb-3 col-md-6">
             <label class="form-label">Material Name</label>
-            <input type="text" name="material_name" class="form-control" required>
+            <input type="text" name="material_name" value="{{old('material_name')}}" class="form-control" required>
           </div>
           <div class="mb-3 col-md-6">
             <label class="form-label">YouTube Link (optional)</label>
-            <input type="url" name="youtube_link" class="form-control">
+            <input type="url" name="youtube_link" value="{{old('youtube_link')}}" class="form-control">
           </div>
           <div class="mb-3 col-12">
             <label class="form-label">Material Description</label>
-            <textarea name="material_description" class="form-control" rows="3" required></textarea>
+            <textarea name="material_description" id="description" class="form-control" rows="3" required>
+              {{old('material_description')}}
+            </textarea>
           </div>
           <div class="mb-3 col-md-6">
             <label class="form-label">Attach File (PDF/Image/Doc)</label>
             <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp">
           </div>
         </div>
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-success">Save</button>
-          <a href="{{ route('trainings.index') }}" class="btn btn-secondary">Cancel</a>
-        </div>
+        <div class="d-flex pt-3 justify-content-end">
+             <a href="{{route('trainings.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+          </div>
       </form>
     </div>
   </div>

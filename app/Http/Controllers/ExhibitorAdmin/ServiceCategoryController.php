@@ -8,6 +8,10 @@ use App\Models\ServiceCategory;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Drive;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 
 class ServiceCategoryController extends Controller
@@ -15,15 +19,52 @@ class ServiceCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $categories = ServiceCategory::with(['parent', 'children'])
-                                   ->orderBy('sort_order')
-                                   ->orderBy('name')
-                                   ->paginate(20);
+        $perPage = (int) $request->input('perPage', 20);
+        $pageNo = (int) $request->input('page', 1);
+        $offset = $perPage * ($pageNo - 1);
 
-        return view('company.service-categories.index', compact('categories'));
+        $query = ServiceCategory::orderBy('created_at', 'DESC');
+
+        // Filter by search (name, description)
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                  ->orWhere('description', 'LIKE', "%$search%");
+            });
+        }
+
+        // Filter by is_active
+        if ($request->has('is_active') && in_array($request->is_active, ['0', '1'])) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        $totalRecords = $query->count();
+
+        $categories = $query->offset($offset)->limit($perPage)->get();
+
+        $paginated = new LengthAwarePaginator(
+            $categories,
+            $totalRecords,
+            $perPage,
+            $pageNo,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        if ($request->ajax() && $request->ajax_request == true) {
+            $paginated->setPath(route('service-categories.index'));
+
+            $data['html'] = view('company.service-categories.table', [
+                'categories' => $paginated,
+            ])->render();
+
+            return response()->json($data);
+        }
+
+        return view('company.service-categories.index', compact('paginated'));
     }
 
     /**
@@ -32,8 +73,8 @@ class ServiceCategoryController extends Controller
     public function create()
     {
         //
-          $parentCategories = ServiceCategory::active()->parents()->orderBy('name')->get();
-        return view('company.service-categories.create', compact('parentCategories'));
+         
+        return view('company.service-categories.create');
     }
 
     /**
@@ -41,17 +82,20 @@ class ServiceCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:service_categories,id',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer|min:0',
-            'image_url' => 'nullable|url'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('service_categories', 'public');
+            $validated['image_url'] = '/storage/' . $path;
+        } else {
+            $validated['image_url'] = null;
+        }
 
         $category = ServiceCategory::create($validated);
 
@@ -62,9 +106,10 @@ class ServiceCategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ServiceCategory $serviceCategory)
     {
-        //
+        
+        return view('company.service-categories.show', ['category' => $serviceCategory]);
     }
 
     /**
@@ -73,13 +118,9 @@ class ServiceCategoryController extends Controller
     public function edit(ServiceCategory $serviceCategory)
     {
         //
-        $parentCategories = ServiceCategory::active()
-                                         ->parents()
-                                         ->where('id', '!=', $serviceCategory->id)
-                                         ->orderBy('name')
-                                         ->get();
+      
 
-        return view('company.service-categories.edit', compact('serviceCategory', 'parentCategories'));
+        return view('company.service-categories.edit', compact('serviceCategory'));
 
     }
 
@@ -88,24 +129,25 @@ class ServiceCategoryController extends Controller
      */
     public function update(Request $request, ServiceCategory $serviceCategory)
     {
-        //
-         $validated = $request->validate([
+       $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:service_categories,id',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer|min:0',
-            'image_url' => 'nullable|url'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validated['name'] !== $serviceCategory->name) {
             $validated['slug'] = Str::slug($validated['name']);
         }
 
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('service_categories', 'public');
+            $validated['image_url'] = '/storage/' . $path;
+        }
+
         $serviceCategory->update($validated);
 
         return redirect()->route('service-categories.index')
-                        ->with('success', 'Service category updated successfully.');
+            ->with('success', 'Service category updated successfully.');
     }
 
     /**

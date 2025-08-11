@@ -11,6 +11,7 @@
     </div>
     
     <!-- Statistics Cards -->
+    @if(Auth::user()->hasRole('Event Admin') || Auth::user()->hasRole('Admin'))
     <div class="row">
       <div class="col-xl-4 col-sm-6 col-12">
         <div class="card text-bg-primary">
@@ -52,7 +53,7 @@
         </div>
       </div>
     </div>
-
+    
     <!-- Quick Actions Section -->
     <div class="row mt-4">
       <div class="col-12">
@@ -142,7 +143,7 @@
         </div>
       </div>
     </div>
-
+   @endif
     <!-- Recent Activity Section -->
     <div class="row mt-4">
       <div class="col-6">

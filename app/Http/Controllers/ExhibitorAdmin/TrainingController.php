@@ -16,15 +16,12 @@ class TrainingController extends Controller
      */
     public function index(Request $request)
     {
-        //
-        $trainings = Training::orderBy('id', 'desc')->paginate(10);
+        $trainings = Training::with('material')->orderBy('id', 'desc')->paginate(10);
          if ($request->ajax()) {
         return view('company.branding.partials.training-table', compact('trainings'))->render();
     }
         return view('company.branding.training-index', compact('trainings'));
-        
-        // return Training::orderBy('id','DESC')->simplePaginate();
-        
+  
     }
 
     /**
@@ -32,8 +29,7 @@ class TrainingController extends Controller
      */
     public function create()
     {
-        //
-         return view('company.branding.training-create');
+        return view('company.branding.training-create');
     }
 
     /**
@@ -46,7 +42,7 @@ class TrainingController extends Controller
             'material_name' => 'required|string',
             'material_description' => 'required|string',
             'youtube_link' => [
-            'required',
+            'nullable',
             'regex:/^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/'
         ]
         ]);
@@ -55,24 +51,13 @@ class TrainingController extends Controller
         $training->material_name = $request->material_name;
         $training->material_description = $request->material_description;
         $training->youtube_link = $request->youtube_link;
-        // $training->tenant_id = tenant()->id ?? null;
         $training->save();
-         if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('training_material', $fileName, 'public');
-
-        Drive::create([
-            'table_id'   => $training->id,
-            'table_type' => 'trainings',
-            'file_type'  => 'training_material',
-            'file_name'  => $path,
-        ]);
-    }
+        
+        if(!empty($request->file("file"))){
+             $this->imageUpload($request->file("file"),"training_material",$training->id,'trainings','training_material');
+         }
  
-        // if(!empty($request->file("file"))){
-        //     imageUpload($request->file("file"),"training_material",$training->id,'trainings','training_material');
-        //  }
+       
       
     return redirect()->route('trainings.index')->with('success', 'Training material uploaded successfully.');
     }
@@ -82,21 +67,8 @@ class TrainingController extends Controller
      */
     public function show(string $id)
     {
-        //
-        // $training =Training::find($id);
-        // if(!$training){
-        //     return ;
-        // }
-        // return $training;
-         $training = Training::findOrFail($id);
-
-    $file = Drive::where([
-        'table_id'   => $training->id,
-        'table_type' => 'trainings',
-        'file_type'  => 'training_material',
-    ])->first();
-
-    return view('company.branding.training-show', compact('training', 'file'));
+        $training = Training::with('material')->findOrFail($id);
+        return view('company.branding.training-show', compact('training'));
     }
 
     /**
@@ -104,17 +76,10 @@ class TrainingController extends Controller
      */
     public function edit(string $id)
     {
-        //
-         $training = Training::findOrFail($id);
-    
-    // Fetch the file if exists
-    $file = Drive::where([
-        'table_id'   => $training->id,
-        'table_type' => 'trainings',
-        'file_type'  => 'training_material',
-    ])->first();
 
-    return view('company.branding.training-edit', compact('training', 'file'));
+        $training = Training::with('material')->findOrFail($id);
+        return view('company.branding.training-edit', compact('training'));
+
     }
 
     /**
@@ -142,37 +107,12 @@ class TrainingController extends Controller
         $training->material_description = $request->material_description;
         $training->youtube_link = $request->youtube_link;
         $training->save();
-        if ($request->hasFile('file')) {
-        $file = $request->file('file');
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('training_material', $fileName, 'public');
-
-        // Update or create the Drive record
-        Drive::updateOrCreate(
-            [
-                'table_id'   => $training->id,
-                'table_type' => 'trainings',
-                'file_type'  => 'training_material',
-            ],
-            [
-                'file_name' => $path,
-            ]
-        );
-    }
+         if(!empty($request->file("file"))){
+              $this->imageUpload($request->file("file"),"training_material",$training->id,'trainings','training_material',$idForUpdate=$training->id);
+         }
  
-        // if(!empty($request->file("file"))){
-        //     imageUpload($request->file("file"),"training_material",$training->id,'trainings','training_material',$idForUpdate=$training->id);
-        //  }
-    //     if (!empty($request->file("file"))) {
-    //     imageUpload(
-    //         $request->file("file"),
-    //         "training_material",
-    //         $training->id,
-    //         'trainings',
-    //         'training_material',
-    //         $idForUpdate = $training->id
-    //     );
-    // }
+        
+
     return redirect()->route('trainings.index')->with('success', 'Training material updated successfully.');
     }
 

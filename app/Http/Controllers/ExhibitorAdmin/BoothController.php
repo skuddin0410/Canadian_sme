@@ -61,7 +61,6 @@ class BoothController extends Controller
      */
     public function create()
     {
-        //
         $companies = Company::all();
         return view('company.booths.create', compact('companies'));
     }

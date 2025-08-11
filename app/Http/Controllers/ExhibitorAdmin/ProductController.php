@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ExhibitorAdmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\User;
 use App\Models\ProductCategory;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -128,7 +129,10 @@ class ProductController extends Controller
         }
         $validated['gallery_images'] = $galleryPaths;
     }
-
+    
+    $user = User::with('company')->where('id',auth()->id())->first();
+    $validated['company_id']= $user->company->id;
+    $validated['user_id']= Auth::id();
     Product::create($validated);
 
     return redirect()->route('products.index')

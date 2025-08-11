@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'jwtauth' => \App\Http\Middleware\JwtAuthenticate::class,
             'webauth' => \App\Http\Middleware\RedirectIfNotAuthenticated::class,
+            //'company.exists' => \App\Http\Middleware\EnsureCompanyExists::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

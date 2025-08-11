@@ -24,15 +24,9 @@
               @endif
             </td>
             <td>
-              @php
-                $file = \App\Models\Drive::where([
-                  'table_id' => $material->id,
-                  'table_type' => 'trainings',
-                  'file_type' => 'training_material',
-                ])->first();
-              @endphp
-              @if($file)
-                <a href="{{ asset('storage/' . $file->file_name) }}" target="_blank">View file</a>
+
+              @if($material->material && $material->material->file_name)
+                <a href="{{$material->material->file_path  }}" target="_blank"><i class="fa fa-file"></i></a>
               @else
                 
               @endif
