@@ -46,9 +46,15 @@ class HomeController extends Controller
                 ->whereHas("roles", function ($q) {
                     $q->whereNotIn("name", ["Admin"]);
                 })->count();
+            
+            if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin')){
+                $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
+                $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
+            }else{
+                $logs = AuditLog::with('user')->where('audit_logs.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
+                $loginlogs = UserLogin::with('user')->where('user_logins.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
+            } 
 
-            $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
-            $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
 
             return view('home',compact('evntCount','userCount','logs','loginlogs'));
         }
