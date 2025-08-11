@@ -21,42 +21,37 @@
             </a>
         </li> 
 
-    <li class="menu-item {{ request()->is('products*') ||  request()->is('service*') ? 'active open' : '' }}">
+   <li class="menu-item {{ request()->is('products*') ||  request()->is('service*') ? 'active open' : '' }}">
     <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
         <div data-i18n="Products & Services">Products & Services</div>
     </a>
 
     <ul class="menu-sub">
-        
-        <li class="menu-item {{ request()->is('products*') || request()->is('product-categories*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <li class="menu-item {{ request()->is('product-categories*') ? 'active' : '' }}">
+            <a href="{{route('product-categories.index')}}" class="menu-link">
+                <div data-i18n="Product Categories">Product Categories</div>
+            </a>
+        </li>
+        <li class="menu-item {{ request()->is('products*') ? 'active open' : '' }}">
+            <a href="{{ route('products.index') }}" class="menu-link">
                 <div data-i18n="Products">Products</div>
             </a>
-            <ul class="menu-sub">
-                
-                <li class="menu-item {{ request()->is('product-categories*') ? 'active' : '' }}">
-                    <a href="{{route('product-categories.index')}}" class="menu-link">
-                        <div data-i18n="Product Categories">Product Categories</div>
-                    </a>
-                </li>
-            </ul>
         </li>
 
-         {{-- Services Dropdown --}}
-        <li class="menu-item {{ request()->is('service*') || request()->is('service-categories*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <div data-i18n="Services">Services</div>
+
+        <li class="menu-item {{ request()->is('service-categories*') ? 'active' : '' }}">
+            <a href="{{route('service-categories.index')}}" class="menu-link">
+                <div data-i18n="Service Categories">Service Categories</div>
             </a>
-            <ul class="menu-sub">
-              
-                <li class="menu-item {{ request()->is('service-categories*') ? 'active' : '' }}">
-                    <a href="{{route('service-categories.index')}}" class="menu-link">
-                        <div data-i18n="Service Categories">Service Categories</div>
-                    </a>
-                </li>
-            </ul>
         </li>
+        <li class="menu-item {{ request()->is('service*') ||  request()->is('service-categories*') ? 'active' : '' }} }}">
+            <a href="{{ route('services.index') }}" class="menu-link">
+                <div data-i18n="Service">Service</div>
+            </a>
+        </li>
+
+      
 
         <li class="menu-item {{ request()->is('technical-specs*') ? 'active' : '' }}">
             <a href="#" class="menu-link">
@@ -65,6 +60,8 @@
         </li>
     </ul>
 </li>
+
+
 
     <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
         <a href="{{route('booths.index')}}" class="menu-link">
