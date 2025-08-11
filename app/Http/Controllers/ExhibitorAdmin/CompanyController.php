@@ -52,12 +52,12 @@ class CompanyController extends Controller
             'location'      => 'required|string|max:255',
             'email'         => 'required|email|max:255',
             'phone'         => 'required|string|max:20',
-            'description'   => 'required|string',
+            'description'   => 'nullable|string',
             'website'       => 'required|url',
-            'linkedin'      => 'required|url',
-            'twitter'       => 'required|url',
-            'facebook'      => 'required|url',
-            'certifications' => 'required|string',
+            'linkedin'      => 'nullable|url',
+            'twitter'       => 'nullable|url',
+            'facebook'      => 'nullable|url',
+            'certifications' => 'nullable|string',
             'certification_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
@@ -68,6 +68,7 @@ class CompanyController extends Controller
         $company = new Company();
         $company->user_id = Auth::id();
         $company->fill($request->only(['name', 'industry', 'size', 'location', 'email', 'phone', 'description', 'website',  'linkedin', 'twitter', 'facebook', 'certifications']));
+           $company->save();
 
         if ($request->file("certification_image")) {
             $uploadPath = 'certifications';
@@ -78,7 +79,7 @@ class CompanyController extends Controller
             $this->imageUpload($request->file("logo"), 'logo', $company->id, 'companies', 'logo');
         }
 
-        $company->save();
+     
 
         return redirect()->back()->with('success', 'Company created.');
     }

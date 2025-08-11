@@ -49,7 +49,7 @@
       <script src="{{asset('backend/assets/vendor/js/helpers.js')}}"></script>
       <script src="{{asset('backend/assets/js/config.js')}}"></script>
 
-      <script src="https://cdn.tiny.cloud/1/svsicmdojxq1j88fchr7d66cbfndgngknh06cgapmgeskqsl/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+      <script src="https://cdn.tiny.cloud/1/svsicmdojxq1j88fchr7d66cbfndgngknh06cgapmgeskqsl/tinymce/6/tinymce.min.js" ></script>
 
   </head>
 

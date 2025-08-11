@@ -109,7 +109,7 @@
           </div>
 
             <div class="mb-3">
-              <label class="form-label" for="location">Locations</label>
+              <label class="form-label" for="location">Locations<span class="text-danger">*</span></label>
               <div class="input-group input-group-merge">
                 <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                 <input

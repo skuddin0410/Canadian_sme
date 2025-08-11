@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ExhibitorAdmin;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+use App\Models\CompanyContact;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -50,7 +51,7 @@ class CompanyContactController extends Controller
             'phone' => 'required|string|max:20',
         ]);
         $company->contacts()->create($request->only(['name', 'email', 'phone']));
-        return redirect()->route('company.contacts')->with('success', 'Contact added successfully.');
+        return redirect()->route('contacts.index')->with('success', 'Contact added successfully.');
    
     }
 
@@ -74,23 +75,43 @@ class CompanyContactController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-         $contact = CompanyContact::findOrFail($id);
+    // public function destroy(Request $request,string $id)
+    // {
+    //      $contact = CompanyContact::findOrFail($id);
 
-        if ($contact->company->user_id !== auth()->id()) {
-            abort(403);
-        }
+    //     if ($contact->company->user_id !== auth()->id()) {
+    //         abort(403);
+    //     }
 
-        $contact->delete();
+    //     $contact->delete();
 
-        if ($request->ajax()) {
-            $company = Company::where('user_id', auth()->id())->firstOrFail();
-            $contacts = $company->contacts()->get();
-            $html = view('company.partials.contacts-table', compact('contacts'))->render();
-            return response()->json(['success' => true, 'html' => $html]);
-        }
+    //     if ($request->ajax()) {
+    //         $company = Company::where('user_id', auth()->id())->firstOrFail();
+    //         $contacts = $company->contacts()->get();
+    //         $html = view('company.partials.contacts-table', compact('contacts'))->render();
+    //         return response()->json(['success' => true, 'html' => $html]);
+    //     }
 
-        return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
+    //     return redirect()->route('contacts.index')->with('success', 'Contact deleted.');
+    // }
+    public function destroy(Request $request, string $id)
+{
+    $contact = CompanyContact::findOrFail($id);
+
+    if ($contact->company->user_id !== auth()->id()) {
+        abort(403);
     }
+
+    $contact->delete();
+
+    if ($request->ajax()) {
+        $company = Company::where('user_id', auth()->id())->firstOrFail();
+        $contacts = $company->contacts()->get();
+        $html = view('company.partials.contacts-table', compact('contacts'))->render();
+        return response()->json(['success' => true, 'html' => $html]);
+    }
+
+    return redirect()->route('contacts.index')->with('success', 'Contact deleted.');
+}
+
 }

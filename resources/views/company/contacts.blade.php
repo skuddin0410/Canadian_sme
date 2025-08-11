@@ -8,7 +8,7 @@
 
   {{-- Add Contact Button --}}
   <div class="mb-3">
-    <a href="{{ route('company.contacts.create') }}" class="btn btn-primary">Add New Contact</a>
+    <a href="{{ route('contacts.create') }}" class="btn btn-primary">Add New Contact</a>
   </div>
 
   {{-- Contacts Table --}}

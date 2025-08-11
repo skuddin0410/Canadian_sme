@@ -38,7 +38,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            {{-- <div class="col-md-3">
                                 <select name="status" class="form-control" id="is_active">
                                     <option value="">All Status</option>
                                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active
@@ -46,7 +46,7 @@
                                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
                                         Inactive</option>
                                 </select>
-                            </div>
+                            </div> --}}
                             <div class="col-md-4">
                                 <input type="text" name="search" class="form-control" placeholder="Search products..."
                                     value="{{ request('search') }}" id="search">

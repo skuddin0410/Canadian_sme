@@ -18,10 +18,8 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
 
 
-    Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts.index');
-    Route::get('company/contacts/create', [CompanyContactController::class, 'create'])->name('company.contacts.create');
-    Route::post('company/contacts', [CompanyContactController::class, 'store'])->name('company.contacts.store');
-    Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
+   
+    Route::resource('contacts', CompanyContactController::class);
 
 
     

@@ -25,7 +25,7 @@
                 
                 <div class="row gy-3">
                     {{-- Left column: Name + Image stacked --}}
-                    <div class="col-md-6">
+                    <div class="col-6">
                         <div class="mb-3">
                             <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input 
@@ -42,7 +42,8 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
+                    </div>
+                     <div class="col-6">
                         <div class="mb-3">
                             <label for="image" class="form-label">Category Image</label>
                             <input 
@@ -59,7 +60,8 @@
                     </div>
 
                     {{-- Right column: Description --}}
-                    <div class="col-md-6">
+                     <div class="col-12">
+                        <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea 
                         class="form-control @error('description') is-invalid @enderror" 
@@ -74,10 +76,10 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">Create Category</button>
-                    <a href="{{ route('product-categories.index') }}" class="btn btn-secondary ms-2">Cancel</a>
-                </div>
+            <div class="d-flex pt-3 justify-content-end">
+             <a href="{{route('product-categories.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"> <i class="bx bx-save"></i>Save</button>
+          </div>
             </form>
         </div>
     </div>

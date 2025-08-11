@@ -92,36 +92,34 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   public function store(Request $request)
+
+public function store(Request $request)
 {
     $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'price' => 'required|numeric|gte:0',
-        'description' => 'required|string',
-        'category_id' => 'nullable|exists:products_categories,id',
-        'features' => 'nullable|string',
-        'benefits' => 'nullable|string',
-        'is_active' => 'boolean',
-        'sort_order' => 'integer|min:0',
-        'meta_title' => 'nullable|string|max:255',
-        'meta_description' => 'nullable|string|max:500',
-        'meta_keywords' => 'nullable|string|max:500',
-        'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        'name'              => 'required|string|max:255',
+        'price'             => 'required|numeric|gte:0',
+        'description'       => 'required|string',
+        'category_id'       => 'required|exists:products_categories,id',
+        'features'          => 'nullable|string',
+        'benefits'          => 'nullable|string',
+        'is_active'         => 'boolean',
+        'sort_order'        => 'integer|min:0',
+        'meta_title'        => 'nullable|string|max:255',
+        'meta_description'  => 'nullable|string|max:500',
+        'meta_keywords'     => 'nullable|string|max:500',
+        'main_image'        => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'gallery_images.*'  => 'required|image|mimes:jpeg,png,jpg|max:2048'
     ]);
 
-    // Parse string inputs to arrays
-
-    $validated['slug'] = Str::slug($validated['name']);
+    $validated['slug']       = Str::slug($validated['name']);
     $validated['created_by'] = Auth::id();
 
-    // Main Image Upload
+    // Upload main image
     if ($request->hasFile('main_image')) {
-        $path = $request->file('main_image')->store('products/main', 'public');
-        $validated['image_url'] = $path;
+        $validated['image_url'] = $request->file('main_image')->store('products/main', 'public');
     }
 
-    // Gallery Images Upload
+    // Upload gallery images
     if ($request->hasFile('gallery_images')) {
         $galleryPaths = [];
         foreach ($request->file('gallery_images') as $img) {
@@ -129,15 +127,25 @@ class ProductController extends Controller
         }
         $validated['gallery_images'] = $galleryPaths;
     }
-    
-    $user = User::with('company')->where('id',auth()->id())->first();
-    $validated['company_id']= $user->company->id;
-    $validated['user_id']= Auth::id();
+
+    // Fetch the authenticated user with their company
+    $user = Auth::user()->load('company');
+
+    if (!$user->company) {
+        return redirect()->back()
+            ->withErrors(['company' => 'You must have a company profile before adding products.'])
+            ->withInput();
+    }
+
+    $validated['company_id'] = $user->company->id;
+    $validated['user_id']    = $user->id;
+
     Product::create($validated);
 
     return redirect()->route('products.index')
         ->with('success', 'Product created successfully.');
 }
+
 
     /**
      * Display the specified resource.
@@ -169,7 +177,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|gte:0',
             'description' => 'required|string',
-            'category_id' => 'nullable|exists:products_categories,id',
+            'category_id' => 'required|exists:products_categories,id',
             'features' => 'nullable|string',
             'benefits' => 'nullable|string',
             'is_active' => 'boolean',
@@ -177,8 +185,8 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:500',
-            'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'main_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'gallery_images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($validated['name'] !== $product->name) {
@@ -204,7 +212,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('products.show', $product)
+        return redirect()->route('products.index', $product)
                         ->with('success', 'Product updated successfully.');
     }
 

@@ -31,9 +31,12 @@
       </div>
     </div>
 
-    <div class="mt-3">
-      <button type="submit" class="btn btn-primary">Save Contact</button>
-      <a href="{{ route('company.contacts') }}" class="btn btn-secondary">Cancel</a>
+ 
+     <div class="card-footer d-flex justify-content-end">
+                <a href="{{ route('contacts.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bx bx-save"></i> Save
+                </button>
     </div>
   </form>
 </div>

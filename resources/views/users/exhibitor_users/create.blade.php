@@ -280,12 +280,45 @@
                   <option value="Exhibitor Admin" {{ old('user_type') =='Exhibitor Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Admin' ? 'selected' : '' }}>Exhibitor Admin</option> 
                  
                 </select>
+                
 
               </div>
+              
             </div>
-            <div class="col-6">
-           <div class="mb-3">
-        <label class="form-label" for="password">Password<span class="text-danger">*</span></label>
+            
+           
+    </div>
+     
+
+
+        {{-- Company Details --}}
+        {{-- <h4>Company Details</h4> --}}
+       <div class="col-6">
+        <div class="mb-3">
+            <label for="company_name" class="form-label">Company Name <span class="text-danger">*</span></label>
+            <input type="text" name="company_name" id="company_name" 
+                   class="form-control" value="{{ old('company_name') }}" required>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="mb-3">
+            <label for="company_email" class="form-label">Company Email<span class="text-danger">*</span></label>
+            <input type="email" name="company_email" id="company_email" 
+                   class="form-control" value="{{ old('company_email') }}">
+        </div>
+      </div>
+
+         <div class="col-6">
+        <div class="mb-3">
+            <label for="company_phone" class="form-label">Company Phone<span class="text-danger">*</span></label>
+            <input type="text" name="company_phone" id="company_phone" 
+                   class="form-control" value="{{ old('company_phone') }}">
+        </div>
+      </div>
+       <div class="col-6">
+        <div class="mb-3">
+           <label class="form-label" for="password">Password<span class="text-danger">*</span></label>
         <div class="input-group input-group-merge">
             <span id="password-icon" class="input-group-text"><i class="bx bx-lock"></i></span>
             <input
@@ -298,16 +331,27 @@
         @if ($errors->has('password'))
             <span class="text-danger text-left">{{ $errors->first('password') }}</span>
         @endif
-    </div>
-</div>
 
-          </div>
+
+        </div>
+      </div>
+
+       <div class="col-12">
+        <div class="mb-3">
+            <label for="company_description" class="form-label">Description</label>
+            <textarea name="company_description" id="company_description" 
+                      class="form-control">{{ old('company_description') }}</textarea>
+        </div>
+      </div>
+
+        
+
          
           <div class="col-12">
             <div class="mb-3">
               <div class="d-flex pt-3 justify-content-end">
                 <a href="{{route('exhibitor-users.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+                <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"><i class="bx bx-save"></i>Save</button>
               </div>
             </div>
           </div>

@@ -101,7 +101,7 @@
 
   <div class="d-flex pt-3 justify-content-end">
     <a href="{{ route('booths.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
-    <button type="submit" class="btn btn-primary">Update</button>
+    <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i>Save</button>
   </div>
 </form>
 

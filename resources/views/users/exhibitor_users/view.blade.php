@@ -10,7 +10,7 @@ Admin | Exhibitor User Details
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light"></span>Exhibitor User</h4>
+    <h3 class="py-3 mb-4"><span class="text-muted fw-light"></span>Exhibitor User</h3>
 
     <div class="row">
         <div class="col-xl">
@@ -69,9 +69,8 @@ Admin | Exhibitor User Details
                                 </ul>
                             </div>
                             <div class="col-4">
-     
-
-    @forelse($companies as $company)
+                                <h5> Company Details:</h5>
+                                @forelse($companies as $company)
             {{-- Company Logo --}}
             @if($company->logoFile)
                <span class="fw-medium me-2"> <img src="{{ Storage::url($company->logoFile->file_name) }}" class="card-img-top"
@@ -79,7 +78,7 @@ Admin | Exhibitor User Details
             @endif
 
             <div class="mt-2">
-                <h5>{{ $company->name }}</h5>
+                <h6>{{ $company->name }}</h6>
                 <p class="mb-1"><strong>Industry:</strong> {{ $company->industry }}</p>
                 <p class="mb-1"><strong>Size:</strong> {{ $company->size }}</p>
                 <p class="mb-1"><strong>Location:</strong> {{ $company->location }}</p>

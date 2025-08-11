@@ -142,7 +142,7 @@
                 </li>
 
                 <li class="menu-item {{ request()->is('company/contacts') ? 'active' : '' }}">
-                    <a href="{{ route('company.contacts.index') }}" class="menu-link">
+                    <a href="{{ route('contacts.index') }}" class="menu-link">
                         <div data-i18n="Contact">Contact</div>
                     </a>
                 </li>

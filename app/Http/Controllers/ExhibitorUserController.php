@@ -117,7 +117,12 @@ class ExhibitorUserController extends Controller
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
-            'password' => 'nullable|string|min:8'
+            'password' => 'nullable|string|min:8',
+            'company_name'          => 'required|string|max:255',
+            'company_email'         => 'required|email|max:255',
+            'company_phone'         => 'required|string|max:20',
+            'company_description'   => 'nullable|string'
+
 
         ]);
         if ($validator->fails()) {
@@ -125,6 +130,7 @@ class ExhibitorUserController extends Controller
                 ->withErrors($validator);
         }
 
+          DB::transaction(function () use ($request) {
         $user = new User();
         $user->username = $request->username;
         $user->name = $request->first_name;
@@ -142,6 +148,17 @@ class ExhibitorUserController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
         $user->assignRole($request->user_type);
+
+         Company::create([
+            'user_id'      => $user->id,
+            'name'         => $request->company_name,
+            'email'        => $request->company_email,
+            'phone'        => $request->company_phone,
+            'description'  => $request->company_description,
+        ]);
+        });
+
+
 
       
         return redirect(route('exhibitor-users.index'))
@@ -177,57 +194,77 @@ class ExhibitorUserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-   public function update(Request $request, User $exhibitor_user)
+
+public function update(Request $request, User $exhibitor_user)
 {
     $validator = Validator::make($request->all(), [
-       
-        'username' => 'required|string|unique:users,username,' . $exhibitor_user->id,
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|string|max:255|email|unique:users,email,' . $exhibitor_user->id,
-        'mobile' => 'required|string|digits:10|unique:users,mobile,' . $exhibitor_user->id,
-        'dob' => 'required|date',
-        'gender' => 'nullable|string|max:255',
-        'street' => 'nullable|string|max:255',
-        'zipcode' => 'nullable|string|max:255',
-        'city' => 'nullable|string|max:255',
-        'state' => 'nullable|string|max:255',
-        'country' => 'nullable|string|max:255',
-        'password' => 'nullable|string|min:8'
+        'username'           => 'required|string|unique:users,username,' . $exhibitor_user->id,
+        'first_name'         => 'required|string|max:255',
+        'last_name'          => 'required|string|max:255',
+        'email'              => 'required|string|max:255|email|unique:users,email,' . $exhibitor_user->id,
+        'mobile'             => 'required|string|digits:10|unique:users,mobile,' . $exhibitor_user->id,
+        'dob'                => 'required|date',
+        'gender'             => 'nullable|string|max:255',
+        'street'             => 'nullable|string|max:255',
+        'zipcode'            => 'nullable|string|max:255',
+        'city'               => 'nullable|string|max:255',
+        'state'              => 'nullable|string|max:255',
+        'country'            => 'nullable|string|max:255',
+        'password'           => 'nullable|string|min:8',
+
+        'company_name'       => 'required|string|max:255',
+        'company_email'      => 'required|email|max:255',
+        'company_phone'      => 'required|string|max:20',
+        'company_description'=> 'nullable|string'
     ]);
 
     if ($validator->fails()) {
         return redirect()->back()->withInput()->withErrors($validator);
     }
 
-    $exhibitor_user->username = $request->username;
-    $exhibitor_user->name = $request->first_name;
-    $exhibitor_user->lastname = $request->last_name;
-    $exhibitor_user->email = $request->email;
-    $exhibitor_user->mobile = $request->mobile;
-    $exhibitor_user->dob = $request->dob;
-    $exhibitor_user->gender = $request->gender;
-    $exhibitor_user->street = $request->street;
-    $exhibitor_user->zipcode = $request->zipcode;
-    $exhibitor_user->city = $request->city;
-    $exhibitor_user->state = $request->state;
-    $exhibitor_user->country = $request->country;
-    $exhibitor_user->place = $request->place;
+    DB::transaction(function () use ($request, $exhibitor_user) {
 
-    if ($request->password) {
-        $exhibitor_user->password = Hash::make($request->password);
-    }
+        // Update Exhibitor User details
+        $exhibitor_user->username = $request->username;
+        $exhibitor_user->name = $request->first_name;
+        $exhibitor_user->lastname = $request->last_name;
+        $exhibitor_user->email = $request->email;
+        $exhibitor_user->mobile = $request->mobile;
+        $exhibitor_user->dob = $request->dob;
+        $exhibitor_user->gender = $request->gender;
+        $exhibitor_user->street = $request->street;
+        $exhibitor_user->zipcode = $request->zipcode;
+        $exhibitor_user->city = $request->city;
+        $exhibitor_user->state = $request->state;
+        $exhibitor_user->country = $request->country;
+        $exhibitor_user->place = $request->place;
 
-    $exhibitor_user->save();
+        if ($request->filled('password')) {
+            $exhibitor_user->password = Hash::make($request->password);
+        }
 
-    $exhibitor_user->syncRoles([]);
-    $exhibitor_user->assignRole($request->user_type);
+        $exhibitor_user->save();
 
-   
+        // Update or Create Company
+        $exhibitor_user->company()->updateOrCreate(
+            ['user_id' => $exhibitor_user->id],
+            [
+                'name'        => $request->company_name,
+                'email'       => $request->company_email,
+                'phone'       => $request->company_phone,
+                'description' => $request->company_description,
+            ]
+        );
+
+        // Sync Roles
+        $exhibitor_user->syncRoles([]);
+        $exhibitor_user->assignRole($request->user_type);
+    });
 
     return redirect(route('exhibitor-users.index'))
-        ->withSuccess('User data has been updated successfully.');
+        ->withSuccess('User and company data have been updated successfully.');
 }
+
 public function approve($id)
 {
     $user = User::findOrFail($id);
