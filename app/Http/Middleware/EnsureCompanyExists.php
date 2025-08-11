@@ -14,6 +14,10 @@ class EnsureCompanyExists
     public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();
+        if ($request->routeIs('company.store', 'company.update')) {
+            return $next($request);
+        }
+
         if ($user && !$user->company_id) {
             session()->flash('error', 'Please add your company details.');
             return redirect()->route('company.details');
