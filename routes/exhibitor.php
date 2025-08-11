@@ -16,15 +16,12 @@ use App\Http\Controllers\ExhibitorAdmin\PublicProductServiceController;
 
 Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () {
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
-
-
+Route::group(['middleware' => ['company.exists']], function () {
     Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts.index');
     Route::get('company/contacts/create', [CompanyContactController::class, 'create'])->name('company.contacts.create');
     Route::post('company/contacts', [CompanyContactController::class, 'store'])->name('company.contacts.store');
     Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
 
-
-    
     Route::get('/company/media-gallery', [CompanyController::class, 'mediaGallery'])->name('company.media.gallery');
     Route::post('/company/media-upload', [CompanyController::class, 'uploadMedia'])->name('company.media.upload');
     Route::delete('/company/media/{id}', [CompanyController::class, 'deleteMedia'])->name('company.media.delete');
@@ -55,7 +52,7 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     });
     // Services
     Route::resource('services', ServiceController::class);
-
+  });
 });
 
 // Public Routes
