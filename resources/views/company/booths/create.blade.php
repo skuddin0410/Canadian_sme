@@ -131,7 +131,4 @@
       Text = slugify(Text);
       $("#slug-target").val(Text);        
   });
-
-
-
 @endsection
