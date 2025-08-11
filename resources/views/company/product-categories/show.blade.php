@@ -11,7 +11,7 @@
 
     <div class="card">
          <div class="d-flex pt-3 justify-content-end">
-    <a href="{{ route('service-categories.index') }}" class="btn btn-outline-primary me-2">Back</a>
+    <a href="{{ route('product-categories.index') }}" class="btn btn-outline-primary me-2">Back</a>
     </div>
         <div class="card-body">
            
