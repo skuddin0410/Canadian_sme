@@ -138,7 +138,7 @@ public function booths()
 
     public function company()
     {
-        return $this->belongsTo(Company::class,'user_id','id');
+        return $this->hasOne(Company::class,'user_id','id');
     }
   protected function approvalStatusLabel(): Attribute
     {

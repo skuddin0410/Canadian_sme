@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-Admin | Add New Product
+Admin | Edit Product
 @endsection
 @section('content')
 
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Create/</span>Product</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Edit/</span>Product</h4>
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Product Create</h5>
+          <h5 class="mb-0">Product Update</h5>
         </div>
         <div class="card-body">
           @if(Session::has('success'))
@@ -45,7 +45,7 @@ Admin | Add New Product
 
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="title">Status<span class="text-danger">*</span></label>
+                  <label class="form-label" for="title">Category<span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                     <select name="category_id" class="form-control">
@@ -223,7 +223,7 @@ Admin | Add New Product
               <div class="d-flex pt-3 justify-content-end">
                 <a href="{{route('products.index')}}"
                   class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+                <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"><i class="bx bx-save"></i>Save</button>
               </div>
           </form>
         </div>

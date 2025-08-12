@@ -46,8 +46,8 @@
             <th>Image</th>
             <th>Name</th>
             <th>Category</th>
-            <th>Status</th>
-            <th>Sort Order</th>
+            {{-- <th>Status</th> --}}
+            {{-- <th>Sort Order</th> --}}
             <th>Created</th>
             <th>Actions</th>
         </tr>
@@ -57,7 +57,7 @@
         <tr>
             <td>
                 @if($product->image_url)
-                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="img-thumbnail"
+                <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" class="img-thumbnail"
                     style="width: 50px; height: 50px; object-fit: cover;">
                 @else
                 <div class="bg-light d-flex align-items-center justify-content-center"
@@ -71,12 +71,12 @@
                 <small class="text-muted">{{ Str::limit($product->description, 50) }}</small>
             </td>
             <td>{{ $product->category->name ?? 'Uncategorized' }}</td>
-            <td>
+            {{-- <td>
                 <span class="badge badge-{{ $product->is_active ? 'success' : 'secondary' }}">
                     {{ $product->is_active ? 'Active' : 'Inactive' }}
                 </span>
-            </td>
-            <td>{{ $product->sort_order }}</td>
+            </td> --}}
+            {{-- <td>{{ $product->sort_order }}</td> --}}
             <td>
                 {{ $product->created_at->format('M d, Y') }}<br>
                 <small class="text-muted">by {{ $product->creator->name ?? 'System' }}</small>

@@ -92,6 +92,14 @@
 
       </div>
     </div>
-  </div>
+
+ 
+     <div class="card-footer d-flex justify-content-end">
+                <a href="{{ route('contacts.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bx bx-save"></i> Save
+                </button>
+    </div>
+  </form>
 </div>
 @endsection

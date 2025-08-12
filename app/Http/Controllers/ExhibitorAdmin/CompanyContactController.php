@@ -108,4 +108,5 @@ class CompanyContactController extends Controller
         $contact->delete();
         return redirect()->route('company.contacts.index')->with('success', 'Contact deleted.');
     }
+
 }

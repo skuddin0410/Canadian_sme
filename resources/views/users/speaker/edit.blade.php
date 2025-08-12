@@ -183,7 +183,7 @@
               <div class="col-12">
                 <div class="d-flex justify-content-end pt-3">
                   <a href="{{ route('speaker.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
-                  <button type="submit" class="btn btn-primary">Update</button>
+                  <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i>Save</button>
                 </div>
               </div>
 

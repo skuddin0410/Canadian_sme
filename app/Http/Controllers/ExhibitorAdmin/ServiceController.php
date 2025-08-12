@@ -21,26 +21,34 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Service::with(['category', 'creator'])
-            ->when($request->category_id, function ($q, $categoryId) {
-                return $q->where('category_id', $categoryId);
-            })
-            ->when($request->search, function ($q, $search) {
-                return $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            })
-            ->when($request->status, function ($q, $status) {
-                return $status === 'active' ? $q->active() : $q->where('is_active', false);
-            });
+        
+    $query = Service::query();
 
-        $services = $query->orderBy('sort_order')
-            ->orderBy('name')
-            ->paginate(15);
-
-        $categories = ServiceCategory::active()->orderBy('name')->get();
-
-        return view('company.services.index', compact('services', 'categories'));
+    // Filters
+    if ($request->category_id) {
+        $query->where('category_id', $request->category_id);
     }
+    if ($request->status) {
+        $query->where('is_active', $request->status === 'active');
+    }
+    if ($request->search) {
+        $query->where('name', 'like', '%' . $request->search . '%');
+    }
+
+    $services = $query->orderBy('sort_order')->orderBy('name')->paginate(15);
+    $categories = ServiceCategory::all();
+
+    // If it's an AJAX request, return only the table HTML
+    if ($request->ajax_request) {
+        $html = view('company.services.table', compact('services'))->render();
+        return response()->json(['html' => $html]);
+    }
+
+    // Full page load
+    return view('company.services.index', compact('services', 'categories'));
+}
+
+       
 
     /**
      * Show the form for creating a new resource.
@@ -60,7 +68,7 @@ class ServiceController extends Controller
                 'name' => 'required|string|max:255',
                 'price' => 'required|numeric|gte:0',
                 'description' => 'required|string',
-                'category_id' => 'nullable|exists:service_categories,id',
+                'category_id' => 'required|exists:service_categories,id',
                 'duration' => 'nullable|string|max:255',
                 'is_active' => 'nullable|string',
                 'sort_order' => 'integer|min:0',
