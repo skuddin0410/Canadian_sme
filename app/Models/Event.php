@@ -55,4 +55,9 @@ class Event extends Model
             ->where('file_type', 'photo')
             ->whereNotNull('file_name');
     }
+
+    public function sessions()
+    {
+        return $this->hasMany(EventSession::class);
+    }
 }

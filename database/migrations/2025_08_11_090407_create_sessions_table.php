@@ -11,6 +11,7 @@ class CreateSessionsTable extends Migration
         Schema::create('event_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
+            $table->foreignId('booth_id')->constrained('event_venues')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('start_time');
@@ -25,6 +26,6 @@ class CreateSessionsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('event_sessions');
     }
 }
