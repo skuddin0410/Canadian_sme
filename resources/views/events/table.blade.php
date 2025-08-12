@@ -41,7 +41,7 @@
 		<th>Tags</th>
 		<th>Author</th>
 		<th>Created At</th>
-		<th width="10%">Action</th>
+		<th width="12%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -58,15 +58,22 @@
 		<th>{{dateFormat($event->created_at)}}</th>
 		<th>
 		<div class="row">
-		    <div class="col-4 p-1">
+
+		  <div class="col-3 p-1">
 			<a href="{{ route("events.show",["event"=> $event->id]) }}" class="btn btn-sm btn-icon btn-primary"><i class="bx bx-show"></i></a>
-		    </div>
-		    <div class="col-4 p-1">
+		  </div>
+
+		  <div class="col-3 p-1">
 			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
 			  <a href="{{ route("events.edit",["event"=> $event->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            @endif
+      @endif
 			</div>
-            <div class="col-4 p-1">
+
+      <div class="col-3 p-1">
+        <a href="{{ route("calendar.index",["event_id"=> $event->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-calendar"></i></a>
+      </div> 
+
+      <div class="col-3 p-1">
 			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
 			<form action="{{ route('events.destroy', $event->id) }}" method="post">
               @csrf
@@ -74,9 +81,9 @@
               <button type="submit" class="btn btn-sm btn-icon btn-danger deleteEmployer" onclick="return confirm('Are you sure you want to delete?')"><i class="bx bxs-trash"></i></button>
             </form>
 			@endif
-            </div>
-        </div>    
-       </th>
+      </div>
+      </div>    
+      </th>
 	</tr>
 	@endforeach
 

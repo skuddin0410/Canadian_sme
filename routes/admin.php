@@ -6,6 +6,7 @@ use App\Http\Controllers\SpeakerController;
 use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
+use App\Http\Controllers\CalendarController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
     Route::resource('banners', App\Http\Controllers\BannerController::class);
@@ -47,12 +48,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::get('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBoothForm'])->name('exhibitor-users.assign-booth-form');
     Route::post('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBooth'])->name('exhibitor-users.assign-booth');
 
-
-   
-
-
     
-     Route::resource('speaker', SpeakerController::class);
+    Route::resource('speaker', SpeakerController::class);
 
     Route::any('faqs/{id}/order/{order}', '\App\Http\Controllers\FaqController@order');
     Route::any('banners/{id}/order/{order}', '\App\Http\Controllers\BannerController@order');
@@ -66,6 +63,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
         Route::get('/{log}', [App\Http\Controllers\AuditController::class, 'show'])->name('audit.show');
         Route::get('/entity/{entityType}/{entityId}', [App\Http\Controllers\AuditController::class, 'entityLogs'])->name('audit.edit');
     });
+
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin']], function () {

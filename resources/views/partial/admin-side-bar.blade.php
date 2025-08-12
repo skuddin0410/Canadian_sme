@@ -19,7 +19,7 @@
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Dashboard</div>
             </a>
-        </li>  
+        </li>
         
         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
          <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">

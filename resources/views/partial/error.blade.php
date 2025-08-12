@@ -1,5 +1,5 @@
 @if ($errors->any())
-<div class="container-xxl flex-grow-1 container-p-y pt-0">
+<div class="container-xxl mt-1">
     <div class="alert alert-danger">
 
         <ul class="mb-0 mt-2">

@@ -3,10 +3,17 @@
 namespace App\Http\Controllers\ExhibitorAdmin;
 
 use App\Models\Company;
+use App\Models\CompanyContact;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+
+use DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use DataTables;
 
 class CompanyContactController extends Controller
 {
@@ -15,19 +22,40 @@ class CompanyContactController extends Controller
      */
     public function index(Request $request)
     {
-   
-    $company = Company::where('user_id', auth()->id())->first();
-    if(empty($company)){
-      return redirect()->route('company.details')->with('success', 'Update Company details first.');
-    }
 
-    $contacts = $company->contacts()->get();
-    if ($request->ajax()) {
-        $html = view('company.partials.contacts-table', compact('contacts'))->render();
-        return response()->json(['html' => $html]);
-    }
+        $company = Company::where('user_id', auth()->id())->first();
+        $perPage = (int) $request->input('perPage', 20);
+        $pageNo = (int) $request->input('page', 1);
+        $offset = $perPage * ($pageNo - 1);
 
-    return view('company.contacts', compact('company', 'contacts'));
+      if($request->ajax() && $request->ajax_request == true){
+        $contacts = CompanyContact::orderBy('id','DESC');
+
+        if($request->search){
+            $contacts = $contacts->where(function($query) use($request){
+                    $query->where('name', 'LIKE', '%'. $request->search .'%');
+                });
+        }
+
+
+        $contactsCount = clone $contacts;
+        $totalRecords = $contactsCount->count(DB::raw('DISTINCT(company_contacts.company_id)'));  
+        $contacts = $contacts->offset($offset)->limit($perPage)->get();     
+        $contacts = new LengthAwarePaginator($contacts, $totalRecords, $perPage, $pageNo, [
+                  'path'  => $request->url(),
+                  'query' => $request->query(),
+                ]);
+        $data['offset'] = $offset;
+        $data['pageNo'] = $pageNo;
+        $contacts->setPath(route('company.contacts.index'));
+        $data['html'] = view('company.contact-table', compact('contacts', 'perPage'))
+                  ->with('i', $pageNo * $perPage)
+                  ->render();
+
+         return response($data);                                              
+        }   
+                   
+        return view('company.contacts');
     }
 
     /**
@@ -50,7 +78,7 @@ class CompanyContactController extends Controller
             'phone' => 'required|string|max:20',
         ]);
         $company->contacts()->create($request->only(['name', 'email', 'phone']));
-        return redirect()->route('company.contacts')->with('success', 'Contact added successfully.');
+        return redirect()->route('company.contacts.index')->with('success', 'Contact added successfully.');
    
     }
 
@@ -75,22 +103,9 @@ class CompanyContactController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-         $contact = CompanyContact::findOrFail($id);
-
-        if ($contact->company->user_id !== auth()->id()) {
-            abort(403);
-        }
-
+    {    
+        $contact = CompanyContact::findOrFail($id);
         $contact->delete();
-
-        if ($request->ajax()) {
-            $company = Company::where('user_id', auth()->id())->firstOrFail();
-            $contacts = $company->contacts()->get();
-            $html = view('company.partials.contacts-table', compact('contacts'))->render();
-            return response()->json(['success' => true, 'html' => $html]);
-        }
-
-        return redirect()->route('company.contacts')->with('success', 'Contact deleted.');
+        return redirect()->route('company.contacts.index')->with('success', 'Contact deleted.');
     }
 }
