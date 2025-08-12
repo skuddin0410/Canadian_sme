@@ -21,6 +21,7 @@ Route::group(['middleware' => ['company.exists']], function () {
     Route::get('company/contacts/create', [CompanyContactController::class, 'create'])->name('company.contacts.create');
     Route::post('company/contacts', [CompanyContactController::class, 'store'])->name('company.contacts.store');
     Route::delete('company/contacts/{contact}', [CompanyContactController::class, 'destroy'])->name('company.contacts.destroy');
+    Route::resource('contacts', CompanyContactController::class);
 
     Route::get('/company/media-gallery', [CompanyController::class, 'mediaGallery'])->name('company.media.gallery');
     Route::post('/company/media-upload', [CompanyController::class, 'uploadMedia'])->name('company.media.upload');

@@ -42,7 +42,7 @@
            </div>
            <div class="col-6">
              <div class="mb-3">
-              <label class="form-label" for="title">Status<span class="text-danger">*</span></label>
+              <label class="form-label" for="title">Category<span class="text-danger">*</span></label>
                 <div class="input-group input-group-merge">
                 <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                 <select name="category_id" class="form-control">
@@ -205,7 +205,7 @@
             
           <div class="d-flex pt-3 justify-content-end">
              <a href="{{route('products.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
-            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"> <i class="bx bx-save"></i>Save</button>
           </div>
           </form>
         </div>

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container flex-grow-1 container-p-y">
-    <h4 class="mb-4">Create New Service Category</h4>
+    <h4 class="mb-4">Create / Service Category</h4>
 
     <div class="card">
         <div class="card-body">
@@ -66,8 +66,12 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-primary">Create Category</button>
-                <a href="{{ route('service-categories.index') }}" class="btn btn-secondary ms-2">Cancel</a>
+              
+
+            <div class="d-flex pt-3 justify-content-end">
+             <a href="{{route('service-categories.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"> <i class="bx bx-save"></i>Save</button>
+          </div>
             </form>
         </div>
     </div>

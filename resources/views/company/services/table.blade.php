@@ -56,7 +56,7 @@
             <tr>
              <td>
                     @if($service->image_url)
-                        <img src="{{ asset($service->image_url) }}" alt="{{ $service->name }}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
+                        <img src="{{ asset('storage/'.$service->image_url) }}" alt="{{ $service->name }}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
                     @else
                         <div class="bg-light text-center d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                             <i class="bx bx-image text-muted"></i>
@@ -111,7 +111,7 @@
 <div class="text-xs-center">
     @if ($services->hasPages())
     <div class="custom_pagination">
-        @if (!$services->onFirstpage())
+        @if (!$services->onFirstPage())
         <a href="{{ $services->appends(request()->input())->url(1) }}" class="pagination-link">
             <i class="bx bx-chevron-left"></i>
             <i class="bx bx-chevron-left"></i>
@@ -123,7 +123,7 @@
 
         <span class="page-count"> <a href="#"> Page {{ number_format($services->currentPage()) }} of
                 {{ number_format($services->lastPage()) }} </a></span>
-        @if (!$services->onLastpage())
+        @if (!$services->onLastPage())
         <a href="{{ $services->appends(request()->input())->nextPageUrl() }}" class="pagination-link">
             <i class="bx bx-chevron-right"></i>
 

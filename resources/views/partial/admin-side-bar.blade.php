@@ -42,11 +42,11 @@
                         <div data-i18n="events">Events</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
                     <a href="{{ url('categories') }}" class="menu-link">
                         <div data-i18n="Categories">Categories</div>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </li>
         @endif 

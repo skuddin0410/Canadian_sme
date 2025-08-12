@@ -34,7 +34,7 @@
             {{ csrf_field() }} 
             <input type="hidden" name="company_id" value="{{Auth::user()->company_id}}">
             <div class="row">
-            <div class="col-12">
+            <div class="col-6">
              <div class="mb-3">
               <label class="form-label" for="title">Booth Title<span class="text-danger">*</span></label>
               <div class="input-group input-group-merge">
@@ -86,28 +86,31 @@
                   @endif
             </div>
            </div>
-           </div>
+          <div class="col-6">
+    <div class="mb-3">
+        <label class="form-label" for="location_preferences">
+            Location<span class="text-danger">*</span>
+        </label>
+        <input
+            type="text"
+            name="location_preferences"
+            id="location_preferences"
+            class="form-control"
+            placeholder="Enter location preference"
+            value="{{ old('location_preferences') }}"
+        >
+        @if ($errors->has('location_preferences'))
+            <span class="text-danger text-left">{{ $errors->first('location_preferences') }}</span>
+        @endif
+    </div>
+</div>
 
-            <div class="mb-3">
-              <label class="form-label" for="description">Location Preferences<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge" id="quill-editor" style="height: 300px;">
-                <textarea
-                  type="text"
-                  name="location_preferences"
-                  id="location_preferences"
-                  class="form-control"
-                  placeholder="Post Description"
-                  rows="8" cols="50"
-                >{{ old('Location Preferences') }}</textarea>
-              </div>
-              @if ($errors->has('location_preferences'))
-                <span class="text-danger text-left">{{ $errors->first('location_preferences') }}</span>
-              @endif
-            </div>
+           </div>
+           
 
           <div class="d-flex pt-3 justify-content-end">
              <a href="{{route('booths.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
-            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user">Save</button>
+            <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"><i class="bx bx-save"></i>Save</button>
           </div>
           </form>
         </div>

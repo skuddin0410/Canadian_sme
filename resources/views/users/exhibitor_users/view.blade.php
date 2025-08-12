@@ -10,7 +10,7 @@ Admin | Exhibitor User Details
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light"></span>Exhibitor User</h4>
+    <h3 class="py-3 mb-4"><span class="text-muted fw-light"></span>Exhibitor User</h3>
 
     <div class="row">
         <div class="col-xl">
@@ -25,7 +25,9 @@ Admin | Exhibitor User Details
                     <div class="d-flex pt-3 justify-content-end">
                         <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
                     </div>
-                    <div class="d-flex pt-3 justify-content-end">
+                      @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+
+            <div class="d-flex pt-3 justify-content-end">
             @if(!$user->is_approve)
     <form action="{{ route('exhibitor-users.approve', $user->id) }}" method="POST" style="display: inline-block;">
         @csrf
@@ -38,6 +40,7 @@ Admin | Exhibitor User Details
             <span class="badge bg-success">Approved</span>
         @endif
     </div>
+    @endif
 
                     <h5 class="pb-2 border-bottom mb-4">Exhibitor User Details</h5>
 
@@ -69,9 +72,8 @@ Admin | Exhibitor User Details
                                 </ul>
                             </div>
                             <div class="col-4">
-     
-
-    @forelse($companies as $company)
+                                <h5> Company Details:</h5>
+                                @forelse($companies as $company)
             {{-- Company Logo --}}
             @if($company->logoFile)
                <span class="fw-medium me-2"> <img src="{{ Storage::url($company->logoFile->file_name) }}" class="card-img-top"
@@ -79,7 +81,7 @@ Admin | Exhibitor User Details
             @endif
 
             <div class="mt-2">
-                <h5>{{ $company->name }}</h5>
+                <h6>{{ $company->name }}</h6>
                 <p class="mb-1"><strong>Industry:</strong> {{ $company->industry }}</p>
                 <p class="mb-1"><strong>Size:</strong> {{ $company->size }}</p>
                 <p class="mb-1"><strong>Location:</strong> {{ $company->location }}</p>

@@ -16,149 +16,128 @@
             </div>
 
             <div class="card-body row">
-                <!-- Left Column -->
-                <div class="col-md-8">
-                    <!-- Name -->
+                <!-- Service Name -->
+                <div class="col-6">
                     <div class="mb-3">
                         <label class="form-label">Service Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" value="{{ old('name') }}">
-                          @if ($errors->has('name'))
-                          <span class="text-danger text-left">{{ $errors->first('name') }}</span>
-                          @endif
-                    </div>
-
-                    <!-- Description -->
-                    <div class="mb-3">
-                        <label class="form-label">Description <span class="text-danger">*</span></label>
-                        <textarea
-                          type="text"
-                          name="description"
-                          id="description"
-                          class="form-control"
-                          placeholder="Service Description"
-                          rows="8" cols="50"
-                        >{{ old('description') }}</textarea>
-
-                        @if ($errors->has('description'))
-                            <span class="text-danger text-left">{{ $errors->first('description') }}</span>
-                          @endif
-                    </div>
-
-                  
-                    <div class="mb-3">
-                       <label class="form-label">Product Price <span class="text-danger">*</span></label>
-                      <div class="input-group input-group-merge">
-                        <span id="title-icon" class="input-group-text">{{config('app.currency_sign')}}</span>
-                        <input type="text" name="price" value="{{ old('price') }}" class="form-control">
-                         
-                    </div>
-                     @if ($errors->has('price'))
-                            <span class="text-danger text-left">{{ $errors->first('price') }}</span>
-                          @endif
-                    </div>
-           
-
-                    <!-- Capabilities -->
-                    <div class="mb-3">
-                        <label class="form-label">Capabilities <small class="text-muted">(one per line)</small></label>
-                        <textarea name="capabilities" class="form-control" rows="8" cols="50">{{ old('capabilities') }}</textarea>
-                        @if ($errors->has('capabilities'))
-                          <span class="text-danger text-left">{{ $errors->first('capabilities') }}</span>
+                        @if ($errors->has('name'))
+                            <span class="text-danger">{{ $errors->first('name') }}</span>
                         @endif
-                    </div>
-
-                    <!-- Deliverables -->
-                    <div class="mb-3">
-                        <label class="form-label">Deliverables <small class="text-muted">(one per line)</small></label>
-                        <textarea name="deliverables" class="form-control" rows="8" cols="50">{{ old('deliverables') }}</textarea>
-                        @if ($errors->has('deliverables'))
-                          <span class="text-danger text-left">{{ $errors->first('deliverables') }}</span>
-                        @endif
-                    </div>
-
-                    <!-- Meta Title -->
-                    <div class="mb-3">
-                        <label class="form-label">Meta Title</label>
-                        <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title') }}">
-                         @if ($errors->has('meta_title'))
-                          <span class="text-danger text-left">{{ $errors->first('meta_title') }}</span>
-                        @endif
-                    </div>
-
-                    <!-- Meta Description -->
-                    <div class="mb-3">
-                        <label class="form-label">Meta Description</label>
-                        <textarea name="meta_description" class="form-control"
-                            rows="8" cols="50">{{ old('meta_description') }}</textarea>
-                    </div>
-
-                     <div class="mb-3">
-                        <label class="form-label">Meta Keywords</label>
-                        <textarea name="meta_keywords" class="form-control"
-                            rows="8" cols="50">{{ old('meta_keywords') }}</textarea>
                     </div>
                 </div>
 
-                <!-- Right Column -->
-                <div class="col-md-4">
+                <!-- Service Price -->
+                <div class="col-6">
                     <div class="mb-3">
-                        <label class="form-label">Category</label>
+                        <label class="form-label">Service Price <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-merge">
+                            <span id="title-icon" class="input-group-text">{{ config('app.currency_sign') }}</span>
+                            <input type="text" name="price" value="{{ old('price') }}" class="form-control">
+                        </div>
+                        @if ($errors->has('price'))
+                            <span class="text-danger">{{ $errors->first('price') }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Description (Full Width) -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="form-label">Description <span class="text-danger">*</span></label>
+                        <textarea name="description" id="description" class="form-control" placeholder="Service Description" rows="8">{{ old('description') }}</textarea>
+                        @if ($errors->has('description'))
+                            <span class="text-danger">{{ $errors->first('description') }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Capabilities -->
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label">Capabilities <small class="text-muted">(one per line)</small></label>
+                        <textarea name="capabilities" class="form-control" rows="8">{{ old('capabilities') }}</textarea>
+                        @if ($errors->has('capabilities'))
+                            <span class="text-danger">{{ $errors->first('capabilities') }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Deliverables -->
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label">Deliverables <small class="text-muted">(one per line)</small></label>
+                        <textarea name="deliverables" class="form-control" rows="8">{{ old('deliverables') }}</textarea>
+                        @if ($errors->has('deliverables'))
+                            <span class="text-danger">{{ $errors->first('deliverables') }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Meta Title -->
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label">Meta Title</label>
+                        <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title') }}">
+                        @if ($errors->has('meta_title'))
+                            <span class="text-danger">{{ $errors->first('meta_title') }}</span>
+                        @endif
+                    </div>
+                </div>
+                  <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label">Category<span class="text-danger">*</span></label>
                         <select name="category_id" class="form-select">
                             <option value="">-- Select Category --</option>
                             @foreach($categories as $category)
-                            <option value="{{ $category->id }}"
-                                {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
+                </div>
 
-                    <!-- Duration -->
+                <!-- Meta Description -->
+                <div class="col-6">
                     <div class="mb-3">
-                        <label class="form-label">Duration</label>
-                        <input type="text" name="duration" class="form-control" value="{{ old('duration') }}">
-                         @if ($errors->has('duration'))
-                          <span class="text-danger text-left">{{ $errors->first('duration') }}</span>
-                        @endif
+                        <label class="form-label">Meta Description</label>
+                        <textarea name="meta_description" class="form-control" rows="8">{{ old('meta_description') }}</textarea>
                     </div>
+                </div>
 
-                    <!-- Sort Order -->
+                <!-- Meta Keywords -->
+                <div class="col-6">
                     <div class="mb-3">
-                        <label class="form-label">Sort Order</label>
-                        <input type="number" name="sort_order" class="form-control" value="{{ old('sort_order', 0) }}">
+                        <label class="form-label">Meta Keywords</label>
+                        <textarea name="meta_keywords" class="form-control" rows="8">{{ old('meta_keywords') }}</textarea>
                     </div>
+                </div>
 
-                    <!-- Status -->
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
-                                {{ old('is_active', true) ? 'checked' : '' }} value="1">
-                            <label class="form-check-label" for="is_active">
-                                Active
-                            </label>
-                        </div>
-                    </div>
-                    <!-- Main Image Upload -->
+                <!-- Category -->
+              
+
+                <!-- Main Image -->
+                <div class="col-6">
                     <div class="mb-3">
                         <label class="form-label">Main Image</label>
                         <input type="file" name="main_image" class="form-control" accept="image/*">
                     </div>
+                </div>
 
-                    <!-- Gallery Image Upload -->
+                <!-- Gallery Images -->
+                <div class="col-6">
                     <div class="mb-3">
                         <label class="form-label">Gallery Images <small>(multiple files allowed)</small></label>
                         <input type="file" name="gallery_images[]" class="form-control" accept="image/*" multiple>
                     </div>
-
                 </div>
             </div>
 
             <div class="card-footer d-flex justify-content-end">
-                <a href="{{route('services.index')}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
+                <a href="{{ route('services.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
                 <button type="submit" class="btn btn-primary">
-                    <i class="bx bx-save"></i> Save Service
+                    <i class="bx bx-save"></i> Save
                 </button>
             </div>
         </div>
