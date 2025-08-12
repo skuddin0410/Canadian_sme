@@ -195,8 +195,6 @@ class LaravelEventCalendar {
 
     updateCalendarEvents() {
         if (!this.calendar) return;
-         try {
-            alert('loading calendor')
         this.calendar.removeAllEvents();
         this.calendar.addEventSource(this.events.map(session => ({
             id: session.id,
@@ -219,10 +217,6 @@ class LaravelEventCalendar {
                 duration: this.calculateDuration(session.start_time, session.end_time)
             }
         })));
-        } catch (error) {
-            console.error('Error loading sessions:', error);
-            this.showAlert('Error loading sessions', 'danger');
-        }
     }
 
     switchView(viewType) {
