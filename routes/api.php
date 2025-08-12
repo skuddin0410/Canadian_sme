@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CalendarController;
 
 Route::post('/register', [App\Http\Controllers\Api\JWTAuthController::class, 'register']);
 Route::post('/login', [App\Http\Controllers\Api\JWTAuthController::class, 'login']);
@@ -35,14 +34,3 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
    
 });
 
-
-
-Route::prefix('calendar')->group(function () {
-    Route::get('/data', [CalendarController::class, 'getCalendarData']);
-    Route::get('/sessions', [CalendarController::class, 'getSessions']);
-    Route::post('/sessions', [CalendarController::class, 'createSession']);
-    Route::get('/sessions/{session}', [CalendarController::class, 'getSessionDetails']);
-    Route::put('/sessions/{session}', [CalendarController::class, 'updateSession']);
-    Route::delete('/sessions/{session}', [CalendarController::class, 'deleteSession']);
-    Route::post('/sessions/bulk-update', [CalendarController::class, 'bulkUpdateSessions']);
-});

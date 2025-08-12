@@ -58,6 +58,6 @@ class Event extends Model
 
     public function sessions()
     {
-        return $this->hasMany(EventSession::class);
+        return $this->hasMany(Session::class);
     }
 }

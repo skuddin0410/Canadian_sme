@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Session extends Model
 {
+    protected $table = "event_sessions";
     protected $fillable = [
-        'event_id', 'track_id', 'venue_id', 'title', 'description',
+        'event_id', 'booth_id', 'title', 'description',
         'start_time', 'end_time', 'status', 'type', 'capacity', 'metadata'
     ];
 
@@ -29,16 +30,20 @@ class Session extends Model
         return $this->belongsTo(Track::class);
     }
 
-    public function venue(): BelongsTo
+    public function booth()
     {
-        return $this->belongsTo(Venue::class);
+        return $this->belongsTo(Booth::class, 'booth_id');
     }
+
 
     public function speakers(): BelongsToMany
     {
-        return $this->belongsToMany(Speaker::class, 'session_speakers')
-                    ->withPivot('role')
-                    ->withTimestamps();
+        return $this->belongsToMany(User::class, 'session_speakers', 'session_id', 'user_id')->withTimestamps();
+    }
+
+    public function tickets()
+    {
+         return $this->hasMany(EventTicket::class, 'session_id');
     }
 
     public function getDurationInMinutes()

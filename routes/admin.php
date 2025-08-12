@@ -67,6 +67,17 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     });
 
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::prefix('calendar')->group(function () {
+        Route::get('/data', [CalendarController::class, 'getCalendarData']);
+        Route::get('/sessions', [CalendarController::class, 'getSessions'])->name('calendar.sessions');
+        Route::post('/sessions', [CalendarController::class, 'createSession'])->name('calendar.sessions.store');
+        Route::get('/sessions/{session}', [CalendarController::class, 'getSessionDetails']);
+        Route::put('/sessions/{session}', [CalendarController::class, 'updateSession'])->name('calendar.sessions.update');
+        Route::delete('/sessions/{session}', [CalendarController::class, 'deleteSession'])->name('calendar.sessions.destroy');
+        Route::post('/sessions/bulk-update', [CalendarController::class, 'bulkUpdateSessions']);
+
+         Route::get('/speakers', [CalendarController::class, 'speakers'])->name('speakers.list');
+    });
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin']], function () {

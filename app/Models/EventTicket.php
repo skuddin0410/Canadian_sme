@@ -13,7 +13,7 @@ class EventTicket extends Model
     // A ticket belongs to a session
     public function session()
     {
-        return $this->belongsTo(EventSession::class, 'session_id');
+        return $this->belongsTo(Session::class, 'session_id');
     }
 
     // A ticket has many bookings

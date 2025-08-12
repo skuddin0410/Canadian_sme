@@ -18,9 +18,9 @@ class LaravelEventCalendar {
         }
         
         this.initializeCalendar();
-        //this.bindEvents();
-        //this.loadSpeakers();
-        //this.loadSessions();
+        this.bindEvents();
+        this.loadSpeakers();
+        this.loadSessions();
     }
 
     initializeCalendar() {
@@ -39,8 +39,8 @@ class LaravelEventCalendar {
                 right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
             },
             height: 'auto',
-            slotMinTime: '08:00:00',
-            slotMaxTime: '20:00:00',
+            slotMinTime: '06:00:00',
+            slotMaxTime: '23:00:00',
             slotDuration: '00:15:00',
             snapDuration: '00:15:00',
             editable: true,
@@ -195,7 +195,8 @@ class LaravelEventCalendar {
 
     updateCalendarEvents() {
         if (!this.calendar) return;
-        
+         try {
+            alert('loading calendor')
         this.calendar.removeAllEvents();
         this.calendar.addEventSource(this.events.map(session => ({
             id: session.id,
@@ -218,6 +219,10 @@ class LaravelEventCalendar {
                 duration: this.calculateDuration(session.start_time, session.end_time)
             }
         })));
+        } catch (error) {
+            console.error('Error loading sessions:', error);
+            this.showAlert('Error loading sessions', 'danger');
+        }
     }
 
     switchView(viewType) {
@@ -698,9 +703,10 @@ class LaravelEventCalendar {
     addSelectedSpeaker() {
         const select = document.getElementById('speakerSelect');
         const speakerId = select.value;
-        
+        console.log(this.speakers);
+        alert(1)
         if (!speakerId) return;
-
+        
         const speaker = this.speakers.find(s => s.id == speakerId);
         if (!speaker) return;
 
