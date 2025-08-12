@@ -28,14 +28,25 @@
                 <i class="menu-icon tf-icons bx bx-building-house"></i>
                     <div data-i18n="User Lookup">User Lookup</div>
             </a>
+           
             <ul class="menu-sub">
 
-                <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
-                    <a href="{{ route('company.details') }}" class="menu-link">
-                        <div data-i18n="User List">User List</div>
+                <li class="menu-item {{ request()->is('exhibitor-users') ? 'active' : '' }}">
+                    <a href="{{ url('exhibitor-users') }}" class="menu-link">
+                        <div data-i18n="Exhibitor Users List"> Exhibitor</div>
                     </a>
                 </li>
             </ul>
+            
+             <ul class="menu-sub">
+
+                <li class="menu-item {{ request()->is('speaker') ? 'active' : '' }}">
+                    <a href="{{ url('speaker') }}" class="menu-link">
+                        <div data-i18n="Speaker List">Speaker</div>
+                    </a>
+                </li>
+            </ul>
+            
         </li>
 
 
