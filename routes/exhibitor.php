@@ -1,7 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;  
-use App\Http\Controllers\ExhibitorAdmin\BoothController;
 use App\Http\Controllers\ExhibitorAdmin\CompanyController;
 use App\Http\Controllers\ExhibitorAdmin\PricingController;
 use App\Http\Controllers\ExhibitorAdmin\ProductController;
@@ -34,7 +33,6 @@ Route::group(['middleware' => ['company.exists']], function () {
 
     Route::resource('trainings', TrainingController::class);
     Route::resource('company', CompanyController::class);
-    Route::resource('booths', BoothController::class);
 
     // Product Categories
     Route::resource('product-categories', ProductCategoryController::class);

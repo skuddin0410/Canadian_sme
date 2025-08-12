@@ -7,6 +7,7 @@ use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ExhibitorAdmin\BoothController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
     Route::resource('banners', App\Http\Controllers\BannerController::class);
@@ -50,6 +51,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 
     
     Route::resource('speaker', SpeakerController::class);
+    Route::resource('booths', BoothController::class);
 
     Route::any('faqs/{id}/order/{order}', '\App\Http\Controllers\FaqController@order');
     Route::any('banners/{id}/order/{order}', '\App\Http\Controllers\BannerController@order');

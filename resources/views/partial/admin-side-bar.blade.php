@@ -30,6 +30,15 @@
         </li>
        @endif
 
+       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+       <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
+            <a href="{{route('booths.index')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store-alt"></i>
+                    <div data-i18n="Booth Management">Booth Management</div>
+            </a>
+        </li>
+       @endif
+       
         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
         <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -52,23 +61,14 @@
         @endif 
         
 
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('banners*') ? 'active open' : '' }}">
-            <a href="{{ url('banners') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Banners">Banners</div>
-            </a>
-        </li>
-        @endif
-
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+  <!--       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
         <li class="menu-item {{ request()->is('coupons*') ? 'active open' : '' }}">
             <a href="{{ url('coupons') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="Coupons">Coupons</div>
             </a>
         </li>
-        @endif
+        @endif -->
 
  
        
@@ -76,10 +76,10 @@
         <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Blogs">Site Users</div>
+                <div data-i18n="Blogs">Users</div>
             </a>
             <ul class="menu-sub">
-                @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') || Auth::user()->hasRole('Accounts Manager'))
+                @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
                 <li class="menu-item {{ request()->is('users') ? 'active open' : '' }}">
                    <a href="{{ url('users') }}" class="menu-link">
                     <div data-i18n="Users">All Users</div>
@@ -95,30 +95,13 @@
                     <div data-i18n="Users">Speaker</div>
                    </a>
                 </li>
-                {{-- <li class="menu-item {{ request()->is('exhibitor-representative') || request()->is('users') ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <div data-i18n="Team">Team</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item {{ request()->is('exhibitor-representative') ? 'active' : '' }}">
-                        <a href="{{ url('representative-users') }}" class="menu-link">
-                            <div data-i18n="Exhibitor Representative">Exhibitor Representative</div>
-                        </a>
-                    </li>
-                    <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">
-                        <a href="{{ url('attendee-users') }}" class="menu-link">
-                            <div data-i18n="Attendee">Attendee</div>
-                        </a>
-                    </li>
-                </ul>
-            </li> --}}
                 @endif
             </ul>
         </li>
         @endif
         
         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-     {{--    <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('admin-users*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('admin-users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="Admin Users">Admin Users</div>
@@ -131,56 +114,9 @@
                    </a>
                 </li>
             </ul>
-        </li>           --}}
+        </li>   
         @endif
         
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('testimonials*') ? 'active open' : '' }}">
-            <a href="{{ url('testimonials') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Testimonials">Testimonials</div>
-            </a>
-        </li>
-        @endif
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('faqs*') ? 'active open' : '' }}">
-            <a href="{{ url('faqs') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="FAQs">FAQs</div>
-            </a>
-        </li>
-        @endif
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('home/settings') ? 'active open' : '' }} {{ request()->is('settings*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Settings">Settings</div>
-            </a>
-            <ul class="menu-sub">
-               <li class="menu-item {{ request()->is('settings') ? 'active open' : '' }}">
-                    <a href="{{ url('settings') }}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                        <div data-i18n="Site Settings">Site settings</div>
-                    </a>
-                </li> 
-                <li class="menu-item {{ request()->is('home/settings') ? 'active open' : '' }}">
-                    <a href="{{ route('indexHome') }}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                        <div data-i18n="Site Settings">Home page settings</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('home/settings') ? 'active open' : '' }}">
-                    <a href="{{ route('roles.matrix') }}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                        <div data-i18n="Site Settings">Permission Matrix</div>
-                    </a>
-                </li>
-                
-            </ul>
-
-         </li> 
-         @endif   
 
          @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
         <li class="menu-item {{ request()->is('audit*') ? 'active open' : '' }}">

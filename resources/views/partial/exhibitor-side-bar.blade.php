@@ -61,14 +61,6 @@
     </ul>
 </li>
 
-
-
-    <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
-        <a href="{{route('booths.index')}}" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-store-alt"></i>
-                <div data-i18n="Booth Management">Booth Management</div>
-        </a>
-    </li>
     <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>

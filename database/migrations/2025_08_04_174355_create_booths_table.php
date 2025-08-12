@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('booths', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->string('title')->nullable();
             $table->string('booth_number');
             $table->string('size')->nullable(); // e.g., 10x10, 5x7
