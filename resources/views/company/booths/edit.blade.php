@@ -82,21 +82,25 @@
     </div>
 
     <!-- Location Preferences -->
-    <div class="col-6">
-      <div class="mb-3">
-        <label class="form-label" for="location_preferences">Location Preferences <span class="text-danger">*</span></label>
-        <textarea
-          name="location_preferences"
-          id="location_preferences"
-          class="form-control"
-          rows="5"
-          placeholder="Post Description"
-        >{{ $booth->location_preferences }}</textarea>
+   <div class="col-6">
+    <div class="mb-3">
+        <label class="form-label" for="location_preferences">
+            Location Preferences <span class="text-danger">*</span>
+        </label>
+        <input
+            type="text"
+            name="location_preferences"
+            id="location_preferences"
+            class="form-control"
+            placeholder="Post Description"
+            value="{{ $booth->location_preferences }}"
+        >
         @if ($errors->has('location_preferences'))
-          <span class="text-danger text-left">{{ $errors->first('location_preferences') }}</span>
+            <span class="text-danger text-left">{{ $errors->first('location_preferences') }}</span>
         @endif
-      </div>
     </div>
+</div>
+
   </div>
 
   <div class="d-flex pt-3 justify-content-end">

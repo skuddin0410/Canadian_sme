@@ -25,7 +25,9 @@ Admin | Exhibitor User Details
                     <div class="d-flex pt-3 justify-content-end">
                         <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
                     </div>
-                    <div class="d-flex pt-3 justify-content-end">
+                      @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+
+            <div class="d-flex pt-3 justify-content-end">
             @if(!$user->is_approve)
     <form action="{{ route('exhibitor-users.approve', $user->id) }}" method="POST" style="display: inline-block;">
         @csrf
@@ -38,6 +40,7 @@ Admin | Exhibitor User Details
             <span class="badge bg-success">Approved</span>
         @endif
     </div>
+    @endif
 
                     <h5 class="pb-2 border-bottom mb-4">Exhibitor User Details</h5>
 
