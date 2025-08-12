@@ -13,7 +13,7 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0"> Exhibitor Representative List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
-                         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') || Auth::user()->hasRole('Support Staff Or Helpdesk'))
                           <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
                           @endif
                         @if(auth()->user()->hasRole('Exhibitor Admin'))
@@ -42,7 +42,7 @@
                             type="text"
                             class="form-control"
                             name="search"
-                            value=""
+                            value="{{ request('search') }}"
                             id="search"
                             placeholder="Search"/>  
                         </div>

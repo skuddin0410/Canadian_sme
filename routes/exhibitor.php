@@ -55,6 +55,10 @@ Route::group(['middleware' => ['webauth', 'role:Exhibitor Admin']], function () 
     Route::resource('services', ServiceController::class);
 
 });
+Route::post('password/email', [\App\Http\Controllers\ExhibitorAdmin\PasswordResetController::class, 'sendResetLinkEmail'])
+    ->middleware(['web', 'auth:exhibitor', 'exhibitor_admin'])
+    ->name('exhibitor.password.email');
+
 
 // Public Routes
 Route::prefix('catalog')->name('catalog.')->group(function () {

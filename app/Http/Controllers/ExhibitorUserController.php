@@ -32,61 +32,120 @@ class ExhibitorUserController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        //
-        $perPage = (int) $request->input('perPage', 20);
-        $pageNo = (int) $request->input('page', 1);
-        $offset = $perPage * ($pageNo - 1);
-        $search = $request->input('search', '');
-        $kyc = $request->input('kyc', '');
+{
+    $perPage = (int) $request->input('perPage', 20);
+    $pageNo = (int) $request->input('page', 1);
+    $offset = $perPage * ($pageNo - 1);
+
+    // Start the query
+    $users = User::with("roles")
+        ->whereHas("roles", function ($q) {
+            $q->whereIn("name", ['Exhibitor Admin']);
+        })
+        ->orderBy('created_at', 'DESC');
+
+    // Apply search filter if present
+    if ($request->filled('search')) {
+        $search = '%' . $request->search . '%';
+        $users = $users->where(function ($query) use ($search) {
+            $query->where('users.name', 'LIKE', $search)
+                  ->orWhere('users.username', 'LIKE', $search)
+                  ->orWhere('users.mobile', 'LIKE', $search)
+                  ->orWhere('users.email', 'LIKE', $search);
+        });
+    }
+
+    // Filter by created_at date range if given
+    if ($request->filled('start_at') && $request->filled('end_at')) {
+        $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
+    }
+
+    // Clone for count
+    $usersCount = clone $users;
+    $totalRecords = $usersCount->count();
+
+    // Pagination
+    $users = $users->offset($offset)->limit($perPage)->get();
+
+    // Convert to LengthAwarePaginator for proper pagination links
+    $users = new \Illuminate\Pagination\LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
+        'path'  => $request->url(),
+        'query' => $request->query(),
+    ]);
+
+    $data['offset'] = $offset;
+    $data['pageNo'] = $pageNo;
+    $users->setPath(route('exhibitor-users.index'));
+    
+    // Return AJAX response with HTML partial
+    if ($request->ajax() && $request->ajax_request == true) {
+        $data['html'] = view('users.exhibitor_users.table', compact('users', 'perPage'))
+            ->with('i', $offset)
+            ->render();
+
+        return response()->json($data);
+    }
+
+    // Normal page load
+    return view('users.exhibitor_users.index', ["kyc" => ""]);
+}
+
+    // public function index(Request $request)
+    // {
+    //     //
+    //     $perPage = (int) $request->input('perPage', 20);
+    //     $pageNo = (int) $request->input('page', 1);
+    //     $offset = $perPage * ($pageNo - 1);
+    //     $search = $request->input('search', '');
+    //     $kyc = $request->input('kyc', '');
         
-        if ($request->ajax() && $request->ajax_request == true) {
-            $users = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Exhibitor Admin']);
-                })->orderBy('created_at', 'DESC');
+    //     if ($request->ajax() && $request->ajax_request == true) {
+    //         $users = User::with("roles")
+    //             ->whereHas("roles", function ($q) {
+    //                 $q->whereIn("name", ['Exhibitor Admin']);
+    //             })->orderBy('created_at', 'DESC');
 
-            if ($request->search) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('username', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
-                });
-            }
+    //         if ($request->search) {
+    //             $users = $users->where(function ($query) use ($request) {
+    //                 $query->where('name', 'LIKE', '%' . $request->search . '%');
+    //                 $query->orWhere('username', 'LIKE', '%' . $request->search . '%');
+    //                 $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
+    //                 $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
+    //             });
+    //         }
 
-            if ($request->start_at && $request->end_at) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->whereDate('created_at', '>=', $request->start_at);
-                    $query->whereDate('created_at', '<=', $request->end_at);
+    //         if ($request->start_at && $request->end_at) {
+    //             $users = $users->where(function ($query) use ($request) {
+    //                 $query->whereDate('created_at', '>=', $request->start_at);
+    //                 $query->whereDate('created_at', '<=', $request->end_at);
                     
-                });
-            }
+    //             });
+    //         }
 
            
 
-            $usersCount = clone $users;
-            $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
-            $users = $users->offset($offset)->limit($perPage)->get();
-            $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
-                'path'  => $request->url(),
-                'query' => $request->query(),
-            ]);
-            $data['offset'] = $offset;
-            $data['pageNo'] = $pageNo;
-            $users->setPath(route('users.index'));
-            $data['html'] = view('users.exhibitor_users.table', compact('users', 'perPage'))
-                ->with('i', $pageNo * $perPage)
-                ->render();
+    //         $usersCount = clone $users;
+    //         $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
+    //         $users = $users->offset($offset)->limit($perPage)->get();
+    //         $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
+    //             'path'  => $request->url(),
+    //             'query' => $request->query(),
+    //         ]);
+    //         $data['offset'] = $offset;
+    //         $data['pageNo'] = $pageNo;
+    //         $users->setPath(route('users.index'));
+    //         $data['html'] = view('users.exhibitor_users.table', compact('users', 'perPage'))
+    //             ->with('i', $pageNo * $perPage)
+    //             ->render();
 
-            return response($data);
-        }
-         $users = User::role('Exhibitor Representative')
-            ->where('created_by', auth()->id())
-            ->get();
+    //         return response($data);
+    //     }
+    //      $users = User::role('Exhibitor Representative')
+    //         ->where('created_by', auth()->id())
+    //         ->get();
 
-        return view('users.exhibitor_users.index', ["kyc" => ""]);
-    }
+    //     return view('users.exhibitor_users.index', ["kyc" => ""]);
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -311,4 +370,31 @@ public function assignBooth(Request $request, $id)
     return redirect()->route('exhibitor-users.show', $user->id)
         ->with('success', 'Booth assigned successfully.');
 }
+    public function toggleBlock(User $user)
+{
+    $currentUser = auth()->user();
+
+    // Admin or Event Admin can block
+    if ($currentUser->hasRole(['Admin', 'Event Admin'])) {
+        // $user->is_block = true;
+        // $user->save();
+        // return back()->withSuccess('User has been blocked successfully.');
+        $allowedRoles = ['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'];
+
+        if ($user->hasAnyRole($allowedRoles)) {
+            $user->is_block = true;
+            $user->save();
+            return back()->withSuccess('User has been blocked successfully.');
+        } else {
+            return back()->withErrors('You are not allowed to block this type of user.');
+        }
+    
+
+    }
+
+    
+
+    return back()->withErrors('You do not have permission to perform this action.');
+}
+
 }

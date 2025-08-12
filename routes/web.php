@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
 
+
 Route::get('/email/open/{id}', function ($id) {
     $email = Email::find($id);
     if ($email && !$email->opened_at) {

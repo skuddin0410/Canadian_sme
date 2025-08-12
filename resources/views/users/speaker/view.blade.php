@@ -23,6 +23,31 @@ Admin | Speaker Details
                      
                       <a href="{{route("speaker.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
                 </div>
+                <div class="d-flex pt-3 justify-content-end">
+                     {{-- Block Button for Admin / Event Admin --}}
+                   @if(Auth::user()->hasAnyRole(['Admin','Event Admin']) 
+                     && !$user->is_block 
+                        && $user->hasAnyRole(['Exhibitor Admin','Exhibitor Representative','Attendee','Speaker']))
+                   <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST">
+                      @csrf
+                    @method('PATCH')
+                  <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14">
+                    Block User
+                  </button>
+                  </form>
+                  @endif
+
+    {{-- Unblock Button for Support Staff / Helpdesk --}}
+    @if(Auth::user()->hasRole('Support Staff Or Helpdesk') && $user->is_block)
+        <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST">
+            @csrf
+            @method('PATCH')
+            <button type="submit" class="btn btn-success btn-pill btn-streach font-book fs-14">
+                Unblock User
+            </button>
+        </form>
+    @endif
+    </div>
                 <h5 class="pb-2 border-bottom mb-4">Speaker Details</h5>
                 <div class="info-container">
                 <div class="row">  

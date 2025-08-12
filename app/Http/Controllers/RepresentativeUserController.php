@@ -83,14 +83,7 @@ class RepresentativeUserController extends Controller
 
             return response($data);
         }
-        //  $representatives = User::role('Exhibitor Representative')
-        //     ->where('created_by', Auth::id())
-        //     ->get();
-    //     $representatives = User::role('Exhibitor Representative')
-    //    ->whereHas('company', function ($q) {
-    //     $q->where('exhibitor_admin_id', auth()->id());
-    // })
-    // ->get();
+  
 
         return view('users.representative_users.index', ["kyc" => ""]);
 
@@ -282,6 +275,32 @@ class RepresentativeUserController extends Controller
         ->withSuccess('Exhibitor Representative user deleted successfully.');
 
     }
+     public function toggleBlock(User $user)
+{
+    $currentUser = auth()->user();
+
+    // Admin or Event Admin can block
+    if ($currentUser->hasRole(['Admin', 'Event Admin'])) {
+        // $user->is_block = true;
+        // $user->save();
+        // return back()->withSuccess('User has been blocked successfully.');
+        $allowedRoles = ['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'];
+
+        if ($user->hasAnyRole($allowedRoles)) {
+            $user->is_block = true;
+            $user->save();
+            return back()->withSuccess('User has been blocked successfully.');
+        } else {
+            return back()->withErrors('You are not allowed to block this type of user.');
+        }
+    
+
+    }
+
+    
+
+    return back()->withErrors('You do not have permission to perform this action.');
+}
     
 
 

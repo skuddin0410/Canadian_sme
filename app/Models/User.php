@@ -43,6 +43,7 @@ class User extends Authenticatable implements JWTSubject
         'username',
         'password',
         'remember_token',
+        'is_block',
         'is_approve',
         'dob',
         'gender',
@@ -78,6 +79,7 @@ class User extends Authenticatable implements JWTSubject
             'password' => 'hashed',
             'dob' => 'date',
             'is_approve' => 'boolean',
+            'is_block' => 'boolean',
         ];
     }
 

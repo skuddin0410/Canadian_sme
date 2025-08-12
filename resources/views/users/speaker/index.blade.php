@@ -36,7 +36,7 @@
                             type="text"
                             class="form-control"
                             name="search"
-                            value=""
+                            value="{{ request('search') }}"
                             id="search"
                             placeholder="Search"/>  
                         </div>
