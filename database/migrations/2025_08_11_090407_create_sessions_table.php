@@ -8,7 +8,7 @@ class CreateSessionsTable extends Migration
 {
     public function up()
     {
-        Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('event_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->string('title');
