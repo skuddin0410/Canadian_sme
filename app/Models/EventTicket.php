@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EventTicket extends Model
 {
     protected $fillable = [
-        'session_id', 'name', 'price', 'quantity'
+        'session_id', 'name', 'price', 'quantity', 'is_group', 'group_size'
     ];
 
     // A ticket belongs to a session
@@ -20,5 +20,10 @@ class EventTicket extends Model
     public function bookings()
     {
         return $this->hasMany(EventTicketBooking::class, 'ticket_id');
+    }
+
+    public function isGroupTicket()
+    {
+        return $this->is_group;
     }
 }

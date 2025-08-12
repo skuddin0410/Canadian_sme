@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg border-0">
-                <div class="card-header bg-gradient-primary text-white py-3">
+                <div class="card-header bg-gradient-primary  py-3">
                     <div class="row align-items-center">
                         <div class="col">
                             <h1 class="h3 mb-0 mt-2">{{ $event->title }} - Calendar</h1>
@@ -241,8 +241,8 @@
     window.calendarConfig = {
         eventId: {{ $event->id }},
         eventName: '{{ $event->title }}',
-        eventStart: '{{ $event->start_date->format('Y-m-d') }}',
-        eventEnd: '{{ $event->end_date->format('Y-m-d') }}',
+        eventStart: "{{ $event->start_date->format('Y-m-d') }}",
+        eventEnd:  "{{ $event->end_date->copy()->addDay()->format('Y-m-d') }}",
         timezone: '{{ config("app.timezone")}}',
         {{-- tracks: @json($event->tracks),--}}
         venues: @json($event->venues), 
