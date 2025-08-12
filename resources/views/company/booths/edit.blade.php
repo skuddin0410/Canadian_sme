@@ -34,10 +34,6 @@
   @csrf
   @method('PUT')
 
-  @if(Auth::user()->company)
-    <input type="hidden" name="company_id" value="{{ Auth::user()->company->id }}">
-  @endif
-
   <div class="row">
     <!-- Booth Title -->
     <div class="col-6">

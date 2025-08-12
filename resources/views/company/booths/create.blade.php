@@ -32,7 +32,6 @@
           @endif
           <form  action="{{ route('booths.store') }}" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }} 
-            <input type="hidden" name="company_id" value="{{Auth::user()->company_id}}">
             <div class="row">
             <div class="col-6">
              <div class="mb-3">
