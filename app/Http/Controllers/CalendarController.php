@@ -56,7 +56,7 @@ class CalendarController extends Controller
         }
 
         $sessions = $query->orderBy('start_time')->get();
-
+        
         $events = $sessions->map(function ($session) {
             return [
                 'id' => $session->id,
@@ -69,16 +69,16 @@ class CalendarController extends Controller
                 'textColor' => '#ffffff',
                 'description' => $session->description,
                 'type' => $session->type,
-                'track' => 'Test Track' ?? null,
-                'venue' => 'Kolkata' ?? null,
+                'venue' => !empty($session->booth) ? $session->booth->title : 'No Booth' ,
+                'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
                 'capacity' => $session->capacity,
                 'duration' => $session->getDurationInMinutes(),
 
                 'extendedProps' => [
                     'description' => $session->description,
                     'type' => $session->type,
-                    'track' => 'Test Track' ?? null,
-                    'venue' => 'Kolkata' ?? null,
+                    'venue' => !empty($session->booth) ? $session->booth->title .'('. $session->booth->booth_number .')': 'No Booth' ,
+                    'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
                     'speakers' => $session->speakers->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
@@ -161,13 +161,21 @@ class CalendarController extends Controller
     }
 
     public function updateSession(Request $request, Session $session): JsonResponse
-    {
+    {   
+        $speakerIds = collect($request->all())
+        ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
+        ->values()
+        ->all();
+
+        $request->merge([
+         'speaker_ids' => $speakerIds
+        ]);
+
         $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'start_time' => 'sometimes|required|date',
             'end_time' => 'sometimes|required|date|after:start_time',
-            'track_id' => 'nullable|exists:tracks,id',
-            'booth_id' => 'nullable|exists:venues,id',
+            'booth_id' => 'nullable|exists:booths,id',
             'type' => 'sometimes|required|in:presentation,workshop,panel,break,networking',
             'description' => 'nullable|string',
             'capacity' => 'nullable|integer|min:1',
@@ -199,9 +207,17 @@ class CalendarController extends Controller
                 ], 422);
             }
         }
-
+      
         $session->update($request->all());
-        $session->load(['venue', 'speakers']);
+        $session->speakers()->detach();
+        if ($speakerIds) {
+            foreach ($speakerIds as $index => $speakerId) {
+                $session->speakers()->detach($speakerId);
+                $session->speakers()->attach($speakerId);
+            }
+        }
+
+        $session->load(['booth', 'speakers']);
 
         return response()->json([
             'message' => 'Session updated successfully',

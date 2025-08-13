@@ -210,10 +210,8 @@ class LaravelEventCalendar {
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
-                    track: 'Test',
-                    track_id: '1',
-                    venue: 'Kolkata',
-                    venue_id: '2',
+                    venue:  session.extendedProps.venue,
+                    venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
@@ -291,7 +289,7 @@ class LaravelEventCalendar {
             sessions.forEach(session => {
                 const statusBadge = this.getStatusBadge(session.status);
                 const typeBadge = this.getTypeBadge(session.type);
-                const trackBadge = session.track ? `<span class="badge rounded-pill" style="background-color: ${session.track.color}20; color: ${session.track.color};">${session.track.name}</span>` : '';
+                
 
                 gridHTML += `
                 <div class="col-md-6 col-lg-4">
@@ -302,7 +300,7 @@ class LaravelEventCalendar {
                                 ${statusBadge}
                             </div>
                             <div class="mb-2">
-                                ${typeBadge} ${trackBadge}
+                                ${typeBadge} 
                             </div>
                             <div class="text-muted small mb-2">
                                 <div><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
@@ -345,9 +343,6 @@ class LaravelEventCalendar {
             sortedSessions.forEach(session => {
             const statusBadge = this.getStatusBadge(session.status);
             const typeBadge = this.getTypeBadge(session.type);
-            const trackBadge = session.track 
-            ? `<span class="badge rounded-pill" style="background-color: ${session.track.color}20; color: ${session.track.color};">${session.track.name}</span>` 
-            : '';
 
             const description = session.description 
             ? `<p class="mb-1 mt-2 small text-truncate" style="max-width: 100%;">${session.description.substring(0, 100)}${session.description.length > 100 ? '...' : ''}</p>` 
@@ -358,7 +353,7 @@ class LaravelEventCalendar {
             <div class="flex-grow-1">
                 <h6 class="mb-1">${session.title}</h6>
                 <div class="mb-2">
-                    ${typeBadge} ${trackBadge} ${statusBadge}
+                    ${typeBadge} ${statusBadge}
                 </div>
                 <div class="small text-muted mb-1">
                     <span class="me-3"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
@@ -383,7 +378,7 @@ class LaravelEventCalendar {
     openSessionModal(eventData = {}) {
         this.isEditing = !!eventData.id;
         this.selectedSpeakers = [];
-        
+        console.log(eventData);
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionModal'));
         const title = document.getElementById('modalTitle');
         const deleteBtn = document.getElementById('deleteBtn');
@@ -398,11 +393,10 @@ class LaravelEventCalendar {
         if (eventData.id) {
             document.getElementById('sessionId').value = eventData.id;
             document.getElementById('sessionTitle').value = eventData.title || '';
-            document.getElementById('description').value = eventData.extendedProps?.description || '';
+            document.getElementById('description2').value = eventData.extendedProps?.description || '';
             document.getElementById('sessionType').value = eventData.extendedProps?.type || 'presentation';
             document.getElementById('capacity').value = eventData.extendedProps?.capacity || '';
-           // document.getElementById('trackSelect').value = eventData.extendedProps?.track_id || '';
-           // document.getElementById('venueSelect').value = eventData.extendedProps?.venue_id || '';
+            document.getElementById('venueSelect').value = eventData.extendedProps?.venue_id || '';
             document.getElementById('status').value = eventData.extendedProps?.status || 'draft';
             
             // Set selected speakers
@@ -456,10 +450,6 @@ class LaravelEventCalendar {
             <div>${this.getTypeBadge(event.extendedProps?.type)}</div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="fw-bold">Track</div>
-            <div>${event.extendedProps?.track || 'No Track'}</div>
-        </div>
-        <div class="col-12 col-md-6">
             <div class="fw-bold">Venue</div>
             <div>${event.extendedProps?.venue || 'No Venue'}</div>
         </div>
@@ -500,10 +490,8 @@ class LaravelEventCalendar {
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
-                    track: 'Test',
-                    track_id: '1',
-                    venue: 'Kolkata',
-                    venue_id: '2',
+                    venue:  session.extendedProps.venue,
+                    venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
@@ -525,13 +513,12 @@ class LaravelEventCalendar {
                 backgroundColor: '#6366f1',
                 borderColor: '#6366f1',
                 textColor: '#fff', // better contrast
+                description: session.description,
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
-                    track: 'Test',
-                    track_id: '1',
-                    venue: 'Kolkata',
-                    venue_id: '2',
+                    venue:  session.extendedProps.venue,
+                    venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
@@ -664,15 +651,15 @@ class LaravelEventCalendar {
     }
 
     applyFilters() {
-        const trackFilter = document.getElementById('trackFilter')?.value;
+        //const trackFilter = document.getElementById('trackFilter')?.value;
         const venueFilter = document.getElementById('venueFilter')?.value;
         const statusFilter = document.getElementById('statusFilter')?.value;
 
         let filteredEvents = [...this.events];
 
-        if (trackFilter) {
-            filteredEvents = filteredEvents.filter(event => event.track_id == trackFilter);
-        }
+        // if (trackFilter) {
+        //     filteredEvents = filteredEvents.filter(event => event.track_id == trackFilter);
+        // }
 
         if (venueFilter) {
             filteredEvents = filteredEvents.filter(event => event.venue_id == venueFilter);
@@ -696,10 +683,8 @@ class LaravelEventCalendar {
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
-                    track: 'Test',
-                    track_id: '1',
-                    venue: 'Kolkata',
-                    venue_id: '2',
+                    venue:  session.extendedProps.venue,
+                    venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),

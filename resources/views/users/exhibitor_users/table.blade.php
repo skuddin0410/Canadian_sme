@@ -87,12 +87,7 @@
                 <i class="bx bxs-group"></i>
             </a>
         </div>
-			{{-- <div class="col-4 p-1">	
-			<a href="{{ route('representative-users.index' }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            </div>
-			 <div class="col-4 p-1">	
-			<a href="{{ route('attendee-users.index'}}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            </div> --}}
+		
        </th>
 	   
 	   
