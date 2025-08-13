@@ -20,12 +20,7 @@ Admin | User Details
               </div>
               <div class="card-body">
                 <div class="d-flex pt-3 justify-content-end">
-                  @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') )
-                  
-                  
                       <a href="{{route("users.edit",["user"=> $user->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
-                  @endif   
-                
                       <a href="{{route("users.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
                 </div>
                 <h5 class="pb-2 border-bottom mb-4">User Details</h5>
@@ -93,13 +88,6 @@ Admin | User Details
                           </li>  
                         </ul>
                     </div>
-
-                 {{-- <div class="d-flex pt-3 justify-content-end">
-                  @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') )    
-                      <a href="{{route("users.edit",["user"=> $user->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
-                  @endif    
-                      <a href="{{route("users.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
-                </div> --}}
                 </div>
 
                 <div class="row">
