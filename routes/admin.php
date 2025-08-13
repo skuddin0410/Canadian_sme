@@ -6,6 +6,8 @@ use App\Http\Controllers\SpeakerController;
 use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ExhibitorAdmin\BoothController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
     Route::resource('banners', App\Http\Controllers\BannerController::class);
@@ -45,12 +47,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::get('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBoothForm'])->name('exhibitor-users.assign-booth-form');
     Route::post('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBooth'])->name('exhibitor-users.assign-booth');
 
-
-   
-
-
     
-   
+    Route::resource('speaker', SpeakerController::class);
+    Route::resource('booths', BoothController::class);
 
     Route::any('faqs/{id}/order/{order}', '\App\Http\Controllers\FaqController@order');
     Route::any('banners/{id}/order/{order}', '\App\Http\Controllers\BannerController@order');
@@ -63,6 +62,19 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
         Route::get('/', [App\Http\Controllers\AuditController::class, 'index'])->name('audit.index');
         Route::get('/{log}', [App\Http\Controllers\AuditController::class, 'show'])->name('audit.show');
         Route::get('/entity/{entityType}/{entityId}', [App\Http\Controllers\AuditController::class, 'entityLogs'])->name('audit.edit');
+    });
+
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::prefix('calendar')->group(function () {
+        Route::get('/data', [CalendarController::class, 'getCalendarData']);
+        Route::get('/sessions', [CalendarController::class, 'getSessions'])->name('calendar.sessions');
+        Route::post('/sessions', [CalendarController::class, 'createSession'])->name('calendar.sessions.store');
+        Route::get('/sessions/{session}', [CalendarController::class, 'getSessionDetails']);
+        Route::put('/sessions/{session}', [CalendarController::class, 'updateSession'])->name('calendar.sessions.update');
+        Route::delete('/sessions/{session}', [CalendarController::class, 'deleteSession'])->name('calendar.sessions.destroy');
+        Route::post('/sessions/bulk-update', [CalendarController::class, 'bulkUpdateSessions']);
+
+         Route::get('/speakers', [CalendarController::class, 'speakers'])->name('speakers.list');
     });
 });
 

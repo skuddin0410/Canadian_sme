@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/tinymce@7.5.1/tinymce.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/tinymce@7.5.1/tinymce.min.js"></script>
 <script>
     @if(Session::has('success'))
         alertify.success("{{ Session::get('success') }}");
@@ -31,4 +31,4 @@
         }
     });
 
-</script>
+</script> --}}

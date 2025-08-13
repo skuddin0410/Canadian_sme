@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ExhibitorAdmin;
 
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -81,6 +82,7 @@ class CompanyController extends Controller
 
      
 
+        User::where('id',auth()->id())->update(['company_id' =>$company->id ]);
         return redirect()->back()->with('success', 'Company created.');
     }
 

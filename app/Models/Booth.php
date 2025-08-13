@@ -26,4 +26,9 @@ class Booth extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function sessions()
+    {
+        return $this->hasMany(Session::class, 'booth_id');
+    }
 }
