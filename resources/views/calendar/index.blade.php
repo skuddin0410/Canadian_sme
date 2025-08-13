@@ -1,11 +1,16 @@
 @extends('layouts.admin')
 
-@section('title', 'Event Calendar')
+@section('title')
+    Admin | Event Calendar
+@endsection
+
 
 @section('content')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <div class="container">
+     <h4 class="py-3 mb-4"><span class="text-muted fw-light">Event/</span>Calendar</h4>
+    <div class="row">
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg border-0">
@@ -18,7 +23,7 @@
                             </p>
                         </div>
                         <div class="col-auto">
-                             <button class="btn btn-light btn-sm" id="addSessionBtn">
+                             <button class="btn btn-primary btn-sm" id="addSessionBtn">
                                 <i class="fas fa-plus me-1"></i> Add Session
                             </button>
                         </div>
@@ -44,7 +49,7 @@
                             </div>
                             <div class="col-md-4 no-padding">
                                 <div class="row g-2">
-                                    <div class="col-auto">
+                                    <!--<div class="col-auto">
                                      <select class="form-select form-select-sm" id="venueFilter">
                                             <option value="">All Booth</option>
                                             @foreach($booths as $booth)
@@ -59,7 +64,7 @@
                                             <option value="published">Published</option>
                                             <option value="cancelled">Cancelled</option>
                                         </select>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                         </div>
@@ -103,8 +108,8 @@
 <div class="modal fade" id="sessionModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalTitle">Add New Session</h5>
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="modalTitle">Add New Session</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="sessionForm">
@@ -147,18 +152,8 @@
                             <input type="number" class="form-control" id="capacity" name="capacity" min="1">
                         </div>
 
-                         {{-- <div class="col-md-6">
-                            <label for="trackSelect" class="form-label">Track</label>
-                           <select class="form-select" id="trackSelect" name="track_id">
-                                <option value="">No Track</option>
-                                @foreach($event->tracks as $track)
-                                    <option value="{{ $track->id }}">{{ $track->name }}</option>
-                                @endforeach
-                            </select>
-                        </div> --}}
-
                         <div class="col-md-6">
-                            <label for="venueSelect" class="form-label">Venue</label>
+                            <label for="venueSelect" class="form-label">Booth</label>
                             <select class="form-select" id="venueSelect" name="booth_id">
                                <option value="">Select Booth</option>
                                     @foreach($booths as $booth)
@@ -195,7 +190,7 @@
 
                         <div class="col-12">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <textarea class="form-control" id="description2" name="description" rows="3"></textarea>
                         </div>
 
                     </div>
@@ -215,8 +210,8 @@
 <div class="modal fade" id="sessionDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="detailsTitle">Session Details</h5>
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="detailsTitle">Session Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -240,8 +235,8 @@
         eventStart: "{{ $event->start_date->format('Y-m-d') }}",
         eventEnd:  "{{ $event->end_date->copy()->addDay()->format('Y-m-d') }}",
         timezone: '{{ config("app.timezone")}}',
-        {{-- tracks: @json($event->tracks),
-        venues: @json($event->venues), --}}
+        {{-- tracks: @json($event->tracks), --}}
+        venues: @json($event->venues),
         apiUrls: {
             sessions: '{{ route('calendar.sessions') }}',
             createSession: '{{ route('calendar.sessions.store') }}',

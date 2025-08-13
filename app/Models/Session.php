@@ -25,11 +25,6 @@ class Session extends Model
         return $this->belongsTo(Event::class);
     }
 
-    public function track(): BelongsTo
-    {
-        return $this->belongsTo(Track::class);
-    }
-
     public function booth()
     {
         return $this->belongsTo(Booth::class, 'booth_id');
