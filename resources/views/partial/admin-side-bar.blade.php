@@ -73,7 +73,7 @@
  
        
        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
-        <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('users*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="Blogs">Users</div>
@@ -123,6 +123,15 @@
             <a href="{{ route('audit.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="audit">Audit</div>
+            </a>
+        </li>
+        @endif
+
+         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
+            <a href="{{ route('roles.matrix') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                <div data-i18n="audit">Roles</div>
             </a>
         </li>
         @endif

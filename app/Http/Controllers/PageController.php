@@ -83,8 +83,8 @@ class PageController extends Controller
             'meta_title'=>"nullable|max:255",
             'meta_keywords'=>"nullable|max:255",
             'status' => 'required',
-            'start_date' => 'required_if:status,scheduled|date',
-            'end_date' => 'required_if:status,scheduled|date'
+            'start_date' => 'required_if:status,scheduled|nullable|date',
+            'end_date' => 'required_if:status,scheduled|nullable|date|after_or_equal:start_date',
         ]);
         if($validator->fails()){
             return redirect(route('pages.create'))->withInput()
@@ -147,8 +147,8 @@ class PageController extends Controller
             'meta_title'=>"nullable|max:255",
             'meta_keywords'=>"nullable|max:255",
             'status' => 'required',
-            'start_date' => 'required_if:status,scheduled|date',
-            'end_date' => 'required_if:status,scheduled|date'
+            'start_date' => 'required_if:status,scheduled|nullable|date',
+            'end_date' => 'required_if:status,scheduled|nullable|date|after_or_equal:start_date',
         ]);
 
         if($validator->fails()){
