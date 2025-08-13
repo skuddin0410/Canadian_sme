@@ -29,6 +29,6 @@ class Booth extends Model
 
     public function sessions()
     {
-        return $this->hasMany(EventSession::class, 'booth_id');
+        return $this->hasMany(Session::class, 'booth_id');
     }
 }

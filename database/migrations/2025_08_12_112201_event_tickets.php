@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->integer('quantity');
-            $table->boolean('is_group')->default(false)->after('quantity');
-            $table->integer('group_size')->nullable()->after('is_group'); 
+            $table->boolean('is_group')->default(false);
+            $table->integer('group_size')->nullable();
             $table->timestamps();
         });
     }

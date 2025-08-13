@@ -150,6 +150,10 @@ public function booths()
         return Attribute::get(fn () => $this->is_approve ? 'success' : 'warning');
     }
     
+    public function sessions()
+    {
+        return $this->belongsToMany(Session::class, 'session_speakers', 'user_id', 'session_id')->withTimestamps();
+    }
 
 
     protected $appends = ['full_name'];

@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg border-0">
-                <div class="card-header bg-gradient-primary text-white py-3">
+                <div class="card-header bg-gradient-primary  py-3">
                     <div class="row align-items-center">
                         <div class="col">
                             <h1 class="h3 mb-0 mt-2">{{ $event->title }} - Calendar</h1>
@@ -18,7 +18,7 @@
                             </p>
                         </div>
                         <div class="col-auto">
-                            <button class="btn btn-light btn-sm" id="addSessionBtn">
+                             <button class="btn btn-light btn-sm" id="addSessionBtn">
                                 <i class="fas fa-plus me-1"></i> Add Session
                             </button>
                         </div>
@@ -29,12 +29,12 @@
                     <!-- Toolbar -->
                     <div class="border-bottom bg-light py-3 px-4">
                         <div class="row align-items-center">
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <div class="btn-group" role="group">
                                     <button type="button" class="btn btn-outline-primary active" id="calendarViewBtn">
                                         <i class="fas fa-calendar me-1"></i> Calendar
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary" id="gridViewBtn">
+                                 <button type="button" class="btn btn-outline-primary" id="gridViewBtn">
                                         <i class="fas fa-th-list me-1"></i> Grid
                                     </button>
                                     <button type="button" class="btn btn-outline-primary" id="listViewBtn">
@@ -42,22 +42,14 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4 no-padding">
                                 <div class="row g-2">
                                     <div class="col-auto">
-                                        {{-- <select class="form-select form-select-sm" id="trackFilter">
-                                            <option value="">All Tracks</option>
-                                            @foreach($event->tracks as $track)
-                                                <option value="{{ $track->id }}">{{ $track->name }}</option>
-                                            @endforeach
-                                        </select> --}}
-                                    </div>
-                                    <div class="col-auto">
                                      <select class="form-select form-select-sm" id="venueFilter">
-                                            <option value="">All Venues</option>
-                                           {{--  @foreach($event->venues as $venue)
-                                                <option value="{{ $venue->id }}">{{ $venue->name }}</option>
-                                            @endforeach --}}
+                                            <option value="">All Booth</option>
+                                            @foreach($booths as $booth)
+                                                <option value="{{ $booth->id }}">{{ $booth->title }} {{ $booth->booth_number}}(Size: {{$booth->size}})</option>
+                                            @endforeach 
                                         </select>
                                     </div>
                                     <div class="col-auto">
@@ -165,29 +157,24 @@
                             </select>
                         </div> --}}
 
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label for="venueSelect" class="form-label">Venue</label>
-                            <select class="form-select" id="venueSelect" name="venue_id">
-                                <option value="">No Venue</option>
-                               {{--  @foreach($event->venues as $venue)
-                                    <option value="{{ $venue->id }}">{{ $venue->name }} ({{ $venue->capacity }} capacity)</option>
-                                @endforeach --}}
+                            <select class="form-select" id="venueSelect" name="booth_id">
+                               <option value="">Select Booth</option>
+                                    @foreach($booths as $booth)
+                                        <option value="{{ $booth->id }}">{{ $booth->title }} {{ $booth->booth_number}}(Size: {{$booth->size}})</option>
+                                    @endforeach 
+                                </select>
                             </select>
                         </div>
 
-                        <div class="col-12">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-
-                        <div class="col-12">
+                        <div class="col-6">
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select" id="status" name="status">
                                 <option value="draft">Draft</option>
                                 <option value="published">Published</option>
                             </select>
-                        </div>
-
+                        </div> 
                         <!-- Speaker Assignment -->
                         <div class="col-12">
                             <label class="form-label">Speakers</label>
@@ -195,13 +182,22 @@
                                 <div class="input-group mb-2">
                                     <select class="form-select" id="speakerSelect">
                                         <option value="">Select a speaker...</option>
+                                         @foreach($speakers as $speaker)
+                                          <option value="{{ $speaker->id }}">{{ $speaker->full_name }}({{ $speaker->email}}, {{$speaker->mobile ?? ''}})</option>
+                                         @endforeach 
                                        
                                     </select>
                                     <button type="button" class="btn btn-outline-secondary" id="addSpeakerBtn">Add</button>
                                 </div>
-                                <div id="selectedSpeakers"></div>
+                                 <div id="selectedSpeakers"></div>
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
                     </div>
                 </div>
 
@@ -241,18 +237,18 @@
     window.calendarConfig = {
         eventId: {{ $event->id }},
         eventName: '{{ $event->title }}',
-        eventStart: '{{ $event->start_date->format('Y-m-d') }}',
-        eventEnd: '{{ $event->end_date->format('Y-m-d') }}',
+        eventStart: "{{ $event->start_date->format('Y-m-d') }}",
+        eventEnd:  "{{ $event->end_date->copy()->addDay()->format('Y-m-d') }}",
         timezone: '{{ config("app.timezone")}}',
-        {{-- tracks: @json($event->tracks),--}}
-        venues: @json($event->venues), 
-      {{--   apiUrls: {
-            sessions: '{{ route('api.calendar.sessions') }}',
-            createSession: '{{ route('api.calendar.sessions.store') }}',
-            updateSession: '{{ route('api.calendar.sessions.update', ':id') }}',
-            deleteSession: '{{ route('api.calendar.sessions.destroy', ':id') }}',
-            speakers: '{{ route('api.speakers.index') }}'
-        }, --}}
+        {{-- tracks: @json($event->tracks),
+        venues: @json($event->venues), --}}
+        apiUrls: {
+            sessions: '{{ route('calendar.sessions') }}',
+            createSession: '{{ route('calendar.sessions.store') }}',
+            updateSession: '{{ route('calendar.sessions.update', ':id') }}',
+            deleteSession: '{{ route('calendar.sessions.destroy', ':id') }}',
+            speakers: '{{ route('speakers.list') }}'
+        },
         csrfToken: '{{ csrf_token() }}'
     };
 </script>

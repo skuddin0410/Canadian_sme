@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSessionsTable extends Migration
+class CreateEventSessionsTable extends Migration
 {
     public function up()
     {
         Schema::create('event_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->foreignId('booth_id')->constrained('event_venues')->onDelete('cascade');
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            $table->foreignId('booth_id')->constrained('booths')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('start_time');
@@ -26,6 +26,8 @@ class CreateSessionsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('event_sessions');
+        Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('event_sessions'); // only drop this table
+        Schema::enableForeignKeyConstraints();
     }
 }

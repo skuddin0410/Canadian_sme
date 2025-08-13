@@ -3,9 +3,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Session;
-use App\Models\Track;
-use App\Models\Venue;
-use App\Models\Speaker;
+use App\Models\Booth;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
@@ -16,8 +15,27 @@ class CalendarController extends Controller
     {
         $eventId = $request->get('event_id');
         $event = Event::findOrFail($eventId);
+        $booths = Booth::all();
+
+        $speakers = User::select('id','name')->whereHas("roles", function ($q) {
+                    $q->where("name", 'Speaker');
+                })->orderBy('created_at', 'DESC')->get();
+
+        $exhibitors = User::whereHas("roles", function ($q) {
+                    $q->where("name", 'Exhibitor Admin');
+                })->orderBy('created_at', 'DESC')->get();
         
-        return view('calendar.index', compact('event'));
+        return view('calendar.index', compact('event','speakers','exhibitors','booths'));
+    }
+
+    public function speakers(Request $request)
+    {
+
+        $speakers = User::select('id','name')->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ['Admin','Event Admin','Exhibitor Admin']);
+                })->orderBy('created_at', 'DESC')->get();
+        return response()->json($speakers);
+        
     }
 
     public function getSessions(Request $request): JsonResponse
@@ -26,7 +44,7 @@ class CalendarController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
 
-        $query = Session::with(['track', 'venue', 'speakers'])
+        $query = Session::with(['booth', 'speakers'])
             ->where('event_id', $eventId)
             ->where('status', 'published');
 
@@ -45,18 +63,18 @@ class CalendarController extends Controller
                 'title' => $session->title,
                 'start' => $session->start_time->toISOString(),
                 'end' => $session->end_time->toISOString(),
-                'backgroundColor' => $session->track->color ?? '#3498db',
-                'borderColor' => $session->track->color ?? '#3498db',
+                'backgroundColor' =>  '#3498db',
+                'borderColor' =>  '#3498db',
                 'textColor' => '#ffffff',
                 'extendedProps' => [
                     'description' => $session->description,
                     'type' => $session->type,
-                    'track' => $session->track->name ?? null,
-                    'venue' => $session->venue->name ?? null,
+                    'track' => 'Test Track' ?? null,
+                    'venue' => 'Kolkata' ?? null,
                     'speakers' => $session->speakers->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->name,
+                            'name' => $speaker->full_name,
                             'role' => $speaker->pivot->role
                         ];
                     }),
@@ -70,14 +88,13 @@ class CalendarController extends Controller
     }
 
     public function createSession(Request $request): JsonResponse
-    {
+    {   
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'track_id' => 'nullable|exists:tracks,id',
-            'venue_id' => 'nullable|exists:venues,id',
+            'booth_id' => 'nullable|exists:booths,id',
             'type' => 'required|in:presentation,workshop,panel,break,networking',
             'description' => 'nullable|string',
             'capacity' => 'nullable|integer|min:1',
@@ -86,8 +103,8 @@ class CalendarController extends Controller
         ]);
 
         // Check for venue conflicts
-        if ($request->venue_id) {
-            $conflicts = Session::where('venue_id', $request->venue_id)
+        if ($request->booth_id) {
+            $conflicts = Session::where('booth_id', $request->booth_id)
                 ->where('event_id', $request->event_id)
                 ->where('status', '!=', 'cancelled')
                 ->where(function ($query) use ($request) {
@@ -112,13 +129,12 @@ class CalendarController extends Controller
         // Attach speakers if provided
         if ($request->speaker_ids) {
             foreach ($request->speaker_ids as $index => $speakerId) {
-                $session->speakers()->attach($speakerId, [
-                    'role' => $index === 0 ? 'primary' : 'co-speaker'
-                ]);
+                dd($speakerId);
+                $session->speakers()->attach($speakerId);
             }
         }
 
-        $session->load(['track', 'venue', 'speakers']);
+        $session->load(['booth', 'speakers']);
 
         return response()->json([
             'message' => 'Session created successfully',
@@ -133,7 +149,7 @@ class CalendarController extends Controller
             'start_time' => 'sometimes|required|date',
             'end_time' => 'sometimes|required|date|after:start_time',
             'track_id' => 'nullable|exists:tracks,id',
-            'venue_id' => 'nullable|exists:venues,id',
+            'booth_id' => 'nullable|exists:venues,id',
             'type' => 'sometimes|required|in:presentation,workshop,panel,break,networking',
             'description' => 'nullable|string',
             'capacity' => 'nullable|integer|min:1',
@@ -141,11 +157,11 @@ class CalendarController extends Controller
         ]);
 
         // Check for venue conflicts if venue or time is being updated
-        if (($request->has('venue_id') || $request->has('start_time') || $request->has('end_time')) && $request->venue_id) {
+        if (($request->has('booth_id') || $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
             $startTime = $request->start_time ?? $session->start_time;
             $endTime = $request->end_time ?? $session->end_time;
             
-            $conflicts = Session::where('venue_id', $request->venue_id)
+            $conflicts = Session::where('booth_id', $request->booth_id)
                 ->where('event_id', $session->event_id)
                 ->where('id', '!=', $session->id)
                 ->where('status', '!=', 'cancelled')
@@ -167,7 +183,7 @@ class CalendarController extends Controller
         }
 
         $session->update($request->all());
-        $session->load(['track', 'venue', 'speakers']);
+        $session->load(['venue', 'speakers']);
 
         return response()->json([
             'message' => 'Session updated successfully',
@@ -205,7 +221,7 @@ class CalendarController extends Controller
 
     public function getSessionDetails(Session $session): JsonResponse
     {
-        $session->load(['track', 'venue', 'speakers', 'event']);
+        $session->load(['venue', 'speakers', 'event']);
 
         return response()->json($session);
     }
@@ -225,8 +241,8 @@ class CalendarController extends Controller
             $session = Session::find($sessionData['id']);
             
             // Check for venue conflicts
-            if ($session->venue_id) {
-                $conflicts = Session::where('venue_id', $session->venue_id)
+            if ($session->booth_id) {
+                $conflicts = Session::where('booth_id', $session->booth_id)
                     ->where('event_id', $session->event_id)
                     ->where('id', '!=', $session->id)
                     ->where('status', '!=', 'cancelled')
