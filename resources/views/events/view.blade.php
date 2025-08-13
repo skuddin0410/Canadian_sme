@@ -27,12 +27,11 @@ Admin | Event Details
 
                     <div class="info-container">
                         <ul class="list-unstyled">
-                            {{-- <li class="mb-3"><span class="fw-medium me-2">Title:</span> <span>{{ $event->title }}</span></li> --}}
                             <li class="mb-3"><span class="fw-medium me-2">Location:</span> <span>{{ $event->location ?? '' }}</span></li>
                             <li class="mb-3"><span class="fw-medium me-2">Status:</span> <span>{{ ucfirst($event->status) }}</span></li>
                             <li class="mb-3"><span class="fw-medium me-2">Start Date:</span> <span>{{ $event->start_date }}</span></li>
                             <li class="mb-3"><span class="fw-medium me-2">End Date:</span> <span>{{ $event->end_date }}</span></li>
-                            <li class="mb-3"><span class="fw-medium me-2">Description:</span> <span>{{ $event->description ?? '' }}</span></li>
+                            <li class="mb-3"><span class="fw-medium me-2">Description:</span> <span>{!! $event->description ?? '' !!}</span></li>
                         </ul>
                     </div>
 
