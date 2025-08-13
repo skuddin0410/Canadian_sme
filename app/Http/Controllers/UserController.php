@@ -292,4 +292,39 @@ public function attendeeIndex()
         return redirect(route('users.index'))
             ->withSuccess('Email sent successfully');
     }
+    // Admin blocks a user
+
+
+// public function blockUser($id)
+// {
+//     $user = User::findOrFail($id);
+
+//     // Prevent blocking yourself
+//     if ($user->id === Auth::id()) {
+//         return redirect()->back()->with('error', 'You cannot block your own account.');
+//     }
+
+//     $user->is_block = true;
+//     $user->save();
+
+//     return redirect()->back()->with('success', 'User has been blocked successfully.');
+// }
+
+// // Helpdesk (or Admin) unblocks a user
+// public function unblockUser($id)
+// {
+//     $user = User::findOrFail($id);
+
+//     // If Helpdesk role, restrict to specific roles
+//     if (Auth::user()->hasRole('Support Staff Or Helpdesk')) {
+//         if (! $user->hasAnyRole(['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'])) {
+//             return redirect()->back()->with('error', 'You are not allowed to unblock this role.');
+//         }
+//     }
+
+//     $user->is_block = false;
+//     $user->save();
+
+//     return redirect()->back()->with('success', 'User has been unblocked successfully.');
+// }
 }

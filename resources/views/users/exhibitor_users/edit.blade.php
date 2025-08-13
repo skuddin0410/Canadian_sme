@@ -14,6 +14,7 @@
           <h5 class="mb-0">Edit Exhibitor User</h5>
         </div>
         <div class="card-body">
+
           @if(Session::has('success'))
               <div class="alert alert-success">{{ Session::get('success') }}</div>
           @endif
@@ -21,6 +22,13 @@
               <div class="alert alert-danger">{{ Session::get('error') }}</div>
           @endif
 
+          @if (session('status'))
+      <div class="alert alert-success">
+          {{ session('status') }}
+      </div>
+  @endif
+
+          {{-- Main Update Form --}}
           <form 
             action="{{ route('exhibitor-users.update', $exhibitor_user->id) }}" 
             method="POST" 
@@ -120,63 +128,69 @@
                 </div>
               </div>
 
-           
-               
-
-     <div class="col-6">
-        <div class="mb-3">
-            <label for="company_name" class="form-label">Company Name <span class="text-danger">*</span></label>
-            <input type="text" name="company_name" id="company_name" 
-                   class="form-control" value="{{ old('company_name') }}" required>
-        </div>
-      </div>
-
-        <div class="col-6">
-          <div class="mb-3">
-            <label for="company_email" class="form-label">Company Email<span class="text-danger">*</span></label>
-            <input type="email" name="company_email" id="company_email" 
-                   class="form-control" value="{{ old('company_email') }}">
-        </div>
-      </div>
-
-       <div class="col-6">
-          <div class="mb-3">
-            <label for="company_phone" class="form-label">Company Phone<span class="text-danger">*</span></label>
-            <input type="text" name="company_phone" id="company_phone" 
-                   class="form-control" value="{{ old('company_phone') }}">
-        </div>
-      </div>
-         <div class="col-6">
-          <div class="mb-3">
-            <label class="form-label">Password <small class="text-muted">(Leave blank to keep current)</small></label>
-                  <input type="password" class="form-control" name="password" placeholder="New Password (optional)">
-                  @error('password') <span class="text-danger">{{ $message }}</span> @enderror
-
-           </div>
-          </div>
-
-        <div class="col-12">
-          <div class="mb-3">
-            <label for="company_description" class="form-label">Description</label>
-            <textarea name="company_description" id="company_description" 
-                      class="form-control">{{ old('company_description') }}</textarea>
-        </div>
-        <div>
-      </div>
-
-        
-
-
-              {{-- Submit --}}
-              <div class="col-12">
-                <div class="d-flex justify-content-end pt-3">
-                  <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
-                  <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i>Save</button>
-                </div>
+              {{-- Company Details --}}
+              <div class="col-6">
+                  <div class="mb-3">
+                      <label for="company_name" class="form-label">Company Name <span class="text-danger">*</span></label>
+                      <input type="text" name="company_name" id="company_name" 
+                             class="form-control" 
+                             value="{{ old('company_name', optional($exhibitor_user->company)->name) }}" required>
+                  </div>
               </div>
 
-            </div> {{-- .row --}}
-          </form>
+              <div class="col-6">
+                  <div class="mb-3">
+                      <label for="company_email" class="form-label">Company Email <span class="text-danger">*</span></label>
+                      <input type="email" name="company_email" id="company_email" 
+                             class="form-control" 
+                             value="{{ old('company_email', optional($exhibitor_user->company)->email) }}" required>
+                  </div>
+              </div>
+
+              <div class="col-6">
+                  <div class="mb-3">
+                      <label for="company_phone" class="form-label">Company Phone <span class="text-danger">*</span></label>
+                      <input type="text" name="company_phone" id="company_phone" 
+                             class="form-control" 
+                             value="{{ old('company_phone', optional($exhibitor_user->company)->phone) }}" required>
+                  </div>
+              </div>
+
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="company_description" class="form-label">Description</label>
+                  <textarea name="company_description" id="company_description" 
+                            class="form-control">{{ old('company_description', optional($exhibitor_user->company)->description) }}</textarea>
+                </div>
+              </div>
+              </form>
+
+              {{-- Buttons Row --}}
+            <div class="col-12">
+  <div class="d-flex justify-content-end pt-3 gap-2">
+    <!-- Cancel -->
+    <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary px-4 py-2">
+      Cancel
+    </a>
+
+    <!-- Reset Password Form -->
+    <form action="{{ route('password.email') }}" method="POST" class="m-0">
+      @csrf
+      <input type="hidden" name="email" value="{{ $exhibitor_user->email }}">
+      <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-1">
+        <i class="bx bx-key"></i> Reset Password
+      </button>
+    </form>
+
+    <!-- Save Button (belongs to main form) -->
+    <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-1">
+      <i class="bx bx-save"></i> Save
+    </button>
+  </div>
+</div>
+
+          
+
         </div>
       </div>
     </div>
