@@ -215,8 +215,8 @@
 <div class="modal fade" id="sessionDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="detailsTitle">Session Details</h5>
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="detailsTitle">Session Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -240,8 +240,8 @@
         eventStart: "{{ $event->start_date->format('Y-m-d') }}",
         eventEnd:  "{{ $event->end_date->copy()->addDay()->format('Y-m-d') }}",
         timezone: '{{ config("app.timezone")}}',
-        {{-- tracks: @json($event->tracks),
-        venues: @json($event->venues), --}}
+        {{-- tracks: @json($event->tracks), --}}
+        venues: @json($event->venues),
         apiUrls: {
             sessions: '{{ route('calendar.sessions') }}',
             createSession: '{{ route('calendar.sessions.store') }}',

@@ -196,27 +196,36 @@ class LaravelEventCalendar {
     updateCalendarEvents() {
         if (!this.calendar) return;
         this.calendar.removeAllEvents();
-        this.calendar.addEventSource(this.events.map(session => ({
-            id: session.id,
-            title: session.title,
-            start: session.start_time,
-            end: session.end_time,
-            backgroundColor: session.track?.color || '#6366f1',
-            borderColor: session.track?.color || '#6366f1',
-            textColor: '#ffffff',
-            extendedProps: {
-                description: session.description,
-                type: session.type,
-                status: session.status,
-                track: session.track?.name,
-                track_id: session.track_id,
-                venue: session.venue?.name,
-                venue_id: session.venue_id,
-                speakers: session.speakers || [],
-                capacity: session.capacity,
-                duration: this.calculateDuration(session.start_time, session.end_time)
-            }
-        })));
+        
+        const events = this.events.map(item => {
+            const session = item; // or item itself if not nested
+            return {
+                id: session.id,
+                title: session.title,
+                start: session.start,
+                end: session.end,
+                backgroundColor: '#6366f1',
+                borderColor: '#6366f1',
+                textColor: '#fff', // better contrast
+                extendedProps: {
+                    description: session.extendedProps.description,
+                    status: session.extendedProps.status,
+                    track: 'Test',
+                    track_id: '1',
+                    venue: 'Kolkata',
+                    venue_id: '2',
+                    speakers: session.extendedProps.speakers || [],
+                    capacity: session.extendedProps.capacity,
+                    duration: this.calculateDuration(session.start, session.end),
+                    //duration: session.extendedProps.duration,
+                    type:session.extendedProps.type
+                }
+            };
+        });
+
+        
+        console.log(events)
+        this.calendar.addEventSource(events); 
     }
 
     switchView(viewType) {
@@ -271,40 +280,48 @@ class LaravelEventCalendar {
             );
 
             gridHTML += `
-                <div class="day-section mb-4">
-                    <h4 class="mb-3 text-primary border-bottom pb-2">
-                        <i class="fas fa-calendar-day me-2"></i>
-                        ${moment(day).format('dddd, MMMM D, YYYY')}
-                    </h4>
-                    <div class="row g-3">
+            <div class="day-section mb-5">
+                <h4 class="mb-4 text-primary border-bottom pb-2">
+                    <i class="fas fa-calendar-day me-2"></i>
+                    ${moment(day).format('dddd, MMMM D, YYYY')}
+                </h4>
+                <div class="row g-4">
             `;
 
             sessions.forEach(session => {
                 const statusBadge = this.getStatusBadge(session.status);
                 const typeBadge = this.getTypeBadge(session.type);
-                
+                const trackBadge = session.track ? `<span class="badge rounded-pill" style="background-color: ${session.track.color}20; color: ${session.track.color};">${session.track.name}</span>` : '';
+
                 gridHTML += `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="session-card" onclick="eventCalendar.showSessionDetailsById('${session.id}')" style="cursor: pointer;">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100 session-card" onclick="eventCalendar.showSessionDetailsById('${session.id}')" style="cursor: pointer; transition: transform 0.2s;">
+                        <div class="card-body d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="mb-0">${session.title}</h6>
+                                <h6 class="card-title mb-0">${session.title}</h6>
                                 ${statusBadge}
                             </div>
                             <div class="mb-2">
-                                ${typeBadge}
-                                ${session.track ? `<span class="badge" style="background-color: ${session.track.color}20; color: ${session.track.color};">${session.track.name}</span>` : ''}
+                                ${typeBadge} ${trackBadge}
                             </div>
-                            <div class="small text-muted">
+                            <div class="text-muted small mb-2">
                                 <div><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
                                 ${session.venue ? `<div><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</div>` : ''}
                                 ${session.capacity ? `<div><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
+                            <div class="mt-auto">
+                                ${session.speakers && session.speakers.length ? session.speakers.map(s => `
+                                    <span class="badge bg-primary me-1 mb-1">${s.name} (${s.pivot?.role || 'Speaker'})</span>
+                                `).join('') : '<span class="text-muted">No speakers assigned</span>'}
+                            </div>
                         </div>
                     </div>
+                </div>
                 `;
             });
 
             gridHTML += '</div></div>';
+
         });
 
         grid.innerHTML = gridHTML;
@@ -323,36 +340,42 @@ class LaravelEventCalendar {
             moment(a.start_time).diff(moment(b.start_time))
         );
 
-        let listHTML = '<div class="list-group">';
-        sortedSessions.forEach(session => {
+            let listHTML = '<div class="list-group">';
+
+            sortedSessions.forEach(session => {
             const statusBadge = this.getStatusBadge(session.status);
             const typeBadge = this.getTypeBadge(session.type);
-            
+            const trackBadge = session.track 
+            ? `<span class="badge rounded-pill" style="background-color: ${session.track.color}20; color: ${session.track.color};">${session.track.name}</span>` 
+            : '';
+
+            const description = session.description 
+            ? `<p class="mb-1 mt-2 small text-truncate" style="max-width: 100%;">${session.description.substring(0, 100)}${session.description.length > 100 ? '...' : ''}</p>` 
+            : '';
+
             listHTML += `
-                <div class="list-group-item list-group-item-action" onclick="eventCalendar.showSessionDetailsById('${session.id}')" style="cursor: pointer;">
-                    <div class="d-flex w-100 justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">${session.title}</h6>
-                            <div class="mb-2">
-                                ${typeBadge}
-                                ${session.track ? `<span class="badge" style="background-color: ${session.track.color}20; color: ${session.track.color};">${session.track.name}</span>` : ''}
-                                ${statusBadge}
-                            </div>
-                            <div class="small text-muted">
-                                <span class="me-3"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
-                                <span class="me-3"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
-                                ${session.venue ? `<span class="me-3"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</span>` : ''}
-                            </div>
-                            ${session.description ? `<p class="mb-1 mt-2 small">${session.description.substring(0, 100)}${session.description.length > 100 ? '...' : ''}</p>` : ''}
-                        </div>
-                        <div class="text-end">
-                            <div class="small text-muted">${this.calculateDuration(session.start_time, session.end_time)} min</div>
-                        </div>
-                    </div>
+            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" onclick="eventCalendar.showSessionDetailsById('${session.id}')">
+            <div class="flex-grow-1">
+                <h6 class="mb-1">${session.title}</h6>
+                <div class="mb-2">
+                    ${typeBadge} ${trackBadge} ${statusBadge}
                 </div>
+                <div class="small text-muted mb-1">
+                    <span class="me-3"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
+                    <span class="me-3"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
+                    ${session.venue ? `<span class="me-3"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</span>` : ''}
+                </div>
+                ${description}
+            </div>
+            <div class="text-end ms-3">
+                <div class="small text-muted">${this.calculateDuration(session.start_time, session.end_time)} min</div>
+            </div>
+            </button>
             `;
-        });
-        listHTML += '</div>';
+            });
+
+            listHTML += '</div>';
+
 
         list.innerHTML = listHTML;
     }
@@ -378,8 +401,8 @@ class LaravelEventCalendar {
             document.getElementById('description').value = eventData.extendedProps?.description || '';
             document.getElementById('sessionType').value = eventData.extendedProps?.type || 'presentation';
             document.getElementById('capacity').value = eventData.extendedProps?.capacity || '';
-            document.getElementById('trackSelect').value = eventData.extendedProps?.track_id || '';
-            document.getElementById('venueSelect').value = eventData.extendedProps?.venue_id || '';
+           // document.getElementById('trackSelect').value = eventData.extendedProps?.track_id || '';
+           // document.getElementById('venueSelect').value = eventData.extendedProps?.venue_id || '';
             document.getElementById('status').value = eventData.extendedProps?.status || 'draft';
             
             // Set selected speakers
@@ -406,54 +429,58 @@ class LaravelEventCalendar {
         title.textContent = event.title;
 
         const speakers = event.extendedProps?.speakers || [];
-        const speakersHTML = speakers.length > 0 ? 
-            speakers.map(speaker => `<span class="speaker-badge">${speaker.name} (${speaker.pivot?.role || 'Speaker'})</span>`).join('') :
-            '<span class="text-muted">No speakers assigned</span>';
+        const speakersHTML = event.extendedProps?.speakers?.length
+        ? event.extendedProps.speakers.map(speaker => `
+            <span class="badge bg-primary me-1 mb-1">
+                ${speaker.name} (${speaker.pivot?.role || 'Speaker'})
+            </span>
+          `).join('')
+        : '<span class="text-muted">No speakers assigned</span>';
+
 
         content.innerHTML = `
-            <div class="session-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Date & Time</div>
-                    <div class="meta-value">
-                        ${moment(event.start).format('dddd, MMMM D, YYYY')}
-                        <br>
-                        ${moment(event.start).format('h:mm A')} - ${moment(event.end).format('h:mm A')}
-                    </div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Duration</div>
-                    <div class="meta-value">${event.extendedProps?.duration || 0} minutes</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Type</div>
-                    <div class="meta-value">${this.getTypeBadge(event.extendedProps?.type)}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Track</div>
-                    <div class="meta-value">${event.extendedProps?.track || 'No Track'}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Venue</div>
-                    <div class="meta-value">${event.extendedProps?.venue || 'No Venue'}</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Capacity</div>
-                    <div class="meta-value">${event.extendedProps?.capacity || 'Unlimited'}</div>
-                </div>
+    <div class="session-meta row g-3">
+        <div class="col-12 col-md-6">
+            <div class="fw-bold">Date & Time</div>
+            <div>
+                ${moment(event.start).format('dddd, MMMM D, YYYY')}<br>
+                ${moment(event.start).format('h:mm A')} - ${moment(event.end).format('h:mm A')}
             </div>
-            
-            ${event.extendedProps?.description ? `
-                <div class="mt-3">
-                    <div class="meta-label">Description</div>
-                    <div class="mt-2" style="line-height: 1.5;">${event.extendedProps.description}</div>
-                </div>
-            ` : ''}
-            
-            <div class="mt-3">
-                <div class="meta-label">Speakers</div>
-                <div class="mt-2">${speakersHTML}</div>
-            </div>
-        `;
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="fw-bold">Duration</div>
+            <div>${event.extendedProps?.duration || 0} minutes</div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="fw-bold">Type</div>
+            <div>${this.getTypeBadge(event.extendedProps?.type)}</div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="fw-bold">Track</div>
+            <div>${event.extendedProps?.track || 'No Track'}</div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="fw-bold">Venue</div>
+            <div>${event.extendedProps?.venue || 'No Venue'}</div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="fw-bold">Capacity</div>
+            <div>${event.extendedProps?.capacity || 'Unlimited'}</div>
+        </div>
+    </div>
+
+    ${event.extendedProps?.description ? `
+        <div class="mt-3">
+            <div class="fw-bold">Description</div>
+            <div class="mt-2">${event.extendedProps.description}</div>
+        </div>
+    ` : ''}
+
+    <div class="mt-3">
+        <div class="fw-bold">Speakers</div>
+        <div class="mt-2">${speakersHTML}</div>
+    </div>
+`;
 
         modal.show();
     }
@@ -465,19 +492,22 @@ class LaravelEventCalendar {
             const eventData = {
                 id: session.id,
                 title: session.title,
-                start: session.start_time,
-                end: session.end_time,
+                start: session.start,
+                end: session.end,
+                backgroundColor: '#6366f1',
+                borderColor: '#6366f1',
+                textColor: '#fff', // better contrast
                 extendedProps: {
-                    description: session.description,
-                    type: session.type,
-                    status: session.status,
-                    track: session.track?.name,
-                    track_id: session.track_id,
-                    venue: session.venue?.name,
-                    venue_id: session.venue_id,
-                    speakers: session.speakers || [],
-                    capacity: session.capacity,
-                    duration: this.calculateDuration(session.start_time, session.end_time)
+                    description: session.extendedProps.description,
+                    status: session.extendedProps.status,
+                    track: 'Test',
+                    track_id: '1',
+                    venue: 'Kolkata',
+                    venue_id: '2',
+                    speakers: session.extendedProps.speakers || [],
+                    capacity: session.extendedProps.capacity,
+                    duration: this.calculateDuration(session.start, session.end),
+                    type:session.extendedProps.type
                 }
             };
             this.showSessionDetails(eventData);
@@ -490,16 +520,23 @@ class LaravelEventCalendar {
             const eventData = {
                 id: session.id,
                 title: session.title,
-                start: session.start_time,
-                end: session.end_time,
+                start: session.start,
+                end: session.end,
+                backgroundColor: '#6366f1',
+                borderColor: '#6366f1',
+                textColor: '#fff', // better contrast
                 extendedProps: {
-                    description: session.description,
-                    type: session.type,
-                    status: session.status,
-                    track_id: session.track_id,
-                    venue_id: session.venue_id,
-                    speakers: session.speakers || [],
-                    capacity: session.capacity
+                    description: session.extendedProps.description,
+                    status: session.extendedProps.status,
+                    track: 'Test',
+                    track_id: '1',
+                    venue: 'Kolkata',
+                    venue_id: '2',
+                    speakers: session.extendedProps.speakers || [],
+                    capacity: session.extendedProps.capacity,
+                    duration: this.calculateDuration(session.start, session.end),
+                    //duration: session.extendedProps.duration,
+                    type:session.extendedProps.type
                 }
             };
             this.openSessionModal(eventData);
@@ -651,22 +688,23 @@ class LaravelEventCalendar {
             this.calendar.addEventSource(filteredEvents.map(session => ({
                 id: session.id,
                 title: session.title,
-                start: session.start_time,
-                end: session.end_time,
-                backgroundColor: session.track?.color || '#6366f1',
-                borderColor: session.track?.color || '#6366f1',
-                textColor: '#ffffff',
+                start: session.start,
+                end: session.end,
+                backgroundColor: '#6366f1',
+                borderColor: '#6366f1',
+                textColor: '#fff', // better contrast
                 extendedProps: {
-                    description: session.description,
-                    type: session.type,
-                    status: session.status,
-                    track: session.track?.name,
-                    track_id: session.track_id,
-                    venue: session.venue?.name,
-                    venue_id: session.venue_id,
-                    speakers: session.speakers || [],
-                    capacity: session.capacity,
-                    duration: this.calculateDuration(session.start_time, session.end_time)
+                    description: session.extendedProps.description,
+                    status: session.extendedProps.status,
+                    track: 'Test',
+                    track_id: '1',
+                    venue: 'Kolkata',
+                    venue_id: '2',
+                    speakers: session.extendedProps.speakers || [],
+                    capacity: session.extendedProps.capacity,
+                    duration: this.calculateDuration(session.start, session.end),
+                    //duration: session.extendedProps.duration,
+                    type:session.extendedProps.type
                 }
             })));
         }
@@ -697,7 +735,6 @@ class LaravelEventCalendar {
     addSelectedSpeaker() {
         const select = document.getElementById('speakerSelect');
         const speakerId = select.value;
-        console.log(this.speakers);
         alert(1)
         if (!speakerId) return;
         
@@ -910,14 +947,14 @@ class LaravelEventCalendar {
     }
 
     convertToCSV(sessions) {
-        const headers = ['ID', 'Title', 'Start Time', 'End Time', 'Type', 'Track', 'Venue', 'Status', 'Capacity', 'Description'];
+        const headers = ['ID', 'Title', 'Start Time', 'End Time', 'Type', 'Venue', 'Status', 'Capacity', 'Description'];
         const rows = sessions.map(session => [
             session.id,
             session.title,
             session.start_time,
             session.end_time,
             session.type,
-            session.track?.name || '',
+           //session.track?.name || '',
             session.venue?.name || '',
             session.status,
             session.capacity || '',

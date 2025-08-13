@@ -61,11 +61,19 @@ class CalendarController extends Controller
             return [
                 'id' => $session->id,
                 'title' => $session->title,
+                'status' => $session->status,
                 'start' => $session->start_time->toISOString(),
                 'end' => $session->end_time->toISOString(),
                 'backgroundColor' =>  '#3498db',
                 'borderColor' =>  '#3498db',
                 'textColor' => '#ffffff',
+                'description' => $session->description,
+                'type' => $session->type,
+                'track' => 'Test Track' ?? null,
+                'venue' => 'Kolkata' ?? null,
+                'capacity' => $session->capacity,
+                'duration' => $session->getDurationInMinutes(),
+
                 'extendedProps' => [
                     'description' => $session->description,
                     'type' => $session->type,
@@ -79,7 +87,8 @@ class CalendarController extends Controller
                         ];
                     }),
                     'capacity' => $session->capacity,
-                    'duration' => $session->getDurationInMinutes()
+                    'duration' => $session->getDurationInMinutes(),
+                    'status' => $session->status,
                 ]
             ];
         });
@@ -89,17 +98,27 @@ class CalendarController extends Controller
 
     public function createSession(Request $request): JsonResponse
     {   
+        $speakerIds = collect($request->all())
+        ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
+        ->values()
+        ->all();
+
+        $request->merge([
+         'speaker_ids' => $speakerIds
+        ]);
+
+
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'booth_id' => 'nullable|exists:booths,id',
+            'booth_id' => 'required|exists:booths,id',
             'type' => 'required|in:presentation,workshop,panel,break,networking',
             'description' => 'nullable|string',
-            'capacity' => 'nullable|integer|min:1',
-            'speaker_ids' => 'nullable|array',
-            'speaker_ids.*' => 'exists:speakers,id'
+            'capacity' => 'required|integer|min:1',
+            'speaker_ids' => 'required|array',
+            'speaker_ids.*' => 'exists:users,id'
         ]);
 
         // Check for venue conflicts
@@ -125,11 +144,10 @@ class CalendarController extends Controller
         }
 
         $session = Session::create($request->except(['speaker_ids']));
-
+        
         // Attach speakers if provided
-        if ($request->speaker_ids) {
-            foreach ($request->speaker_ids as $index => $speakerId) {
-                dd($speakerId);
+        if ($speakerIds) {
+            foreach ($speakerIds as $index => $speakerId) {
                 $session->speakers()->attach($speakerId);
             }
         }
