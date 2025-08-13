@@ -31,23 +31,7 @@
              @method('PUT')
             @endif
             <div class="row"> 
-              <div class="col-12">
-                <div class="mb-3">
-                    <label class="form-label" for="title">Role<span class="text-danger">*(Select type of user, you want to create)</span></label>
-                    <div class="input-group input-group-merge">
-                      <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
-                      <select class="form-control" name="user_type">
-                        <option value="">Please select role</option>
-                       <option value="Content Manager" {{ old('user_type') =='Content Manager' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Content Manager' ? 'selected' : '' }}>Content Manager</option> 
-                       <option value="Analytics Manager" {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Analytics Manager' ? 'selected' : '' }}  {{ old('user_type') =='Analytics Manager' ? 'selected' : '' }}>Analytics Manager</option>
-                       <option value="Accounts Manager" {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Accounts Manager' ? 'selected' : '' }}  {{ old('user_type') =='Accounts Manager' ? 'selected' : '' }}>Accounts Manager</option>
-                      </select>
-                      @if ($errors->has('user_type'))
-                      <span class="text-danger text-left">{{ $errors->first('user_type') }}</span>
-                      @endif
-                    </div>
-                  </div>
-                </div> 
+             
             <div class="col-6">
              <div class="mb-3">
               <label class="form-label" for="title">First Name<span class="text-danger">*</span></label>

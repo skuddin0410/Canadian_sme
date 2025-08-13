@@ -59,14 +59,14 @@
 		<th>
 		<div class="row">
 	    <div class="col-4 p-1">
-			<a href="{{ route("coupons.show",["coupon"=> $coupon->id ]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
+			<a href="{{ route('coupons.show', ['coupon' => $coupon->id]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
 		</div>
 	    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))			
 		<div class="col-4 p-1">
-			<a href="{{ route("coupons.edit",["coupon"=> $coupon->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
+			<a href="{{ route('coupons.edit', ['coupon' => $coupon->id]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
 		</div>
 		<div class="col-4 p-1">
-		   <form action="{{ route('coupons.destroy', ["coupon"=> $coupon->id ]) }}" method="post">
+		   <form action="{{ route('coupons.destroy', ['coupon' => $coupon->id]) }}" method="post">
               @csrf
               @method('DELETE')
               <button type="submit" class="btn btn-sm btn-icon btn-danger delete" onclick="return confirm('Are you sure you want to delete?')"><i class="bx bxs-trash"></i></button>

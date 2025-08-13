@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Company;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use Illuminate\Database\Eloquent\Model;
 
 
 class Booth extends Model
@@ -22,10 +23,21 @@ class Booth extends Model
         'location_preferences',
     ];
 
+    // public function company()
+    // {
+    //     return $this->belongsTo(Company::class);
+    // }
     public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
+{
+    return $this->belongsTo(Company::class, 'user_id', 'user_id');
+}
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
+
 
     public function sessions()
     {

@@ -34,7 +34,7 @@
             <ul class="menu-sub">
 
                 <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
-                    <a href="#" class="menu-link">
+                    <a href="{{ url('staff-profile') }}" class="menu-link">
                         <div data-i18n="Staff List">Staff List</div>
                     </a>
                 </li>
@@ -50,7 +50,7 @@
             <ul class="menu-sub">
 
                 <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
-                    <a href="#" class="menu-link">
+                    <a href="{{ url('attendee-users') }}" class="menu-link">
                         <div data-i18n="Attendee List">Attendee List</div>
                     </a>
                 </li>

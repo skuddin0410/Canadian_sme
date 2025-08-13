@@ -103,6 +103,7 @@ class SpeakerController extends Controller
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => 'required|string|max:255|email|unique:users,email',
+         'bio'       => 'required|string',
         'website_url' => 'nullable|url|max:255',
         'linkedin_url' => 'nullable|url|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
@@ -128,6 +129,7 @@ class SpeakerController extends Controller
     $user->name = $request->first_name;
     $user->lastname = $request->last_name;
     $user->email = $request->email;
+     $user->bio = $request->bio;
     $user->website_url = $request->website_url;
     $user->linkedin_url = $request->linkedin_url;
     $user->mobile = $request->mobile;
@@ -193,6 +195,7 @@ class SpeakerController extends Controller
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+        'bio' => 'required|string',
         'website_url' => 'nullable|url|max:255',
         'linkedin_url' => 'nullable|url|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
@@ -216,6 +219,7 @@ class SpeakerController extends Controller
     $user->name = $request->first_name;
     $user->lastname = $request->last_name;
     $user->email = $request->email;
+     $user->bio = $request->bio;
     $user->website_url = $request->website_url;
     $user->linkedin_url = $request->linkedin_url;
     $user->mobile = $request->mobile;
@@ -237,13 +241,7 @@ class SpeakerController extends Controller
     $user->syncRoles([]);
     $user->assignRole($request->user_type);
 
-    // if ($request->file("frontimage")) {
-    //     $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo', $user->id);
-    // }
 
-    // if ($request->file("image")) {
-    //     $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background', $user->id);
-    // }
 
     return redirect(route('speaker.index'))->withSuccess('Speaker data has been updated successfully.');
     }

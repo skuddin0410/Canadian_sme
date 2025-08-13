@@ -238,7 +238,7 @@ class ExhibitorUserController extends Controller
         ->get();
 
                               
-        return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $booths,'companies' => $companies]);
+        return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $exhibitor_user->booths,'companies' => $companies]);
     }
 
     /**

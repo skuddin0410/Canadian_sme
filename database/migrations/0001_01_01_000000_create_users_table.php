@@ -24,6 +24,8 @@ return new class extends Migration
             $table->timestamp('mobile_verified_at')->nullable();
             $table->string('username')->nullable();
             $table->string('password')->nullable();
+            $table->text('bio')->nullable();
+
             $table->boolean('is_block')->default(false);
             $table->rememberToken();
             $table->boolean('is_approve')->default(false)->comment('Approval status by admin');

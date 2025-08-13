@@ -19,7 +19,7 @@ class CouponController extends Controller
     {     $perPage = (int) $request->input('perPage', 20);
           $pageNo = (int) $request->input('page', 1);
           $offset = $perPage * ($pageNo - 1);
-          $search = (int) $request->input('search', '');
+          $search =  $request->input('search', '');
         if($request->ajax() && $request->ajax_request == true){
             $coupons = Coupon::with('spinners')->orderBy('id','DESC');
             if($request->search){

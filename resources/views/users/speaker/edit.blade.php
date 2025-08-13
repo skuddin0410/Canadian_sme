@@ -65,6 +65,18 @@
                   @error('email') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>
+              {{-- Bio --}}
+               <div class="col-12">
+                <div class="mb-3">
+               <label class="form-label">Bio <span class="text-danger">*</span></label>
+                    <textarea name="bio" id="bio" class="form-control" rows="6" placeholder="Speaker Bio">{{ old('bio', $user->bio) }}</textarea>
+                    @if ($errors->has('bio'))
+                        <span class="text-danger">{{ $errors->first('bio') }}</span>
+                    @endif
+                </div>
+              </div>
+
+
               {{-- Website --}}
 <div class="col-6">
   <div class="mb-3">
@@ -130,7 +142,7 @@
               @endforeach
 
               {{-- Website & LinkedIn --}}
-              <div class="col-6">
+              {{-- <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Website</label>
                   <input type="url" class="form-control" name="website_url" value="{{ old('website_url', $user->website_url) }}" placeholder="Website URL">
@@ -142,7 +154,7 @@
                   <label class="form-label">LinkedIn</label>
                   <input type="url" class="form-control" name="linkedin_url" value="{{ old('linkedin_url', $user->linkedin_url) }}" placeholder="LinkedIn URL">
                 </div>
-              </div>
+              </div> --}}
 
               {{-- Role --}}
               <div class="col-6">

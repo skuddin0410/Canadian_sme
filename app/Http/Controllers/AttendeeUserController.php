@@ -39,31 +39,33 @@ class AttendeeUserController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-            $users = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Attendee']);
-                })->orderBy('created_at', 'DESC');
+    $users = User::with("roles")
+        ->whereHas("roles", function ($q) {
+            $q->whereIn("name", ['Attendee']);
+        })
+        ->orderBy('created_at', 'DESC');
 
-            if ($request->search) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('username', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
-                });
-            }
-
-            if ($request->start_at && $request->end_at) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->whereDate('created_at', '>=', $request->start_at);
-                    $query->whereDate('created_at', '<=', $request->end_at);
-                    
-                });
-            }
-              // Filter by exhibitor_id if provided
-          if ($request->has('exhibitor_id')) {
-          $query->where('created_by_exhibitor_id', $request->exhibitor_id);
+    // Search (triggered by search button)
+    if ($request->filled('search')) {
+        $users = $users->where(function ($query) use ($request) {
+            $query->where('name', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('username', 'LIKE', '%' . $request->search . '%')
+                //   ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('email', 'LIKE', '%' . $request->search . '%');
+        });
     }
+
+    // Filters (triggered by filter button, add your filter logic here)
+    if ($request->filled('start_at') && $request->filled('end_at')) {
+        $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
+    }
+    
+    if ($request->has('exhibitor_id')) {
+        $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
+    }
+             
+         
+    
 
            
 
