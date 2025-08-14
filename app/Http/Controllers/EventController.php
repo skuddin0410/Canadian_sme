@@ -77,7 +77,8 @@ class EventController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
             'meta_keywords' => 'nullable|string|max:1000',
-            'tags'=>'nullable|string|max:1000'
+            'tags'=>'nullable|string|max:1000',
+            'image'=>'required|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size')
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
@@ -117,7 +118,8 @@ class EventController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
             'meta_keywords' => 'nullable|string|max:1000',
-            'tags'=>'nullable|string|max:1000'
+            'tags'=>'nullable|string|max:1000',
+            'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
         ]);
 
         $event->update($validated);

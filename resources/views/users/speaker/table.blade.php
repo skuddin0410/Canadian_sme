@@ -41,7 +41,6 @@
 		<th>User name</th>
 		<th>Email</th>
 		<th>Mobile</th>
-		{{-- <th>Referral coupon</th> --}}
 		<th>Created At</th>
 		<th width="8%">Action</th>
 	</tr>
@@ -54,7 +53,6 @@
 		<th style="text-transform:none">{{$user->username ?? ''}}</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
-		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}
 		<th>{{dateFormat($user->created_at) ?? '' }}</th>
 		<th>
 			<div class="row">

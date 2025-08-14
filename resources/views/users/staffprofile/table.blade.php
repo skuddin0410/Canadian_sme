@@ -37,30 +37,32 @@
 <thead>
 	<tr>
 		<th>Name</th>
+		<th>Role</th>
 		<th>User name</th>
-		<th>User Role</th>
 		<th>Email</th>
 		<th>Mobile</th>
-		<th>DOB</th>
-		<th>Gender</th>
-		<th width="4%" align="text-center">Action</th>
+		{{-- <th>Referral coupon</th> --}}
+		<th>Created At</th>
+		<th width="8%">Action</th>
 	</tr>
 </thead>
 <tbody>	
     @foreach($users as $user)
     <tr>
     	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th style="text-transform:none">{{$user->username ?? ''}}</th>
 		<th>{{!empty($user->roles) ? $user->roles[0]->name : ''}}</th>
+		<th style="text-transform:none">{{$user->username ?? ''}}</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
-		<th>{{$user->dob ? dateFormat($user->dob) : '' }}</th>
-		<th>{{$user->gender ?? '' }}</th>
-		{{-- <th>{{$user->country ?? ''}}</th> --}}
+		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}
+		<th>{{dateFormat($user->created_at) ?? '' }}</th>
 		<th>
 			<div class="row">
 			<div class="col-4 p-1">	
-				<a href="{{ route("users.show",["user"=> $user->id,'page'=>'kyc' ]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
+				<a href="{{route('staff-profile.show',$user->id)}}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
+            </div>
+		    <div class="col-4 p-1">	
+			<a href="{{route('staff-profile.edit',$user->id)}}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
             </div>
        </th>
 	</tr>

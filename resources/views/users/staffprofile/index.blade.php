@@ -1,18 +1,26 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin | User List
+    Admin | Staff Profile
 @endsection
 
 @section('content')
 <div class="container flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">{{ (!empty($kyc) && $kyc == "done") ? "KYC " : ''}} {{ (!empty($kyc) && $kyc == "required") ? "KYC Required " : '' }} User/</span>Lists</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light"> Support Staff Or Helpdesk / </span> Staff Profile</h4>
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
 				<div class="card-header d-flex justify-content-between align-items-center">
-				    <h5 class="mb-0">{{ (!empty($kyc) && $kyc == "done") ? "KYC " : ''}} {{ (!empty($kyc) && $kyc == "required") ? "KYC Required " : '' }} User List</h5>
-
+				    <h5 class="mb-0"> Staff Profile User List</h5>
+					<div class="dt-action-buttons text-end pt-3 pt-md-0">
+						<div class="dt-buttons"> 
+							<a href="{{route('staff-profile.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
+								<span><i class="bx bx-plus me-sm-1"></i> 
+									<span class="d-none d-sm-inline-block">Add Staff Profile</span>
+								</span>
+							</a> 
+						</div>
+					</div>
 				</div>
                 <div class="col-12 text-right">
                 <form action="#" method="GET" id="users-filter">        
@@ -20,24 +28,17 @@
                         <div class="col-4">  
                         </div>
                         <div class="col-3">
-                            <input
-                              type="text"
-                              class="form-control"
-                              name="search"
-                              value=""
-                              id="search"
-                              placeholder="Search"/>  
+                            
                         </div>          
                         <div class="col-3">  
                          <div class="mb-3">
-                          <div class="input-group input-group-merge padding-none">
-                            <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
-                            <select class="form-control" name="user_type" id="user_type">
-                              <option value="">Please select user type</option>    
-                              {{-- <option value="Affiliate">Affiliate</option> --}}
-                              <option value="User">User</option>
-                            </select>
-                          </div>
+                            <input
+                            type="text"
+                            class="form-control"
+                            name="search"
+                            value=""
+                            id="search"
+                            placeholder="Search"/>  
                         </div>
                         </div>
                         <div class="col-2 text-center">
@@ -73,20 +74,10 @@
 
 @section('scripts')
 <script type="text/javascript">
-@php
-   $url = route('users.index');
-   if($kyc=='done'){
-      $url = route('kyc-users');
-   }
-   if($kyc=='required'){
-      $url = route('kyc-required-users');
-   }
-@endphp
-
  function GetUserList() {
         $(".spinner-border").fadeIn(300);
         $.ajax({
-            url: "{{$url}}",
+            url: "{{route('staff-profile.index')}}",
             type: 'get',
             headers: {
                 'X-CSRF-Token': $('meta[name="_token"]').attr('content')
@@ -131,13 +122,12 @@
   });
    $(document).on("click", ".filter", function(e) {
         var search = $('#search').val();
-        var user_type = $('#user_type').val();
-        if( search.trim() == '' && user_type.trim()== ''){
+        if( search.trim() == ''){
            return ;
         }
        $(".spinner-border").fadeIn(300);  
        $.ajax({
-            url: "{{ $url }}" + '?' + $("#users-filter").serialize(),
+            url: "{{route('staff-profile.index')}}" + '?' + $("#users-filter").serialize(),
             type: 'GET',
             headers: {
                 'X-CSRF-Token': $('meta[name="_token"]').attr('content')
@@ -157,7 +147,7 @@
     })
     
     $('.reset-filter').on('click', function() {
-      window.location.href = "{{$url}}";
+      window.location.href = "{{route('staff-profile.index')}}";
     });   	
 </script>	
 @endsection

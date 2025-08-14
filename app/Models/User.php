@@ -42,6 +42,7 @@ class User extends Authenticatable implements JWTSubject
         'mobile_verified_at',
         'username',
         'password',
+        'bio',
         'remember_token',
         'is_block',
         'is_approve',
@@ -111,6 +112,8 @@ public function booths()
         'id'            // Local key on Company (Company.id)
     );
 }
+
+
 
 
     public function getFullNameAttribute()

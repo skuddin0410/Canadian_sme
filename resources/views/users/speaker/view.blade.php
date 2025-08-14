@@ -99,15 +99,20 @@ Admin | Speaker Details
                             <span class="fw-medium me-2">Gender:</span>
                             <span>{{ $user->gender ?? '' }}</span>
                           </li>
-                           <li class="mb-3">
-                            <span class="fw-medium me-2">Place:</span>
-                            <span>{{ $user->place ?? ''}}</span>
-                          </li>
+                          <li class="mb-3">
+                <span class="fw-medium me-2">Bio:</span>
+                <span>{{ $user->bio ?? '' }}</span>
+              </li>
+                           
                         </ul>
                     </div>
 
                     <div class="col-4"> 
-                        <ul class="list-unstyled justify-content-between">  
+                        <ul class="list-unstyled justify-content-between"> 
+                          <li class="mb-3">
+                            <span class="fw-medium me-2">Place:</span>
+                            <span>{{ $user->place ?? ''}}</span>
+                          </li> 
                           <li class="mb-3">
                             <span class="fw-medium me-2">Street:</span>
                             <span>{{$user->street ?? ''}}</span>

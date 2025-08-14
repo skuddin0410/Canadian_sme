@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\Booth;
 use App\Models\Drive;
-use App\Models\CompanyContact;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use App\Models\CompanyContact;
 use App\Traits\AutoHtmlDecode;
+use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
@@ -33,6 +34,16 @@ class Company extends Model
             ->where('file_type', 'certifications')
             ->whereNotNull('file_name');
     }
+//     public function booths()
+// {
+//     return $this->hasMany(Booth::class, 'user_id', 'user_id');
+// }
+public function booths()
+{
+    return $this->hasMany(Booth::class, 'company_id', 'id'); // adjust column names
+}
+
+
     public function logoFile()
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
@@ -52,6 +63,7 @@ class Company extends Model
             ->where('table_type', 'companies')
             ->where('file_type', 'company_video');
     }
+    
 
 
 
