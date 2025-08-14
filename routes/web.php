@@ -34,4 +34,5 @@ Route::group(['middleware' => 'auth:web'], function () {
    require __DIR__.'/speaker.php';
    require __DIR__.'/attendee.php';
    require __DIR__.'/helpdesk.php';
+   require __DIR__.'/ticket.php';
 });

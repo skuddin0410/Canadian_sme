@@ -51,14 +51,48 @@
                         <div data-i18n="events">Events</div>
                     </a>
                 </li>
-                {{-- <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
-                    <a href="{{ url('categories') }}" class="menu-link">
-                        <div data-i18n="Categories">Categories</div>
-                    </a>
-                </li> --}}
             </ul>
         </li>
         @endif 
+
+          @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                <div data-i18n="tickets">Tickets</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }}">
+                    <a href="{{ route('ticket.dashboard') }}" class="menu-link">
+                        <div data-i18n="tickets">Tickets Dashboard</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
+                    <a href="{{ route('admin.ticket-categories.index') }}" class="menu-link">
+                        <div data-i18n="ticket-categories"> Ticket categories</div>
+                    </a>
+                </li>
+                 <li class="menu-item {{ request()->is('admin/ticket-types*') ? 'active open' : '' }}">
+                    <a href="{{ route('admin.ticket-types.index') }}" class="menu-link">
+                        <div data-i18n="ticket-types"> Ticket Types</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }}">
+                    <a href="{{ route('admin.ticket-inventory.index') }}" class="menu-link">
+                        <div data-i18n="ticket-inventory"> Ticket inventory</div>
+                    </a>
+                </li>
+
+                 <li class="menu-item {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
+                    <a href="{{ route('admin.ticket-pricing.index') }}" class="menu-link">
+                        <div data-i18n="ticket-pricing"> Ticket pricing setup</div>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+        @endif
         
 
   <!--       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
