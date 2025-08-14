@@ -64,10 +64,34 @@ class NewsletterService
     /**
      * Send newsletter immediately
      */
-    public function sendNewsletter(Newsletter $newsletter): void
-    {
-        $this->scheduleNewsletter($newsletter, now());
+    // public function sendNewsletter(Newsletter $newsletter): void
+    // {
+    //     $this->scheduleNewsletter($newsletter, now());
+    // }
+    public function sendNewsletter(Newsletter $newsletter)
+{
+    $subscribers = NewsletterSubscriber::subscribed()->get();
+
+    foreach ($subscribers as $subscriber) {
+        $send = NewsletterSend::create([
+            'newsletter_id' => $newsletter->id,
+            'email' => $subscriber->email,
+            'status' => 'pending',
+        ]);
+
+        try {
+            Mail::to($subscriber->email)->send(new NewsletterMail($newsletter, $send));
+            $send->update(['status' => 'sent', 'sent_at' => now()]);
+        } catch (\Exception $e) {
+            $send->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
+            Log::error('Newsletter send failed: ' . $e->getMessage());
+        }
     }
+
+    // Update newsletter status
+    $newsletter->update(['status' => 'sent']);
+}
+
 
     /**
      * Get recipients based on criteria

@@ -241,7 +241,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        {{-- <div class="row mb-3">
                             <div class="col-6">
                                 <label class="form-label small">Min Lead Score</label>
                                 <input type="number" name="recipient_criteria[min_lead_score]" 
@@ -256,15 +256,15 @@
                                        min="0" max="100" placeholder="100"
                                        class="form-control form-control-sm">
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label class="form-label small">Active in Last (days)</label>
                             <input type="number" name="recipient_criteria[min_activity_days]" 
                                    value="{{ old('recipient_criteria.min_activity_days', $newsletter->recipient_criteria['min_activity_days'] ?? '') }}"
                                    placeholder="30"
                                    class="form-control form-control-sm">
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 

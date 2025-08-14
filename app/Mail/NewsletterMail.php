@@ -33,30 +33,51 @@ class NewsletterMail extends Mailable
     //         'email' => $send->email
     //     ]);
     // }
-    public function __construct(Newsletter $newsletter, NewsletterSend $send)
-{
-    Log::info('Preparing NewsletterMail', [
-        'newsletter_id' => $newsletter->id,
-        'template_name' => $newsletter->template_name,
-        'recipient_email' => $send->email
-    ]);
+//     public function __construct(Newsletter $newsletter, NewsletterSend $send)
+// {
+//     Log::info('Preparing NewsletterMail', [
+//         'newsletter_id' => $newsletter->id,
+//         'template_name' => $newsletter->template_name,
+//         'recipient_email' => $send->email
+//     ]);
 
+//     $this->newsletter = $newsletter;
+//     $this->send = $send;
+
+//     $this->trackingPixelUrl = route('newsletter.track-open', [
+//         'newsletter' => $newsletter->id,
+//         'email' => $send->email
+//     ]);
+//     $this->unsubscribeUrl = route('newsletter.unsubscribe', [
+//         'email' => $send->email
+//     ]);
+
+//     Log::info('NewsletterMail URLs generated', [
+//         'trackingPixelUrl' => $this->trackingPixelUrl,
+//         'unsubscribeUrl'   => $this->unsubscribeUrl
+//     ]);
+// }
+public function __construct(Newsletter $newsletter, NewsletterSend $send)
+{
     $this->newsletter = $newsletter;
     $this->send = $send;
 
+    $email = $send->email ?? $send->test_email; // fallback for test sends
+
     $this->trackingPixelUrl = route('newsletter.track-open', [
         'newsletter' => $newsletter->id,
-        'email' => $send->email
+        'email' => $email
     ]);
-    $this->unsubscribeUrl = route('newsletter.unsubscribe', [
-        'email' => $send->email
-    ]);
+
+    $this->unsubscribeUrl = url('/newsletter/unsubscribe') . '?email=' . urlencode($email);
 
     Log::info('NewsletterMail URLs generated', [
         'trackingPixelUrl' => $this->trackingPixelUrl,
-        'unsubscribeUrl'   => $this->unsubscribeUrl
+        'unsubscribeUrl'   => $this->unsubscribeUrl,
+        'email_used'       => $email
     ]);
 }
+
 
 
     public function envelope(): Envelope
@@ -73,7 +94,7 @@ class NewsletterMail extends Mailable
             'new_properties' => 'emails.newsletters.new_properties',
             'investment_tips' => 'emails.newsletters.investment_tips',
             'portfolio_update' => 'emails.newsletters.portfolio_update',
-            'event_announcement' => 'emails.newsletters.events',
+            'event_announcement' => 'emails.newsletters.event_announcement',
             'default' => 'emails.newsletters.default'
         ];
 

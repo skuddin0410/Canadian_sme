@@ -226,7 +226,7 @@ public function testSend(Request $request, $newsletterId)
     // Step 2: Create a dummy NewsletterSend object
     $testSend = new NewsletterSend();
     $testSend->newsletter_id = $newsletter->id;
-    $testSend->test_email = $request->test_email;
+    $testSend->email = $request->test_email;
     $testSend->sent_at = now();
 
     try {
@@ -292,11 +292,11 @@ public function testSend(Request $request, $newsletterId)
             return view('newsletters.unsubscribe-form');
         }
         $success = $this->newsletterService->unsubscribe($email);
-        if ($success) {
-            return view('newsletters.unsubscribed', ['email' => $email]);
-        } else {
+        // if ($success) {
+        //     return view('newsletters.unsubscribed', ['email' => $email]);
+        // } else {
              return view('newsletters.unsubscribed', ['email' => $email]);
-        }
+        // }
     }
 
     /**
