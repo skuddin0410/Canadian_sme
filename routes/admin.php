@@ -78,19 +78,20 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     });
 });
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin|Support Staff Or Helpdesk']], function () {
-Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
-    'exhibitor-users' => 'exhibitor_user',
-]);
- Route::resource('representative-users', RepresentativeUserController::class);
- Route::resource('attendee-users', AttendeeUserController::class);
-Route::resource('speaker', SpeakerController::class);
-Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
-Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
-Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
-Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
+    Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin|Support Staff Or Helpdesk']], function () {
+    Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
+        'exhibitor-users' => 'exhibitor_user',
+    ]);
+     Route::resource('representative-users', RepresentativeUserController::class);
+     Route::resource('attendee-users', AttendeeUserController::class);
+    Route::resource('speaker', SpeakerController::class);
+    Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
+    Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
+    Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
+    Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
 
-});
+    });
+
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
 

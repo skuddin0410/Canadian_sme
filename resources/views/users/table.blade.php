@@ -53,7 +53,6 @@
     <tr>
     	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
 		<th style="text-transform:none">{{$user->username ?? ''}}</th>
-		{{-- <th>{{!empty($user->roles) ? $user->roles[0]->name : ''}}</th> --}}
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
 		<th>{{$user->dob ? dateFormat($user->dob) : '' }}</th>
@@ -69,7 +68,6 @@
             <i class="bx bxs-show" style="font-size: 1rem;"></i>
         </a>
 
-        @if(Auth::user()->hasRole('Admin'))
             <!-- Edit -->
             <a href="{{ route('users.edit', ['user' => $user->id]) }}" 
                class="btn btn-sm btn-icon p-1" 
@@ -88,7 +86,7 @@
                     <i class="bx bxs-trash" style="font-size: 1rem;"></i>
                 </button>
             </form>
-        @endif
+       
     </div>
 </th>
 

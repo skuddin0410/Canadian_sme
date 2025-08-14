@@ -239,7 +239,7 @@
                   name="meta_description"
                   id="meta_description"
                   class="form-control"
-                  placeholder="Event description"
+                  placeholder="Meta description"
                   rows="8" cols="50"
                 >{{ old('meta_description', $e->meta_description ?? '') }}</textarea>
 
