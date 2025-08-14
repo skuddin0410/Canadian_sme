@@ -288,7 +288,7 @@
                         @if($newsletter->status === 'scheduled')
                         <div class="d-flex justify-content-between">
                             <span class="text-muted small">Scheduled:</span>
-                            <span class="fw-medium small">{{ $newsletter->scheduled_at->format('M j, g:i A') }}</span>
+                            <span class="fw-medium small">{{ dateTimeFormat($newsletter->scheduled_at) }}</span>
                         </div>
                         @endif
                     </div>
@@ -506,8 +506,8 @@
 </div>
 
 <!-- Bootstrap CSS and JS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
 <style>
 /* Content Editor Styles */
