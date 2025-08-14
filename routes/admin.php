@@ -91,3 +91,8 @@ Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'togg
 Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
 
 });
+
+Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
+
+ require __DIR__.'/newsletters.php';
+});

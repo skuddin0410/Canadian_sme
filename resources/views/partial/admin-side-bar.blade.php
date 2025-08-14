@@ -114,6 +114,14 @@
                    </a>
                 </li>
             </ul>
+             <ul class="menu-sub">
+                
+                <li class="menu-item {{ request()->is('admin-users') ? 'active open' : '' }}">
+                   <a href="{{ url('newsletters') }}" class="menu-link">
+                    <div data-i18n="newsletters">Newsletter</div>
+                   </a>
+                </li>
+            </ul>
         </li>   
         @endif
         
