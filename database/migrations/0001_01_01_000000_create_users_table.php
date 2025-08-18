@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name')->nullable()->index();
             $table->string('lastname')->nullable()->index();
             $table->string('email')->nullable()->unique();
+            $table->string('designation')->nullable();
+            $table->string('tags')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('website_url')->nullable();
             $table->string('linkedin_url')->nullable();

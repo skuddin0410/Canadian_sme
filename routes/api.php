@@ -20,8 +20,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::prefix('me')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getUser']);
         Route::post('/update', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUser']);
-        Route::post('/kyc', [App\Http\Controllers\Api\KycController::class, 'store']);
-        Route::post('/bank', [App\Http\Controllers\Api\KycController::class, 'update']);
+      
     });
 
     Route::prefix('password')->group(function () {

@@ -278,15 +278,12 @@ class JWTAuthController extends Controller
             }
 
             $photo = $user->load('photo');
-            $background = $user->load('background');
-            $bank = $user->load('bank');
-
             $token = request()->bearerToken() ?? JWTAuth::refresh();
 
             return response()->json([
                 'success' => true,
                 'message' => 'successful',
-                'data' => compact('user', 'photo', 'background', 'bank', 'token'),
+                'data' => compact('user', 'photo',  'token'),
             ]);
         } catch (JWTException $e) {
             return response()->json([

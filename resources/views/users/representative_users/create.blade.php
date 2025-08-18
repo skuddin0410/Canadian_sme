@@ -104,6 +104,75 @@
               @endif
             </div>
           </div>
+          <div class="row">
+    <!-- Designation -->
+    <div class="col-6">
+        <div class="mb-3">
+            <label class="form-label" for="designation">Designation</label>
+            <div class="input-group input-group-merge">
+                <span id="designation-icon" class="input-group-text">
+                    <i class="bx bx-briefcase"></i>
+                </span>
+                <input
+                    type="text"
+                    class="form-control"
+                    name="designation"
+                    id="designation"
+                    value="{{ $user->designation ?? old('designation') }}"
+                    placeholder="Enter designation"/>
+            </div>
+            @if ($errors->has('designation'))
+                <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
+            @endif
+        </div>
+    </div>
+
+    <!-- Tags -->
+    {{-- <div class="col-6">
+        <div class="mb-3">
+            <label class="form-label" for="tags">Tags</label>
+            <div class="input-group input-group-merge">
+                <span id="tags-icon" class="input-group-text">
+                    <i class="bx bx-purchase-tag"></i>
+                </span>
+                <input
+                    type="text"
+                    class="form-control"
+                    name="tags"
+                    id="tags"
+                    value="{{ old('tags', $user->tags ?? '') }}"
+                    data-role="tagsinput"
+                    placeholder="Add tags (comma separated)"/>
+            </div>
+            @if ($errors->has('tags'))
+                <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
+            @endif
+        </div>
+    </div> --}}
+    <div class="col-6">
+    <div class="mb-3">
+        <label class="form-label" for="tags">Tags</label>
+        <div class="input-group input-group-merge">
+            <span id="tags-icon" class="input-group-text">
+                <i class="bx bx-purchase-tag"></i>
+            </span>
+            <input
+                type="text"
+                class="form-control"
+                name="tags"
+                id="tags"
+                value="{{ old('tags', isset($user) ? $user->tags : '') }}"
+                data-role="tagsinput"
+                placeholder="Add tags (comma separated)" />
+        </div>
+        @if ($errors->has('tags'))
+            <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
+        @endif
+    </div>
+</div>
+
+
+
           <div class="col-6">
     <div class="mb-3">
         <label class="form-label" for="website_url">Website URL</label>
@@ -335,6 +404,8 @@
 </div>
 @endsection
 @section('scripts')
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script> --}}
 <script>
 $("#last-name-target").keyup(function() {
       var Text = $('#slug-source').val();
@@ -357,16 +428,6 @@ $("#slug-source").keyup(function() {
         $("#slug-target").val(Text); 
       }       
   });
-// $("#slug-target").keyup(function() {
-//       var Text = $('#slug-source').val();
-//       var Last = $('#last-name-target').val();
-//       console.log(Text+" "+Last);
-//       if(Last != undefined && Text != undefined){
-//         Text = Text+" "+Last;
-//         Text = slugify(Text);
-//         $("#slug-target").val(Text); 
-//       }       
-//   });
 
 
 function slugify(str) {
@@ -377,6 +438,8 @@ function slugify(str) {
            .replace(/-+/g, '-'); // remove consecutive hyphens
   return str.replace(/^-+|-+$/g, '');
 }
+$('#tags').tagsinput();
+
 
 </script>
 @endsection

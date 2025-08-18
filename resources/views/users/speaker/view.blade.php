@@ -69,6 +69,7 @@ Admin | Speaker Details
                             <span class="fw-medium me-2">Email:</span>
                             <span>{{ $user->email }}</span>
                           </li>
+                           <li class="mb-3"><span class="fw-medium me-2">Designation:</span> <span>{{ $user->designation ?? '-' }}</span></li>
                         
                           <li class="mb-3">
   <span class="fw-medium me-2">Website:</span>
@@ -138,6 +139,16 @@ Admin | Speaker Details
                             <span class="fw-medium me-2">Referral coupon:</span>
                             <span>{{ $user->referral_coupon?? '' }}</span>
                           </li> 
+                          <li class="mb-3"><span class="fw-medium me-2">Tags:</span> 
+                                        @if(!empty($user->tags))
+                                            @foreach(explode(',', $user->tags) as $tag)
+                                                <span class="badge bg-primary me-1">{{ trim($tag) }}</span>
+                                            @endforeach
+                                        @else
+                                            <span>-</span>
+                                        @endif
+                                    </li>
+
                            
                         </ul>
                     </div>
