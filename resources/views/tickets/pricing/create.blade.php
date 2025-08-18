@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Ticket Type')
+@section('title', 'Create Ticket')
 
 @section('content')
 <div class="container">
     <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-3">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-plus-circle mr-2"></i>Create Ticket Type
+            <i class="fas fa-plus-circle mr-2"></i>Create Ticket
         </h1>
         <a href="{{ route('admin.ticket-pricing.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left mr-1"></i>Back to Tickets

@@ -21,14 +21,14 @@ class TicketPricingController extends Controller
         }
         
         $pricingRules = $query->orderBy('created_at', 'desc')->paginate(15);
-        $ticketTypes = TicketType::active()->with('event')->get();
+        $ticketTypes = TicketType::with('event')->get();
         
         return view('tickets.pricing.index', compact('pricingRules', 'ticketTypes'));
     }
 
     public function create()
     {
-        $ticketTypes = TicketType::active()->with('event')->get();
+        $ticketTypes = TicketType::with('event')->get();
         return view('tickets.pricing.create', compact('ticketTypes'));
     }
 
