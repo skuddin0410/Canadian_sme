@@ -39,7 +39,7 @@ return new class extends Migration
             $table->string('city')->nullable()->index();
             $table->string('state')->nullable()->index();
             $table->string('country')->nullable()->index();
-            $table->string('qrcode')->nullable()->index();
+            $table->string('qr_code')->nullable()->index();
             $table->string('company_id')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
