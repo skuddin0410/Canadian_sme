@@ -23,8 +23,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $eventAdmin->assignRole('Event Admin');
-
-        
+        qrCode($eventAdmin->id);
 
         $companies = [];
 
@@ -42,6 +41,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password')
         ]);
         $exhibitorAdmin->assignRole('Exhibitor Admin');
+        qrCode($exhibitorAdmin->id);
 
             $companies= [
                 'user_id'           => $exhibitorAdmin->id,
@@ -78,6 +78,8 @@ class UserSeeder extends Seeder
             ]);
             $exhibitorRepresentative->assignRole('Exhibitor Representative');
 
+            qrCode($exhibitorRepresentative->id);
+
             $attendee = User::create([
                 'name' => 'Attendee',
                 'lastname'=>'Attendee',
@@ -90,7 +92,7 @@ class UserSeeder extends Seeder
                 'bio'=>"This is a short bio for Attaindee $i. Experienced in event management and exhibitions.",
             ]);
             $attendee->assignRole('Attendee');
-
+            qrCode($attendee->id);
             $exhibitorAdmin->company_id = $company->id;
             $exhibitorAdmin->save();
         }
@@ -105,7 +107,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $speaker->assignRole('Speaker');
-
+        qrCode($speaker->id);
 
         $SupportStaff = User::create([
             'name' => 'Support Staff',
@@ -115,8 +117,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $SupportStaff->assignRole('Support Staff Or Helpdesk');
-
-
+        qrCode($SupportStaff->id); 
+ 
         $registrationDesk = User::create([
             'name' => 'Registration',
             'lastname'=>'Desk',
@@ -125,7 +127,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $registrationDesk->assignRole('Registration Desk');
-
+        qrCode($registrationDesk->id);
 
     }
 }

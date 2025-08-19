@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();    
             $table->string('name');
             $table->decimal('price', 10, 2)->nullable();
             $table->string('slug')->unique();
@@ -37,6 +38,7 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('service_categories')->onDelete('set null');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');  
             $table->index(['is_active', 'sort_order']);
             $table->index('category_id');
            

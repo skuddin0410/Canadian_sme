@@ -57,7 +57,8 @@ class User extends Authenticatable implements JWTSubject
         'state',
         'country',
         'created_by',
-        'company_id'
+        'company_id',
+        'qr_code'
     ];
 
     /**

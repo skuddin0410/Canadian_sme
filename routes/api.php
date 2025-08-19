@@ -7,9 +7,9 @@ Route::post('/login', [App\Http\Controllers\Api\JWTAuthController::class, 'login
 Route::post('/login-by-user', [App\Http\Controllers\Api\JWTAuthController::class, 'loginByUser']);
 Route::post('/social', [App\Http\Controllers\Api\JWTAuthController::class, 'social']);
 
-Route::prefix('otp')->group(function () {
-    Route::post('generate', [App\Http\Controllers\Api\OtpController::class, 'generate']);
-    Route::post('verify', [App\Http\Controllers\Api\OtpController::class, 'verify']);
+Route::prefix('auth')->group(function () {
+    Route::post('login', [App\Http\Controllers\Api\OtpController::class, 'generate']);
+    Route::post('verify-otp', [App\Http\Controllers\Api\OtpController::class, 'verify']);
 });
 
 Route::prefix('password')->group(function () {
@@ -17,9 +17,9 @@ Route::prefix('password')->group(function () {
 });
 
 Route::middleware(['auth:api', 'jwtauth'])->group(function () {
-    Route::prefix('me')->group(function () {
+    Route::prefix('profile')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getUser']);
-        Route::post('/update', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUser']);
+        Route::put('/', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUser']);
       
     });
 
