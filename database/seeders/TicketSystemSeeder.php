@@ -48,11 +48,90 @@ class TicketSystemSeeder extends Seeder
             [ 'name' => 'Science & Innovation', 'type' => 'event' ],
         ];
 
+        $tags = [
+            // Event Formats
+            'Conference',
+            'Workshop',
+            'Webinar',
+            'Networking',
+            'Training',
+            'Summit',
+            'Seminar',
+            'Panel Discussion',
+            'Roundtable',
+            'Hackathon',
+            'Bootcamp',
+            'Expo',
+            'Festival',
+            'Product Launch',
+            'Meetup',
+            'Trade Show',
+            'Fair',
+            'Showcase',
+            'Competition',
+            'Ceremony',
+
+            // Topics / Themes
+            'Technology',
+            'Innovation',
+            'Leadership',
+            'Marketing',
+            'Sales',
+            'Finance',
+            'Startups',
+            'Entrepreneurship',
+            'Healthcare',
+            'Education',
+            'Sustainability',
+            'Climate Change',
+            'Artificial Intelligence',
+            'Machine Learning',
+            'Blockchain',
+            'Cybersecurity',
+            'Data Science',
+            'Software Development',
+            'Design Thinking',
+            'UI/UX',
+
+            // Audience & Engagement
+            'Students',
+            'Professionals',
+            'Executives',
+            'Investors',
+            'Mentorship',
+            'Career Growth',
+            'Community Building',
+            'Networking',
+            'Collaboration',
+            'Innovation Labs',
+
+            // Event Styles
+            'Virtual',
+            'Hybrid',
+            'In-Person',
+            'On-Demand',
+            'Interactive',
+            'Panel',
+            'Keynote',
+            'Fireside Chat',
+            'Case Study',
+            'Demo Day'
+        ];
+
+
+        foreach ($tags as $category) {
+            Category::create([
+                'name' => $category['name'],
+                'slug' => Str::slug($category['name']),
+                'type' => 'tag',
+            ]);
+        }
+
         foreach ($categories as $category) {
             Category::create([
                 'name' => $category['name'],
                 'slug' => Str::slug($category['name']),
-                'type' => $category['type'],
+                'type' => 'event',
             ]);
         }
 
