@@ -96,7 +96,7 @@ if (!function_exists('getKeyValue')) {
 
 
 if (!function_exists('qrCode')) {
-  function qrCode($userId)
+  function qrCode($userId,$folder="user")
   { 
        $user = User::findOrFail($userId);
 
@@ -110,7 +110,7 @@ if (!function_exists('qrCode')) {
             mkdir(public_path('qrcodes'), 0755, true);
         }
 
-        $fileName = 'qrcodes/user_' . $user->id . '.png';
+        $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
         $filePath = public_path($fileName);
 
         if (file_exists($filePath)) {
