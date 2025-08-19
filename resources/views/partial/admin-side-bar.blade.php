@@ -28,6 +28,7 @@
                 <div data-i18n="Coupons">Pages</div>
             </a>
         </li>
+         
        @endif
 
        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
@@ -35,6 +36,12 @@
             <a href="{{route('booths.index')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store-alt"></i>
                     <div data-i18n="Booth Management">Booth Management</div>
+            </a>
+        </li>
+        <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }}">
+            <a href="{{route('leads.index')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store-alt"></i>
+                    <div data-i18n="Booth Management">Lead Management</div>
             </a>
         </li>
        @endif
@@ -49,6 +56,11 @@
                 <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
                     <a href="{{ route('events.index') }}" class="menu-link">
                         <div data-i18n="events">Events</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                    <a href="{{ route('categories.index') }}" class="menu-link">
+                    <div data-i18n="events">Categories & Tags</div>
                     </a>
                 </li>
             </ul>

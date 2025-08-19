@@ -26,6 +26,9 @@ class CategoryController extends Controller
 
       if($request->ajax() && $request->ajax_request == true){
        $categories = Category::orderBy(DB::raw("ISNULL(categories.order), categories.order"), 'ASC')->orderBy('created_at','DESC');
+        if ($request->has('type')) {
+        $query->where('type', $request->type);
+    }
 
         if($request->search){
             $categories = $categories->where(function($query) use($request){
@@ -139,4 +142,41 @@ class CategoryController extends Controller
        $category->save();
        return 'success';
     }
+//     public function getTags(Request $request)
+// {
+//     $perPage = (int) $request->input('perPage', 20);
+//     $pageNo = (int) $request->input('page', 1);
+//     $offset = $perPage * ($pageNo - 1);
+
+//     $tags = Category::where('type', 'tags')
+//         ->orderBy(DB::raw("ISNULL(categories.order), categories.order"), 'ASC')
+//         ->orderBy('created_at', 'DESC');
+
+//     if ($request->search) {
+//         $tags = $tags->where(function ($query) use ($request) {
+//             $query->where('name', 'LIKE', '%' . $request->search . '%');
+//         });
+//     }
+
+//     $tagsCount = clone $tags;
+//     $totalRecords = $tagsCount->count(DB::raw('DISTINCT(categories.id)'));
+
+//     $tags = $tags->offset($offset)->limit($perPage)->get();
+
+//     $tags = new LengthAwarePaginator($tags, $totalRecords, $perPage, $pageNo, [
+//         'path'  => $request->url(),
+//         'query' => $request->query(),
+//     ]);
+
+//     $tags->setPath(route('categories.index')); // adjust if you want a separate route
+
+//     $data['offset'] = $offset;
+//     $data['pageNo'] = $pageNo;
+//     $data['html'] = view('category.table', compact('tags', 'perPage'))
+//         ->with('i', $pageNo * $perPage)
+//         ->render();
+
+//     return response($data);
+// }
+
 }
