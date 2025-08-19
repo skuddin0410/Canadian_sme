@@ -15,7 +15,7 @@ class OtpController extends Controller
     public function generate(Request $request) {
         $validator = Validator::make($request->all(), [
             'email' => 'sometimes|nullable|string|max:255|email',
-            'mobile' => 'sometimes|nullable|string',
+            // 'mobile' => 'sometimes|nullable|string',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -28,59 +28,7 @@ class OtpController extends Controller
         $code = rand(1000, 9999);
         $currentDateTime = Carbon::now();
 
-        if ($request->mobile) {
-            $apiKey = config('app.2_factor_api_key');
-
-            $url = "https://2factor.in/API/V1/{$apiKey}/SMS/{$request->mobile}/{$code}/" . urlencode("OTP SMS 1");
-            $url = sprintf(
-                "https://2factor.in/API/V1/%s/SMS/%s/%s/%s",
-                urlencode($apiKey),
-                urlencode($request->mobile),
-                urlencode($code),
-                urlencode("OTP SMS 1")
-            );
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // to ignore SSL issues (not recommended for production)
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30); // timeout after 30 seconds
-            $result = curl_exec($ch);
-            if ($result == false) {
-                $error = curl_error($ch);
-                curl_close($ch);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'cURL Error.',
-                    'data' => $error,
-                ], 500);
-            }
-            curl_close($ch);
-
-            $response = json_decode($result, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'JSON Decode Error.',
-                    'data' => json_last_error_msg(),
-                ], 500);
-            }
-
-            if (!empty($response) && isset($response['Status']) && $response['Status'] == 'Success') {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'successful',
-                    'data' => json_decode($result),
-                ]);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong',
-                'data' => json_decode($result),
-            ], 400);
-        } else {
+      
             $otp = Otp::firstOrNew(['email' => $request->email]);
             $otp->otp = $code;
             $otp->expired_at = $currentDateTime->addMinutes(5);
@@ -93,7 +41,7 @@ class OtpController extends Controller
                 'message' => 'successful',
                 'data' => $otp,
             ]);
-        }
+        
     }
 
     public function verify(Request $request) {
