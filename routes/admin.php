@@ -96,4 +96,5 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
 
  require __DIR__.'/newsletters.php';
+ require __DIR__.'/formbuilder.php';
 });

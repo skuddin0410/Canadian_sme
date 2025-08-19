@@ -53,6 +53,20 @@
                 </li>
             </ul>
         </li>
+          <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                <div data-i18n="formbuilder">FormBuilder</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                    <a href="{{ route('form-builder.index') }}" class="menu-link">
+                        <div data-i18n="events">FormBuilder</div>
+                    </a>
+                </li>
+                
+            </ul>
+        </li>
         @endif 
 
           @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
