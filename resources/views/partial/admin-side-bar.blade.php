@@ -78,18 +78,6 @@
                     </a>
                 </li>
 
-               {{--  <li class="menu-item {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }}">
-                    <a href="{{ route('admin.ticket-inventory.index') }}" class="menu-link">
-                        <div data-i18n="ticket-inventory"> Ticket inventory</div>
-                    </a>
-                </li> --}}
-
-                 <li class="menu-item {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
-                    <a href="{{ route('admin.ticket-pricing.index') }}" class="menu-link">
-                        <div data-i18n="ticket-pricing"> Ticket pricing setup</div>
-                    </a>
-                </li>
-
             </ul>
         </li>
         @endif

@@ -76,6 +76,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 
          Route::get('/speakers', [CalendarController::class, 'speakers'])->name('speakers.list');
     });
+
+     Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
 });
 
     Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin|Support Staff Or Helpdesk']], function () {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\TicketPricingRule;
 use App\Models\TicketType;
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 class TicketPricingController extends Controller
@@ -21,19 +22,20 @@ class TicketPricingController extends Controller
         }
         
         $pricingRules = $query->orderBy('created_at', 'desc')->paginate(15);
-        $ticketTypes = TicketType::with('event')->get();
+        $ticketTypes = TicketType::active()->with('event')->get();
         
         return view('tickets.pricing.index', compact('pricingRules', 'ticketTypes'));
     }
 
     public function create()
     {
-        $ticketTypes = TicketType::with('event')->get();
-        return view('tickets.pricing.create', compact('ticketTypes'));
+        $ticketTypes = TicketType::active()->with('event')->get();
+        $events = Event::where('end_date', '>=', now())->where('visibility','public')->get();
+        return view('tickets.pricing.create', compact('ticketTypes','events'));
     }
 
     public function store(Request $request)
-    {
+    {   
         $request->validate([
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'name' => 'required|string|max:255',
