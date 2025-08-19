@@ -7,6 +7,11 @@ use App\Models\TicketCategory;
 use App\Models\TicketType;
 use App\Models\TicketPricingRule;
 use App\Models\Event;
+use Illuminate\Support\Str;
+use App\Models\Category;
+use App\Models\Session;
+use App\Models\Booth;
+use Illuminate\Support\Facades\DB;
 
 class TicketSystemSeeder extends Seeder
 {
@@ -32,15 +37,98 @@ class TicketSystemSeeder extends Seeder
             ]);
         }
 
+         $categories = [
+            [ 'name' => 'Technology', 'type' => 'event' ],
+            [ 'name' => 'Health & Wellness', 'type' => 'event' ],
+            [ 'name' => 'Business & Entrepreneurship', 'type' => 'event' ],
+            [ 'name' => 'Education & Training', 'type' => 'event' ],
+            [ 'name' => 'Arts & Culture', 'type' => 'event' ],
+            [ 'name' => 'Sports & Fitness', 'type' => 'event' ],
+            [ 'name' => 'Music & Entertainment', 'type' => 'event' ],
+            [ 'name' => 'Science & Innovation', 'type' => 'event' ],
+        ];
+
+        foreach ($categories as $category) {
+            Category::create([
+                'name' => $category['name'],
+                'slug' => Str::slug($category['name']),
+                'type' => $category['type'],
+            ]);
+        }
+
         // Create sample events if they don't exist
         if (Event::count() == 0) {
-            Event::create([
-                'name' => 'Tech Conference 2025',
-                'description' => 'Annual technology conference',
-                'start_date' => now()->addMonths(3),
-                'end_date' => now()->addMonths(3)->addDays(2),
-                'is_active' => true,
-            ]);
+          
+        $categoryIds = Category::pluck('id')->toArray();
+
+        $events = [];
+
+        // --- 7 past events ---
+        for ($i = 1; $i <= 7; $i++) {
+            $start = now()->subMonths(rand(1,12))->subDays(rand(1,10));
+            $end   = (clone $start)->addDays(rand(1,3));
+
+            $events[] = [
+                'title' => "Past Event $i",
+                'description' => "This is past event number $i",
+                'location' => "City $i",
+                'tags' => 'past,event',
+                'start_date' => $start,
+                'end_date' => $end,
+                'is_featured' => rand(0,1),
+                'visibility' => 'public',
+                'created_by' => rand(1,3),
+                'status' => 'published',
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+            ];
+        }
+
+        // --- 6 current events (ongoing today) ---
+        for ($i = 1; $i <= 6; $i++) {
+            $start = now()->subDays(rand(0,2));
+            $end   = now()->addDays(rand(0,2));
+
+            $events[] = [
+                'title' => "Current Event $i",
+                'description' => "This is current event number $i",
+                'location' => "City $i",
+                'tags' => 'current,event',
+                'start_date' => $start,
+                'end_date' => $end,
+                'is_featured' => rand(0,1),
+                'visibility' => 'public',
+                'created_by' => rand(1,3),
+                'status' => 'published',
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+            ];
+        }
+
+        // --- 7 upcoming events ---
+        for ($i = 1; $i <= 7; $i++) {
+            $start = now()->addMonths(rand(1,12))->addDays(rand(0,5));
+            $end   = (clone $start)->addDays(rand(1,3));
+
+            $events[] = [
+                'title' => "Upcoming Event $i",
+                'description' => "This is upcoming event number $i",
+                'location' => "City $i",
+                'tags' => 'upcoming,event',
+                'start_date' => $start,
+                'end_date' => $end,
+                'is_featured' => rand(0,1),
+                'visibility' => 'public',
+                'created_by' => rand(1,3),
+                'status' => 'draft',
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+            ];
+        }
+
+        // --- Insert all events ---
+        foreach ($events as $event) {
+            Event::create(array_merge($event, [
+                'slug' => Str::slug($event['title'])
+            ]));
+        }
         }
 
         $event = Event::first();
@@ -89,28 +177,56 @@ class TicketSystemSeeder extends Seeder
                 'sale_start_date' => now()->subDays(30),
                 'sale_end_date' => now()->addMonths(2),
             ]);
+        }
 
-            // Create pricing rules for some ticket types
-            if ($ticketType->name === 'General Admission') {
-                // Early bird pricing
-                TicketPricingRule::create([
-                    'ticket_type_id' => $ticketType->id,
-                    'name' => 'Early Bird Discount',
-                    'type' => 'early_bird',
-                    'price' => 249.00,
-                    'start_date' => now()->subDays(30),
-                    'end_date' => now()->addDays(30),
-                    'is_active' => true,
+        $booths = [
+            ['title' => 'Tech Innovations Booth', 'booth_number' => 'B101', 'size' => 'Large', 'location_preferences' => 'Near Entrance'],
+            ['title' => 'AI Showcase Booth', 'booth_number' => 'B102', 'size' => 'Medium', 'location_preferences' => 'Center Hall'],
+            ['title' => 'Health & Wellness Booth', 'booth_number' => 'B103', 'size' => 'Small', 'location_preferences' => 'Near Stage'],
+            ['title' => 'Startup Pitch Booth', 'booth_number' => 'B104', 'size' => 'Medium', 'location_preferences' => 'Back Area'],
+            ['title' => 'Education Expo Booth', 'booth_number' => 'B105', 'size' => 'Large', 'location_preferences' => 'Corner Zone'],
+        ];
+
+        foreach ($booths as $booth) {
+            Booth::create($booth);
+        }
+
+        $events = Event::all();
+        $boothIds = Booth::pluck('id')->toArray();
+
+        foreach ($events as $event) {
+            for ($i = 1; $i <= 5; $i++) {
+                $start = $event->start_date->copy()->addHours($i * 2);
+                $end   = $start->copy()->addHour();
+
+                Session::create([
+                    'event_id'    => $event->id,
+                    'booth_id'    => $boothIds[array_rand($boothIds)], // assign booth from DB
+                    'title'       => "Session $i for " . $event->title,
+                    'description' => "This is session $i of the event " . $event->title,
+                    'start_time'  => $start,
+                    'end_time'    => $end,
+                    'status'      => 'published',
+                    'type'        => ['session','workshop','keynote'][array_rand(['session','workshop','keynote'])],
+                    'capacity'    => rand(50, 200),
                 ]);
+            }
+        }
 
-                // Group discount
-                TicketPricingRule::create([
-                    'ticket_type_id' => $ticketType->id,
-                    'name' => 'Group Discount (5+)',
-                    'type' => 'group',
-                    'price' => 269.00,
-                    'min_quantity' => 5,
-                    'is_active' => true,
+        $sessions = DB::table('event_sessions')->pluck('id')->toArray();
+        $users = DB::table('users')->pluck('id')->toArray();
+
+        foreach ($sessions as $sessionId) {
+            // pick 2 random users for each session
+            $speakers = collect($users)->random(2);
+
+            foreach ($speakers as $userId) {
+                DB::table('session_speakers')->insert([
+                    'session_id' => $sessionId,
+                    'user_id' => $userId,
+                    'role' => collect(['keynote','panelist','moderator'])->random(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         }
