@@ -111,6 +111,8 @@ class RepresentativeUserController extends Controller
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => 'required|string|max:255|email|unique:users,email',
+        'designation' => 'nullable|string|max:255',
+        'tags' => 'nullable|string|max:255',
         'website_url' => 'nullable|url|max:255',
         'linkedin_url' => 'nullable|url|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
@@ -136,6 +138,8 @@ class RepresentativeUserController extends Controller
     $user->name = $request->first_name;
     $user->lastname = $request->last_name;
     $user->email = $request->email;
+    $user->designation = $request->designation;
+    $user->tags = $request->tags;
     $user->website_url = $request->website_url;
     $user->linkedin_url = $request->linkedin_url;
     $user->mobile = $request->mobile;
@@ -200,6 +204,8 @@ class RepresentativeUserController extends Controller
     'first_name' => 'required|string|max:255',
     'last_name' => 'required|string|max:255',
     'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+    'designation' => 'nullable|string|max:255' ,
+    'tags' => 'nullable|string|max:255'  ,
     'website_url' => 'nullable|url|max:255',
     'linkedin_url' => 'nullable|url|max:255',
     'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
@@ -224,6 +230,8 @@ class RepresentativeUserController extends Controller
     $user->name = $request->first_name;
     $user->lastname = $request->last_name;
     $user->email = $request->email;
+    $user->designation = $request->designation;
+    $user->tags = $request->tags;
     $user->website_url = $request->website_url;
     $user->linkedin_url = $request->linkedin_url;
     $user->mobile = $request->mobile;

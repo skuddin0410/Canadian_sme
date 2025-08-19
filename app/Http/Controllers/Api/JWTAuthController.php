@@ -267,39 +267,36 @@ class JWTAuthController extends Controller
         ]);
     }
 
+    // public function getUser() {
+    //     try {
+    //         if (! $user = JWTAuth::parseToken()->authenticate()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'User not found.',
+    //                 'data' => collect(),
+    //             ], 404);
+    //         }
+
+    //         $photo = $user->load('photo');
+    //         $token = request()->bearerToken() ?? JWTAuth::refresh();
+    //         $roles = $user->getRoleNames();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'successful',
+    //             'data' => compact('user', 'photo', 'roles', 'token'),
+    //         ]);
+    //     } catch (JWTException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Unauthorized',
+    //             'data' => null,
+    //         ], 401);
+    //     }
+    // }
     public function getUser() {
-        try {
-            if (! $user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found.',
-                    'data' => collect(),
-                ], 404);
-            }
-
-            $photo = $user->load('photo');
-            $background = $user->load('background');
-            $bank = $user->load('bank');
-
-            $token = request()->bearerToken() ?? JWTAuth::refresh();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'successful',
-                'data' => compact('user', 'photo', 'background', 'bank', 'token'),
-            ]);
-        } catch (JWTException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-                'data' => null,
-            ], 401);
-        }
-    }
-
-    public function updateUser(Request $request) {
-        $user = JWTAuth::user();
-        if (!$user) {
+    try {
+        if (! $user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
                 'success' => false,
                 'message' => 'User not found.',
@@ -307,76 +304,235 @@ class JWTAuthController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|nullable|string|max:255',
-            'lastname' => 'sometimes|nullable|string|max:255',
-            'email' => 'sometimes|nullable|string|max:255|email|unique:users,email,' . $user->id,
-            'mobile' => 'sometimes|nullable|string|unique:users,mobile,' . $user->id,
-            'username' => 'sometimes|nullable|string|unique:users,username,' . $user->id,
-            'dob' => 'sometimes|nullable|date|date_format:Y-m-d|before_or_equal:' . date('Y-m-d', strtotime('-18 years')),
-            'gender' => 'sometimes|nullable|string|max:255',
-            'place' => 'sometimes|nullable|string|max:255',
-            'street' => 'sometimes|nullable|string|max:255',
-            'zipcode' => 'sometimes|nullable|string|max:255',
-            'city' => 'sometimes|nullable|string|max:255',
-            'state' => 'sometimes|nullable|string|max:255',
-            'country' => 'sometimes|nullable|string|max:255',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors(),
-                'data' => $request->all(),
-            ], 422);
-        }
+        // Load related photo once
+        $user->load('photo'); 
 
-        if ($request->name) {
-            $user->name = $request->name;
-        }
-        if ($request->lastname) {
-            $user->lastname = $request->lastname;
-        }
-        if ($request->email) {
-            $user->email = $request->email;
-        }
-        if ($request->mobile) {
-            $user->mobile = $request->mobile;
-        }
-        if ($request->username) {
-            $user->username = $request->username;
-        }
-        if ($request->dob) {
-            $user->dob = $request->dob;
-        }
-        if ($request->gender) {
-            $user->gender = $request->gender;
-        }
-        if ($request->place) {
-            $user->place = $request->place;
-        }
-        if ($request->street) {
-            $user->street = $request->street;
-        }
-        if ($request->zipcode) {
-            $user->zipcode = $request->zipcode;
-        }
-        if ($request->city) {
-            $user->city = $request->city;
-        }
-        if ($request->state) {
-            $user->state = $request->state;
-        }
-        if ($request->country) {
-            $user->country = $request->country;
-        }
-        $user->save();
+        // Get Bearer token or refresh
+        $token = request()->bearerToken() ?? JWTAuth::refresh();
+
+        // Roles
+        $roles = $user->getRoleNames();
+
+        // Build address object
+        $address = [
+            'street'   => $user->address ?? null,
+            'city'     => $user->city ?? null,
+            'state'    => $user->state ?? null,
+            'country'  => $user->country ?? null,
+            'zipcode'  => $user->zipcode ?? null,
+        ];
 
         return response()->json([
             'success' => true,
             'message' => 'successful',
-            'data' => compact('user'),
+            'data' => [
+                // full user info like before
+                'user' => [
+                    'id'        => $user->id,
+                    'name'      => $user->name,
+                    'lastname'  => $user->lastname,
+                    'full_name' => $user->full_name,
+                    'email'     => $user->email,
+                    'mobile'    => $user->mobile,
+                    'gender'    => $user->gender,
+                    'dob'       => $user->dob,
+                    'company'   => $user->company,
+                    'designation'=> $user->designation,
+                    'about'     => $user->about,
+                    'tags'      => $user->tags,
+                    'status'    => $user->status,
+                    'created_at'=> $user->created_at,
+                    'updated_at'=> $user->updated_at,
+                    // merged address
+                    'address'   => $address,
+                ],
+                'photo' => $user->photo, // photo relation
+                'roles' => $roles,       // roles separately
+                'token' => $token,
+            ],
         ]);
+
+    } catch (JWTException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized',
+            'data' => null,
+        ], 401);
     }
+}
+
+
+    // public function updateUser(Request $request) {
+    //     $user = JWTAuth::user();
+    //     if (!$user) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'User not found.',
+    //             'data' => collect(),
+    //         ], 404);
+    //     }
+
+    //     $validator = Validator::make($request->all(), [
+    //         'name' => 'sometimes|nullable|string|max:255',
+    //         'lastname' => 'sometimes|nullable|string|max:255',
+    //         'email' => 'sometimes|nullable|string|max:255|email|unique:users,email,' . $user->id,
+            
+    //         'mobile' => 'sometimes|nullable|string|unique:users,mobile,' . $user->id,
+    //         'username' => 'sometimes|nullable|string|unique:users,username,' . $user->id,
+    //         'dob' => 'sometimes|nullable|date|date_format:Y-m-d|before_or_equal:' . date('Y-m-d', strtotime('-18 years')),
+    //         'gender' => 'sometimes|nullable|string|max:255',
+    //         'place' => 'sometimes|nullable|string|max:255',
+    //         'street' => 'sometimes|nullable|string|max:255',
+    //         'zipcode' => 'sometimes|nullable|string|max:255',
+    //         'city' => 'sometimes|nullable|string|max:255',
+    //         'state' => 'sometimes|nullable|string|max:255',
+    //         'country' => 'sometimes|nullable|string|max:255',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $validator->errors(),
+    //             'data' => $request->all(),
+    //         ], 422);
+    //     }
+
+    //     if ($request->name) {
+    //         $user->name = $request->name;
+    //     }
+    //     if ($request->lastname) {
+    //         $user->lastname = $request->lastname;
+    //     }
+    //     if ($request->email) {
+    //         $user->email = $request->email;
+    //     }
+    //     if ($request->mobile) {
+    //         $user->mobile = $request->mobile;
+    //     }
+    //     if ($request->username) {
+    //         $user->username = $request->username;
+    //     }
+    //     if ($request->dob) {
+    //         $user->dob = $request->dob;
+    //     }
+    //     if ($request->gender) {
+    //         $user->gender = $request->gender;
+    //     }
+    //     if ($request->place) {
+    //         $user->place = $request->place;
+    //     }
+    //     if ($request->street) {
+    //         $user->street = $request->street;
+    //     }
+    //     if ($request->zipcode) {
+    //         $user->zipcode = $request->zipcode;
+    //     }
+    //     if ($request->city) {
+    //         $user->city = $request->city;
+    //     }
+    //     if ($request->state) {
+    //         $user->state = $request->state;
+    //     }
+    //     if ($request->country) {
+    //         $user->country = $request->country;
+    //     }
+    //     $user->save();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'successful',
+    //         'data' => compact('user'),
+    //     ]);
+    // }
+    public function updateUser(Request $request)
+{
+    try {
+        if (! $user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.',
+                'data' => collect(),
+            ], 404);
+        }
+
+        // Validate incoming data
+        $validated = $request->validate([
+            'name'        => 'nullable|string|max:255',
+            'lastname'    => 'nullable|string|max:255',
+            'email'       => 'nullable|email|unique:users,email,' . $user->id,
+            'mobile'      => 'nullable|string|max:20',
+            'gender'      => 'nullable|in:male,female,other',
+            'dob'         => 'nullable|date',
+            'company'     => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
+            'about'       => 'nullable|string',
+            'tags'        => 'nullable|string',
+            'status'      => 'nullable|in:active,inactive',
+            // address fields
+            'street'      => 'nullable|string|max:255',
+            'city'        => 'nullable|string|max:255',
+            'state'       => 'nullable|string|max:255',
+            'country'     => 'nullable|string|max:255',
+            'zipcode'     => 'nullable|string|max:20',
+        ]);
+
+        // Update user with validated data
+        $user->update($validated);
+
+        // Reload relations
+        $user->load('photo');
+
+        // Build address object
+        $address = [
+            'street'   => $user->street ?? null,
+            'city'     => $user->city ?? null,
+            'state'    => $user->state ?? null,
+            'country'  => $user->country ?? null,
+            'zipcode'  => $user->zipcode ?? null,
+        ];
+
+        // Get user roles
+        $roles = $user->getRoleNames();
+
+        // Fresh token
+        $token = request()->bearerToken() ?? JWTAuth::refresh();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully.',
+            'data' => [
+                'user' => [
+                    'id'         => $user->id,
+                    'name'       => $user->name,
+                    'lastname'   => $user->lastname,
+                    'full_name'  => $user->full_name,
+                    'email'      => $user->email,
+                    'mobile'     => $user->mobile,
+                    'gender'     => $user->gender,
+                    'dob'        => $user->dob,
+                    'company'    => $user->company,
+                    'designation'=> $user->designation,
+                    'about'      => $user->about,
+                    'tags'       => $user->tags,
+                    'status'     => $user->status,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                    'address'    => $address,
+                ],
+                'photo' => $user->photo,
+                'roles' => $roles,
+                'token' => $token,
+            ],
+        ]);
+
+    } catch (JWTException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized',
+            'data' => null,
+        ], 401);
+    }
+}
+
 
     public function changePassword(Request $request) {
         $user = JWTAuth::user();

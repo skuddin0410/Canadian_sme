@@ -65,6 +65,7 @@ Admin | Exhibitor Representative Details
                                     <li class="mb-3"><span class="fw-medium me-2">User Name:</span> <span>{{ $user->username ?? '' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">DOB:</span> <span>{{ $user->dob ? dateFormat($user->dob) : '' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Email:</span> <span>{{ $user->email }}</span></li>
+                                     <li class="mb-3"><span class="fw-medium me-2">Designation:</span> <span>{{ $user->designation ?? '-' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Mobile:</span> <span>{{ $user->mobile ?? '' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Gender:</span> <span>{{ $user->gender ?? '' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Place:</span> <span>{{ $user->place ?? '' }}</span></li>
@@ -80,6 +81,16 @@ Admin | Exhibitor Representative Details
                                     <li class="mb-3"><span class="fw-medium me-2">State:</span> <span>{{ $user->state ?? '' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Country:</span> <span>{{ $user->country ?? '' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Referral coupon:</span> <span>{{ $user->referral_coupon ?? '' }}</span></li>
+                                     
+                                    <li class="mb-3"><span class="fw-medium me-2">Tags:</span> 
+                                        @if(!empty($user->tags))
+                                            @foreach(explode(',', $user->tags) as $tag)
+                                                <span class="badge bg-primary me-1">{{ trim($tag) }}</span>
+                                            @endforeach
+                                        @else
+                                            <span>-</span>
+                                        @endif
+                                    </li>
                                     
                                 </ul>
                             </div>
