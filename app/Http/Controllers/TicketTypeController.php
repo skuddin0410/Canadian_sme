@@ -38,7 +38,7 @@ class TicketTypeController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {   
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'category_id' => 'nullable|exists:ticket_categories,id',

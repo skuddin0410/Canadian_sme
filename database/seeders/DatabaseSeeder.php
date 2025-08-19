@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class, // php artisan db:seed --class=AdminSeeder
             UserSeeder::class,
             SettingSeeder::class, // php artisan db:seed --class=SettingSeeder
-            AccountManagerPermissionSeeder::class
-           // SpinnerSeeder::class, // php artisan db:seed --class=SpinnerSeeder
+            AccountManagerPermissionSeeder::class,
+            TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
         ]);
     }
 }

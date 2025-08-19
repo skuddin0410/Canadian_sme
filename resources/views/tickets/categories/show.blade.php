@@ -185,16 +185,6 @@
                             @endif
                         </div>
                     </div>
-
-                    <!-- Category Performance Chart -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Category Performance Over Time</h5>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="performanceChart" height="300"></canvas>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Sidebar -->
@@ -253,72 +243,9 @@
                         </div>
                     </div>
 
-                    <!-- Category Statistics -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Statistics</h5>
-                        </div>
-                        <div class="card-body">
-                            @php
-                                $activeTicketTypes = $ticketCategory->ticketTypes->where('is_active', true)->count();
-                                $totalInventory = $ticketCategory->ticketTypes->sum('total_quantity');
-                                $availableInventory = $ticketCategory->ticketTypes->sum('available_quantity');
-                                $soldInventory = $totalInventory - $availableInventory;
-                                $minPrice = $ticketCategory->ticketTypes->min('base_price');
-                                $maxPrice = $ticketCategory->ticketTypes->max('base_price');
-                            @endphp
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Active Ticket Types</small>
-                                    <small>{{ $activeTicketTypes }}/{{ $ticketCategory->ticketTypes->count() }}</small>
-                                </div>
-                                @if($ticketCategory->ticketTypes->count() > 0)
-                                    @php $activePercentage = ($activeTicketTypes / $ticketCategory->ticketTypes->count()) * 100; @endphp
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-success" style="width: {{ $activePercentage }}%"></div>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small>Inventory Utilization</small>
-                                    <small>{{ $totalInventory > 0 ? round(($soldInventory / $totalInventory) * 100) : 0 }}%</small>
-                                </div>
-                                @if($totalInventory > 0)
-                                    @php $utilizationPercentage = ($soldInventory / $totalInventory) * 100; @endphp
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-info" style="width: {{ $utilizationPercentage }}%"></div>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <h6 class="text-muted mb-1">Price Range</h6>
-                                    @if($minPrice && $maxPrice)
-                                        <p class="mb-0">
-                                            ${{ number_format($minPrice, 2) }}
-                                            @if($minPrice != $maxPrice)
-                                                - ${{ number_format($maxPrice, 2) }}
-                                            @endif
-                                        </p>
-                                    @else
-                                        <p class="text-muted mb-0">N/A</p>
-                                    @endif
-                                </div>
-                                <div class="col-6">
-                                    <h6 class="text-muted mb-1">Total Revenue</h6>
-                                    @php $totalRevenue = $soldInventory * $avgPrice; @endphp
-                                    <p class="mb-0">${{ number_format($totalRevenue, 2) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Quick Actions -->
-                    <div class="card">
+                    {{-- <div class="card">
                         <div class="card-header">
                             <h5 class="card-title mb-0">Quick Actions</h5>
                         </div>
@@ -361,7 +288,7 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -394,49 +321,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    initPerformanceChart();
-});
-
-function initPerformanceChart() {
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    
-    // Mock data - replace with actual API data
-    const chartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-            label: 'Tickets Sold',
-            data: [12, 19, 8, 15, 20, 25],
-            borderColor: '{{ $ticketCategory->color }}',
-            backgroundColor: '{{ $ticketCategory->color }}33',
-            tension: 0.4
-        }]
-    };
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
 
 function duplicateCategory() {
     if (confirm('Create a copy of this category?')) {

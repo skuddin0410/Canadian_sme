@@ -63,8 +63,10 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
 
-                                <div class="mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                     <label for="name" class="form-label">Ticket Type Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                            id="name" name="name" value="{{ old('name') }}" 
@@ -73,6 +75,27 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="session_id" class="font-weight-bold">
+                                                Session <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-control @error('session_id') is-invalid @enderror" 
+                                                    id="session_id" name="session_id" required>
+                                                <option value="">Select Event First</option>
+                                            </select>
+                                            @error('session_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                               </div>
+
+                                
+
+
 
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Description</label>
@@ -85,7 +108,7 @@
                                 </div>
                             </div>
                         </div>
-
+             
                         <!-- Pricing & Inventory -->
                         <div class="card mb-4">
                             <div class="card-header">
@@ -186,6 +209,128 @@
                                 </div>
                             </div>
                         </div>
+
+                           <!-- Early Bird Pricing -->
+                <div class="card shadow mb-4" id="earlyBird">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-clock me-2"></i>Early Bird Pricing
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="enable_early_bird" 
+                                       name="enable_early_bird" value="1" {{ old('enable_early_bird') ? 'checked' : '' }}>
+                                <label class="custom-control-label font-weight-bold" for="enable_early_bird">
+                                    Enable Early Bird Pricing
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Offer discounted pricing for early bookings</small>
+                        </div>
+
+                        <div id="earlyBirdSettings" style="display: {{ old('enable_early_bird') ? 'block' : 'none' }};">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="early_bird_price" class="font-weight-bold">Early Bird Price</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">$</span>
+                                            </div>
+                                            <input type="number" class="form-control @error('early_bird_price') is-invalid @enderror" 
+                                                   id="early_bird_price" name="early_bird_price" 
+                                                   value="{{ old('early_bird_price', '0.00') }}" step="0.01" min="0">
+                                        </div>
+                                        @error('early_bird_price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                    
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="early_bird_quantity" class="font-weight-bold">Early Bird Quantity</label>
+                                        <input type="number" class="form-control @error('early_bird_quantity') is-invalid @enderror" 
+                                               id="early_bird_quantity" name="early_bird_quantity" 
+                                               value="{{ old('early_bird_quantity', '50') }}" min="1">
+                                        <small class="form-text text-muted">Limited quantity at early bird price</small>
+                                        @error('early_bird_quantity')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                   <div class="card shadow mb-4" id="grouptTicket">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-users me-2"></i>Group Ticket Configuration
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="is_group" name="is_group" 
+                                       value="1" {{ old('is_group') ? 'checked' : '' }}>
+                                <label class="custom-control-label font-weight-bold" for="is_group">
+                                    Enable Group Ticket
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Allow this ticket to be purchased as a group package</small>
+                        </div>
+
+                        <div id="groupSettings" style="display: {{ old('is_group') ? 'block' : 'none' }};">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="group_size" class="font-weight-bold">Group Size</label>
+                                        <input type="number" class="form-control @error('group_size') is-invalid @enderror" 
+                                               id="group_size" name="group_size" value="{{ old('group_size', '5') }}" 
+                                               min="2">
+                                        <small class="form-text text-muted">Number of people included in group ticket</small>
+                                        @error('group_size')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="group_discount" class="font-weight-bold">Group Discount (%)</label>
+                                        <input type="number" class="form-control @error('group_discount') is-invalid @enderror" 
+                                               id="group_discount" name="group_discount" value="{{ old('group_discount', '10') }}" 
+                                               min="0" max="100" step="0.01">
+                                        <small class="form-text text-muted">Discount percentage for group bookings</small>
+                                        @error('group_discount')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Create Ticket Type
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                     </div>
 
                     <!-- Settings Sidebar -->
@@ -207,7 +352,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
+                                {{-- <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" class="form-check-input" id="requires_approval" 
                                                name="requires_approval" value="1" {{ old('requires_approval') ? 'checked' : '' }}>
@@ -216,12 +361,12 @@
                                             <div class="form-text">Bookings need manual approval</div>
                                         </label>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
 
                         <!-- Access Permissions -->
-                        <div class="card mb-4">
+                        <!---<div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">Access Permissions</h5>
                             </div>
@@ -270,7 +415,7 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
+                        </div>--->
 
                         <!-- Preview -->
                         <div class="card">
@@ -296,31 +441,93 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Form Actions -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('admin.ticket-types.index') }}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">
-                                        <i class="fas fa-times"></i> Cancel
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Create Ticket Type
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </form>
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Load sessions when event is selected
+        $('#event_id').change(function() {
+            const eventId = $(this).val();
+            const sessionSelect = $('#session_id');
+            
+            sessionSelect.html('<option value="">Loading sessions...</option>').prop('disabled', true);
+            
+            if (eventId) {
+                $.ajax({
+                    url: `/events/${eventId}/sessions`,
+                    method: 'GET',
+                    success: function(response) {
+                        sessionSelect.html('<option value="">Select Session</option>').prop('disabled', false);
+                     
+                        if (response.sessions && response.sessions.length > 0) {
+                            response.sessions.forEach(function(session) {
+                                sessionSelect.append(`<option value="${session.id}">${session.title}</option>`);
+                            });
+                        } else {
+                            sessionSelect.append('<option value="" disabled>No sessions available</option>');
+                        }
+                    },
+                    error: function() {
+                        sessionSelect.html('<option value="">Error loading sessions</option>').prop('disabled', false);
+                    }
+                });
+            } else {
+                sessionSelect.html('<option value="">Select Event First</option>').prop('disabled', false);
+            }
+        });
+
+    $('#grouptTicket').hide(); 
+    $('#earlyBird').hide();
+
+    $('#is_group').change(function() {
+        if ($(this).is(':checked')) {
+            $('#groupSettings').slideDown();
+        } else {
+            $('#groupSettings').slideUp();
+        }
+        
+    });
+
+    // Early bird toggle
+    $('#enable_early_bird').change(function() {
+        if ($(this).is(':checked')) {
+            $('#earlyBirdSettings').slideDown();
+        } else {
+            $('#earlyBirdSettings').slideUp();
+        }
+        
+    });
+    
+    $('#category_id').change(function() {
+        const category_id = $(this).val();
+        const category_name = $.trim($("#category_id option:selected").text());
+
+        if(category_name == 'General' || category_name == 'No Category' || category_name == 'VIP' || category_name == 'Student'){
+           $('#grouptTicket').hide(); 
+           $('#earlyBird').hide();
+        }
+
+        if(category_name == 'Early Bird'){
+           $('#grouptTicket').hide(); 
+           $('#earlyBird').show();
+        }
+
+        if(category_name == 'Group'){
+           $('#grouptTicket').show(); 
+           $('#earlyBird').hide();
+        }
+    });
+    
+
+});
+
+
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Form elements
@@ -424,5 +631,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 </script>
-@endpush
+@endsection

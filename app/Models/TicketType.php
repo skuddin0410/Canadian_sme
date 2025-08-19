@@ -37,10 +37,10 @@ class TicketType extends Model
         return $this->belongsTo(TicketCategory::class, 'category_id');
     }
 
-    public function pricingRules()
-    {
-        return $this->hasMany(TicketPricingRule::class);
-    }
+    // public function pricingRules()
+    // {
+    //     return $this->hasMany(TicketPricingRule::class);
+    // }
 
     public function inventoryLogs()
     {

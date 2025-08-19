@@ -310,4 +310,10 @@ class CalendarController extends Controller
             'sessions' => $updatedSessions
         ]);
     }
+
+    public function eventSessionList(Request $request){
+       $session =Session::where('event_id',$request->event_id)->get(); 
+       return response()->json(['sessions'=>$session , 'length'=>count($session)]);
+
+    }
 }
