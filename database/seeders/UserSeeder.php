@@ -36,6 +36,9 @@ class UserSeeder extends Seeder
             'lastname'=>'Admin',
             'email' => "exhibitor$i@admin.com",
             'mobile' => '12345678',
+            'tags'=>'exhibitor,admin,event',
+            'designation'=>'Event Manager',
+            'bio'=>"This is a short bio for Exhibitor $i. Experienced in event management and exhibitions.",
             'password' => Hash::make('password')
         ]);
         $exhibitorAdmin->assignRole('Exhibitor Admin');
@@ -68,7 +71,10 @@ class UserSeeder extends Seeder
                 'email' => "exhibitor$i@representative.com",
                 'mobile' => '12345678',
                 'password' => Hash::make('password'),
-                'company_id'=>$company->id
+                'company_id'=>$company->id,
+                'tags'=>'Representative, Exhibitor',
+                'designation'=>'Exhibitor Representative',
+                'bio'=>"This is a short bio for Exhibitor Representative $i. Experienced in event management and exhibitions.",
             ]);
             $exhibitorRepresentative->assignRole('Exhibitor Representative');
 
@@ -78,7 +84,10 @@ class UserSeeder extends Seeder
                 'email' => "attendee$i@attendee.com",
                 'mobile' => '12345678',
                 'password' => Hash::make('password'),
-                'company_id'=>$company->id
+                'company_id'=>$company->id,
+                'tags'=>'Attaindee',
+                'designation'=>'Software Engineer',
+                'bio'=>"This is a short bio for Attaindee $i. Experienced in event management and exhibitions.",
             ]);
             $attendee->assignRole('Attendee');
 
