@@ -2,7 +2,7 @@
     <div class="app-brand demo">
         <a href="" class="app-brand-link">
             <span class="app-brand-logo">
-                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="20%">
+                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="55%">
             </span>
         </a>
 
@@ -27,7 +27,7 @@
         <div data-i18n="Products & Services">Products & Services</div>
     </a>
 
-    <ul class="menu-sub">
+    <ul class="menu-sub active">
         <li class="menu-item {{ request()->is('product-categories*') ? 'active' : '' }}">
             <a href="{{route('product-categories.index')}}" class="menu-link">
                 <div data-i18n="Product Categories">Product Categories</div>

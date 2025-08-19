@@ -34,7 +34,7 @@ class ServiceController extends Controller
     if ($request->search) {
         $query->where('name', 'like', '%' . $request->search . '%');
     }
-    $services = $services->where('company_id',auth()->user()->company_id);
+    $query->where('company_id',auth()->user()->company_id);
     $services = $query->orderBy('sort_order')->orderBy('name')->paginate(15);
     $categories = ServiceCategory::all();
 

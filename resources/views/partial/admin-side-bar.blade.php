@@ -2,7 +2,7 @@
     <div class="app-brand demo">
         <a href="" class="app-brand-link">
             <span class="app-brand-logo">
-                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="20%">
+                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="55%">
             </span>
         </a>
 
@@ -62,11 +62,6 @@
                 <div data-i18n="tickets">Tickets</div>
             </a>
             <ul class="menu-sub">
-               {{--  <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }}">
-                    <a href="{{ route('ticket.dashboard') }}" class="menu-link">
-                        <div data-i18n="tickets">Tickets Dashboard</div>
-                    </a>
-                </li> --}}
                 <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
                     <a href="{{ route('admin.ticket-categories.index') }}" class="menu-link">
                         <div data-i18n="ticket-categories"> Ticket categories</div>
@@ -136,17 +131,17 @@
                    </a>
                 </li>
             </ul>
-             <ul class="menu-sub">
-                
-                <li class="menu-item {{ request()->is('admin-users') ? 'active open' : '' }}">
-                   <a href="{{ url('newsletters') }}" class="menu-link">
-                    <div data-i18n="newsletters">Newsletter</div>
-                   </a>
-                </li>
-            </ul>
         </li>   
         @endif
         
+         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        <li class="menu-item {{ request()->is('newsletters*') ? 'active open' : '' }}">
+            <a href="{{ url('newsletters') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                <div data-i18n="newsletters">Newsletter</div>
+            </a>
+        </li>
+        @endif 
 
          @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
         <li class="menu-item {{ request()->is('audit*') ? 'active open' : '' }}">

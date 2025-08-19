@@ -34,7 +34,7 @@ Route::group(['middleware' => ['company.exists']], function () {
 
     Route::resource('trainings', TrainingController::class);
     Route::resource('company', CompanyController::class);
-    //  Route::resource('attendee-users', AttendeeUserController::class);
+    Route::resource('attendee-users', AttendeeUserController::class);
 
     // Product Categories
     Route::resource('product-categories', ProductCategoryController::class);
