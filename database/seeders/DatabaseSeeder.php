@@ -13,7 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
         $this->call([
             RoleSeeder::class, // php artisan db:seed --class=RoleSeeder
             AdminSeeder::class, // php artisan db:seed --class=AdminSeeder
@@ -21,6 +20,12 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class, // php artisan db:seed --class=SettingSeeder
             AccountManagerPermissionSeeder::class,
             TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
+            PagesSeeder::class,
+            ProductsCategoriesSeeder::class,
+            ProductsSeeder::class,
+            ProductTechnicalSpecsSeeder::class,
+            ServiceCategoriesSeeder::class,
+            ServicesSeeder::class
         ]);
     }
 }
