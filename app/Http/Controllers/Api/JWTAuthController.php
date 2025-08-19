@@ -335,6 +335,7 @@ return response()->json([
             'designation'=> $user->designation,
             'bio'       => $user->about,
             'tags'      => $user->tags,
+            'qr_code' => $user-> qr_code,
             'address'   => [
                 'street'  => $user->street,
                 'city'    => $user->city,
