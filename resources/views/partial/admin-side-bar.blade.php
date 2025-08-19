@@ -62,11 +62,11 @@
                 <div data-i18n="tickets">Tickets</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }}">
+               {{--  <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }}">
                     <a href="{{ route('ticket.dashboard') }}" class="menu-link">
                         <div data-i18n="tickets">Tickets Dashboard</div>
                     </a>
-                </li>
+                </li> --}}
                 <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
                     <a href="{{ route('admin.ticket-categories.index') }}" class="menu-link">
                         <div data-i18n="ticket-categories"> Ticket categories</div>
@@ -75,18 +75,6 @@
                  <li class="menu-item {{ request()->is('admin/ticket-types*') ? 'active open' : '' }}">
                     <a href="{{ route('admin.ticket-types.index') }}" class="menu-link">
                         <div data-i18n="ticket-types"> Ticket Types</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }}">
-                    <a href="{{ route('admin.ticket-inventory.index') }}" class="menu-link">
-                        <div data-i18n="ticket-inventory"> Ticket inventory</div>
-                    </a>
-                </li>
-
-                 <li class="menu-item {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
-                    <a href="{{ route('admin.ticket-pricing.index') }}" class="menu-link">
-                        <div data-i18n="ticket-pricing"> Ticket pricing setup</div>
                     </a>
                 </li>
 
