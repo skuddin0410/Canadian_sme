@@ -16,25 +16,42 @@
             <h1 class="h4 fw-bold text-dark mb-1">Lead Management</h1>
             <p class="text-muted mb-0">Manage and track your event leads</p>
         </div>
-        <div class="mt-3 mt-md-0">
+        <div class="mt-3 mt-md-0 d-flex flex-column align-items-md-end">
             <a href="{{ route('leads.create') }}" class="btn btn-primary">
                 <i class="fa fa-plus me-2"></i> Add New Lead
             </a>
+
+
+             <div class="btn-group mt-4">
+            <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-download me-2"></i> Export
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="{{ route('leads.export', 'xlsx') }}">
+                        <i class="fa fa-file-excel me-1 text-success"></i> Excel
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('leads.export', 'csv') }}">
+                        <i class="fa fa-file-csv me-1 text-info"></i> CSV
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('leads.export', 'crm') }}">
+                        <i class="fa fa-database me-1 text-warning"></i> CRM
+                    </a>
+                </li>
+            </ul>
+        </div>
         </div>
         
     </div>
+  
     <div class="mb-3">
-        <a href="{{ route('leads.export', 'xlsx') }}" class="btn btn-primary btn-sm">
-        <i class="fa fa-file-excel me-1"></i> Export Excel
-         </a>
-        <a href="{{ route('leads.export', 'csv') }}" class="btn btn-primary btn-sm">
-        <i class="fa fa-file-csv me-1"></i> Export CSV
-        </a>
-        <a href="{{ route('leads.export', 'crm') }}" class="btn btn-primary btn-sm">
-        <i class="fa fa-database me-1"></i> Export CRM
-        </a>
     
-    </div>
+</div>
+
 
 
     <!-- Filters + Advanced Search -->
