@@ -294,23 +294,63 @@ public function index(Request $request)
         return redirect()->route('leads.index')
             ->with('success', 'Lead deleted successfully!');
     }
-    public function export(Request $request, $format = 'xlsx')
+//     public function export(Request $request, $format = 'xlsx')
+// {
+//     $fileName = 'leads_export_' . now()->format('Y_m_d_H_i_s');
+
+//     switch($format) {
+//         case 'csv':
+//             $fileName .= '.csv';
+//             break;
+//         case 'xls':
+//             $fileName .= '.xls';
+//             break;
+//         case 'crm': // CRM-Compatible format
+//             $fileName .= '_crm.csv'; 
+//             break;
+//         case 'xlsx':
+//         default:
+//             $fileName .= '.xlsx';
+//             break;
+//     }
+//        if ($format === 'crm') {
+//         return Excel::download(new LeadsCrmExport, $fileName, \Maatwebsite\Excel\Excel::CSV);
+//     }
+
+//     return Excel::download(new LeadsExport, $fileName);
+// }
+public function export(Request $request, $format = 'xlsx')
 {
     $fileName = 'leads_export_' . now()->format('Y_m_d_H_i_s');
 
     switch($format) {
         case 'csv':
             $fileName .= '.csv';
+            $exportFormat = 'default';
+            $writerType = \Maatwebsite\Excel\Excel::CSV;
             break;
+
         case 'xls':
             $fileName .= '.xls';
+            $exportFormat = 'default';
+            $writerType = \Maatwebsite\Excel\Excel::XLS;
             break;
+
+        case 'crm': // CRM-Compatible format
+            $fileName .= '_crm.csv'; 
+            $exportFormat = 'crm';
+            $writerType = \Maatwebsite\Excel\Excel::CSV;
+            break;
+
         case 'xlsx':
         default:
             $fileName .= '.xlsx';
+            $exportFormat = 'default';
+            $writerType = \Maatwebsite\Excel\Excel::XLSX;
             break;
     }
 
-    return Excel::download(new LeadsExport, $fileName);
+    return Excel::download(new LeadsExport($exportFormat), $fileName, $writerType);
 }
+
 }

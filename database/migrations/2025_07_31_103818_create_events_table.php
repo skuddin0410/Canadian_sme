@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('location')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->string('youtube_link')->nullable();
             $table->enum('status', ['draft', 'published', 'cancelled'])->default('draft');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();

@@ -73,6 +73,11 @@ class EventController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:draft,published,cancelled',
+            'youtube_link' => [
+            'nullable',
+            'url',
+            'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
+        ],
             'visibility' => 'required|in:public,private,unlisted',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
@@ -113,6 +118,11 @@ class EventController extends Controller
             'location' => 'nullable|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'youtube_link' => [
+            'nullable',
+            'url',
+            'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
+        ],
             'status' => 'required|in:draft,published,cancelled',
             'visibility' => 'required|in:public,private,unlisted',
             'meta_title' => 'nullable|string|max:255',

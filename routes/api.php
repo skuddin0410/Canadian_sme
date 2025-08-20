@@ -22,6 +22,9 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::put('/', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUser']);
       
     });
+    Route::get('/exhibitors/{exhibitorId}', [App\Http\Controllers\Api\JWTAuthController::class, 'getExhibitor']);
+    Route::get('/speakers', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeaker']);
+    Route::get('/tags', [App\Http\Controllers\Api\JWTAuthController::class, 'getTags']);
 
     Route::prefix('password')->group(function () {
         Route::post('/change', [App\Http\Controllers\Api\JWTAuthController::class, 'changePassword']);

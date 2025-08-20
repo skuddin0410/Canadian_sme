@@ -112,9 +112,9 @@ class OtpController extends Controller
         $user = JWTAuth::user();
 
         return response()->json([
-            'success' => true,
-            'message' => 'successful',
-            'data'    => compact('user', 'token'),
+            // 'success' => true,
+            'message' => 'Login successful',
+            'data'    => compact( 'token'),
         ]);
 
     } catch (JWTException $e) {

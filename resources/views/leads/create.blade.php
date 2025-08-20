@@ -106,22 +106,7 @@
 
                 {{-- Desired Amenities --}}
                 <h5 class="fw-bold mb-3">Desired Amenities</h5>
-                {{-- @php
-                    $amenities = ['parking','gym','pool','laundry','pet_friendly','balcony','concierge','storage'];
-                @endphp
-                <div class="row">
-                    @foreach($amenities as $amenity)
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="desired_amenities[]" value="{{ $amenity }}" 
-                                    {{ in_array($amenity, old('desired_amenities', [])) ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    {{ ucfirst(str_replace('_',' ',$amenity)) }}
-                                </label>
-                            </div>
-                        </div>
-                    @endforeach
-                </div> --}}
+                
                 @php
     $amenities = ['parking','gym','pool','laundry','pet_friendly','balcony','concierge','storage'];
     $selectedAmenities = old('desired_amenities', []);
@@ -142,6 +127,7 @@
         </div>
     @endforeach
 </div>
+
 <hr class="my-4">
 
 {{-- Lead Organization: Tagging System --}}
@@ -162,6 +148,29 @@
             </div>
         </div>
     @endforeach
+</div>
+<hr class="my-4">
+
+{{-- Custom Fields --}}
+<h5 class="fw-bold mb-3">Custom Fields</h5>
+ <p class="text-black">Add Company-specific information and notes:</p>
+<div id="custom-fields-wrapper">
+    <div class="row g-3 mb-2 custom-field">
+        <div class="col-md-5">
+            <input type="text" name="custom_fields[0][key]" class="form-control" placeholder="Field Name">
+        </div>
+        <div class="col-md-5">
+            <input type="text" name="custom_fields[0][value]" class="form-control" placeholder="Field Value">
+        </div>
+        <div class="col-md-2 d-flex align-items-center">
+            <button type="button" class="btn btn-success btn-sm add-field me-2">
+                <i class="fa fa-plus"></i>
+            </button>
+            <button type="button" class="btn btn-danger btn-sm remove-field">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 
@@ -187,6 +196,163 @@
 </div>
 @endsection
 
-@push('scripts')
+{{-- @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-@endpush
+<script>
+    let fieldIndex = 1;
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-field')) {
+            e.preventDefault();
+            let wrapper = document.getElementById('custom-fields-wrapper');
+
+            let newField = document.createElement('div');
+            newField.classList.add('row', 'g-3', 'mb-2', 'custom-field');
+            newField.innerHTML = `
+                <div class="col-md-5">
+                    <input type="text" name="custom_fields[${fieldIndex}][key]" class="form-control" placeholder="Field Name">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="custom_fields[${fieldIndex}][value]" class="form-control" placeholder="Field Value">
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-success btn-sm add-field me-2">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm remove-field">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            wrapper.appendChild(newField);
+            fieldIndex++;
+        }
+
+        if (e.target.closest('.remove-field')) {
+            e.preventDefault();
+            let field = e.target.closest('.custom-field');
+            if (field.parentNode.children.length > 1) {
+                field.remove();
+            }
+        }
+    });
+</script>
+<script>
+    let fieldIndex = 1;
+
+    function refreshButtons() {
+        let fields = document.querySelectorAll('#custom-fields-wrapper .custom-field');
+        fields.forEach((field, idx) => {
+            let addBtn = field.querySelector('.add-field');
+            let removeBtn = field.querySelector('.remove-field');
+
+            // Only last row shows +
+            if (addBtn) addBtn.style.display = (idx === fields.length - 1) ? 'inline-block' : 'none';
+
+            // First row cannot be removed
+            if (removeBtn) removeBtn.style.display = (fields.length > 1) ? 'inline-block' : 'none';
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        // Add field
+        if (e.target.matches('.add-field, .add-field *')) {
+            e.preventDefault();
+            let wrapper = document.getElementById('custom-fields-wrapper');
+
+            let newField = document.createElement('div');
+            newField.classList.add('row', 'g-3', 'mb-2', 'custom-field');
+            newField.innerHTML = `
+                <div class="col-md-5">
+                    <input type="text" name="custom_fields[${fieldIndex}][key]" class="form-control" placeholder="Field Name">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="custom_fields[${fieldIndex}][value]" class="form-control" placeholder="Field Value">
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-success btn-sm add-field me-2">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm remove-field">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            wrapper.appendChild(newField);
+            fieldIndex++;
+
+            refreshButtons();
+        }
+
+        // Remove field
+        if (e.target.matches('.remove-field, .remove-field *')) {
+            e.preventDefault();
+            let field = e.target.closest('.custom-field');
+            if (field && document.querySelectorAll('#custom-fields-wrapper .custom-field').length > 1) {
+                field.remove();
+            }
+            refreshButtons();
+        }
+    });
+
+    // Initial setup
+    refreshButtons();
+</script>
+
+@endpush --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let fieldIndex = 1;
+
+    function refreshRemoveButtons() {
+        let fields = document.querySelectorAll('#custom-fields-wrapper .custom-field');
+        fields.forEach((field, index) => {
+            let removeBtn = field.querySelector('.remove-field');
+            if (removeBtn) {
+                removeBtn.style.display = (index === 0) ? 'none' : 'inline-block';
+            }
+        });
+    }
+
+    document.getElementById('custom-fields-wrapper').addEventListener('click', function (e) {
+        // Add new field
+        if (e.target.closest('.add-field')) {
+            e.preventDefault();
+            let wrapper = document.getElementById('custom-fields-wrapper');
+            let newField = document.createElement('div');
+            newField.classList.add('row', 'g-3', 'mb-2', 'custom-field');
+            newField.innerHTML = `
+                <div class="col-md-5">
+                    <input type="text" name="custom_fields[${fieldIndex}][key]" class="form-control" placeholder="Field Name">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="custom_fields[${fieldIndex}][value]" class="form-control" placeholder="Field Value">
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-success btn-sm add-field me-2">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm remove-field">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            wrapper.appendChild(newField);
+            fieldIndex++;
+            refreshRemoveButtons();
+        }
+
+        // Remove field
+        if (e.target.closest('.remove-field')) {
+            e.preventDefault();
+            e.target.closest('.custom-field').remove();
+            refreshRemoveButtons();
+        }
+    });
+
+    // Run once on load
+    refreshRemoveButtons();
+});
+</script>
+
+

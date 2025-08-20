@@ -13,7 +13,7 @@
             <tr>
                 <td>
                     @if($category->image_url)
-                        <img src="{{ $category->image_url }}" alt="{{ $category->name }}" style="max-width: 80px; max-height: 50px;">
+                        <img src="{{ asset('storage/'.$category->image_url) }}" alt="{{ $category->name }}" style="max-width: 80px; max-height: 50px;">
                     @else
                         <span>No Image</span>
                     @endif

@@ -24,14 +24,17 @@
         
     </div>
     <div class="mb-3">
-    <a href="{{ route('leads.export', 'xlsx') }}" class="btn btn-success btn-sm">
+        <a href="{{ route('leads.export', 'xlsx') }}" class="btn btn-primary btn-sm">
         <i class="fa fa-file-excel me-1"></i> Export Excel
-    </a>
-    <a href="{{ route('leads.export', 'csv') }}" class="btn btn-primary btn-sm">
+         </a>
+        <a href="{{ route('leads.export', 'csv') }}" class="btn btn-primary btn-sm">
         <i class="fa fa-file-csv me-1"></i> Export CSV
-    </a>
+        </a>
+        <a href="{{ route('leads.export', 'crm') }}" class="btn btn-primary btn-sm">
+        <i class="fa fa-database me-1"></i> Export CRM
+        </a>
     
-</div>
+    </div>
 
 
     <!-- Filters + Advanced Search -->

@@ -705,7 +705,7 @@ public function updateUser(Request $request)
                 ], 404);
             }
 
-            // Invalidate the token
+        
             JWTAuth::invalidate($token);
 
             return response()->json([
@@ -727,4 +727,166 @@ public function updateUser(Request $request)
             ], 401);
         }
     }
+public function getExhibitor($exhibitorId)
+{
+    try {
+        
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                // 'data'    => collect(),
+            ], 401);
+        }
+
+     
+        $exhibitor = User::find($exhibitorId);
+
+        if (! $exhibitor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load exhibitor details!',
+                'data'    => collect(),
+            ], 404);
+        }
+
+     
+        $response = [
+            'name'     => trim(($exhibitor->name ?? '') . ' ' . ($exhibitor->lastname ?? '')),
+            'word_no'  => $exhibitor->designation ?? '',
+            'location' => trim(($exhibitor->city ?? '') . ', ' . ($exhibitor->country ?? '')),
+            'email'    => $exhibitor->email ?? '',
+            'phone'    => $exhibitor->mobile ?? '',
+            'website'  => $exhibitor->website_url ?? '',
+
+            'social_links' => [
+                ['name' => 'linkedin', 'url' => $exhibitor->linkedin_url ?? ''],
+                ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
+                ['name' => 'instagram', 'url' => $speaker->instagram_url ?? ''],
+                ['name' => 'twitter', 'url' => $speaker->twitter_url ?? ''],
+                ['name' => 'github', 'url' => $speaker->github_url ?? ''],
+
+            ],
+
+            'bio' => $exhibitor->bio ?? '',
+        ];
+
+        return response()->json([
+            'success' => true,
+            // 'message' => 'Exhibitor details fetched successfully',
+            'data'    => $response,
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Something went wrong: ' . $e->getMessage(),
+            'data'    => collect(),
+        ], 500);
+    }
+}
+public function getSpeaker()
+{
+    try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+     
+        $speakers = User::whereHas("roles", function ($q) {
+            $q->where("name", "Speaker");
+        })->get();
+
+        if ($speakers->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!',
+                'data'    => collect(),
+            ], 404);
+        }
+
+        
+        $response = $speakers->map(function ($speaker) {
+            return [
+                'name'     => trim(($speaker->name ?? '') . ' ' . ($speaker->lastname ?? '')),
+                'word_no'  => $speaker->designation ?? '',
+                'location' => trim(($speaker->place ?? '') . ', ' . ($speaker->street ?? '') . ', ' . ($speaker->city ?? '') . '- ' . ($speaker->zipcode ?? '') . ', ' . ($speaker->state ?? '') . ', ' . ($speaker->country ?? '')),
+                'email'    => $speaker->email ?? '',
+                'phone'    => $speaker->mobile ?? '',
+                'website'  => $speaker->website_url ?? '',
+                // 'avatar'   => $speaker->avatar ?? '',
+
+                'social_links' => [
+                    ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
+                    ['name' => 'instagram', 'url' => $speaker->instagram_url ?? ''],
+                    ['name' => 'linkedin', 'url' => $speaker->linkedin_url ?? ''],
+                    ['name' => 'twitter', 'url' => $speaker->twitter_url ?? ''],
+                    ['name' => 'github', 'url' => $speaker->github_url ?? ''],
+                ],
+
+                'bio'            => $speaker->bio ?? '',
+                // 'uploaded_files' => method_exists($speaker, 'files')
+                //     ? $speaker->files->map(function ($file) {
+                //         return [
+                //             'name' => $file->name,
+                //             'url'  => $file->url,
+                //         ];
+                //     })
+                //     : [], 
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $response,
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Something went wrong: ' . $e->getMessage(),
+            'data'    => collect(),
+        ], 500);
+    }
+}
+public function getTags()
+{
+    try {
+     
+        $tags = \App\Models\User::pluck('tags')
+            ->filter() 
+            ->flatMap(function ($tagString) {
+                // handle JSON or comma-separated tags
+                if (is_array($tagString)) {
+                    return $tagString;
+                }
+                return explode(',', $tagString);
+            })
+            ->map(fn($tag) => trim($tag)) // clean spaces
+            ->filter() // remove empty after trim
+            ->unique()
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $tags,
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Something went wrong: ' . $e->getMessage(),
+            'data'    => [],
+        ], 500);
+    }
+}
+
+
+
+
 }

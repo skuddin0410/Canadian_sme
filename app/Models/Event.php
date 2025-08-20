@@ -20,6 +20,7 @@ class Event extends Model
         'location',
         'start_date',
         'end_date',
+        'youtube_link',
         'status',
         'created_by',
         'category_id',
