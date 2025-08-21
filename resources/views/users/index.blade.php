@@ -13,7 +13,7 @@
 				    <h5 class="mb-0"> User List</h5>
 
                     <div class="row justify-content-end" style="width:345px">
-                        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin')) 
+                        @if(Auth::user()->hasRole('Admin') ) 
                         <div class="col-6 text-end"> 
                             <a href="{{route('user_export')}}" class="dt-button create-new btn btn-primary"><span class="d-none d-sm-inline-block">Export User</span></a> 
                         </div> 
@@ -23,7 +23,7 @@
                         </a>
                         </div>
                         @endif
-                        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                        @if(Auth::user()->hasRole('Admin') )
                         <div class="col-12 text-end ml-5 mt-2" style="padding: none!important"> 
 							<a href="{{route('users.create')}}" class="dt-button create-new btn btn-primary">
 								<span>
@@ -102,7 +102,7 @@
             <label for="importType" class="form-label">Import Type</label>
             <select class="form-select" id="importType" name="role" required>
               <option value="">Select role...</option>
-              <option value="Event Admin" >Event Admin</option> 
+              <option value="Admin" >Admin</option> 
 
                   <option value="Admin">Admin</option> 
 

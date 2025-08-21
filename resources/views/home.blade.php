@@ -11,7 +11,7 @@
     </div>
     
     <!-- Statistics Cards -->
-    @if(Auth::user()->hasRole('Event Admin') || Auth::user()->hasRole('Admin'))
+    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Admin'))
     <div class="row">
       <div class="col-xl-4 col-sm-6 col-12">
         <div class="card text-bg-primary">

@@ -15,7 +15,7 @@ class RoleController extends Controller
     public function matrix()
     {
         $roles = Role::whereIn('name', [
-            'Event Admin',
+            'Admin',
             'Admin',
             'Support Staff Or Helpdesk',
             'Registration Desk'

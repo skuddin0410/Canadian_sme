@@ -21,7 +21,7 @@
             </a>
         </li>
         
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        @if(Auth::user()->hasRole('Admin') )
          <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
             <a href="{{ route('pages.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -31,7 +31,7 @@
          
        @endif
 
-       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+       @if(Auth::user()->hasRole('Admin') )
        <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
             <a href="{{route('booths.index')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store-alt"></i>
@@ -46,7 +46,7 @@
         </li>
        @endif
        
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -81,7 +81,7 @@
         </li>
         @endif 
 
-          @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+          @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -104,7 +104,7 @@
         @endif
         
 
-  <!--       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+  <!--       @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('coupons*') ? 'active open' : '' }}">
             <a href="{{ url('coupons') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -115,14 +115,14 @@
 
  
        
-       @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+       @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                 <div data-i18n="Blogs">Users</div>
             </a>
             <ul class="menu-sub">
-                @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                @if(Auth::user()->hasRole('Admin') )
                 <li class="menu-item {{ request()->is('users') ? 'active open' : '' }}">
                    <a href="{{ url('users') }}" class="menu-link">
                     <div data-i18n="Users">All Users</div>
@@ -143,7 +143,7 @@
         </li>
         @endif
         
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('admin-users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -160,7 +160,7 @@
         </li>   
         @endif
         
-         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+         @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('newsletters*') ? 'active open' : '' }}">
             <a href="{{ url('newsletters') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -169,7 +169,7 @@
         </li>
         @endif 
 
-         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+         @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('audit*') ? 'active open' : '' }}">
             <a href="{{ route('audit.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -178,7 +178,7 @@
         </li>
         @endif
 
-         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+         @if(Auth::user()->hasRole('Admin') )
         <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
             <a href="{{ route('roles.matrix') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>

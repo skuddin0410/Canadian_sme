@@ -13,7 +13,7 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0">Page List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
-                        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                        @if(Auth::user()->hasRole('Admin') )
 						<div class="dt-buttons"> 
 							<a href="{{route('pages.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
 								<span><i class="bx bx-plus me-sm-1"></i> 

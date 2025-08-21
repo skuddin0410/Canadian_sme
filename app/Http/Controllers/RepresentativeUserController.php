@@ -287,8 +287,8 @@ class RepresentativeUserController extends Controller
 {
     $currentUser = auth()->user();
 
-    // Admin or Event Admin can block
-    if ($currentUser->hasRole(['Admin', 'Event Admin'])) {
+    // Admin or Admin can block
+    if ($currentUser->hasRole(['Admin', 'Admin'])) {
         // $user->is_block = true;
         // $user->save();
         // return back()->withSuccess('User has been blocked successfully.');

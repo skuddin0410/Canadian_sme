@@ -28,8 +28,8 @@ Admin | Representative Details
                         
                     </div>
                     <div class="d-flex pt-3 justify-content-end">
-                     {{-- Block Button for Admin / Event Admin --}}
-                   @if(Auth::user()->hasAnyRole(['Admin','Event Admin']) 
+                     {{-- Block Button for Admin / Admin --}}
+                   @if(Auth::user()->hasAnyRole(['Admin','Admin']) 
                      && !$user->is_block 
                         && $user->hasAnyRole(['Admin','Representative','Attendee','Speaker']))
                    <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST">

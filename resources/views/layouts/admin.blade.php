@@ -62,7 +62,7 @@
       <div class="layout-container">
         <!-- Menu -->
 
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        @if(Auth::user()->hasRole('Admin') )
             @include('partial.admin-side-bar')
         @endif    
         

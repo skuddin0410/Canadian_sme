@@ -32,7 +32,7 @@ class CalendarController extends Controller
     {
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Admin','Event Admin','Admin']);
+                    $q->whereNotIn("name", ['Admin','Admin','Admin']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
         

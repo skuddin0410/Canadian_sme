@@ -13,7 +13,7 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0"> Exhibitor User List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
-                         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') ||  Auth::user()->hasRole('Admin') )
+                         @if(Auth::user()->hasRole('Admin')  ||  Auth::user()->hasRole('Admin') )
 
 
 						<div class="dt-buttons"> 

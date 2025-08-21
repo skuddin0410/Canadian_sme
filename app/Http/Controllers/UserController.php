@@ -40,7 +40,7 @@ class UserController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["Event Admin",'Admin','Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
+                    $q->whereIn("name", ["Admin",'Admin','Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
                 })->orderBy('created_at', 'DESC');
 
             if ($request->search) {

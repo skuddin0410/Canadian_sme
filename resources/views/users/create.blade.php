@@ -276,7 +276,7 @@
                 <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
                 <select class="form-control" name="user_type">
                  <option value="">Please Select Role</option> 
-                 <option value="Event Admin" {{ old('user_type') =='Event Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Event Admin' ? 'selected' : '' }}>Event Admin</option> 
+                 <option value="Admin" {{ old('user_type') =='Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Admin' ? 'selected' : '' }}>Admin</option> 
 
                   <option value="Admin" {{ old('user_type') =='Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Admin' ? 'selected' : '' }}>Admin</option> 
 

@@ -64,7 +64,7 @@
 		  </div>
 
 		  <div class="col-3 p-1">
-			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
+			@if(Auth::user()->hasRole('Admin') )		
 			  <a href="{{ route("events.edit",["event"=> $event->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
       @endif
 			</div>
@@ -74,7 +74,7 @@
       </div> 
 
       <div class="col-3 p-1">
-			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
+			@if(Auth::user()->hasRole('Admin') )		
 			<form action="{{ route('events.destroy', $event->id) }}" method="post">
               @csrf
               @method('DELETE')
