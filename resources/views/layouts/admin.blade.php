@@ -66,10 +66,10 @@
             @include('partial.admin-side-bar')
         @endif    
         
-        @if(Auth::user()->hasRole('Admin'))
+        {{-- @if(Auth::user()->hasRole('Admin'))
            @include('partial.exhibitor-side-bar')
         @endif 
-        
+         --}}
         @if(Auth::user()->hasRole('Registration Desk'))
            @include('partial.registration-desk-sidebar')
         @endif 
