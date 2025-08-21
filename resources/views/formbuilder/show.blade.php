@@ -3,7 +3,7 @@
 @section('title', $form->title)
 
 @section('content')
-<div class="max-w-2xl mx-auto py-8 px-4">
+<div class="container mx-auto py-8 px-4">
     <div class="bg-white rounded-lg shadow-sm border p-6">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900">{{ $form->title }}</h1>

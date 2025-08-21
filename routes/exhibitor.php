@@ -14,7 +14,7 @@ use App\Http\Controllers\ExhibitorAdmin\ProductTechnicalSpecController;
 use App\Http\Controllers\ExhibitorAdmin\PublicProductServiceController;
 
 
-Route::group(['middleware' => ['webauth', 'role:Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
 Route::group(['middleware' => ['company.exists']], function () {
     Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts.index');
@@ -56,7 +56,7 @@ Route::group(['middleware' => ['company.exists']], function () {
   });
 });
 Route::post('password/email', [\App\Http\Controllers\ExhibitorAdmin\PasswordResetController::class, 'sendResetLinkEmail'])
-    ->middleware(['web', 'auth:exhibitor', 'exhibitor_admin'])
+    ->middleware(['web'])
     ->name('exhibitor.password.email');
 
 
@@ -66,9 +66,4 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('products/{slug}', [PublicProductServiceController::class, 'productDetail'])->name('products.show');
     Route::get('services', [PublicProductServiceController::class, 'services'])->name('services');
     Route::get('services/{slug}', [PublicProductServiceController::class, 'serviceDetail'])->name('services.show');
-});
-
-Route::group(['middleware' => ['webauth', 'role:Representative']], function () {
-
-	
 });
