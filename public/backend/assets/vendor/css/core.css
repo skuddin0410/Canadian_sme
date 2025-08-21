@@ -16966,7 +16966,7 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
   flex: none;
 }
 .menu-vertical .menu-sub .menu-link {
-  padding-left: 3rem;
+  padding-left: 2rem;
 }
 .menu-vertical .menu-sub .menu-sub .menu-link {
   padding-left: 3.65rem;
