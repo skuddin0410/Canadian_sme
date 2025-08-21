@@ -81,7 +81,18 @@ class HomeController extends Controller
 
 
             $user = auth()->user();
-            User::where('id',$user->id)->update(['name' =>$request->name,'lastname' =>$request->lastname,'mobile' =>$request->contact_number,'designation' =>$request->designation]);
+            User::where('id',$user->id)->update([
+                'name' =>$request->name,
+                'lastname' =>$request->lastname,
+                'mobile' =>$request->contact_number,
+                'designation' =>$request->designation,
+                'website_url' =>$request->website_url,
+                'linkedin_url' =>$request->linkedin_url,
+                'facebook_url' =>$request->facebook_url,
+                'instagram_url' =>$request->instagram_url,
+                'twitter_url' =>$request->twitter_url
+
+            ]);
 
            if($request->file("image")){
               $this->imageUpload($request->file("image"),'users',$user->id,'users','photo',$idForUpdate=$user->id);   
