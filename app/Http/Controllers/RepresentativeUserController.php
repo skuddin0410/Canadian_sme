@@ -42,7 +42,7 @@ class RepresentativeUserController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Exhibitor Representative']);
+                    $q->whereIn("name", ['Representative']);
                 })->orderBy('created_at', 'DESC');
 
             if ($request->search) {
@@ -165,7 +165,7 @@ class RepresentativeUserController extends Controller
     }
 
     return redirect(route('representative-users.index'))
-        ->withSuccess('Exhibitor Representative data has been saved successfully');
+        ->withSuccess('Representative data has been saved successfully');
 
     }
 
@@ -261,7 +261,7 @@ class RepresentativeUserController extends Controller
         $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background', $user->id);
     }
 
-    return redirect(route('representative-users.index'))->withSuccess('Exhibitor Representative data has been updated successfully.');
+    return redirect(route('representative-users.index'))->withSuccess('Representative data has been updated successfully.');
     }
 
     /**
@@ -280,19 +280,19 @@ class RepresentativeUserController extends Controller
 
     return redirect()
         ->route('representative-users.index')
-        ->withSuccess('Exhibitor Representative user deleted successfully.');
+        ->withSuccess('Representative user deleted successfully.');
 
     }
      public function toggleBlock(User $user)
 {
     $currentUser = auth()->user();
 
-    // Admin or Event Admin can block
-    if ($currentUser->hasRole(['Admin', 'Event Admin'])) {
+    // Admin or Admin can block
+    if ($currentUser->hasRole(['Admin', 'Admin'])) {
         // $user->is_block = true;
         // $user->save();
         // return back()->withSuccess('User has been blocked successfully.');
-        $allowedRoles = ['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'];
+        $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
 
         if ($user->hasAnyRole($allowedRoles)) {
             $user->is_block = true;

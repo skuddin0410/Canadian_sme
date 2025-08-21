@@ -40,7 +40,7 @@ class ExhibitorUserController extends Controller
     // Start the query
     $users = User::with("roles")
         ->whereHas("roles", function ($q) {
-            $q->whereIn("name", ['Exhibitor Admin']);
+            $q->whereIn("name", ['Admin']);
         })
         ->orderBy('created_at', 'DESC');
 
@@ -102,7 +102,7 @@ class ExhibitorUserController extends Controller
     //     if ($request->ajax() && $request->ajax_request == true) {
     //         $users = User::with("roles")
     //             ->whereHas("roles", function ($q) {
-    //                 $q->whereIn("name", ['Exhibitor Admin']);
+    //                 $q->whereIn("name", ['Admin']);
     //             })->orderBy('created_at', 'DESC');
 
     //         if ($request->search) {
@@ -140,7 +140,7 @@ class ExhibitorUserController extends Controller
 
     //         return response($data);
     //     }
-    //      $users = User::role('Exhibitor Representative')
+    //      $users = User::role('Representative')
     //         ->where('created_by', auth()->id())
     //         ->get();
 
@@ -408,12 +408,12 @@ public function assignBooth(Request $request, $id)
 {
     $currentUser = auth()->user();
 
-    // Admin or Event Admin can block
-    if ($currentUser->hasRole(['Admin', 'Event Admin'])) {
+    // Admin or Admin can block
+    if ($currentUser->hasRole(['Admin', 'Admin'])) {
         // $user->is_block = true;
         // $user->save();
         // return back()->withSuccess('User has been blocked successfully.');
-        $allowedRoles = ['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'];
+        $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
 
         if ($user->hasAnyRole($allowedRoles)) {
             $user->is_block = true;

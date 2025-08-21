@@ -40,7 +40,7 @@ class UserController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["Event Admin",'Exhibitor Admin','Exhibitor Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
+                    $q->whereIn("name", ["Admin",'Admin','Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
                 })->orderBy('created_at', 'DESC');
 
             if ($request->search) {
@@ -247,7 +247,7 @@ class UserController extends Controller
     }
     public function representativeIndex()
 {
-    $users = User::role('Exhibitor Representative')
+    $users = User::role('Representative')
         ->where('created_by', auth()->id())
         ->get();
 
@@ -317,7 +317,7 @@ public function attendeeIndex()
 
 //     // If Helpdesk role, restrict to specific roles
 //     if (Auth::user()->hasRole('Support Staff Or Helpdesk')) {
-//         if (! $user->hasAnyRole(['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'])) {
+//         if (! $user->hasAnyRole(['Admin', 'Representative', 'Attendee', 'Speaker'])) {
 //             return redirect()->back()->with('error', 'You are not allowed to unblock this role.');
 //         }
 //     }

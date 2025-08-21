@@ -277,7 +277,7 @@
                 <select class="form-control" name="user_type">
                  <option value="">Please Select Role</option> 
 
-                  <option value="Exhibitor Admin" {{ old('user_type') =='Exhibitor Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Admin' ? 'selected' : '' }}>Exhibitor Admin</option> 
+                  <option value="Admin" {{ old('user_type') =='Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Admin' ? 'selected' : '' }}>Admin</option> 
                  
                 </select>
                 

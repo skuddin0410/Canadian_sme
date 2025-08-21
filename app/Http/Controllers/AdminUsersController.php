@@ -26,7 +26,7 @@ class AdminUsersController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["Event Admin"]);
+                    $q->whereIn("name", ["Admin"]);
                 })->orderBy('created_at', 'DESC');
 
             if ($request->search) {
@@ -99,7 +99,7 @@ class AdminUsersController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
 
-        $user->assignRole('Event Admin');
+        $user->assignRole('Admin');
         // $user->assignRole($request->user_type);
 
         return redirect(route('admin-users.index'))
@@ -154,7 +154,7 @@ class AdminUsersController extends Controller
         // $user->referral_coupon = $request->referral_coupon;
         $user->password = Hash::make($request->password);
         $user->save();
-        $user->assignRole("Event Admin");
+        $user->assignRole("Admin");
 
         return redirect(route('admin-users.index'))
             ->withSuccess('Admin user data has been saved successfully');

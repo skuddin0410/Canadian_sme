@@ -18,7 +18,7 @@ Admin | Banner Details
               </div>
               <div class="card-body">
                   <div class="d-flex pt-3 justify-content-end">
-                    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                    @if(Auth::user()->hasRole('Admin') )
                       <a href="{{route("banners.edit",["banner"=> $banner->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
                     @endif  
                       <a href="{{route("banners.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
@@ -51,7 +51,7 @@ Admin | Banner Details
                     
                   </ul>
                   <div class="d-flex pt-3 justify-content-end">
-                    @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+                    @if(Auth::user()->hasRole('Admin') )
                       <a href="{{route("banners.edit",["banner"=> $banner->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
                     @endif  
                       <a href="{{route("banners.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>

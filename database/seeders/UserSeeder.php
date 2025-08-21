@@ -22,8 +22,8 @@ class UserSeeder extends Seeder
             'mobile' => '123345678',
             'password' => Hash::make('password'),
         ]);
-        $eventAdmin->assignRole('Event Admin');
-        qrCode($eventAdmin->id);
+        $eventAdmin->assignRole('Admin');
+         qrCode($eventAdmin->id);
 
         $companies = [];
 
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
             'bio'=>"This is a short bio for Exhibitor $i. Experienced in event management and exhibitions.",
             'password' => Hash::make('password')
         ]);
-        $exhibitorAdmin->assignRole('Exhibitor Admin');
+        $exhibitorAdmin->assignRole('Admin');
         qrCode($exhibitorAdmin->id);
 
             $companies= [
@@ -73,10 +73,10 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'company_id'=>$company->id,
                 'tags'=>'Representative, Exhibitor',
-                'designation'=>'Exhibitor Representative',
-                'bio'=>"This is a short bio for Exhibitor Representative $i. Experienced in event management and exhibitions.",
+                'designation'=>'Representative',
+                'bio'=>"This is a short bio for Representative $i. Experienced in event management and exhibitions.",
             ]);
-            $exhibitorRepresentative->assignRole('Exhibitor Representative');
+            $exhibitorRepresentative->assignRole('Representative');
 
             qrCode($exhibitorRepresentative->id);
 

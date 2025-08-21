@@ -33,9 +33,7 @@ class HomeController extends Controller
     public function index()
     {  
         if ( Auth::user()->hasRole('Admin') 
-            || Auth::user()->hasRole('Event Admin') 
-            || Auth::user()->hasRole('Exhibitor Admin') 
-            || Auth::user()->hasRole('Exhibitor Representative')
+            || Auth::user()->hasRole('Representative')
             || Auth::user()->hasRole('Attendee')
             || Auth::user()->hasRole('Speaker')
             || Auth::user()->hasRole('Support Staff Or Helpdesk')
@@ -47,7 +45,7 @@ class HomeController extends Controller
                     $q->whereNotIn("name", ["Admin"]);
                 })->count();
             
-            if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin')){
+            if(Auth::user()->hasRole('Admin') ){
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
             }else{

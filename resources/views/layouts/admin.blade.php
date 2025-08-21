@@ -9,6 +9,8 @@
   data-template="vertical-menu-template-free">
   <head>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
@@ -60,11 +62,11 @@
       <div class="layout-container">
         <!-- Menu -->
 
-        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        @if(Auth::user()->hasRole('Admin') )
             @include('partial.admin-side-bar')
         @endif    
         
-        @if(Auth::user()->hasRole('Exhibitor Admin'))
+        @if(Auth::user()->hasRole('Admin'))
            @include('partial.exhibitor-side-bar')
         @endif 
         

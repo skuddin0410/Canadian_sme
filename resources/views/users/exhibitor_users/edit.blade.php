@@ -123,7 +123,7 @@
                   <label class="form-label">Role</label>
                   <select class="form-control" name="user_type">
                     <option value="">Select Role</option>
-                    <option value="Exhibitor Admin" {{ old('user_type', $exhibitor_user->roles[0]->name ?? '') == 'Exhibitor Admin' ? 'selected' : '' }}>Exhibitor Admin</option>
+                    <option value="Admin" {{ old('user_type', $exhibitor_user->roles[0]->name ?? '') == 'Admin' ? 'selected' : '' }}>Admin</option>
                   </select>
                 </div>
               </div>

@@ -9,7 +9,7 @@ use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Admin']], function () {
     Route::resource('banners', App\Http\Controllers\BannerController::class);
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
@@ -80,7 +80,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
      Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
 });
 
-    Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin|Support Staff Or Helpdesk']], function () {
+    Route::group(['middleware' => ['webauth', 'role:Admin|Admin|Admin|Support Staff Or Helpdesk']], function () {
     Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
         'exhibitor-users' => 'exhibitor_user',
     ]);
@@ -95,8 +95,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     });
 
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Admin']], function () {
 
  require __DIR__.'/newsletters.php';
+ require __DIR__.'/formbuilder.php';
   require __DIR__.'/lead.php';
 });

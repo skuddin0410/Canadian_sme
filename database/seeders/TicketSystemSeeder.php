@@ -119,11 +119,11 @@ class TicketSystemSeeder extends Seeder
         ];
 
 
-        foreach ($tags as $category) {
+        foreach ($tags as $tag) {
             Category::create([
-                'name' => $category['name'],
-                'slug' => Str::slug($category['name']),
-                'type' => 'tag',
+                'name' => $tag,
+                'slug' => Str::slug($tag),
+                'type' => 'tags'
             ]);
         }
 
@@ -131,7 +131,7 @@ class TicketSystemSeeder extends Seeder
             Category::create([
                 'name' => $category['name'],
                 'slug' => Str::slug($category['name']),
-                'type' => 'event',
+                'type' => 'event'
             ]);
         }
 

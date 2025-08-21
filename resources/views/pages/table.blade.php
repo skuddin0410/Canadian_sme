@@ -62,12 +62,12 @@
 			<a href="{{ route("pages.show",["page"=> $page->id]) }}" class="btn btn-sm btn-icon btn-primary"><i class="bx bx-show"></i></a>
 		    </div>
 		    <div class="col-4 p-1">
-			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
+			@if(Auth::user()->hasRole('Admin') )		
 			  <a href="{{ route("pages.edit",["page"=> $page->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
             @endif
 			</div>
             <div class="col-4 p-1">
-			@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))		
+			@if(Auth::user()->hasRole('Admin') )		
 			<form action="{{ route('pages.destroy', $page->id) }}" method="post">
               @csrf
               @method('DELETE')

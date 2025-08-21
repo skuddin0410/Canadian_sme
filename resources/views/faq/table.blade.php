@@ -55,7 +55,7 @@
 				<div class="col-4 p-1">	
 					<a href="{{ route("faqs.show",["faq"=> $faq->id ]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
 			    </div>
-				@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+				@if(Auth::user()->hasRole('Admin') )
 			    <div class="col-4 p-1">	
 					<a href="{{ route("faqs.edit",["faq"=> $faq->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
 				</div>	

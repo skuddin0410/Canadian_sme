@@ -6,7 +6,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterSubscriberController;
 
 // Admin routes for newsletter management
-Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Admin']], function () {
     Route::resource('newsletters', NewsletterController::class);
     Route::post('newsletters/{newsletter}/send', [NewsletterController::class, 'send'])->name('newsletters.send');
     Route::post('newsletters/{newsletter}/schedule', [NewsletterController::class, 'schedule'])->name('newsletters.schedule');
@@ -43,7 +43,7 @@ Route::get('/email/track', function(Request $request) {
 })->name('email.track');
 
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Admin']], function () {
     Route::get('/newsletters/{newsletter}/preview-popup', function($newsletter) {
         $newsletter = \App\Models\Newsletter::findOrFail($newsletter);
         return view('users.newsletters.preview-popup', compact('newsletter'));

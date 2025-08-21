@@ -265,12 +265,12 @@ class SpeakerController extends Controller
 {
     $currentUser = auth()->user();
 
-    // Admin or Event Admin can block
-    if ($currentUser->hasRole(['Admin', 'Event Admin'])) {
+    // Admin or Admin can block
+    if ($currentUser->hasRole(['Admin', 'Admin'])) {
         // $user->is_block = true;
         // $user->save();
         // return back()->withSuccess('User has been blocked successfully.');
-        $allowedRoles = ['Exhibitor Admin', 'Exhibitor Representative', 'Attendee', 'Speaker'];
+        $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
 
         if ($user->hasAnyRole($allowedRoles)) {
             $user->is_block = true;

@@ -18,10 +18,10 @@
        class="btn btn-outline-primary btn-pill btn-streach font-book fs-14">Back</a>
 </div>
        <div class="d-flex justify-content-end gap-2 pt-3">
-    {{-- Block Button for Admin / Event Admin --}}
-    @if(Auth::user()->hasAnyRole(['Admin','Event Admin']) 
+    {{-- Block Button for Admin / Admin --}}
+    @if(Auth::user()->hasAnyRole(['Admin','Admin']) 
         && !$user->is_block 
-        && $user->hasAnyRole(['Exhibitor Admin','Exhibitor Representative','Attendee','Speaker']))
+        && $user->hasAnyRole(['Admin','Representative','Attendee','Speaker']))
         <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST">
             @csrf
             @method('PATCH')
@@ -43,7 +43,7 @@
     @endif
 
     {{-- Approve Exhibitor Button --}}
-    @if(Auth::user()->hasAnyRole(['Admin','Event Admin']) && !$user->is_block)
+    @if(Auth::user()->hasAnyRole(['Admin','Admin']) && !$user->is_block)
         @if(!$user->is_approve)
             <form action="{{ route('exhibitor-users.approve', $user->id) }}" method="POST">
                 @csrf
@@ -191,7 +191,7 @@
 </div>
 
 {{-- Assign Booth Form --}}
-@if(Auth::user()->hasAnyRole(['Admin','Event Admin']))
+@if(Auth::user()->hasAnyRole(['Admin','Admin']))
     <form method="POST" action="{{ route('exhibitor-users.assign-booth', $user->id) }}" class="mt-3">
         @csrf
         <div class="row align-items-end">
@@ -215,7 +215,7 @@
 
 
                     {{-- Assign Booth Form --}}
-                    {{-- @if(Auth::user()->hasAnyRole(['Admin','Event Admin']))
+                    {{-- @if(Auth::user()->hasAnyRole(['Admin','Admin']))
                         <form method="POST" action="{{ route('exhibitor-users.assign-booth', $user->id) }}" class="mt-3">
                             @csrf
                             <div class="row align-items-end">

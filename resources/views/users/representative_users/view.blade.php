@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-Admin | Exhibitor Representative Details
+Admin | Representative Details
 @endsection
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
@@ -10,7 +10,7 @@ Admin | Exhibitor Representative Details
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light"></span>Exhibitor Representative</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light"></span>Representative</h4>
 
     <div class="row">
         <div class="col-xl">
@@ -28,10 +28,10 @@ Admin | Exhibitor Representative Details
                         
                     </div>
                     <div class="d-flex pt-3 justify-content-end">
-                     {{-- Block Button for Admin / Event Admin --}}
-                   @if(Auth::user()->hasAnyRole(['Admin','Event Admin']) 
+                     {{-- Block Button for Admin / Admin --}}
+                   @if(Auth::user()->hasAnyRole(['Admin','Admin']) 
                      && !$user->is_block 
-                        && $user->hasAnyRole(['Exhibitor Admin','Exhibitor Representative','Attendee','Speaker']))
+                        && $user->hasAnyRole(['Admin','Representative','Attendee','Speaker']))
                    <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST">
                       @csrf
                     @method('PATCH')
@@ -54,7 +54,7 @@ Admin | Exhibitor Representative Details
     </div>
                     
 
-                    <h5 class="pb-2 border-bottom mb-4">Exhibitor Representative Details</h5>
+                    <h5 class="pb-2 border-bottom mb-4">Representative Details</h5>
 
                     <div class="info-container">
                         <div class="row">
