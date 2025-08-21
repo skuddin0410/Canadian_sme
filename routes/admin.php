@@ -9,7 +9,7 @@ use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin']], function () {
     Route::resource('banners', App\Http\Controllers\BannerController::class);
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);

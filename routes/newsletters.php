@@ -6,7 +6,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterSubscriberController;
 
 // Admin routes for newsletter management
-Route::group(['middleware' => ['webauth', 'role:Admin|Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin']], function () {
     Route::resource('newsletters', NewsletterController::class);
     Route::post('newsletters/{newsletter}/send', [NewsletterController::class, 'send'])->name('newsletters.send');
     Route::post('newsletters/{newsletter}/schedule', [NewsletterController::class, 'schedule'])->name('newsletters.schedule');
