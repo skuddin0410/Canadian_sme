@@ -132,7 +132,7 @@
                     </div>
 
                     {{-- Booth Details --}}
-                    <div class="mt-5">
+                    {{-- <div class="mt-5">
                         <h5 class="pb-2 border-bottom mb-3">Booth Details</h5>
                         @if ($user->booths->count())
                             <table class="table table-bordered">
@@ -158,10 +158,64 @@
                         @else
                             <p class="text-muted">No booths assigned to this user.</p>
                         @endif
-                    </div>
+                    </div> --}}
+                    {{-- Booth Details --}}
+<div class="mt-5">
+    <h5 class="pb-2 border-bottom mb-3">Booth Details</h5>
+    @if ($user->booths->count())
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Booth Number</th>
+                    <th>Size</th>
+                    <th>Location Preferences</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($user->booths as $booth)
+                    <tr>
+                        <td>{{ $booth->title ?? '-' }}</td>
+                        <td>{{ $booth->booth_number ?? '-' }}</td>
+                        <td>{{ $booth->size ?? '-' }}</td>
+                        <td>{{ $booth->location_preferences ?? '-' }}</td>
+                        <td>{{ $booth->created_at->format('d M Y') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <p class="text-muted">No booths assigned to this user.</p>
+    @endif
+</div>
+
+{{-- Assign Booth Form --}}
+@if(Auth::user()->hasAnyRole(['Admin','Event Admin']))
+    <form method="POST" action="{{ route('exhibitor-users.assign-booth', $user->id) }}" class="mt-3">
+        @csrf
+        <div class="row align-items-end">
+            <div class="col-md-4">
+                <label for="booth_id" class="form-label">Assign Booth:</label>
+                <select name="booth_id" class="form-control" required>
+                    <option value="" disabled selected>Select a booth</option>
+                    @foreach ($booths as $booth)
+                        <option value="{{ $booth->id }}">
+                            {{ $booth->title ?? 'Booth #'.$booth->booth_number }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-success">Assign Booth</button>
+            </div>
+        </div>
+    </form>
+@endif
+
 
                     {{-- Assign Booth Form --}}
-                    @if(Auth::user()->hasAnyRole(['Admin','Event Admin']))
+                    {{-- @if(Auth::user()->hasAnyRole(['Admin','Event Admin']))
                         <form method="POST" action="{{ route('exhibitor-users.assign-booth', $user->id) }}" class="mt-3">
                             @csrf
                             <div class="row align-items-end">
@@ -179,7 +233,7 @@
                                 </div>
                             </div>
                         </form>
-                    @endif
+                    @endif --}}
 
                 </div>
             </div>

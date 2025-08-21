@@ -92,7 +92,7 @@ class ServiceCategoryController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('service_categories', 'public');
-            $validated['image_url'] = '/storage/' . $path;
+            $validated['image_url'] = $path;
         } else {
             $validated['image_url'] = null;
         }
@@ -141,7 +141,7 @@ class ServiceCategoryController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('service_categories', 'public');
-            $validated['image_url'] = '/storage/' . $path;
+            $validated['image_url'] =  $path;
         }
 
         $serviceCategory->update($validated);

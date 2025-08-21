@@ -228,18 +228,52 @@ class ExhibitorUserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $exhibitor_user, Request $request)
-    {
+    // public function show(User $exhibitor_user, Request $request)
+    // {
        
-        $exhibitor_user->load('booths');
-        $booths = Booth::all(); 
-        $companies = Company::with('certificationFile','logoFile', 'mediaGallery', 'videos')
-        ->where('user_id',$exhibitor_user->id)
-        ->get();
+    //     $exhibitor_user->load('booths');
+    //     $booths = Booth::all(); 
+    //     $companies = Company::with('certificationFile','logoFile', 'mediaGallery', 'videos')
+    //     ->where('user_id',$exhibitor_user->id)
+    //     ->get();
 
                               
-        return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $exhibitor_user->booths,'companies' => $companies]);
-    }
+    //     return view('users.exhibitor_users.view', ['user' => $exhibitor_user , 'booths' => $exhibitor_user->booths,'companies' => $companies]);
+    // }
+//     public function show(User $exhibitor_user, Request $request)
+// {
+//     // Don’t try to load booths via relation
+//     $companies = Company::with('certificationFile','logoFile','mediaGallery','videos')
+//         ->where('user_id', $exhibitor_user->id)
+//         ->get();
+
+//     // Get booths by user directly
+//     $booths = Booth::where('user_id', $exhibitor_user->id)->get();
+
+//     return view('users.exhibitor_users.view', [
+//         'user' => $exhibitor_user,
+//         'booths' => $booths,
+//         'companies' => $companies
+//     ]);
+// }
+public function show(User $exhibitor_user, Request $request)
+{
+    // Load companies with related files
+    $companies = Company::with(['certificationFile', 'logoFile', 'mediaGallery', 'videos'])
+        ->where('user_id', $exhibitor_user->id)
+        ->get();
+
+    // Eager load booths via the hasManyThrough relationship
+    $exhibitor_user->load('booths');
+
+    return view('users.exhibitor_users.view', [
+        'user'      => $exhibitor_user,
+        'booths'    => $exhibitor_user->booths,  // now works via hasManyThrough
+        'companies' => $companies,
+    ]);
+}
+
+
 
     /**
      * Show the form for editing the specified resource.

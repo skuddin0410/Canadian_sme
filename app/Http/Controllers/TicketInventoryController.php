@@ -111,7 +111,7 @@ class TicketInventoryController extends Controller
                             $ticketType->logInventoryChange('decrease', $quantity, $request->reason);
                         } else {
                             $errors[] = "Cannot decrease {$ticketType->name} by {$quantity} - insufficient stock";
-                            continue;
+                            continue 2;
                         }
                         break;
                 }

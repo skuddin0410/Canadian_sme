@@ -2,7 +2,7 @@
     <div class="app-brand demo">
         <a href="" class="app-brand-link">
             <span class="app-brand-logo">
-                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="20%">
+                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="55%">
             </span>
         </a>
 
@@ -28,6 +28,7 @@
                 <div data-i18n="Coupons">Pages</div>
             </a>
         </li>
+         
        @endif
 
        @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
@@ -35,6 +36,12 @@
             <a href="{{route('booths.index')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store-alt"></i>
                     <div data-i18n="Booth Management">Booth Management</div>
+            </a>
+        </li>
+        <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }}">
+            <a href="{{route('leads.index')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store-alt"></i>
+                    <div data-i18n="Booth Management">Lead Management</div>
             </a>
         </li>
        @endif
@@ -51,6 +58,11 @@
                         <div data-i18n="events">Events</div>
                     </a>
                 </li>
+                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                    <a href="{{ route('categories.index') }}" class="menu-link">
+                    <div data-i18n="events">Categories & Tags</div>
+                    </a>
+                </li>
             </ul>
         </li>
         @endif 
@@ -62,11 +74,6 @@
                 <div data-i18n="tickets">Tickets</div>
             </a>
             <ul class="menu-sub">
-               {{--  <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }}">
-                    <a href="{{ route('ticket.dashboard') }}" class="menu-link">
-                        <div data-i18n="tickets">Tickets Dashboard</div>
-                    </a>
-                </li> --}}
                 <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
                     <a href="{{ route('admin.ticket-categories.index') }}" class="menu-link">
                         <div data-i18n="ticket-categories"> Ticket categories</div>
@@ -136,17 +143,17 @@
                    </a>
                 </li>
             </ul>
-             <ul class="menu-sub">
-                
-                <li class="menu-item {{ request()->is('admin-users') ? 'active open' : '' }}">
-                   <a href="{{ url('newsletters') }}" class="menu-link">
-                    <div data-i18n="newsletters">Newsletter</div>
-                   </a>
-                </li>
-            </ul>
         </li>   
         @endif
         
+         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
+        <li class="menu-item {{ request()->is('newsletters*') ? 'active open' : '' }}">
+            <a href="{{ url('newsletters') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
+                <div data-i18n="newsletters">Newsletter</div>
+            </a>
+        </li>
+        @endif 
 
          @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin'))
         <li class="menu-item {{ request()->is('audit*') ? 'active open' : '' }}">

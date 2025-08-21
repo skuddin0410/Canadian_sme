@@ -51,8 +51,8 @@ Admin |  Admin user Details
                 
                  <div class="d-flex pt-3 justify-content-end">
       
-                      <a href="{{route("admin-users.edit",["admin_user"=> $user->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
-                      <a href="{{route("admin-users.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
+                      {{-- <a href="{{route("admin-users.edit",["admin_user"=> $user->id ])}}" class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
+                      <a href="{{route("admin-users.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a> --}}
                 </div>
                 </div>
               </div>
