@@ -125,28 +125,6 @@
         </div>
     </div>
 
-    <!-- Tags -->
-    {{-- <div class="col-6">
-        <div class="mb-3">
-            <label class="form-label" for="tags">Tags</label>
-            <div class="input-group input-group-merge">
-                <span id="tags-icon" class="input-group-text">
-                    <i class="bx bx-purchase-tag"></i>
-                </span>
-                <input
-                    type="text"
-                    class="form-control"
-                    name="tags"
-                    id="tags"
-                    value="{{ old('tags', $user->tags ?? '') }}"
-                    data-role="tagsinput"
-                    placeholder="Add tags (comma separated)"/>
-            </div>
-            @if ($errors->has('tags'))
-                <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
-            @endif
-        </div>
-    </div> --}}
     <div class="col-6">
     <div class="mb-3">
         <label class="form-label" for="tags">Tags</label>

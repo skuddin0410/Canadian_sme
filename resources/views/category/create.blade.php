@@ -67,22 +67,19 @@
               @endif
             </div>
             
-            <div class="mb-3" style="display:none">
-              <label class="form-label" for="title">Type<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="hidden"
-                  class="form-control"
-                  name="type"
-                  id="type"
-                  value="blogs"
-                  placeholder="Type"/>
-              </div>
-              @if ($errors->has('type'))
-                <span class="text-danger text-left">{{ $errors->first('type') }}</span>
-              @endif
-            </div>
+            
+            <div class="mb-3">
+            <label for="type" class="form-label">Category Type</label>
+            <select name="type" id="type" 
+                    class="form-select @error('type') is-invalid @enderror" required>
+                <option value="">-- Select Type --</option>
+                <option value="events" {{ old('type') == 'events' ? 'selected' : '' }}>Events</option>
+                <option value="tags" {{ old('type') == 'tags' ? 'selected' : '' }}>Tags</option>
+            </select>
+            @error('type')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
 
 
             @if(!empty($category))

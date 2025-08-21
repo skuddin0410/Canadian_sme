@@ -34,7 +34,7 @@ class ServiceController extends Controller
     if ($request->search) {
         $query->where('name', 'like', '%' . $request->search . '%');
     }
-
+    $query->where('company_id',auth()->user()->company_id);
     $services = $query->orderBy('sort_order')->orderBy('name')->paginate(15);
     $categories = ServiceCategory::all();
 
@@ -84,6 +84,7 @@ class ServiceController extends Controller
 
             $validated['slug'] = Str::slug($validated['name']);
             $validated['created_by'] = Auth::id() ?? null;
+            $validated['company_id'] = auth()->user()->company_id ?? null;
 
             // Upload main image
             if ($request->hasFile('main_image')) {

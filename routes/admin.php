@@ -13,9 +13,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::resource('banners', App\Http\Controllers\BannerController::class);
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
-    Route::resource('cms', App\Http\Controllers\CmsController::class);
     Route::resource('coupons', App\Http\Controllers\CouponController::class);
-    Route::resource('drives', App\Http\Controllers\DriveController::class);
     Route::resource('faqs', App\Http\Controllers\FaqController::class);
     Route::resource('otps', App\Http\Controllers\OtpController::class);
     Route::resource('orders', App\Http\Controllers\OrderController::class);
@@ -25,6 +23,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::resource('affiliates', App\Http\Controllers\AffiliateController::class);
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
     Route::resource('events', App\Http\Controllers\EventController::class);
+   
+
 
     Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
     Route::post('/assign-permission', [App\Http\Controllers\RoleController::class, 'assignPermission'])->name('roles.assign.permission');
@@ -76,6 +76,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 
          Route::get('/speakers', [CalendarController::class, 'speakers'])->name('speakers.list');
     });
+
+     Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
 });
 
     Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin|Support Staff Or Helpdesk']], function () {
@@ -97,4 +99,5 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
 
  require __DIR__.'/newsletters.php';
  require __DIR__.'/formbuilder.php';
+  require __DIR__.'/lead.php';
 });

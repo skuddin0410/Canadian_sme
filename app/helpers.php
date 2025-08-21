@@ -5,16 +5,10 @@ use App\Models\Giveaway;
 use App\Models\Quiz;
 use App\Models\Setting;
 use App\Models\User;
+use BaconQrCode\Renderer\GDLibRenderer;
+use BaconQrCode\Writer;
+use Illuminate\Support\Facades\Storage;
 
-
-if (!function_exists('getQuestionLists')) {
-    function getQuestionLists($table_id,$table_type)
-    {
-       $questionList = Question::with(["answers"])->where('table_id',$table_id)->where('table_type',$table_type)->orderBy("created_at","DESC")->get();
-
-       return $questionList;
-    }
-}
 
 if (!function_exists('getCategory')) {
     function getCategory()
@@ -89,25 +83,7 @@ if (!function_exists('createSlug')) {
   }
 }
 
-if (!function_exists('questionForGiveawayOrQuiz')) {
-    function questionForGiveawayOrQuiz($table_id,$type)
-    { 
-       if($type == "giveaways"){
-           $giveaway = Giveaway::where('id',$table_id)->first();
-           if(!empty($giveaway)){
-            return $giveaway->name;
-           }
-       }
 
-       if($type == "quizzes"){
-           $giveaway = Quiz::where('id',$table_id)->first();
-           if(!empty($giveaway)){
-            return $giveaway->name;
-           }
-       }
-
-    }
-}
 
 if (!function_exists('getKeyValue')) {
     function getKeyValue($key)
@@ -117,13 +93,36 @@ if (!function_exists('getKeyValue')) {
     }
 }
 
-if (!function_exists('blogUser')) {
-  function blogUser()
-  {
-    $users = User::with("roles")
-    ->whereHas("roles", function ($q) {
-        $q->whereIn("name", ["Content Manager"]);
-    })->orderBy('created_at', 'DESC')->get();
-    return $users;
+
+
+if (!function_exists('qrCode')) {
+  function qrCode($userId,$folder="user")
+  { 
+       $user = User::findOrFail($userId);
+
+        $data = json_encode([
+            'id' => $user->id,
+            'name' => $user->full_name ?? '',
+            'email' => $user->email ?? '',
+        ]);
+
+        if (!file_exists(public_path('qrcodes'))) {
+            mkdir(public_path('qrcodes'), 0755, true);
+        }
+
+        $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
+        $filePath = public_path($fileName);
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        // Use GDLibRenderer
+        $renderer = new GDLibRenderer(300); // 300 is the size of the QR code
+        $writer = new Writer($renderer);
+        $writer->writeFile($data, $filePath);
+
+        $user->qr_code = asset($fileName);
+        $user->save();
   }
 }

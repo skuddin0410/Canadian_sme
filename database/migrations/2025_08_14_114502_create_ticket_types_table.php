@@ -23,6 +23,14 @@ return new class extends Migration
             $table->integer('available_quantity')->default(0);
             $table->integer('min_quantity_per_order')->default(1);
             $table->integer('max_quantity_per_order')->nullable();
+
+            $table->boolean('is_group')->default(false);
+            $table->integer('group_size')->nullable();
+            $table->decimal('discount_percentage', 5, 2)->nullable();
+            $table->boolean('is_earlybird')->default(false);
+            $table->decimal('earlybird_amount', 10, 2)->nullable();
+            $table->decimal('earlybird_quantity', 5, 2)->nullable(); 
+
             $table->boolean('is_active')->default(true);
             $table->boolean('requires_approval')->default(false);
             $table->json('access_permissions')->nullable(); // JSON for flexible permissions

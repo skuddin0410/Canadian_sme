@@ -24,5 +24,6 @@ class AdminSeeder extends Seeder
         $user->password = Hash::make('password');
         $user->save();
         $user->assignRole('Admin');
+        qrCode($user->id);
     }
 }

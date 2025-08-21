@@ -17518,7 +17518,7 @@ html:not(.layout-footer-fixed) .content-wrapper {
 
 .menu-vertical .app-brand {
   padding-right: 2rem;
-  padding-left: 2rem;
+  padding-left: 0rem;
 }
 
 .menu-horizontal .app-brand,

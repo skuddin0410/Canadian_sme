@@ -16,7 +16,7 @@ class TrainingController extends Controller
      */
     public function index(Request $request)
     {
-        $trainings = Training::with('material')->orderBy('id', 'desc')->paginate(10);
+        $trainings = Training::with('material')->where('company_id',auth()->user()->company_id)->orderBy('id', 'desc')->paginate(10);
          if ($request->ajax()) {
         return view('company.branding.partials.training-table', compact('trainings'))->render();
     }
@@ -51,6 +51,7 @@ class TrainingController extends Controller
         $training->material_name = $request->material_name;
         $training->material_description = $request->material_description;
         $training->youtube_link = $request->youtube_link;
+        $training->company_id = $request->company_id;
         $training->save();
         
         if(!empty($request->file("file"))){
