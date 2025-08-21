@@ -26,15 +26,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::patch('/helpdesk/users/{user}/unblock', [HelpdeskUserController::class, 'unblock'])
     ->name('helpdesk.users.unblock');
 
-
+    Route::resource('attendee-users', AttendeeUserController::class);
+    Route::resource('staff-profile', StaffProfileController::class);
 
 });
 
     
-
-Route::group(['middleware' => ['webauth', 'role:Registration Desk']], function () {
-
-	 Route::resource('attendee-users', AttendeeUserController::class);
-     Route::resource('staff-profile', StaffProfileController::class);
-
-});
