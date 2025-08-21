@@ -107,23 +107,47 @@
             </div>
           </div>
           </div>
+             
+           <div class="row">
+  <div class="col-6">
+    <div class="mb-3">
+      <label class="form-label" for="location">Location<span class="text-danger">*</span></label>
+      <div class="input-group input-group-merge">
+        <span id="title-icon" class="input-group-text"><i class="bx bx-map"></i></span>
+        <input
+          type="text"
+          class="form-control"
+          name="location"
+          id="location"
+          value="{{ old('location', $e->location ?? '') }}"
+          placeholder="Event Location"/>
+      </div>
+      @if ($errors->has('location'))
+        <span class="text-danger text-left">{{ $errors->first('location') }}</span>
+      @endif
+    </div>
+  </div>
 
-            <div class="mb-3">
-              <label class="form-label" for="location">Locations<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="location"
-                  id="location"
-                  value="{{ old('location', $e->location ?? '') }}"
-                  placeholder="Event meta title"/>
-              </div>
-              @if ($errors->has('location'))
-                <span class="text-danger text-left">{{ $errors->first('location') }}</span>
-              @endif
-            </div>
+  <div class="col-6">
+    <div class="mb-3">
+      <label class="form-label" for="youtube_link">YouTube Link</label>
+      <div class="input-group input-group-merge">
+        <span id="title-icon" class="input-group-text"><i class="bx bxl-youtube"></i></span>
+        <input
+          type="url"
+          class="form-control"
+          name="youtube_link"
+          id="youtube_link"
+          value="{{ old('youtube_link', $e->youtube_link ?? '') }}"
+          placeholder="https://www.youtube.com/watch?v=xxxx"/>
+      </div>
+      @if ($errors->has('youtube_link'))
+        <span class="text-danger text-left">{{ $errors->first('youtube_link') }}</span>
+      @endif
+    </div>
+  </div>
+</div>
+
 
             <div class="mb-3">
               <label class="form-label" for="description">Description<span class="text-danger">*</span></label>

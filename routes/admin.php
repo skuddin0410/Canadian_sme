@@ -23,6 +23,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function (
     Route::resource('affiliates', App\Http\Controllers\AffiliateController::class);
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
     Route::resource('events', App\Http\Controllers\EventController::class);
+   
+
 
     Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
     Route::post('/assign-permission', [App\Http\Controllers\RoleController::class, 'assignPermission'])->name('roles.assign.permission');
@@ -96,4 +98,6 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin']], function () {
 
  require __DIR__.'/newsletters.php';
+ require __DIR__.'/formbuilder.php';
+  require __DIR__.'/lead.php';
 });
