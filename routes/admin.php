@@ -3,10 +3,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;   
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SpeakerController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\SponsorsController;
 use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
-use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -86,6 +87,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ]);
      Route::resource('representative-users', RepresentativeUserController::class);
      Route::resource('attendee-users', AttendeeUserController::class);
+     Route::resource('sponsors', SponsorsController::class);
     Route::resource('speaker', SpeakerController::class);
     Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');

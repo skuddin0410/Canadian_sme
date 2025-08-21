@@ -87,7 +87,7 @@ class UserSeeder extends Seeder
                 'mobile' => '12345678',
                 'password' => Hash::make('password'),
                 'company_id'=>$company->id,
-                'tags'=>'Attaindee',
+                'tags'=>'Attendee',
                 'designation'=>'Software Engineer',
                 'bio'=>"This is a short bio for Attaindee $i. Experienced in event management and exhibitions.",
             ]);
