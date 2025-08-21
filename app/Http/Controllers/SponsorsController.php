@@ -107,7 +107,8 @@ class SponsorsController extends Controller
         'facebook_url' => 'nullable|url|max:255',
         'twitter_url' => 'nullable|url|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
-        'user_type' => 'required|string'
+        'user_type' => 'required|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -129,6 +130,22 @@ class SponsorsController extends Controller
         $user->mobile = $request->mobile;
         $user->save();
         $user->assignRole($request->user_type);
+           
+        if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('public/users', $filename);
+
+      
+        $user->photo()->updateOrCreate(
+            ['table_type' => 'users', 'file_type' => 'photo'], 
+            [
+                'table_id' => $user->id,
+                'file_name' => $filename,
+                'file_type' => 'photo',
+            ]
+        );
+    }
         return redirect(route('sponsors.index'))
             ->withSuccess('Sponsors data has been saved successfully');
 
@@ -173,6 +190,7 @@ class SponsorsController extends Controller
             'facebook_url' => 'nullable|url|max:255',
             'twitter_url' => 'nullable|url|max:255',
             'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'user_type' => 'required|string'
         ]);
 
@@ -194,6 +212,21 @@ class SponsorsController extends Controller
         $user->save();
         $user->syncRoles([]);
         $user->assignRole($request->user_type);
+         if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('public/users', $filename);
+
+        // Save or update in Drive table
+        $user->photo()->updateOrCreate(
+            ['table_type' => 'users', 'file_type' => 'photo'], // match existing
+            [
+                'table_id' => $user->id,
+                'file_name' => $filename,
+                'file_type' => 'photo',
+            ]
+        );
+    }
 
    
 

@@ -20,12 +20,33 @@ Admin | Edit Sponsors Data
           @if(Session::has('error'))
           <div class="alert alert-danger">{{ Session::get('error') }}</div>
           @endif
+            @php
+            $user = auth()->user()->load('photo');
+            if( isset($user->photo->file_path) ){
+              $filepath = $user->photo->file_path;
+            }else{
+              $filepath = "https://via.placeholder.com/150";
+            }
+
+          @endphp
+
 
           <form action="{{ route('sponsors.update', $user->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
             <div class="row">
+                 <div class="text-left">
+            <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
+            <label for="profileImageInput">
+              <img id="profileImagePreview" 
+                   src="{{$filepath}}" 
+                   class="rounded-circle border border-2" 
+                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+            </label>
+            
+            <p class="mt-2 text-muted">Click image to upload</p>
+          </div>
               {{-- First Name --}}
               <div class="col-6">
                 <div class="mb-3">
@@ -178,4 +199,16 @@ Admin | Edit Sponsors Data
     </div>
   </div>
 </div>
+<script>
+document.getElementById("profileImageInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById("profileImagePreview").src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 @endsection

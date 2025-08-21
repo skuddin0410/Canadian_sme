@@ -13,6 +13,7 @@ Admin | Add Sponsors
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">Sponsors @if(!empty($user)) Update @else Create @endif</h5>
         </div>
+        
         <div class="card-body">
           @if(Session::has('success'))
           <div class="alert alert-success">
@@ -25,13 +26,51 @@ Admin | Add Sponsors
           </div>
           @endif
 
+          @php
+            $user = auth()->user()->load('photo');
+            if( isset($user->photo->file_path) ){
+              $filepath = $user->photo->file_path;
+            }else{
+              $filepath = "https://via.placeholder.com/150";
+            }
+
+          @endphp
+
+        <div class="card-body">
+          @if(Session::has('success'))
+              <div class="alert alert-success">
+              {{ Session::get('success') }}
+              </div>
+          @endif
+          @if(Session::has('error'))
+              <div class="alert alert-danger">
+              {{ Session::get('error') }}
+              </div>
+          @endif
           <form
-            action="@if(!empty($user)) {{ route('sponsors.update',['user'=>$user->id]) }} @else {{ route('sponsors.store') }} @endif "
+            action="@if(!empty($user)) {{ route('sponsors.update',$user->id) }} @else {{ route('sponsors.store') }} @endif "
             method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
             @if(!empty($user))
             @method('PUT')
             @endif
+
+
+            <div class="row">
+
+          <div class="text-left">
+            <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
+            <label for="profileImageInput">
+              <img id="profileImagePreview" 
+                   src="{{$filepath}}" 
+                   class="rounded-circle border border-2" 
+                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+            </label>
+            
+            <p class="mt-2 text-muted">Click image to upload</p>
+          </div>
+
+        
             <div class="row">
               <div class="col-6">
                 <div class="mb-3">
@@ -39,7 +78,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                     <input type="text" class="form-control" name="first_name" id="slug-source"
-                      value="{{$user->name ?? old('first_name')}}" placeholder="User first name" />
+                      value="{{$user->name }}" placeholder="User first name" />
                   </div>
                   @if ($errors->has('first_name'))
                   <span class="text-danger text-left">{{ $errors->first('first_name') }}</span>
@@ -52,7 +91,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                     <input type="text" class="form-control" name="last_name" id="last-name-target"
-                      value="{{$user->lastname ?? old('last_name')}}" placeholder="User last name" />
+                      value="{{$user->lastname }}" placeholder="User last name" />
                   </div>
                   @if ($errors->has('last_name'))
                   <span class="text-danger text-left">{{ $errors->first('last_name') }}</span>
@@ -66,7 +105,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                     <input type="text" class="form-control" name="email" id="email"
-                      value="{{ $user->email ?? old('email') }}" placeholder="User email" />
+                      value="{{ $user->email  }}" placeholder="User email" />
                   </div>
                   @if ($errors->has('email'))
                   <span class="text-danger text-left">{{ $errors->first('email') }}</span>
@@ -80,7 +119,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                     <input type="text" class="form-control" name="mobile" id="mobile"
-                      value="{{ $user->mobile ?? old('mobile') }}" placeholder="User mobile" />
+                      value="{{ $user->mobile }}" placeholder="User mobile" />
                   </div>
                   @if ($errors->has('mobile'))
                   <span class="text-danger text-left">{{ $errors->first('mobile') }}</span>
@@ -97,7 +136,7 @@ Admin | Add Sponsors
                       <i class="bx bx-briefcase"></i>
                     </span>
                     <input type="text" class="form-control" name="designation" id="designation"
-                      value="{{ $user->designation ?? old('designation') }}" placeholder="Enter designation" />
+                      value="{{ $user->designation  }}" placeholder="Enter designation" />
                   </div>
                   @if ($errors->has('designation'))
                   <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
@@ -254,5 +293,17 @@ Admin | Add Sponsors
       .replace(/-+/g, '-'); // remove consecutive hyphens
     return str.replace(/^-+|-+$/g, '');
   }
+</script>
+<script>
+document.getElementById("profileImageInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById("profileImagePreview").src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
 </script>
 @endsection
