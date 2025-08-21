@@ -22,6 +22,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('website_url')->nullable();
             $table->string('linkedin_url')->nullable();
+            $table->string('facebook_url')->nullable();
+            $table->string('instagram_url')->nullable();
+            $table->string('twitter_url')->nullable();
             $table->string('mobile')->nullable();
             $table->timestamp('mobile_verified_at')->nullable();
             $table->string('username')->nullable();
