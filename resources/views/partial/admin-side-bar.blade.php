@@ -21,14 +21,14 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('company/details') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('company/media-gallery') ? 'active' : '' }} {{ request()->is('trainings') ? 'active' : '' }} {{ request()->is('company/media-gallery') ? 'active' : '' }} {{ request()->is('company/videos') ? 'active' : '' }} {{ request()->is('product-categories*') ? 'active' : '' }} {{ request()->is('products*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('company/details') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('company/media-gallery') ? 'active' : '' }} {{ request()->is('trainings') ? 'active' : '' }} {{ request()->is('company/media-gallery') ? 'active' : '' }} {{ request()->is('company/videos') ? 'active' : '' }} {{ request()->is('product-categories*') ? 'active' : '' }} {{ request()->is('products*') ? 'active open' : '' }} {{ request()->is('account-information*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user-circle" style="font-size: 24px;"></i>
                 <div data-i18n="events">Profile Overview</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
-                    <a href="{{ route('events.index') }}" class="menu-link">
+                <li class="menu-item {{ request()->is('account-information*') ? 'active open' : '' }}">
+                    <a href="{{route('change.account.information')}}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-user"></i>
                         <div data-i18n="events">Profile Information</div>
                     </a>
