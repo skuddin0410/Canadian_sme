@@ -52,9 +52,7 @@
             <div class="mb-3">
               <label class="form-label" for="name">First Name</label>
               <div class="input-group input-group-merge">
-                <span id="basic-icon-default-fullname2" class="input-group-text"
-                  ><i class="bx bx-user"></i
-                ></span>
+                
                 <input
                   type="text"
                   class="form-control"
@@ -73,9 +71,7 @@
             <div class="mb-3">
               <label class="form-label" for="lastname">Last Name</label>
               <div class="input-group input-group-merge">
-                <span id="basic-icon-default-fullname2" class="input-group-text"
-                  ><i class="bx bx-user"></i
-                ></span>
+                
                 <input
                   type="text"
                   class="form-control"
@@ -94,7 +90,7 @@
               <div class="mb-3">
               <label class="form-label" for="email">Email</label>
               <div class="input-group input-group-merge">
-                <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                
                 <input
                   type="text"
                   name="email"
@@ -113,15 +109,13 @@
             <div class="mb-3">
               <label class="form-label" for="contact_number">Contact Number</label>
               <div class="input-group input-group-merge">
-                <span id="basic-icon-default-phone2" class="input-group-text"
-                  ><i class="bx bx-phone"></i
-                ></span>
+        
                 <input
                   type="text"
                   name="contact_number"
                   id="contact_number"
                   class="form-control phone-mask"
-                  placeholder="658 799 8941"
+                  placeholder=""
                   value="{{old('contact_number', $admin_user->mobile)}}" />
               </div>
               <span class="text-danger text-left" id="contact_number_error"></span>
@@ -135,15 +129,13 @@
             <div class="mb-3">
               <label class="form-label" for="contact_number">Designation</label>
               <div class="input-group input-group-merge">
-                <span id="basic-icon-default-phone2" class="input-group-text"
-                  ><i class="bx bx-phone"></i
-                ></span>
+        
                 <input
                   type="text"
                   name="designation"
                   id="designation"
                   class="form-control phone-mask"
-                  placeholder="658 799 8941"
+                  placeholder=""
                   value="{{old('designation', $admin_user->designation)}}" />
               </div>
               <span class="text-danger text-left" id="designation_error"></span>
@@ -161,6 +153,110 @@
                 </div>
             </div>
             </div>
+
+            <div class="col-12">
+            <div class="mb-3">
+              <label class="form-label" for="contact_number">Website url</label>
+              <div class="input-group input-group-merge">
+         
+                <input
+                  type="text"
+                  name="website_url"
+                  id="website_url"
+                  class="form-control phone-mask"
+                  placeholder=""
+                  value="{{old('website_url', $admin_user->website_url)}}" />
+              </div>
+              <span class="text-danger text-left" id="website_url_error"></span>
+              @if ($errors->has('website_url'))
+                <span class="text-danger text-left">{{ $errors->first('website_url') }}</span>
+              @endif
+            </div>
+          </div>
+
+
+          <div class="col-6">
+            <div class="mb-3">
+              <label class="form-label" for="contact_number">Linkedin url</label>
+              <div class="input-group input-group-merge">
+             
+                <input
+                  type="text"
+                  name="linkedin_url"
+                  id="linkedin_url"
+                  class="form-control phone-mask"
+                  placeholder=""
+                  value="{{old('linkedin_url', $admin_user->linkedin_url)}}" />
+              </div>
+              <span class="text-danger text-left" id="linkedin_url_error"></span>
+              @if ($errors->has('linkedin_url'))
+                <span class="text-danger text-left">{{ $errors->first('linkedin_url') }}</span>
+              @endif
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="mb-3">
+              <label class="form-label" for="contact_number">Facebook url</label>
+              <div class="input-group input-group-merge">
+      
+                <input
+                  type="text"
+                  name="facebook_url"
+                  id="facebook_url"
+                  class="form-control phone-mask"
+                  placeholder=""
+                  value="{{old('facebook_url', $admin_user->facebook_url)}}" />
+              </div>
+              <span class="text-danger text-left" id="facebook_url_error"></span>
+              @if ($errors->has('facebook_url'))
+                <span class="text-danger text-left">{{ $errors->first('facebook_url') }}</span>
+              @endif
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="mb-3">
+              <label class="form-label" for="contact_number">Instagram url</label>
+              <div class="input-group input-group-merge">
+        
+                <input
+                  type="text"
+                  name="instagram_url"
+                  id="instagram_url"
+                  class="form-control phone-mask"
+                  placeholder=""
+                  value="{{old('instagram_url', $admin_user->instagram_url)}}" />
+              </div>
+              <span class="text-danger text-left" id="instagram_url_error"></span>
+              @if ($errors->has('instagram_url'))
+                <span class="text-danger text-left">{{ $errors->first('instagram_url') }}</span>
+              @endif
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="mb-3">
+              <label class="form-label" for="contact_number">Twitter url</label>
+              <div class="input-group input-group-merge">
+     
+                <input
+                  type="text"
+                  name="twitter_url"
+                  id="twitter_url"
+                  class="form-control phone-mask"
+                  placeholder=""
+                  value="{{old('twitter_url', $admin_user->twitter_url)}}" />
+              </div>
+              <span class="text-danger text-left" id="twitter_url_error"></span>
+              @if ($errors->has('twitter_url'))
+                <span class="text-danger text-left">{{ $errors->first('twitter_url') }}</span>
+              @endif
+            </div>
+          </div>
+
+
+
             </div>
 
             <input type="button" id="account_info_submit_btn" value="Save" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"/>

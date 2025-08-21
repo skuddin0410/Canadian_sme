@@ -67,10 +67,15 @@ class CompanyController extends Controller
         }
 
         $company = new Company();
+
         $company->user_id = Auth::id();
         $company->fill($request->only(['name', 'industry', 'size', 'location', 'email', 'phone', 'description', 'website',  'linkedin', 'twitter', 'facebook', 'certifications']));
-           $company->save();
+        $company->save();
 
+        $user = User::where('id',auth()->id())->first();
+        $user->company_id = $company->id;
+        $user->save();
+        
         if ($request->file("certification_image")) {
             $uploadPath = 'certifications';
             $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications');
@@ -80,9 +85,7 @@ class CompanyController extends Controller
             $this->imageUpload($request->file("logo"), 'logo', $company->id, 'companies', 'logo');
         }
 
-     
-
-        User::where('id',auth()->id())->update(['company_id' =>$company->id ]);
+    
         return redirect()->back()->with('success', 'Company created.');
     }
 
