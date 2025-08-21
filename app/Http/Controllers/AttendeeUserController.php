@@ -39,36 +39,30 @@ class AttendeeUserController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-    $users = User::with("roles")
-        ->whereHas("roles", function ($q) {
+        $users = User::with("roles")->whereHas("roles", function ($q) {
             $q->whereIn("name", ['Attendee']);
-        })
-        ->orderBy('created_at', 'DESC');
+            })->orderBy('created_at', 'DESC');
 
-    // Search (triggered by search button)
-    if ($request->filled('search')) {
-        $users = $users->where(function ($query) use ($request) {
-            $query->where('name', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('username', 'LIKE', '%' . $request->search . '%')
-                //   ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('email', 'LIKE', '%' . $request->search . '%');
-        });
-    }
+ 
+            if ($request->filled('search')) {
+                $users = $users->where(function ($query) use ($request) {
+                    $query->where('name', 'LIKE', '%' . $request->search . '%')
+                          ->orWhere('username', 'LIKE', '%' . $request->search . '%')
+                        //   ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
+                          ->orWhere('email', 'LIKE', '%' . $request->search . '%');
+                });
+            }
 
-    // Filters (triggered by filter button, add your filter logic here)
-    if ($request->filled('start_at') && $request->filled('end_at')) {
-        $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
-    }
-    
-    if ($request->has('exhibitor_id')) {
-        $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
-    }
-             
+            // Filters (triggered by filter button, add your filter logic here)
+            if ($request->filled('start_at') && $request->filled('end_at')) {
+                $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
+            }
+            
+            if ($request->has('exhibitor_id')) {
+                $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
+            }
+                     
          
-    
-
-           
-
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
             $users = $users->offset($offset)->limit($perPage)->get();
@@ -95,9 +89,7 @@ class AttendeeUserController extends Controller
      */
     public function create()
     {
-        //
         return view('users.attendee_users.create');
-
     }
 
     /**
@@ -105,10 +97,8 @@ class AttendeeUserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+   
         $validator = Validator::make($request->all(), [
-       
-        'username' => 'required|string|unique:users,username',
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => 'required|string|max:255|email|unique:users,email',
@@ -117,51 +107,27 @@ class AttendeeUserController extends Controller
         'website_url' => 'nullable|url|max:255',
         'linkedin_url' => 'nullable|url|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
-        'dob' => 'required|date|max:255',
-        'gender' => 'nullable|string|max:255',
-        'street' => 'nullable|string|max:255',
-        'zipcode' => 'nullable|string|max:255',
-        'city' => 'nullable|string|max:255',
-        'state' => 'nullable|string|max:255',
-        'country' => 'nullable|string|max:255',
-        'place' => 'nullable|string|max:255',
-        'password' => 'nullable|string|min:8',
-       
-    ]);
+        'user_type' => 'required|string'
+        ]);
 
-    if ($validator->fails()) {
-        return redirect(route('attendee-users.create'))->withInput()
-            ->withErrors($validator);
-    }
+        if ($validator->fails()) {
+            return redirect(route('attendee-users.create'))->withInput()
+                ->withErrors($validator);
+        }
 
-    $user = new User();
-    $user->username = $request->username;
-    $user->name = $request->first_name;
-    $user->lastname = $request->last_name;
-    $user->email = $request->email;
-    $user->designation = $request->designation;
-    $user->tags = $request->tags;
-    $user->website_url = $request->website_url;
-    $user->linkedin_url = $request->linkedin_url;
-    $user->mobile = $request->mobile;
-    $user->dob = $request->dob;
-    $user->gender = $request->gender;
-    $user->street = $request->street;
-    $user->zipcode = $request->zipcode;
-    $user->city = $request->city;
-    $user->state = $request->state;
-    $user->country = $request->country;
-    $user->place = $request->place;
-   
-    $user->password = Hash::make($request->password);
-    $user->save();
-
-    $user->assignRole($request->user_type);
-
-   
-
-    return redirect(route('attendee-users.index'))
-        ->withSuccess('Attendee data has been saved successfully');
+        $user = new User();
+        $user->name = $request->first_name;
+        $user->lastname = $request->last_name;
+        $user->email = $request->email;
+        $user->designation = $request->designation;
+        $user->tags = $request->tags;
+        $user->website_url = $request->website_url;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->mobile = $request->mobile;
+        $user->save();
+        $user->assignRole($request->user_type);
+        return redirect(route('attendee-users.index'))
+            ->withSuccess('Attendee data has been saved successfully');
     }
 
     /**
@@ -169,9 +135,9 @@ class AttendeeUserController extends Controller
      */
     public function show(string $id)
     {
-        //
+     
         $user = User::findOrFail($id); // ensures fresh data
-    return view('users.attendee_users.view', compact('user'));
+        return view('users.attendee_users.view', compact('user'));
 
 
     }
@@ -192,62 +158,36 @@ class AttendeeUserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
-         $user = User::findOrFail($id);
+        $user = User::findOrFail($id);
 
-    $validator = Validator::make($request->all(), [
-        
-        'username' => 'required|string|unique:users,username,' . $user->id,
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
-        'designation' => 'nullable|string|max:255' ,
-        'tags' => 'nullable|string|max:255'  ,
-        'website_url' => 'nullable|url|max:255',
-        'linkedin_url' => 'nullable|url|max:255',
-        'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
-        'dob' => 'required|date',
-        'gender' => 'nullable|string|max:255',
-        'street' => 'nullable|string|max:255',
-        'zipcode' => 'nullable|string|max:255',
-        'city' => 'nullable|string|max:255',
-        'state' => 'nullable|string|max:255',
-        'country' => 'nullable|string|max:255',
-        'place' => 'nullable|string|max:255',
-        'password' => 'nullable|string|min:8',
-        'user_type' => 'required|string'
-    ]);
+        $validator = Validator::make($request->all(), [
+            
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+            'designation' => 'nullable|string|max:255' ,
+            'tags' => 'nullable|string|max:255'  ,
+            'website_url' => 'nullable|url|max:255',
+            'linkedin_url' => 'nullable|url|max:255',
+            'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
+            'user_type' => 'required|string'
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()->withInput()->withErrors($validator);
-    }
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
 
-    $user->username = $request->username;
-    $user->name = $request->first_name;
-    $user->lastname = $request->last_name;
-    $user->email = $request->email;
-    $user->designation = $request->designation;
-    $user->tags = $request->tags;
-    $user->website_url = $request->website_url;
-    $user->linkedin_url = $request->linkedin_url;
-    $user->mobile = $request->mobile;
-    $user->dob = $request->dob;
-    $user->gender = $request->gender;
-    $user->street = $request->street;
-    $user->zipcode = $request->zipcode;
-    $user->city = $request->city;
-    $user->state = $request->state;
-    $user->country = $request->country;
-    $user->place = $request->place;
-
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
-    }
-
-    $user->save();
-
-    $user->syncRoles([]);
-    $user->assignRole($request->user_type);
+        $user->name = $request->first_name;
+        $user->lastname = $request->last_name;
+        $user->email = $request->email;
+        $user->designation = $request->designation;
+        $user->tags = $request->tags;
+        $user->website_url = $request->website_url;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->mobile = $request->mobile;
+        $user->save();
+        $user->syncRoles([]);
+        $user->assignRole($request->user_type);
 
    
 
@@ -260,45 +200,28 @@ class AttendeeUserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
         $user = User::findOrFail($id);
+        $user->roles()->detach();
+        $user->delete();
 
-    // Detach roles to clean up pivot table (optional but good practice)
-    $user->roles()->detach();
-
-    // Delete user permanently
-    $user->delete();
-
-    return redirect()
-        ->route('attendee-users.index')
-        ->withSuccess('Attendee user deleted successfully.');
+        return redirect()
+            ->route('attendee-users.index')
+            ->withSuccess('Attendee user deleted successfully.');
 
     }
-       public function toggleBlock(User $user)
-{
-    $currentUser = auth()->user();
-
-    // Admin or Admin can block
-    if ($currentUser->hasRole(['Admin', 'Admin'])) {
-        // $user->is_block = true;
-        // $user->save();
-        // return back()->withSuccess('User has been blocked successfully.');
-        $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
-
-        if ($user->hasAnyRole($allowedRoles)) {
-            $user->is_block = true;
-            $user->save();
-            return back()->withSuccess('User has been blocked successfully.');
-        } else {
-            return back()->withErrors('You are not allowed to block this type of user.');
+    public function toggleBlock(User $user){
+        $currentUser = auth()->user();
+        if ($currentUser->hasRole(['Admin'])) {
+            $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
+            if ($user->hasAnyRole($allowedRoles)) {
+                $user->is_block = true;
+                $user->save();
+                return back()->withSuccess('User has been blocked successfully.');
+            } else {
+                return back()->withErrors('You are not allowed to block this type of user.');
+            }
         }
-    
-
+        return back()->withErrors('You do not have permission to perform this action.');
     }
-
-    
-
-    return back()->withErrors('You do not have permission to perform this action.');
-}
     
 }
