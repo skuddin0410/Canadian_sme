@@ -7,7 +7,7 @@ use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\SupportStaff\HelpdeskUserController;
 use App\Http\Controllers\SupportStaff\PasswordResetController;
 
-Route::group(['middleware' => ['webauth', 'role:Support Staff Or Helpdesk']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
 	// Route::post('/exhibitor-users/{id}/send-reset', [ExhibitorUserController::class, 'sendResetLink'])
     // ->name('exhibitor-users.send-reset');

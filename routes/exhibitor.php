@@ -14,7 +14,7 @@ use App\Http\Controllers\ExhibitorAdmin\ProductTechnicalSpecController;
 use App\Http\Controllers\ExhibitorAdmin\PublicProductServiceController;
 
 
-Route::group(['middleware' => ['webauth', 'role:Admin']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::get('company/details', [CompanyController::class, 'details'])->name('company.details');
 Route::group(['middleware' => ['company.exists']], function () {
     Route::get('company/contacts', [CompanyContactController::class, 'index'])->name('company.contacts.index');
