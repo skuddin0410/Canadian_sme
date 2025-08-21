@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use App\Models\Otp;
 use App\Models\User;
 use App\Mail\OtpMail;
+use App\Models\SessionDate;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
@@ -49,23 +51,21 @@ class OtpController extends Controller
         
     }
 
-    
-    public function verify(Request $request) {
+public function verify(Request $request)
+{
     $validator = Validator::make($request->all(), [
-        'email' => 'sometimes|nullable|string|max:255|email',
-        // 'mobile' => 'sometimes|nullable|string',
+        'email' => 'required|string|email|max:255',
         'otp'   => 'required|digits:4',
     ]);
-    
+
     if ($validator->fails()) {
         return response()->json([
             'success' => false,
             'message' => $validator->errors(),
-            'data'    => $request->all(),
         ], 422);
     }
 
-    
+    // Find OTP
     $otp = Otp::where('email', $request->email)
         ->where('otp', $request->otp)
         ->where('expired_at', '>=', now())
@@ -74,56 +74,56 @@ class OtpController extends Controller
     if (!$otp) {
         return response()->json([
             'success' => false,
-            'message' => 'Invalid OTP',
-            // 'data'    => $request->all(),
+            'message' => 'Invalid or expired OTP',
         ], 400);
     }
 
-    
-    $user = User::where('email', $request->email)->first();
+   
+    $user = User::firstOrCreate(
+        ['email' => $request->email],
+        ['password' => Hash::make($request->otp)]
+    );
 
-    if (!$user) {
-        // Create new user if not exists
-        $user = new User();
-        $user->email = $request->email;
-        $user->password = Hash::make($request->otp); // store hashed OTP
-        $user->save();
-    } else {
-        // Update password with new OTP hash (optional, so OTP works for login)
-        $user->password = Hash::make($request->otp);
-        $user->save();
-    }
+ 
+    $user->update([
+        'password' => Hash::make($request->otp)
+    ]);
 
     try {
-        // Prepare credentials for JWT attempt
+       
         $credentials = [
             'email'    => $request->email,
-            'password' => $request->otp, // raw OTP entered by user
+            'password' => $request->otp, 
         ];
 
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials',
-                'data'    => $request->all(),
             ], 401);
         }
 
-        $user = JWTAuth::user();
+    
+        $session = SessionDate::create([
+            'user_id'    => $user->id,
+            'expires_at' => Carbon::now()->addMonths(2),
+        ]);
 
         return response()->json([
-            // 'success' => true,
-            'message' => 'Login successful',
-            'data'    => compact( 'token'),
+            'success'    => true,
+            'message'    => 'Login successful',
+            'token'      => $token,
+            'expires_at' => $session->expires_at,
         ]);
 
     } catch (JWTException $e) {
         return response()->json([
             'success' => false,
-            'message' => $e->getMessage(),
-            'data'    => [],
+            'message' => 'Could not create token',
+            'error'   => $e->getMessage(),
         ], 500);
     }
 }
+
 
 }
