@@ -81,7 +81,12 @@ class HomeController extends Controller
 
 
             $user = auth()->user();
-            User::where('id',$user->id)->update(['name' =>$request->name,'mobile' =>$request->contact_number]);
+            User::where('id',$user->id)->update(['name' =>$request->name,'lastname' =>$request->lastname,'mobile' =>$request->contact_number,'designation' =>$request->designation]);
+
+           if($request->file("image")){
+              $this->imageUpload($request->file("image"),'users',$user->id,'users','photo',$idForUpdate=$user->id);   
+            }
+
             return redirect()->route('change.account.information')
             ->withSuccess('Your account information changed successfully.');
         }catch(\Exception $e) {
