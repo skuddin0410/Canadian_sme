@@ -15,8 +15,8 @@ class PasswordResetController extends Controller
 {
     //
      protected $allowedRoles = [
-        'Exhibitor Admin',
-        'Exhibitor Representative',
+        'Admin',
+        'Representative',
         'Attendee',
         'Speaker'
     ];

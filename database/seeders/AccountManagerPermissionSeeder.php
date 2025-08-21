@@ -87,13 +87,8 @@ class AccountManagerPermissionSeeder extends Seeder
         foreach ($adminPermission  as $permissionName) {
          Permission::create(['name' => $permissionName, 'guard_name'=>'web']);
         }
-
         $adminRole = Role::where('name', 'Admin')->first(); 
         $adminRole->givePermissionTo($adminPermission);
-
-        $adminEventRole = Role::where('name', 'Event Admin')->first(); 
-        $adminEventRole->givePermissionTo($adminPermission);
-
 
     }
 }

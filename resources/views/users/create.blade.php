@@ -278,9 +278,9 @@
                  <option value="">Please Select Role</option> 
                  <option value="Event Admin" {{ old('user_type') =='Event Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Event Admin' ? 'selected' : '' }}>Event Admin</option> 
 
-                  <option value="Exhibitor Admin" {{ old('user_type') =='Exhibitor Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Admin' ? 'selected' : '' }}>Exhibitor Admin</option> 
+                  <option value="Admin" {{ old('user_type') =='Admin' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Admin' ? 'selected' : '' }}>Admin</option> 
 
-                  <option value="Exhibitor Representative" {{ old('user_type') =='Exhibitor Representative' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Representative' ? 'selected' : '' }}>Exhibitor Representative</option> 
+                  <option value="Representative" {{ old('user_type') =='Representative' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Representative' ? 'selected' : '' }}>Representative</option> 
 
                   <option value="Attendee" {{ old('user_type') =='Attendee' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Attendee' ? 'selected' : '' }}>Attendee</option> 
 

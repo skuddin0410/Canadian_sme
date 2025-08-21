@@ -17,7 +17,7 @@
                         @if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Event Admin') || Auth::user()->hasRole('Support Staff Or Helpdesk'))
                             <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
                         @endif
-                        @if(auth()->user()->hasRole('Exhibitor Admin'))
+                        @if(auth()->user()->hasRole('Admin'))
                             <a href="{{ route('attendee-users.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add Attendee
                             </a>

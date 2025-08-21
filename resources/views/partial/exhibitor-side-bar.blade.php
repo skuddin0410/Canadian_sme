@@ -70,7 +70,7 @@
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->is('exhibitor-representative') ? 'active' : '' }}">
                     <a href="{{ url('representative-users') }}" class="menu-link">
-                        <div data-i18n="Exhibitor Representative">Exhibitor Representative</div>
+                        <div data-i18n="Representative">Representative</div>
                     </a>
                 </li>
                 <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">

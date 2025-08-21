@@ -34,8 +34,8 @@ class HomeController extends Controller
     {  
         if ( Auth::user()->hasRole('Admin') 
             || Auth::user()->hasRole('Event Admin') 
-            || Auth::user()->hasRole('Exhibitor Admin') 
-            || Auth::user()->hasRole('Exhibitor Representative')
+            || Auth::user()->hasRole('Admin') 
+            || Auth::user()->hasRole('Representative')
             || Auth::user()->hasRole('Attendee')
             || Auth::user()->hasRole('Speaker')
             || Auth::user()->hasRole('Support Staff Or Helpdesk')

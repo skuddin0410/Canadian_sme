@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title')
-    Exhibitor Admin | Company Details
+    Admin | Company Details
 @endsection
 
 @section('content')

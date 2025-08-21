@@ -21,7 +21,7 @@
     {{-- Block Button for Admin / Event Admin --}}
     @if(Auth::user()->hasAnyRole(['Admin','Event Admin']) 
         && !$user->is_block 
-        && $user->hasAnyRole(['Exhibitor Admin','Exhibitor Representative','Attendee','Speaker']))
+        && $user->hasAnyRole(['Admin','Representative','Attendee','Speaker']))
         <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST">
             @csrf
             @method('PATCH')

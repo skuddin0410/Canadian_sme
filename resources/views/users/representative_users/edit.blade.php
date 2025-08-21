@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin | Edit Exhibitor Representative Data
+    Admin | Edit Representative Data
 @endsection
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Exhibitor Representative /</span> Edit</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Representative /</span> Edit</h4>
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Edit Exhibitor Representative</h5>
+          <h5 class="mb-0">Edit Representative</h5>
         </div>
         <div class="card-body">
           @if(Session::has('success'))
@@ -196,7 +196,7 @@
                   <label class="form-label">Role <span class="text-danger">*</span></label>
                   <select class="form-control" name="user_type" required>
                    
-                    <option value="Exhibitor Representative" {{ old('user_type', $user->roles[0]->name ?? '') == 'Exhibitor Representative' ? 'selected' : '' }}>Exhibitor Representative</option>
+                    <option value="Representative" {{ old('user_type', $user->roles[0]->name ?? '') == 'Representative' ? 'selected' : '' }}>Representative</option>
                   </select>
                 </div>
               </div>

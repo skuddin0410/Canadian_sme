@@ -80,7 +80,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
      Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
 });
 
-    Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Exhibitor Admin|Support Staff Or Helpdesk']], function () {
+    Route::group(['middleware' => ['webauth', 'role:Admin|Event Admin|Admin|Support Staff Or Helpdesk']], function () {
     Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
         'exhibitor-users' => 'exhibitor_user',
     ]);

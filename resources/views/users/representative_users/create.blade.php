@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin |  Add Exhibitor Representative
+    Admin |  Add Representative
 @endsection
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Exhibitor Representative/</span>Create</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Representative/</span>Create</h4>
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Exhibitor Representative @if(!empty($user)) Update @else Create @endif</h5>
+          <h5 class="mb-0">Representative @if(!empty($user)) Update @else Create @endif</h5>
         </div>
         <div class="card-body">
           @if(Session::has('success'))
@@ -374,7 +374,7 @@
                 <select class="form-control" name="user_type">
                  <option value="">Please Select Role</option> 
 
-                  <option value="Exhibitor Representative" {{ old('user_type') =='Exhibitor Representative' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Exhibitor Representative' ? 'selected' : '' }}>Exhibitor Representative</option> 
+                  <option value="Representative" {{ old('user_type') =='Representative' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Representative' ? 'selected' : '' }}>Representative</option> 
                  
                 </select>
 

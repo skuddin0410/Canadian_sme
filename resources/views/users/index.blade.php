@@ -104,9 +104,9 @@
               <option value="">Select role...</option>
               <option value="Event Admin" >Event Admin</option> 
 
-                  <option value="Exhibitor Admin">Exhibitor Admin</option> 
+                  <option value="Admin">Admin</option> 
 
-                  <option value="Exhibitor Representative">Exhibitor Representative</option> 
+                  <option value="Representative">Representative</option> 
 
                   <option value="Attendee">Attendee</option> 
 

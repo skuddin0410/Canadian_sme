@@ -22,7 +22,7 @@ class CalendarController extends Controller
                 })->orderBy('created_at', 'DESC')->get();
 
         $exhibitors = User::whereHas("roles", function ($q) {
-                    $q->where("name", 'Exhibitor Admin');
+                    $q->where("name", 'Admin');
                 })->orderBy('created_at', 'DESC')->get();
         
         return view('calendar.index', compact('event','speakers','exhibitors','booths'));
@@ -32,7 +32,7 @@ class CalendarController extends Controller
     {
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Admin','Event Admin','Exhibitor Admin']);
+                    $q->whereNotIn("name", ['Admin','Event Admin','Admin']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
         

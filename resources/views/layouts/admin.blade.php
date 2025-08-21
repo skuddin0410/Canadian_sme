@@ -66,7 +66,7 @@
             @include('partial.admin-side-bar')
         @endif    
         
-        @if(Auth::user()->hasRole('Exhibitor Admin'))
+        @if(Auth::user()->hasRole('Admin'))
            @include('partial.exhibitor-side-bar')
         @endif 
         
