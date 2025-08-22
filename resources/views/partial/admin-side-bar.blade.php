@@ -257,7 +257,7 @@
         
 
         
-    
+{{--     
         <li class="menu-item {{ request()->is('users*') ? 'active open' : '' }} {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
@@ -272,24 +272,9 @@
                 </li>
                 @endif
             </ul>
-        </li>
+        </li> --}}
    
         
-
-        <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('admin-users*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
-                <div data-i18n="Admin Users">Admin Users</div>
-            </a>
-            <ul class="menu-sub">
-                
-                <li class="menu-item {{ request()->is('admin-users') ? 'active open' : '' }}">
-                   <a href="{{ url('admin-users') }}" class="menu-link">
-                    <div data-i18n="admin-users">Lists</div>
-                   </a>
-                </li>
-            </ul>
-        </li>   
     
 
     </ul>
