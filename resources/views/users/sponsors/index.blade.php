@@ -14,19 +14,17 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Sponsors List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                        @if(Auth::user()->hasRole('Admin')  || Auth::user()->hasRole('Support Staff Or Helpdesk'))
-                            <a href="{{ route('sponsors.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
-                        @endif
-                        @if(auth()->user()->hasRole('Admin'))
-                            <a href="{{ route('sponsors.create') }}" class="btn btn-primary dt-button create-new">
+                      
+                        <a href="{{ route('sponsors.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
+
+                        <a href="{{ route('sponsors.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add Sponsors
                             </a>
-                        @endif
+                    
                     </div>
                 </div>
 
-                <!-- Search Section -->
-               <!-- Search + Filter Section -->
+      
 <div class="col-12 text-end p-3">
     <form action="#" method="GET" id="users-search-filter-form">
         <div class="row justify-content-end g-2 align-items-center">

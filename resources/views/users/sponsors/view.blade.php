@@ -102,4 +102,6 @@ Admin | Sponsors Details
         </div>
     </div>
 </div>
+
+@include('users.ChangeUserPassword')
 @endsection
