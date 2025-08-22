@@ -76,7 +76,8 @@ class AdminUsersController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
-            'mobile' => 'required|string|unique:users,mobile'
+            'mobile' => 'required|string|unique:users,mobile',
+            'bio'    => 'required|string|max:500',
 
         ]);
         if ($validator->fails()) {
@@ -97,6 +98,7 @@ class AdminUsersController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio = $request->bio;
         $user->save();
         $user->assignRole('Admin');
         if ($request->hasFile('image')) {
@@ -137,6 +139,7 @@ class AdminUsersController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email,'. $id,
             'mobile' => 'required|string|unique:users,mobile,'. $id,
+            'bio'    => 'required|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -156,6 +159,7 @@ class AdminUsersController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio = $request->bio;
         $user->save();
         $user->assignRole('Admin');
         if ($request->hasFile('image')) {

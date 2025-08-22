@@ -10,3 +10,24 @@
     </div>
 </div>
 @endif
+
+
+   @if(Session::has('success'))
+   <div class="container-xxl mt-1">
+    <div class="card-body pt-0">
+      <div class="alert alert-success">
+      {{ Session::get('success') }}
+      </div>
+    </div>
+    </div>
+  @endif
+  @if(Session::has('error'))
+   <div class="container-xxl mt-1">
+    <div class="card-body pt-0">
+      <div class="alert alert-danger">
+      {{ Session::get('error') }}
+      </div>
+    </div> 
+    </div> 
+  @endif
+
