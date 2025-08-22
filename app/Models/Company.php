@@ -34,14 +34,6 @@ class Company extends Model
             ->where('file_type', 'certifications')
             ->whereNotNull('file_name');
     }
-//     public function booths()
-// {
-//     return $this->hasMany(Booth::class, 'user_id', 'user_id');
-// }
-public function booths()
-{
-    return $this->hasMany(Booth::class, 'company_id', 'id'); // adjust column names
-}
 
 
     public function logoFile()
@@ -50,6 +42,7 @@ public function booths()
             ->where('table_type', 'companies')
             ->where('file_type', 'logo');
     }
+
     public function mediaGallery()
     {
         return $this->hasMany(Drive::class, 'table_id', 'id')
@@ -57,6 +50,7 @@ public function booths()
             ->where('file_type', 'media_gallery')
             ->whereNotNull('file_name');
     }
+
     public function videos()
     {
         return $this->hasMany(Drive::class, 'table_id', 'id')
@@ -65,7 +59,10 @@ public function booths()
     }
     
 
-
+   public function products()
+   {
+    return $this->belongsTo(Product::class,'company_id');
+   }
 
 
 }

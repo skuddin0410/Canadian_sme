@@ -29,7 +29,7 @@ class Session extends Model
     {
         return $this->belongsTo(Booth::class, 'booth_id');
     }
-
+    
 
     public function speakers(): BelongsToMany
     {

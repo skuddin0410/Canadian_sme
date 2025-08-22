@@ -98,27 +98,6 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    // public function setPasswordAttribute($value)
-    // {
-    //     return $this->attributes['password'] = bcrypt($value);
-    // }
-    // In App\Models\User.php
-
-public function booths()
-{
-    return $this->hasManyThrough(
-        Booth::class,
-        Company::class,
-        'user_id',      // Foreign key on Company (Company.user_id → User.id)
-        'company_id',   // Foreign key on Booth (Booth.company_id → Company.id)
-        'id',           // Local key on User (User.id)
-        'id'            // Local key on Company (Company.id)
-    );
-}
-
-
-
-
     public function getFullNameAttribute()
     {
         return $this->name . ' ' . $this->lastname;
