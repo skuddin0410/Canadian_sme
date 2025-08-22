@@ -52,20 +52,20 @@ Admin | Attendee Details
                     <div class="info-container">
                     <div class="row">   
 
-                    <div class="text-left mb-2">
-                        <label for="profileImageInput">
-                          <img id="profileImagePreview" 
-                               src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
-                               class="rounded-circle border border-2" 
-                               style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
-                        </label>
-                    </div>    
-                    <div class="col-12 mt-2">
-                        <ul class="list-unstyled justify-content-between">
-                        <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
-                         </ul>
-                    </div>  
-                     <div class="col-6">
+                        <div class="text-left mb-2">
+                            <label for="profileImageInput">
+                              <img id="profileImagePreview" 
+                                   src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
+                                   class="rounded-circle border border-2" 
+                                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                            </label>
+                        </div>    
+                        <div class="col-12 mt-2">
+                            <ul class="list-unstyled justify-content-between">
+                            <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
+                             </ul>
+                        </div>  
+                        <div class="col-6">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Name:</span> <span>{{ $user->name }}
                                             {{ $user->lastname }}</span></li>

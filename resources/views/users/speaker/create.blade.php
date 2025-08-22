@@ -31,365 +31,184 @@
              @method('PUT')
             @endif
             <div class="row">
-            <div class="col-6">
-             <div class="mb-3">
-              <label class="form-label" for="title">First Name<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="first_name"
-                  id="slug-source"
-                  value="{{$user->name ?? old('first_name')}}"
-                  placeholder="User first name"/>
-              </div>
-              @if ($errors->has('first_name'))
-                <span class="text-danger text-left">{{ $errors->first('first_name') }}</span>
-              @endif
+             <div class="text-left">
+              <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
+              <label for="profileImageInput">
+                <img id="profileImagePreview" 
+                     src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
+                     class="rounded-circle border border-2" 
+                     style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+              </label>
+              <p class="mt-2 text-muted">Click image to upload</p>
             </div>
-          </div>
-          <div class="col-6">
-            <div class="mb-3">
+             
+            <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="title">First Name<span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="first_name" id="slug-source"
+                      value="{{$user->name ?? old('first_name')}}" placeholder="User first name" />
+                  </div>
+                  @if ($errors->has('first_name'))
+                  <span class="text-danger text-left">{{ $errors->first('first_name') }}</span>
+                  @endif
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="mb-3">
                   <label class="form-label" for="title">last name<span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="last_name"
-                      id="last-name-target"
-                      value="{{$user->lastname ?? old('last_name')}}"
-                      placeholder="User last name"
-                      />
+                    <input type="text" class="form-control" name="last_name" id="last-name-target"
+                      value="{{$user->lastname ?? old('last_name') }}" placeholder="User last name" />
                   </div>
                   @if ($errors->has('last_name'))
-                    <span class="text-danger text-left">{{ $errors->first('last_name') }}</span>
+                  <span class="text-danger text-left">{{ $errors->first('last_name') }}</span>
                   @endif
-            </div>
-           </div>
-          <div class="col-6">
-             <div class="mb-3">
-              <label class="form-label" for="title">User Name<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="username"
-                  id="slug-target"
-                  value="{{$user->username ?? old('username')}}"
-                  placeholder="User name"/>
+                </div>
               </div>
-              @if ($errors->has('username'))
-                <span class="text-danger text-left">{{ $errors->first('username') }}</span>
-              @endif
-            </div>
-          </div>
-            <div class="col-6">
-             <div class="mb-3">
-              <label class="form-label" for="title">Email<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="email"
-                  id="email"
-                  value="{{ $user->email ?? old('email') }}"
-                  placeholder="User email"/>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="title">Email<span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="email" id="email"
+                      value="{{$user->email ?? old('email') }}" placeholder="User email" />
+                  </div>
+                  @if ($errors->has('email'))
+                  <span class="text-danger text-left">{{ $errors->first('email') }}</span>
+                  @endif
+                </div>
               </div>
-              @if ($errors->has('email'))
-                <span class="text-danger text-left">{{ $errors->first('email') }}</span>
-              @endif
-            </div>
-          </div>
-            <!-- Designation -->
-    <div class="col-6">
-        <div class="mb-3">
-            <label class="form-label" for="designation">Designation</label>
-            <div class="input-group input-group-merge">
-                <span id="designation-icon" class="input-group-text">
-                    <i class="bx bx-briefcase"></i>
-                </span>
-                <input
-                    type="text"
-                    class="form-control"
-                    name="designation"
-                    id="designation"
-                    value="{{ $user->designation ?? old('designation') }}"
-                    placeholder="Enter designation"/>
-            </div>
-            @if ($errors->has('designation'))
-                <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
-            @endif
-        </div>
-    </div>
 
-    <!-- Tags -->
-    {{-- <div class="col-6">
-        <div class="mb-3">
-            <label class="form-label" for="tags">Tags</label>
-            <div class="input-group input-group-merge">
-                <span id="tags-icon" class="input-group-text">
-                    <i class="bx bx-purchase-tag"></i>
-                </span>
-                <input
-                    type="text"
-                    class="form-control"
-                    name="tags"
-                    id="tags"
-                    value="{{ old('tags', $user->tags ?? '') }}"
-                    data-role="tagsinput"
-                    placeholder="Add tags (comma separated)"/>
-            </div>
-            @if ($errors->has('tags'))
-                <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
-            @endif
-        </div>
-    </div> --}}
-    <div class="col-6">
-    <div class="mb-3">
-        <label class="form-label" for="tags">Tags</label>
-        <div class="input-group input-group-merge">
-            <span id="tags-icon" class="input-group-text">
-                <i class="bx bx-purchase-tag"></i>
-            </span>
-            <input
-                type="text"
-                class="form-control"
-                name="tags"
-                id="tags"
-                value="{{ old('tags', isset($user) ? $user->tags : '') }}"
-                data-role="tagsinput"
-                placeholder="Add tags (comma separated)" />
-        </div>
-        @if ($errors->has('tags'))
-            <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
-        @endif
-    </div>
-</div>
-
-    <div class="col-12">
-    <div class="mb-3">
-       <label class="form-label">Bio <span class="text-danger">*</span></label>
-                        <textarea name="bio" id="bio" class="form-control" placeholder="Speaker Bio" rows="8">{{ old('bio') }}</textarea>
-                        @if ($errors->has('bio'))
-                            <span class="text-danger">{{ $errors->first('bio') }}</span>
-                        @endif
-
-    </div>
-  </div>
-
-          <div class="col-6">
-    <div class="mb-3">
-        <label class="form-label" for="website_url">Website URL</label>
-        <div class="input-group input-group-merge">
-            <span class="input-group-text"><i class="bx bx-link"></i></span>
-            <input type="url" class="form-control" name="website_url" id="website_url"
-                   value="{{ old('website_url') }}" placeholder="https://example.com"/>
-        </div>
-        @if ($errors->has('website_url'))
-            <span class="text-danger">{{ $errors->first('website_url') }}</span>
-        @endif
-    </div>
-</div>
-
-<div class="col-6">
-    <div class="mb-3">
-        <label class="form-label" for="linkedin_url">LinkedIn URL</label>
-        <div class="input-group input-group-merge">
-            <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
-            <input type="url" class="form-control" name="linkedin_url" id="linkedin_url"
-                   value="{{ old('linkedin_url') }}" placeholder="https://linkedin.com/in/username"/>
-        </div>
-        @if ($errors->has('linkedin_url'))
-            <span class="text-danger">{{ $errors->first('linkedin_url') }}</span>
-        @endif
-    </div>
-</div>
-
-          <div class="col-6">
-            <div class="mb-3">
+               <div class="col-6">
+                <div class="mb-3">
                   <label class="form-label" for="title">Mobile<span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
                     <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="mobile"
-                      id="mobile"
-                      value="{{ $user->mobile ?? old('mobile') }}"
-                      placeholder="User mobile"
-                      />
+                    <input type="text" class="form-control" name="mobile" id="mobile"
+                      value="{{ $user->mobile ?? old('mobile') }}" placeholder="User mobile" />
                   </div>
                   @if ($errors->has('mobile'))
-                    <span class="text-danger text-left">{{ $errors->first('mobile') }}</span>
+                  <span class="text-danger text-left">{{ $errors->first('mobile') }}</span>
                   @endif
-            </div>
-           </div>
-
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">DOB<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="date"
-                  class="form-control"
-                  name="dob"
-                  id="dob"
-                  value="{{ !empty($user) && $user->dob ? userDateFormat($user->dob) : old('dob') }}"
-                  placeholder="Event at"/>
+                </div>
               </div>
-              @if ($errors->has('dob'))
-                <span class="text-danger text-left">{{ $errors->first('dob') }}</span>
-              @endif
-            </div> 
-          </div>
-          <div class="col-6">
-          <div class="mb-3">
-              <label class="form-label" for="title">Gender</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
-                <select class="form-control" name="gender">
-                 <option value="male" {{ !empty($user) && $user->gender=='male' ? 'selected' : '' }}  {{ old('dob') =='male' ? 'selected' : '' }}>Male</option>
-                 <option value="female" {{ old('dob') =='female' ? 'selected' : '' }} {{ !empty($user) && $user->gender=='female' ? 'selected' : '' }}>Female</option>
-                </select>
-              </div>
-            </div>
-          </div>
+              
 
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">Place</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="place"
-                  id="place"
-                  value="{{ $user->place ?? old('place') }}"
-                  placeholder="Place"/>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="designation">Designation</label>
+                  <div class="input-group input-group-merge">
+                    <span id="designation-icon" class="input-group-text">
+                      <i class="bx bx-briefcase"></i>
+                    </span>
+                    <input type="text" class="form-control" name="designation" id="designation"
+                      value="{{$user->designation ?? old('designation') }}" placeholder="Enter designation" />
+                  </div>
+                  @if ($errors->has('designation'))
+                  <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
+                  @endif
+                </div>
               </div>
-              @if ($errors->has('place'))
-                <span class="text-danger text-left">{{ $errors->first('place') }}</span>
-              @endif
-            </div> 
-          </div>
 
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">Street</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="street"
-                  id="street"
-                  value="{{ $user->street ?? old('street') }}"
-                  placeholder="Street"/>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="tags">Tags</label>
+                  <div class="input-group input-group-merge">
+                    <span id="tags-icon" class="input-group-text">
+                      <i class="bx bx-purchase-tag"></i>
+                    </span>
+                    <input type="text" class="form-control" name="tags" id="tags"
+                      value="{{$user->tags ?? old('tags') }}" data-role="tagsinput"
+                      placeholder="Add tags (comma separated)" />
+                  </div>
+                  @if ($errors->has('tags'))
+                  <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
+                  @endif
+                </div>
               </div>
-              @if ($errors->has('street'))
-                <span class="text-danger text-left">{{ $errors->first('street') }}</span>
-              @endif
-            </div> 
-          </div>
 
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">Zipcode</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="zipcode"
-                  id="zipcode"
-                  value="{{ $user->zipcode ?? old('zipcode') }}"
-                  placeholder="Zipcode"/>
-              </div>
-              @if ($errors->has('zipcode'))
-                <span class="text-danger text-left">{{ $errors->first('zipcode') }}</span>
-              @endif
-            </div> 
-          </div>
-
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">City</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="city"
-                  id="city"
-                  value="{{ $user->city ?? old('city') }}"
-                  placeholder="City"/>
-              </div>
-              @if ($errors->has('city'))
-                <span class="text-danger text-left">{{ $errors->first('city') }}</span>
-              @endif
-            </div> 
-          </div>
-
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">State</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="state"
-                  id="state"
-                  value="{{ $user->state ?? old('state') }}"
-                  placeholder="State"/>
-              </div>
-              @if ($errors->has('state'))
-                <span class="text-danger text-left">{{ $errors->first('state') }}</span>
-              @endif
-            </div> 
-          </div>
-
-          <div class="col-6">
-            <div class="mb-3">
-              <label class="form-label" for="title">Country</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="country"
-                  id="country"
-                  value="{{ $user->country ?? old('country') }}"
-                  placeholder="Country"/>
-              </div>
-              @if ($errors->has('country'))
-                <span class="text-danger text-left">{{ $errors->first('country') }}</span>
-              @endif
-            </div> 
-          </div>
-          
-          <div class="col-6">
-          <div class="mb-3">
-              <label class="form-label" for="title">Role</label>
-              <div class="input-group input-group-merge">
-                <span id="title-icon" class="input-group-text"><i class="bx bx-chevron-down"></i></span>
-                <select class="form-control" name="user_type">
-                 <option value="">Please Select Role</option> 
-
-                  <option value="Speaker" {{ old('user_type') =='Speaker' ? 'selected' : '' }} {{ !empty($user) && !empty($user->roles) && $user->roles[0]->name=='Speaker' ? 'selected' : '' }}>Speaker</option> 
-                 
-                </select>
+            <div class="col-12">
+              <div class="mb-3">
+                 <label class="form-label">Bio <span class="text-danger">*</span></label>
+                  <textarea name="bio" id="bio" class="form-control" placeholder="Speaker Bio" rows="8">{{$user->bio ?? old('bio') }}</textarea>
+                  @if ($errors->has('bio'))
+                      <span class="text-danger">{{ $errors->first('bio') }}</span>
+                  @endif
 
               </div>
             </div>
-           
-</div>
+
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="form-label" for="website_url">Website</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bx-link"></i></span>
+                    <input type="text" class="form-control" name="website_url" id="website_url"
+                      value="{{$user->website_url ?? old('website_url') }}" placeholder="https://example.com" />
+                  </div>
+                  @if ($errors->has('website_url'))
+                  <span class="text-danger">{{ $errors->first('website_url') }}</span>
+                  @endif
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="linkedin_url">LinkedIn</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
+                    <input type="text" class="form-control" name="linkedin_url" id="linkedin_url"
+                      value="{{$user->linkedin_url ?? old('linkedin_url') }}" placeholder="https://linkedin.com/in/username" />
+                  </div>
+                  @if ($errors->has('linkedin_url'))
+                  <span class="text-danger">{{ $errors->first('linkedin_url') }}</span>
+                  @endif
+                </div>
+              </div>
+               <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="facebook_url">Facebook</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
+                    <input type="text" class="form-control" name="facebook_url" id="facebook_url"
+                      value="{{ $user->facebook_url ?? old('facebook_url') }}" placeholder="https://facebook.com" />
+                  </div>
+                  @if ($errors->has('facebook_url'))
+                  <span class="text-danger">{{ $errors->first('facebook_url') }}</span>
+                  @endif
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="instagram">Instagram</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
+                    <input type="text" class="form-control" name="instagram_url" id="instagram_url"
+                      value="{{$user->instagram_url ?? old('instagram_url') }}" placeholder="https://instagram.com" />
+                  </div>
+                  @if ($errors->has('instagram_url'))
+                  <span class="text-danger">{{ $errors->first('instagram_url') }}</span>
+                  @endif
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="twitter">Twitter</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
+                    <input type="text" class="form-control" name="twitter_url" id="twitter_url"
+                      value="{{ $user->twitter_url ?? old('twitter_url') }}" placeholder="https://twitter.com" />
+                  </div>
+                  @if ($errors->has('twitter_url'))
+                  <span class="text-danger">{{ $errors->first('twitter_url') }}</span>
+                  @endif
+                </div>
+              </div>
 
           </div>
          
