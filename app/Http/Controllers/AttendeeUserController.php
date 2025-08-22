@@ -104,10 +104,10 @@ class AttendeeUserController extends Controller
         'email' => 'required|string|max:255|email|unique:users,email',
         'designation' => 'nullable|string|max:255',
         'tags' => 'nullable|string|max:255',
-        'website_url' => 'nullable|url|max:255',
-        'linkedin_url' => 'nullable|url|max:255',
+        'website_url' => 'nullable|string|max:255',
+        'linkedin_url' => 'nullable|string|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
-        'user_type' => 'required|string'
+        'bio' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -123,9 +123,17 @@ class AttendeeUserController extends Controller
         $user->tags = $request->tags;
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
+        $user->instagram_url = $request->linkedin_url;
+        $user->facebook_url = $request->facebook_url;
+        $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio = $request->bio;
         $user->save();
-        $user->assignRole($request->user_type);
+        $user->assignRole('Attendee');
+
+        if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo');
+        }
         return redirect(route('attendee-users.index'))
             ->withSuccess('Attendee data has been saved successfully');
     }
@@ -167,10 +175,10 @@ class AttendeeUserController extends Controller
             'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
-            'website_url' => 'nullable|url|max:255',
-            'linkedin_url' => 'nullable|url|max:255',
+            'website_url' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
-            'user_type' => 'required|string'
+            'bio' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -184,14 +192,18 @@ class AttendeeUserController extends Controller
         $user->tags = $request->tags;
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
+        $user->instagram_url = $request->linkedin_url;
+        $user->facebook_url = $request->facebook_url;
+        $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio = $request->bio;
         $user->save();
-        $user->syncRoles([]);
-        $user->assignRole($request->user_type);
 
-   
+        if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        }
 
-    return redirect(route('attendee-users.index'))->withSuccess('Attendee data has been updated successfully.');
+        return redirect(route('attendee-users.index'))->withSuccess('Attendee data has been updated successfully.');
 
     }
 

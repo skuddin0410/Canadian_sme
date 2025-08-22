@@ -14,17 +14,6 @@
           <h5 class="mb-0"> Admin user @if(!empty($user)) Update @else Create @endif</h5>
         </div>
         <div class="card-body">
-          @if(Session::has('success'))
-              <div class="alert alert-success">
-              {{ Session::get('success') }}
-              </div>
-          @endif
-          @if(Session::has('error'))
-              <div class="alert alert-danger">
-              {{ Session::get('error') }}
-              </div>
-          @endif
-           
             <form  action="@if(!empty($user)) {{ route('admin-users.update',['admin_user'=>$user->id]) }} @else {{ route('admin-users.store') }} @endif " method="POST" autocomplete="off" enctype="multipart/form-data" >
             {{ csrf_field() }}
              @if(!empty($user))
