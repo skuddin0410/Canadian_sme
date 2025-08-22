@@ -73,15 +73,10 @@ class AdminUsersController extends Controller
     public function store(Request $request)
     {   
         $validator = Validator::make($request->all(), [
-            // 'user_type' => 'required|string',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
-            'mobile' => 'required|string|unique:users,mobile',
-            'username' => 'required|string|alpha_num|unique:users,username',
-            // 'referral_coupon' => 'required|string|alpha_num|unique:users,referral_coupon',
-            'password' => 'required|string|min:8',
-            'confirm_password' => 'min:8|same:password',
+            'mobile' => 'required|string|unique:users,mobile'
 
         ]);
         if ($validator->fails()) {
@@ -90,17 +85,23 @@ class AdminUsersController extends Controller
         }
 
         $user = new User();
-        $user->username = $request->username;
+
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
         $user->email = $request->email;
+        $user->designation = $request->designation;
+        $user->tags = $request->tags;
+        $user->website_url = $request->website_url;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->instagram_url = $request->linkedin_url;
+        $user->facebook_url = $request->facebook_url;
+        $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
-        // $user->referral_coupon = $request->referral_coupon;
-        $user->password = Hash::make($request->password);
         $user->save();
-
         $user->assignRole('Admin');
-        // $user->assignRole($request->user_type);
+        if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo');
+        }
 
         return redirect(route('admin-users.index'))
             ->withSuccess('Admin users has been saved successfully');
@@ -112,6 +113,7 @@ class AdminUsersController extends Controller
     public function show(string $id)
     {
        $user = User::where('id',$id)->first(); 
+       $user->load('photo');
        return view('users.admin_users.view',compact('user'));
     }
 
@@ -119,8 +121,9 @@ class AdminUsersController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    {
+    {  
        $user = User::where('id',$id)->first(); 
+       $user->load('photo');
        return view('users.admin_users.create',compact('user'));
     }
 
@@ -130,14 +133,10 @@ class AdminUsersController extends Controller
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
-            // 'user_type' => 'required|string',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email,'. $id,
             'mobile' => 'required|string|unique:users,mobile,'. $id,
-            'username' => 'required|string|alpha_num|unique:users,username,'. $id,
-            // 'referral_coupon' => 'required|string|alpha_num|unique:users,referral_coupon,'.$id
-
         ]);
 
         if ($validator->fails()) {
@@ -146,15 +145,22 @@ class AdminUsersController extends Controller
         }
 
         $user = User::where('id',$id)->first();
-        $user->username = $request->username;
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
         $user->email = $request->email;
+        $user->designation = $request->designation;
+        $user->tags = $request->tags;
+        $user->website_url = $request->website_url;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->instagram_url = $request->linkedin_url;
+        $user->facebook_url = $request->facebook_url;
+        $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
-        // $user->referral_coupon = $request->referral_coupon;
-        $user->password = Hash::make($request->password);
         $user->save();
-        $user->assignRole("Admin");
+        $user->assignRole('Admin');
+        if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        }
 
         return redirect(route('admin-users.index'))
             ->withSuccess('Admin user data has been saved successfully');

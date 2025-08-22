@@ -26,11 +26,6 @@ Admin | Add Sponsors
           </div>
           @endif
 
-          @php
-              $filepath = "https://via.placeholder.com/150";
-
-          @endphp
-
         <div class="card-body">
           @if(Session::has('success'))
               <div class="alert alert-success">
@@ -54,11 +49,10 @@ Admin | Add Sponsors
             <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
             <label for="profileImageInput">
               <img id="profileImagePreview" 
-                   src="{{$filepath}}" 
+                   src="" 
                    class="rounded-circle border border-2" 
                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
             </label>
-            
             <p class="mt-2 text-muted">Click image to upload</p>
           </div>
 
@@ -267,16 +261,6 @@ Admin | Add Sponsors
       $("#slug-target").val(Text);
     }
   });
-  // $("#slug-target").keyup(function() {
-  //       var Text = $('#slug-source').val();
-  //       var Last = $('#last-name-target').val();
-  //       console.log(Text+" "+Last);
-  //       if(Last != undefined && Text != undefined){
-  //         Text = Text+" "+Last;
-  //         Text = slugify(Text);
-  //         $("#slug-target").val(Text); 
-  //       }       
-  //   });
   function slugify(str) {
     str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
     str = str.toLowerCase(); // convert string to lowercase
@@ -285,17 +269,5 @@ Admin | Add Sponsors
       .replace(/-+/g, '-'); // remove consecutive hyphens
     return str.replace(/^-+|-+$/g, '');
   }
-</script>
-<script>
-document.getElementById("profileImageInput").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById("profileImagePreview").src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
-});
 </script>
 @endsection

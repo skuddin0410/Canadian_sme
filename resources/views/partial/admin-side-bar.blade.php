@@ -84,7 +84,7 @@
             </ul>
         </li>
 
-        <li class="menu-item {{ request()->is('admin-users') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}">
             <a href="{{ url('admin-users') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-users"></i>
                 <div data-i18n="events">Team Managment</div>

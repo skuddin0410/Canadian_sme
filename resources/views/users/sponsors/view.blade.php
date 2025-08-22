@@ -48,22 +48,12 @@ Admin | Sponsors Details
                     <h5 class="border-bottom mb-4">Sponsors Details: {{ $user->full_name }}</h5>
 
                     <div class="info-container">
-                    <div class="row">
-
-                    @php
-                    $user = $user->load('photo');
-                    if( isset($user->photo->file_path) ){
-                      $filepath = $user->photo->file_path;
-                    }else{
-                      $filepath = "https://via.placeholder.com/150";
-                    }
-
-                    @endphp   
+                    <div class="row">   
                    <div class="text-left mb-2">
                     
                     <label for="profileImageInput">
                       <img id="profileImagePreview" 
-                           src="{{$filepath}}" 
+                           src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
                            class="rounded-circle border border-2" 
                            style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
                     </label>

@@ -11,12 +11,6 @@
 
           @php
             $admin_user = auth()->user()->load('photo');
-            if( isset($admin_user->photo->file_path) ){
-              $filepath = $admin_user->photo->file_path;
-            }else{
-              $filepath = "https://via.placeholder.com/150";
-            }
-
           @endphp
 
         <div class="card-body">
@@ -40,7 +34,7 @@
             <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
             <label for="profileImageInput">
               <img id="profileImagePreview" 
-                   src="{{$filepath}}" 
+                   src="{{!empty($admin_user->photo) ? $admin_user->photo->file_path : ''}}" 
                    class="rounded-circle border border-2" 
                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
             </label>
@@ -268,19 +262,6 @@
     </div>
   </div>
 </div>
-
-<script>
-document.getElementById("profileImageInput").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById("profileImagePreview").src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
-});
-</script>
 @endsection
 
 @section('scripts')

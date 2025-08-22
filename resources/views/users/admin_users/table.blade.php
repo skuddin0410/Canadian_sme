@@ -37,11 +37,8 @@
 <thead>
 	<tr>
 		<th>Name</th>
-		<th>Role</th>
-		<th>User name</th>
 		<th>Email</th>
 		<th>Mobile</th>
-		{{-- <th>Referral coupon</th> --}}
 		<th>Created At</th>
 		<th width="8%">Action</th>
 	</tr>
@@ -49,9 +46,7 @@
 <tbody>	
     @foreach($users as $user)
     <tr>
-    	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th>{{!empty($user->roles) ? $user->roles[0]->name : ''}}</th>
-		<th style="text-transform:none">{{$user->username ?? ''}}</th>
+    <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
 		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}
