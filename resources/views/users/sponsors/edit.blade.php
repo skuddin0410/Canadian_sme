@@ -20,15 +20,16 @@ Admin | Edit Sponsors Data
           @if(Session::has('error'))
           <div class="alert alert-danger">{{ Session::get('error') }}</div>
           @endif
+
             @php
-            $user = auth()->user()->load('photo');
+            $user = $user->load('photo');
             if( isset($user->photo->file_path) ){
               $filepath = $user->photo->file_path;
             }else{
               $filepath = "https://via.placeholder.com/150";
             }
 
-          @endphp
+             @endphp
 
 
           <form action="{{ route('sponsors.update', $user->id) }}" method="POST" enctype="multipart/form-data">
@@ -121,10 +122,10 @@ Admin | Edit Sponsors Data
                 </div>
               </div>
               {{-- Website --}}
-              <div class="col-6">
+              <div class="col-12">
                 <div class="mb-3">
                   <label class="form-label">Website</label>
-                  <input type="url" class="form-control" name="website_url"
+                  <input type="text" class="form-control" name="website_url"
                     value="{{ old('website_url', $user->website_url) }}" placeholder="https://example.com">
                   @error('website_url') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -134,7 +135,7 @@ Admin | Edit Sponsors Data
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">LinkedIn</label>
-                  <input type="url" class="form-control" name="linkedin_url"
+                  <input type="text" class="form-control" name="linkedin_url"
                     value="{{ old('linkedin_url', $user->linkedin_url) }}"
                     placeholder="https://linkedin.com/in/username">
                   @error('linkedin_url') <span class="text-danger">{{ $message }}</span> @enderror
@@ -145,7 +146,7 @@ Admin | Edit Sponsors Data
                   <label class="form-label" for="facebook_url">Facebook</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
-                    <input type="url" class="form-control" name="facebook_url" id="facebook_url"
+                    <input type="text" class="form-control" name="facebook_url" id="facebook_url"
                       value="{{ old('facebook_url' , $user->facebook_url) }}" placeholder="https://facebook.com" />
                   </div>
                   @if ($errors->has('facebook_url'))
@@ -159,7 +160,7 @@ Admin | Edit Sponsors Data
                   <label class="form-label" for="instagram">Instagram</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
-                    <input type="url" class="form-control" name="instagram_url" id="instagram_url"
+                    <input type="text" class="form-control" name="instagram_url" id="instagram_url"
                       value="{{ old('instagram_url',$user->instagram_url) }}" placeholder="https://instagram.com" />
                   </div>
                   @if ($errors->has('instagram_url'))
@@ -167,12 +168,12 @@ Admin | Edit Sponsors Data
                   @endif
                 </div>
               </div>
-              <div class="col-12">
+              <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label" for="twitter">Twitter</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
-                    <input type="url" class="form-control" name="twitter_url" id="twitter_url"
+                    <input type="text" class="form-control" name="twitter_url" id="twitter_url"
                       value="{{ old('twitter_url',$user->twitter_url) }}" placeholder="https://twitter.com" />
                   </div>
                   @if ($errors->has('twitter_url'))

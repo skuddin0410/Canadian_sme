@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 
 @section('title')
@@ -37,8 +38,6 @@ Admin | Sponsors Details
                         </form>
 
                         <form action="{{ route('sponsors.index') }}" method="GET" class="d-inline">
-                            @csrf
-                            
                             <button type="submit" class="btn btn-outline-primary btn-pill btn-streach font-book fs-14 me-2">
                                <i class="fa fa-angle-left me-1"></i> Back
                             </button>
@@ -49,9 +48,27 @@ Admin | Sponsors Details
                     <h5 class="border-bottom mb-4">Sponsors Details: {{ $user->full_name }}</h5>
 
                     <div class="info-container">
-                        <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-6">
+                    <div class="row">
+
+                    @php
+                    $user = $user->load('photo');
+                    if( isset($user->photo->file_path) ){
+                      $filepath = $user->photo->file_path;
+                    }else{
+                      $filepath = "https://via.placeholder.com/150";
+                    }
+
+                    @endphp   
+                   <div class="text-left mb-2">
+                    
+                    <label for="profileImageInput">
+                      <img id="profileImagePreview" 
+                           src="{{$filepath}}" 
+                           class="rounded-circle border border-2" 
+                           style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                    </label>
+                    
+                  </div>     <div class="col-6">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Name:</span> <span>{{ $user->name }}
                                             {{ $user->lastname }}</span></li>
@@ -74,6 +91,18 @@ Admin | Sponsors Details
                                     </li>
                                 </ul>
                             </div>
+                            <div class="col-6">
+                                <ul class="list-unstyled justify-content-between">
+                                    <li class="mb-3"><span class="fw-medium me-2">Website:</span> <span>{{ $user->website_url }}</span></li>
+                                   
+                                   <li class="mb-3"><span class="fw-medium me-2">Linkedin:</span> <span>{{ $user->linkedin_url }}</span></li>
+
+                                   <li class="mb-3"><span class="fw-medium me-2">Facebook:</span> <span>{{ $user->facebook_url }}</span></li>
+                                   <li class="mb-3"><span class="fw-medium me-2">Instagram:</span> <span>{{ $user->instagram_url }}</span></li>
+                                   <li class="mb-3"><span class="fw-medium me-2">Twitter:</span> <span>{{ $user->twitter_url }}</span></li> 
+                                </ul>
+                            </div>
+
                         </div>
                     </div>
 
