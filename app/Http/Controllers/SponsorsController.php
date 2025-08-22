@@ -108,7 +108,8 @@ class SponsorsController extends Controller
         'twitter_url' => 'nullable|string|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
         'user_type' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'bio' => 'string|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -128,6 +129,7 @@ class SponsorsController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio=$request->bio;
         $user->save();
         $user->assignRole($request->user_type);
            
@@ -180,7 +182,7 @@ class SponsorsController extends Controller
             'twitter_url' => 'nullable|string|max:255',
             'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'user_type' => 'required|string'
+            'bio' => 'string|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -198,9 +200,10 @@ class SponsorsController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio=$request->bio;
         $user->save();
-        $user->syncRoles([]);
-        $user->assignRole($request->user_type);
+ 
+        
         if ($request->hasFile('image')) {
             if ($request->hasFile('image')) {
              $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);

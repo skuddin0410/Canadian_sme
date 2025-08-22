@@ -404,31 +404,28 @@ public function assignBooth(Request $request, $id)
     return redirect()->route('exhibitor-users.show', $user->id)
         ->with('success', 'Booth assigned successfully.');
 }
+
     public function toggleBlock(User $user)
-{
-    $currentUser = auth()->user();
+    {
+        $currentUser = auth()->user();
 
-    // Admin or Admin can block
-    if ($currentUser->hasRole(['Admin', 'Admin'])) {
-        // $user->is_block = true;
-        // $user->save();
-        // return back()->withSuccess('User has been blocked successfully.');
-        $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
+        // Admin or Admin can block
+        if ($currentUser->hasRole(['Admin'])) {
 
-        if ($user->hasAnyRole($allowedRoles)) {
-            $user->is_block = true;
-            $user->save();
-            return back()->withSuccess('User has been blocked successfully.');
-        } else {
-            return back()->withErrors('You are not allowed to block this type of user.');
+            $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
+
+            if ($user->hasAnyRole($allowedRoles)) {
+                $user->is_block = true;
+                $user->save();
+                return back()->withSuccess('User has been blocked successfully.');
+            } else {
+                return back()->withErrors('You are not allowed to block this type of user.');
+            }
+        
+
         }
-    
 
+        return back()->withErrors('You do not have permission to perform this action.');
     }
-
-    
-
-    return back()->withErrors('You do not have permission to perform this action.');
-}
 
 }

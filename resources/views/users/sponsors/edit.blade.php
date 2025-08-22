@@ -121,6 +121,16 @@ Admin | Edit Sponsors Data
                   @endif
                 </div>
               </div>
+            <div class="col-12">
+              <div class="mb-3">
+                 <label class="form-label">Bio <span class="text-danger">*</span></label>
+                  <textarea name="bio" id="bio" class="form-control" placeholder="Speaker Bio" rows="8">{{$user->bio ?? old('bio') }}</textarea>
+                  @if ($errors->has('bio'))
+                      <span class="text-danger">{{ $errors->first('bio') }}</span>
+                  @endif
+
+              </div>
+            </div>
               {{-- Website --}}
               <div class="col-12">
                 <div class="mb-3">

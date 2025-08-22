@@ -14,15 +14,7 @@ Admin |  Team User Details
 
                     <div class="d-flex justify-content-end">
                         
-                        <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14 me-2">
-                                Block User
-                            </button>
-                        </form>
-          
-                        
+                        @if($user->is_block ==1)
                         <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('PATCH')
@@ -30,7 +22,17 @@ Admin |  Team User Details
                                 Unblock User
                             </button>
                         </form>
+                        @else
 
+                        <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14 me-2">
+                                Block User
+                            </button>
+                        </form>
+                        @endif
+                        
                         <form action="{{ route('sponsors.index') }}" method="GET" class="d-inline">
                             <button type="submit" class="btn btn-outline-primary btn-pill btn-streach font-book fs-14 me-2">
                                <i class="fa fa-angle-left me-1"></i> Back

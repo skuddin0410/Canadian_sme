@@ -91,14 +91,14 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('attendee') ? 'active' : '' }}">
+        <li class="menu-item {{ request()->is('attendee-users*') ? 'active' : '' }}">
             <a href="{{ url('attendee-users') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-user"></i>
                 <div data-i18n="Attendee">Attendee Managment</div>
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('exhibitor-users') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active open' : '' }}">
            <a href="{{ url('exhibitor-users') }}" class="menu-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-person-square" viewBox="0 0 16 16">
               <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
