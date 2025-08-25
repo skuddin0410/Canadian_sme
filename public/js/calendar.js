@@ -204,8 +204,8 @@ class LaravelEventCalendar {
                 title: session.title,
                 start: session.start,
                 end: session.end,
-                backgroundColor: '#6366f1',
-                borderColor: '#6366f1',
+                backgroundColor: session.color,
+                borderColor: session.color,
                 textColor: '#fff', // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
@@ -216,7 +216,10 @@ class LaravelEventCalendar {
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
                     //duration: session.extendedProps.duration,
-                    type:session.extendedProps.type
+                    type:session.extendedProps.type,
+                    backgroundColor: session.color,
+                    borderColor: session.color,
+                    textColor: '#fff', // better contrast
                 }
             };
         });
@@ -293,24 +296,24 @@ class LaravelEventCalendar {
 
                 gridHTML += `
                 <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-sm h-100 session-card" onclick="eventCalendar.showSessionDetailsById('${session.id}')" style="cursor: pointer; transition: transform 0.2s;">
+                    <div class="card shadow-sm h-100 session-card" style="background-color: ${session.backgroundColor}; color: ${session.textColor};" onclick="eventCalendar.showSessionDetailsById('${session.id}')" style="cursor: pointer; transition: transform 0.2s;">
                         <div class="card-body d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="card-title mb-0">${session.title}</h6>
+                                <h6 class="card-title mb-0" style="color: ${session.textColor};">${session.title}</h6>
                                 ${statusBadge}
                             </div>
-                            <div class="mb-2">
+                            <div class="mb-2" style="color: ${session.textColor};">
                                 ${typeBadge} 
                             </div>
                             <div class="text-muted small mb-2">
-                                <div><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
-                                ${session.venue ? `<div><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</div>` : ''}
-                                ${session.capacity ? `<div><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
+                                <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
+                                ${session.venue ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</div>` : ''}
+                                ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
                             <div class="mt-auto">
                                 ${session.speakers && session.speakers.length ? session.speakers.map(s => `
-                                    <span class="badge bg-primary me-1 mb-1">${s.name} (${s.pivot?.role || 'Speaker'})</span>
-                                `).join('') : '<span class="text-muted">No speakers assigned</span>'}
+                                    <span class="badge bg-primary me-1 mb-1" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
+                                `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No speakers assigned</span>'}
                             </div>
                         </div>
                     </div>
@@ -343,27 +346,30 @@ class LaravelEventCalendar {
             sortedSessions.forEach(session => {
             const statusBadge = this.getStatusBadge(session.status);
             const typeBadge = this.getTypeBadge(session.type);
+            console.log(session)
 
+
+           
             const description = session.description 
             ? `<p class="mb-1 mt-2 small text-truncate" style="max-width: 100%;">${session.description.substring(0, 100)}${session.description.length > 100 ? '...' : ''}</p>` 
             : '';
 
             listHTML += `
-            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" onclick="eventCalendar.showSessionDetailsById('${session.id}')">
+            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" style="background-color: ${session.backgroundColor}; color: ${session.textColor};" onclick="eventCalendar.showSessionDetailsById('${session.id}')">
             <div class="flex-grow-1">
-                <h6 class="mb-1">${session.title}</h6>
-                <div class="mb-2">
+                <h6 class="mb-1" style="color: ${session.textColor};">${session.title}</h6>
+                <div class="mb-2" style="color: ${session.textColor};">
                     ${typeBadge} ${statusBadge}
                 </div>
                 <div class="small text-muted mb-1">
-                    <span class="me-3"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
-                    <span class="me-3"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
-                    ${session.venue ? `<span class="me-3"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</span>` : ''}
+                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
+                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
+                    ${session.venue ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</span>` : ''}
                 </div>
                 ${description}
             </div>
             <div class="text-end ms-3">
-                <div class="small text-muted">${this.calculateDuration(session.start_time, session.end_time)} min</div>
+                <div class="small text-muted" style="color: ${session.textColor};">${this.calculateDuration(session.start_time, session.end_time)} min</div>
             </div>
             </button>
             `;
@@ -484,8 +490,8 @@ class LaravelEventCalendar {
                 title: session.title,
                 start: session.start,
                 end: session.end,
-                backgroundColor: '#6366f1',
-                borderColor: '#6366f1',
+                backgroundColor: session.color,
+                borderColor: session.color,
                 textColor: '#fff', // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
@@ -495,7 +501,10 @@ class LaravelEventCalendar {
                     speakers: session.extendedProps.speakers || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
-                    type:session.extendedProps.type
+                    type:session.extendedProps.type,
+                    backgroundColor: session.color,
+                    borderColor: session.color,
+                    textColor: '#fff', // better contrast
                 }
             };
             this.showSessionDetails(eventData);
@@ -510,8 +519,8 @@ class LaravelEventCalendar {
                 title: session.title,
                 start: session.start,
                 end: session.end,
-                backgroundColor: '#6366f1',
-                borderColor: '#6366f1',
+                backgroundColor: session.color,
+                borderColor: session.color,
                 textColor: '#fff', // better contrast
                 description: session.description,
                 extendedProps: {
@@ -523,7 +532,10 @@ class LaravelEventCalendar {
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
                     //duration: session.extendedProps.duration,
-                    type:session.extendedProps.type
+                    type:session.extendedProps.type,
+                    backgroundColor: session.color,
+                    borderColor: session.color,
+                    textColor: '#fff', // better contrast
                 }
             };
             this.openSessionModal(eventData);
@@ -677,8 +689,8 @@ class LaravelEventCalendar {
                 title: session.title,
                 start: session.start,
                 end: session.end,
-                backgroundColor: '#6366f1',
-                borderColor: '#6366f1',
+                backgroundColor: session.color,
+                borderColor: session.color,
                 textColor: '#fff', // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
@@ -689,7 +701,10 @@ class LaravelEventCalendar {
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
                     //duration: session.extendedProps.duration,
-                    type:session.extendedProps.type
+                    type:session.extendedProps.type,
+                    backgroundColor: session.color,
+                    borderColor: session.color,
+                    textColor: '#fff', // better contrast
                 }
             })));
         }
