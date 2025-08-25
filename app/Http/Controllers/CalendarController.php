@@ -36,7 +36,7 @@ class CalendarController extends Controller
     {
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Speaker']);
+                    $q->whereIn("name", ['Speaker']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
         
@@ -46,7 +46,7 @@ class CalendarController extends Controller
     {
 
         $exhibitors = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Exhibitor']);
+                    $q->whereIn("name", ['Exhibitor']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($exhibitors);
         
@@ -56,7 +56,7 @@ class CalendarController extends Controller
     {
 
         $sponsors = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Sponsors']);
+                    $q->whereIn("name", ['Sponsors']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($sponsors);
         

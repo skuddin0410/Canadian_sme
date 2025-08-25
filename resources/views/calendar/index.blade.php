@@ -126,6 +126,23 @@
                             <input type="text" class="form-control" id="sessionTitle" name="title" required>
                         </div>
 
+                        <div class="col-6">
+                            <label for="sessionTitle" class="form-label">Session Location *</label>
+                            <input type="text" class="form-control" id="sessionTitle" name="location" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="venueSelect" class="form-label">Booth </label>
+                            <select class="form-select" id="venueSelect" name="booth_id">
+                               <option value="">Select Booth</option>
+                                    @foreach($booths as $booth)
+                                        <option value="{{ $booth->id }}">{{ $booth->title }} {{ $booth->booth_number}}(Size: {{$booth->size}})</option>
+                                    @endforeach 
+                                </select>
+                            </select>
+                        </div>
+
+
                         <div class="col-md-6">
                             <label for="startTime" class="form-label">Start Time *</label>
                             <input type="datetime-local" class="form-control" id="startTime" name="start_time" required>
@@ -151,31 +168,30 @@
                             <label for="capacity" class="form-label">Capacity</label>
                             <input type="number" class="form-control" id="capacity" name="capacity" min="1">
                         </div>
-
                         <div class="col-md-6">
-                            <label for="venueSelect" class="form-label">Booth</label>
-                            <select class="form-select" id="venueSelect" name="booth_id">
-                               <option value="">Select Booth</option>
-                                    @foreach($booths as $booth)
-                                        <option value="{{ $booth->id }}">{{ $booth->title }} {{ $booth->booth_number}}(Size: {{$booth->size}})</option>
-                                    @endforeach 
-                                </select>
+                            <label for="tracks" class="form-label">Tracks *</label>
+                            <select class="form-select" id="tracks" name="type" required>
+                                <option value="presentation">Presentation</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="panel">Panel Discussion</option>
+                                <option value="break">Break</option>
+                                <option value="networking">Networking</option>
                             </select>
                         </div>
 
                         <div class="col-6">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="draft">Draft</option>
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-select" id="status" name="status" required>
                                 <option value="published">Published</option>
+                                <option value="draft">Draft</option>
                             </select>
                         </div> 
                         <!-- Speaker Assignment -->
-                        <div class="col-12">
-                            <label class="form-label">Speakers</label>
+                        <div class="col-6">
+                            <label class="form-label">Speakers *</label>
                             <div id="speakerSelection">
                                 <div class="input-group mb-2">
-                                    <select class="form-select" id="speakerSelect">
+                                    <select class="form-select" id="speakerSelect" required>
                                         <option value="">Select a speaker...</option>
                                          @foreach($speakers as $speaker)
                                           <option value="{{ $speaker->id }}">{{ $speaker->full_name }}</option>
@@ -188,11 +204,11 @@
                             </div>
                         </div>
 
-                         <div class="col-12">
-                            <label class="form-label">Exhibitors</label>
+                         <div class="col-6">
+                            <label class="form-label">Exhibitors *</label>
                             <div id="exhibitorSelection">
                                 <div class="input-group mb-2">
-                                    <select class="form-select" id="exhibitorSelect">
+                                    <select class="form-select" id="exhibitorSelect" required>
                                         <option value="">Select a exhibitor...</option>
                                          @foreach($exhibitors as $exhibitor)
                                           <option value="{{ $exhibitor->id }}">{{ $exhibitor->full_name }}</option>
@@ -205,7 +221,7 @@
                             </div>
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-6">
                             <label class="form-label">Sponsors</label>
                             <div id="SponsorSelection">
                                 <div class="input-group mb-2">
@@ -222,9 +238,61 @@
                             </div>
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-6">
+                            @php
+                                $calendarColors = [
+                                    '#FF5733', // Red-Orange
+                                    '#33C1FF', // Sky Blue
+                                    '#28A745', // Green
+                                    '#FFC107', // Amber
+                                    '#6F42C1', // Purple
+                                    '#E83E8C', // Pink
+                                    '#20C997', // Teal
+                                    '#FD7E14', // Orange
+                                    '#17A2B8', // Cyan
+                                    '#343A40', // Dark Gray
+                                ];
+                            @endphp
+                            <label class="form-label">Color</label>
+                            <div>
+                                <div class="input-group mb-2">
+                                    <select class="form-select" id="sponsorSelect">
+                                        <option value="">Select a sponsors...</option>
+                                         @foreach($calendarColors as $color)
+                                          <option value="{{ $color}}">{{ $color}}</option>
+                                         @endforeach 
+                                       
+                                    </select>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" id="description2" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-6">
+                            <label for="keynote" class="form-label">Keynote</label>
+                            <textarea class="form-control" id="keynote2" name="keynote" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-6">
+                            <label for="panels" class="form-label">Panels</label>
+                            <textarea class="form-control" id="panels2" name="panels" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-6">
+                            <label for="demoes" class="form-label">Demoes</label>
+                            <textarea class="form-control" id="demoes2" name="demoes" rows="3"></textarea>
+                        </div>
+
+                         <div class="col-md-6">
+                             <input class="form-check-input" type="checkbox" id="featuredCheck" name="is_featured" value="1">
+                            <label class="form-check-label" for="featuredCheck">
+                                Marked as Feature
+                            </label>
                         </div>
 
                     </div>
