@@ -43,6 +43,22 @@ class UserSeeder extends Seeder
         $exhibitorAdmin->assignRole('Exhibitor');
         qrCode($exhibitorAdmin->id);
 
+
+        $sponsors = User::create([
+            'name' => "Sponsors$i",
+            'lastname'=>'Admin',
+            'email' => "sponsors$i@admin.com",
+            'mobile' => '12345678',
+            'tags'=>'Sponsors,admin,event',
+            'designation'=>'Event Manager',
+            'bio'=>"This is a short bio for Sponsors $i. Experienced in event management and exhibitions.",
+            'password' => Hash::make('password')
+        ]);
+        $sponsors->assignRole('Sponsors');
+        qrCode($sponsors->id);
+
+
+
             $companies= [
                 'user_id'           => $exhibitorAdmin->id,
                 'name'              => $name,

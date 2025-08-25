@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\Category;
 use App\Models\Session;
 use App\Models\Booth;
+use App\Models\Track;
 use Illuminate\Support\Facades\DB;
 
 class TicketSystemSeeder extends Seeder
@@ -144,7 +145,7 @@ class TicketSystemSeeder extends Seeder
 
         // --- 7 past events ---
         for ($i = 1; $i <=1; $i++) {
-            $start = now()->subMonths(rand(1,12))->subDays(rand(1,10));
+            $start = now();
             $end   = (clone $start)->addYears(100);
 
             $events[] = [
@@ -244,9 +245,15 @@ class TicketSystemSeeder extends Seeder
                     'booth_id'    => $boothIds[array_rand($boothIds)], // assign booth from DB
                     'title'       => "Session $i for " . $event->title,
                     'description' => "This is session $i of the event " . $event->title,
+                    'keynote' => "This is session keynote$i of the event " . $event->title,
+                    'demoes' => "This is session panels$i of the event " . $event->title,
+                    'panels' => "This is session panels$i of the event " . $event->title,
+                    'track'=>'Test1,Test2',
+                    'color'=>'#' . substr(\Str::random(6), 0, 6),
                     'start_time'  => $start,
                     'end_time'    => $end,
                     'status'      => 'published',
+                    'is_featured'=>rand(0, 1),
                     'type'        => ['session','workshop','keynote'][array_rand(['session','workshop','keynote'])],
                     'capacity'    => rand(50, 200),
                 ]);
@@ -264,6 +271,32 @@ class TicketSystemSeeder extends Seeder
                     'session_id' => $sessionId,
                     'user_id' => $userId,
                     'role' => collect(['keynote','panelist','moderator'])->random(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        foreach ($sessions as $sessionId) {
+            $speakers = collect($users)->random(2);
+
+            foreach ($speakers as $userId) {
+                DB::table('session_exhibitors')->insert([
+                    'session_id' => $sessionId,
+                    'user_id' => $userId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        foreach ($sessions as $sessionId) {
+            $speakers = collect($users)->random(2);
+
+            foreach ($speakers as $userId) {
+                DB::table('session_sponsors')->insert([
+                    'session_id' => $sessionId,
+                    'user_id' => $userId,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
