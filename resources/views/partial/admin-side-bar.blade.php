@@ -84,7 +84,15 @@
             </ul>
         </li>
 
-        <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}">
+
+         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('attendee-users*') ? 'active' : '' }} {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }} {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+                <div data-i18n="events">Content</div>
+            </a>
+
+        <ul class="menu-sub">
+         <li class="menu-item {{ request()->is('admin-users*') ? 'active' : '' }}">
             <a href="{{ url('admin-users') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-users"></i>
                 <div data-i18n="events">Team Managment</div>
@@ -98,7 +106,7 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active' : '' }}">
            <a href="{{ url('exhibitor-users') }}" class="menu-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-person-square" viewBox="0 0 16 16">
               <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
@@ -107,7 +115,7 @@
             <div data-i18n="Users">Exhibitor Managment</div>
            </a>
         </li>
-        <li class="menu-item {{ request()->is('speaker*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('speaker*') ? 'active' : '' }}">
            <a href="{{ url('speaker') }}" class="menu-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-speaker" viewBox="0 0 16 16">
               <path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
@@ -117,14 +125,41 @@
            </a>
         </li>
 
-         <li class="menu-item {{ request()->is('sponsors*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('sponsors*') ? 'active' : '' }}">
            <a href="{{ url('sponsors') }}" class="menu-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-buildings-fill" viewBox="0 0 16 16">
               <path d="M15 .5a.5.5 0 0 0-.724-.447l-8 4A.5.5 0 0 0 6 4.5v3.14L.342 9.526A.5.5 0 0 0 0 10v5.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V14h1v1.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zM2 11h1v1H2zm2 0h1v1H4zm-1 2v1H2v-1zm1 0h1v1H4zm9-10v1h-1V3zM8 5h1v1H8zm1 2v1H8V7zM8 9h1v1H8zm2 0h1v1h-1zm-1 2v1H8v-1zm1 0h1v1h-1zm3-2v1h-1V9zm-1 2h1v1h-1zm-2-4h1v1h-1zm3 0v1h-1V7zm-2-2v1h-1V5zm1 0h1v1h-1z"/>
             </svg>
             <div data-i18n="Users">Sponsors Managment</div>
            </a>
-        </li>
+         </li>
+
+          <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                    <a href="{{ route('events.index') }}" class="menu-link">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="menu-icon tf-icons bi bi-calendar2-event-fill" viewBox="0 0 16 16">
+                          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5m9.954 3H2.545c-.3 0-.545.224-.545.5v1c0 .276.244.5.545.5h10.91c.3 0 .545-.224.545-.5v-1c0-.276-.244-.5-.546-.5M11.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                        </svg>
+                        <div data-i18n="events">Event Lists</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
+                    <a href="{{ route('categories.index') }}" class="menu-link">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="menu-icon tf-icons bi bi-calendar-event" viewBox="0 0 16 16">
+                      <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
+                      <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                    </svg>
+                    <div data-i18n="categories">Categories & Tags</div>
+                    </a>
+                </li>
+
+            </ul>
+
+         </li>   
+
+        
         
          <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
