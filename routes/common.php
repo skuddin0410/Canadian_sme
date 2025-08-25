@@ -9,3 +9,5 @@ Route::get('change-password', [App\Http\Controllers\HomeController::class, 'chan
 Route::post('change-password', [App\Http\Controllers\HomeController::class, 'changePassword'])->name('admin.change.password.post');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::post('change-user-password', [App\Http\Controllers\HomeController::class, 'changeUserPassword'])->name('change.user.password');
+

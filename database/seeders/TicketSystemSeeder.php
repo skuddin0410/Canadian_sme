@@ -143,18 +143,18 @@ class TicketSystemSeeder extends Seeder
         $events = [];
 
         // --- 7 past events ---
-        for ($i = 1; $i <= 7; $i++) {
+        for ($i = 1; $i <=1; $i++) {
             $start = now()->subMonths(rand(1,12))->subDays(rand(1,10));
-            $end   = (clone $start)->addDays(rand(1,3));
+            $end   = (clone $start)->addYears(100);
 
             $events[] = [
-                'title' => "Past Event $i",
+                'title' => "Summit ".$start,
                 'description' => "This is past event number $i",
                 'location' => "City $i",
                 'tags' => 'past,event',
                 'start_date' => $start,
                 'end_date' => $end,
-                'is_featured' => rand(0,1),
+                'is_featured' => 1,
                 'visibility' => 'public',
                 'created_by' => rand(1,3),
                 'status' => 'published',
@@ -162,52 +162,13 @@ class TicketSystemSeeder extends Seeder
             ];
         }
 
-        // --- 6 current events (ongoing today) ---
-        for ($i = 1; $i <= 6; $i++) {
-            $start = now()->subDays(rand(0,2));
-            $end   = now()->addDays(rand(0,2));
-
-            $events[] = [
-                'title' => "Current Event $i",
-                'description' => "This is current event number $i",
-                'location' => "City $i",
-                'tags' => 'current,event',
-                'start_date' => $start,
-                'end_date' => $end,
-                'is_featured' => rand(0,1),
-                'visibility' => 'public',
-                'created_by' => rand(1,3),
-                'status' => 'published',
-                'category_id' => $categoryIds[array_rand($categoryIds)],
-            ];
-        }
-
-        // --- 7 upcoming events ---
-        for ($i = 1; $i <= 7; $i++) {
-            $start = now()->addMonths(rand(1,12))->addDays(rand(0,5));
-            $end   = (clone $start)->addDays(rand(1,3));
-
-            $events[] = [
-                'title' => "Upcoming Event $i",
-                'description' => "This is upcoming event number $i",
-                'location' => "City $i",
-                'tags' => 'upcoming,event',
-                'start_date' => $start,
-                'end_date' => $end,
-                'is_featured' => rand(0,1),
-                'visibility' => 'public',
-                'created_by' => rand(1,3),
-                'status' => 'draft',
-                'category_id' => $categoryIds[array_rand($categoryIds)],
-            ];
-        }
-
-        // --- Insert all events ---
-        foreach ($events as $event) {
-            Event::create(array_merge($event, [
-                'slug' => Str::slug($event['title'])
-            ]));
-        }
+   
+        
+            foreach ($events as $event) {
+                Event::create(array_merge($event, [
+                    'slug' => Str::slug($event['title'])
+                ]));
+            }
         }
 
         $event = Event::first();
@@ -274,7 +235,7 @@ class TicketSystemSeeder extends Seeder
         $boothIds = Booth::pluck('id')->toArray();
 
         foreach ($events as $event) {
-            for ($i = 1; $i <= 5; $i++) {
+            for ($i = 1; $i <= 30; $i++) {
                 $start = $event->start_date->copy()->addHours($i * 2);
                 $end   = $start->copy()->addHour();
 
@@ -296,7 +257,6 @@ class TicketSystemSeeder extends Seeder
         $users = DB::table('users')->pluck('id')->toArray();
 
         foreach ($sessions as $sessionId) {
-            // pick 2 random users for each session
             $speakers = collect($users)->random(2);
 
             foreach ($speakers as $userId) {

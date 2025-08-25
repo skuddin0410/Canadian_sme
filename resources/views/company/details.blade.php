@@ -66,6 +66,14 @@
           </div>
 
             <div class="col-6">
+                   
+            <div class="mb-3">
+                  <label class="form-label">Certifications<span class="text-danger">*</span></label>
+                <text name="certifications" rows="6" class="form-control" placeholder="Enter certifications">{{ old('certifications', $company->certifications ?? '') }}</text>
+              </div>
+            </div>
+
+            <div class="col-6">
                 <div class="mb-3 ">
               <label class="form-label">LinkedIn <span class="text-danger">*</span></label>
               <input type="url" name="linkedin" value="{{ old('linkedin', $company->linkedin ?? '') }}" class="form-control">
@@ -85,27 +93,23 @@
             </div>
 
           </div>
+
+           <div class="col-6">
+                <div class="mb-3 ">
+              <label class="form-label">Twitter<span class="text-danger">*</span></label>
+              <input type="url" name="twitter" value="{{ old('twitter', $company->twitter ?? '') }}" class="form-control">
+            </div>
+
+          </div>
         
         
-          <div class="col-6">
+          <div class="col-12">
                
           <div class="mb-3">
               <label class="form-label">Description<span class="text-danger">*</span></label>
             <textarea name="description"  rows="6" class="form-control" placeholder="Describe your company...">{{ old('description', $company->description ?? '') }}</textarea>
           </div>
         </div>
-          <div class="col-6">
-               
-          <div class="mb-3">
-              <label class="form-label">Certifications<span class="text-danger">*</span></label>
-            <textarea name="certifications" rows="6" class="form-control" placeholder="Enter certifications">{{ old('certifications', $company->certifications ?? '') }}</textarea>
-          </div>
-        </div>
-        
-          
-
-        
-         
 
            <div class="col-6">
                 <div class="mb-3 ">

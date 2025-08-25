@@ -19,15 +19,7 @@ Admin | Attendee Details
 
                     <div class="d-flex justify-content-end">
                         
-                        <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14 me-2">
-                                Block User
-                            </button>
-                        </form>
-          
-                        
+                        @if($user->is_block ==1)
                         <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('PATCH')
@@ -35,6 +27,15 @@ Admin | Attendee Details
                                 Unblock User
                             </button>
                         </form>
+                        @else
+                        <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14 me-2">
+                                Block User
+                            </button>
+                        </form>
+                        @endif
 
                         <form action="{{ route('attendee-users.index') }}" method="GET" class="d-inline">
                             @csrf
@@ -49,9 +50,22 @@ Admin | Attendee Details
                     <h5 class="border-bottom mb-4">Attendee Details: {{ $user->full_name }}</h5>
 
                     <div class="info-container">
-                        <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-6">
+                    <div class="row">   
+
+                        <div class="text-left mb-2">
+                            <label for="profileImageInput">
+                              <img id="profileImagePreview" 
+                                   src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
+                                   class="rounded-circle border border-2" 
+                                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                            </label>
+                        </div>    
+                        <div class="col-12 mt-2">
+                            <ul class="list-unstyled justify-content-between">
+                            <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
+                             </ul>
+                        </div>  
+                        <div class="col-6">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Name:</span> <span>{{ $user->name }}
                                             {{ $user->lastname }}</span></li>
@@ -74,6 +88,18 @@ Admin | Attendee Details
                                     </li>
                                 </ul>
                             </div>
+                            <div class="col-6">
+                                <ul class="list-unstyled justify-content-between">
+                                    <li class="mb-3"><span class="fw-medium me-2">Website:</span> <span>{{ $user->website_url }}</span></li>
+                                   
+                                   <li class="mb-3"><span class="fw-medium me-2">Linkedin:</span> <span>{{ $user->linkedin_url }}</span></li>
+
+                                   <li class="mb-3"><span class="fw-medium me-2">Facebook:</span> <span>{{ $user->facebook_url }}</span></li>
+                                   <li class="mb-3"><span class="fw-medium me-2">Instagram:</span> <span>{{ $user->instagram_url }}</span></li>
+                                   <li class="mb-3"><span class="fw-medium me-2">Twitter:</span> <span>{{ $user->twitter_url }}</span></li> 
+                                </ul>
+                            </div>
+
                         </div>
                     </div>
 
@@ -83,4 +109,6 @@ Admin | Attendee Details
         </div>
     </div>
 </div>
+
+@include('users.ChangeUserPassword')
 @endsection

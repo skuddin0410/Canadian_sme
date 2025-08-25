@@ -101,14 +101,15 @@ class SponsorsController extends Controller
         'email' => 'required|string|max:255|email|unique:users,email',
         'designation' => 'nullable|string|max:255',
         'tags' => 'nullable|string|max:255',
-        'website_url' => 'nullable|url|max:255',
-        'linkedin_url' => 'nullable|url|max:255',
-        'instagram_url' => 'nullable|url|max:255',
-        'facebook_url' => 'nullable|url|max:255',
-        'twitter_url' => 'nullable|url|max:255',
+        'website_url' => 'nullable|string|max:255',
+        'linkedin_url' => 'nullable|string|max:255',
+        'instagram_url' => 'nullable|string|max:255',
+        'facebook_url' => 'nullable|string|max:255',
+        'twitter_url' => 'nullable|string|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile',
         'user_type' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'bio' => 'string|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -128,24 +129,13 @@ class SponsorsController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio=$request->bio;
         $user->save();
         $user->assignRole($request->user_type);
            
         if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('public/users', $filename);
-
-      
-        $user->photo()->updateOrCreate(
-            ['table_type' => 'users', 'file_type' => 'photo'], 
-            [
-                'table_id' => $user->id,
-                'file_name' => $filename,
-                'file_type' => 'photo',
-            ]
-        );
-    }
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo');
+        }
         return redirect(route('sponsors.index'))
             ->withSuccess('Sponsors data has been saved successfully');
 
@@ -157,6 +147,7 @@ class SponsorsController extends Controller
     public function show(string $id)
     {
         $user = User::findOrFail($id); // ensures fresh data
+        $user->load('photo');
         return view('users.sponsors.view', compact('user'));
     }
 
@@ -184,14 +175,14 @@ class SponsorsController extends Controller
             'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
-            'website_url' => 'nullable|url|max:255',
-            'linkedin_url' => 'nullable|url|max:255',
-            'instagram_url' => 'nullable|url|max:255',
-            'facebook_url' => 'nullable|url|max:255',
-            'twitter_url' => 'nullable|url|max:255',
+            'website_url' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|string|max:255',
+            'instagram_url' => 'nullable|string|max:255',
+            'facebook_url' => 'nullable|string|max:255',
+            'twitter_url' => 'nullable|string|max:255',
             'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'user_type' => 'required|string'
+            'bio' => 'string|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -209,24 +200,15 @@ class SponsorsController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
+        $user->bio=$request->bio;
         $user->save();
-        $user->syncRoles([]);
-        $user->assignRole($request->user_type);
-         if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('public/users', $filename);
-
-        // Save or update in Drive table
-        $user->photo()->updateOrCreate(
-            ['table_type' => 'users', 'file_type' => 'photo'], // match existing
-            [
-                'table_id' => $user->id,
-                'file_name' => $filename,
-                'file_type' => 'photo',
-            ]
-        );
-    }
+ 
+        
+        if ($request->hasFile('image')) {
+            if ($request->hasFile('image')) {
+             $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+            }
+        }
 
    
 

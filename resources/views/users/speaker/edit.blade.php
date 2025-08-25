@@ -30,211 +30,184 @@
             @method('PUT')
 
             <div class="row">
-              {{-- First Name --}}
+               <div class="text-left">
+              <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
+              <label for="profileImageInput">
+                <img id="profileImagePreview" 
+                     src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
+                     class="rounded-circle border border-2" 
+                     style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+              </label>
+              <p class="mt-2 text-muted">Click image to upload</p>
+            </div>
+             
+            <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="title">First Name<span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="first_name" id="slug-source"
+                      value="{{$user->name ?? old('first_name')}}" placeholder="User first name" />
+                  </div>
+                  @if ($errors->has('first_name'))
+                  <span class="text-danger text-left">{{ $errors->first('first_name') }}</span>
+                  @endif
+                </div>
+              </div>
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">First Name <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="first_name" value="{{ old('first_name', $user->name) }}" placeholder="User first name">
-                  @error('first_name') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-
-              {{-- Last Name --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="last_name" value="{{ old('last_name', $user->lastname) }}" placeholder="User last name">
-                  @error('last_name') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-
-              {{-- Username --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Username <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="username" value="{{ old('username', $user->username) }}" placeholder="Username">
-                  @error('username') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-
-              {{-- Email --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Email <span class="text-danger">*</span></label>
-                  <input type="email" class="form-control" name="email" value="{{ old('email', $user->email) }}" placeholder="Email">
-                  @error('email') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-              <!-- Designation -->
-<div class="col-6">
-    <div class="mb-3">
-        <label class="form-label" for="designation">Designation</label>
-        <div class="input-group input-group-merge">
-            <span id="designation-icon" class="input-group-text">
-                <i class="bx bx-briefcase"></i>
-            </span>
-            <input
-                type="text"
-                class="form-control"
-                name="designation"
-                id="designation"
-                value="{{ old('designation', $user->designation ?? '') }}"
-                placeholder="Enter designation"/>
-        </div>
-        @if ($errors->has('designation'))
-            <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
-        @endif
-    </div>
-</div>
-
-<!-- Tags -->
-<div class="col-6">
-    <div class="mb-3">
-        <label class="form-label" for="tags">Tags</label>
-        <div class="input-group input-group-merge">
-            <span id="tags-icon" class="input-group-text">
-                <i class="bx bx-purchase-tag"></i>
-            </span>
-            <input
-                type="text"
-                class="form-control"
-                name="tags"
-                id="tags"
-                value="{{ old('tags', $user->tags ?? '') }}"
-                data-role="tagsinput"
-                placeholder="Add tags (comma separated)" />
-        </div>
-        @if ($errors->has('tags'))
-            <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
-        @endif
-    </div>
-</div>
-              {{-- Bio --}}
-               <div class="col-12">
-                <div class="mb-3">
-               <label class="form-label">Bio <span class="text-danger">*</span></label>
-                    <textarea name="bio" id="bio" class="form-control" rows="6" placeholder="Speaker Bio">{{ old('bio', $user->bio) }}</textarea>
-                    @if ($errors->has('bio'))
-                        <span class="text-danger">{{ $errors->first('bio') }}</span>
-                    @endif
-                </div>
-              </div>
-
-
-              {{-- Website --}}
-<div class="col-6">
-  <div class="mb-3">
-    <label class="form-label">Website</label>
-    <input type="url" class="form-control" name="website_url" value="{{ old('website_url', $user->website_url) }}" placeholder="https://example.com">
-    @error('website_url') <span class="text-danger">{{ $message }}</span> @enderror
-  </div>
-</div>
-
-{{-- LinkedIn --}}
-<div class="col-6">
-  <div class="mb-3">
-    <label class="form-label">LinkedIn</label>
-    <input type="url" class="form-control" name="linkedin_url" value="{{ old('linkedin_url', $user->linkedin_url) }}" placeholder="https://linkedin.com/in/username">
-    @error('linkedin_url') <span class="text-danger">{{ $message }}</span> @enderror
-  </div>
-</div>
-
-
-              {{-- Mobile --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Mobile <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" name="mobile" value="{{ old('mobile', $user->mobile) }}" placeholder="Mobile">
-                  @error('mobile') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-
-              {{-- DOB --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                  <input type="date" class="form-control" name="dob" value="{{ old('dob', $user->dob ? \Carbon\Carbon::parse($user->dob)->format('Y-m-d') : '') }}">
-                  @error('dob') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-
-              {{-- Gender --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Gender</label>
-                  <select class="form-control" name="gender">
-                    <option value="">Select</option>
-                    <option value="male" {{ old('gender', $user->gender) === 'male' ? 'selected' : '' }}>Male</option>
-                    <option value="female" {{ old('gender', $user->gender) === 'female' ? 'selected' : '' }}>Female</option>
-                    <option value="other" {{ old('gender', $user->gender) === 'other' ? 'selected' : '' }}>Other</option>
-                  </select>
-                </div>
-              </div>
-
-              {{-- Address Fields --}}
-              @php
-                $fields = ['place', 'street', 'zipcode', 'city', 'state', 'country'];
-              @endphp
-              @foreach($fields as $field)
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ ucfirst($field) }}</label>
-                  <input type="text" class="form-control" name="{{ $field }}" value="{{ old($field, $user->$field) }}" placeholder="{{ ucfirst($field) }}">
-                  @error($field) <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-              @endforeach
-
-              {{-- Website & LinkedIn --}}
-              {{-- <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Website</label>
-                  <input type="url" class="form-control" name="website_url" value="{{ old('website_url', $user->website_url) }}" placeholder="Website URL">
+                  <label class="form-label" for="title">last name<span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="last_name" id="last-name-target"
+                      value="{{$user->lastname ?? old('last_name') }}" placeholder="User last name" />
+                  </div>
+                  @if ($errors->has('last_name'))
+                  <span class="text-danger text-left">{{ $errors->first('last_name') }}</span>
+                  @endif
                 </div>
               </div>
 
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">LinkedIn</label>
-                  <input type="url" class="form-control" name="linkedin_url" value="{{ old('linkedin_url', $user->linkedin_url) }}" placeholder="LinkedIn URL">
-                </div>
-              </div> --}}
-
-              {{-- Role --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Role <span class="text-danger">*</span></label>
-                  <select class="form-control" name="user_type" required>
-                    <option value="Speaker" {{ old('user_type', $user->roles[0]->name ?? '') == 'Speaker' ? 'selected' : '' }}>Speaker</option>
-                    
-                  </select>
+                  <label class="form-label" for="title">Email<span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="email" id="email"
+                      value="{{$user->email ?? old('email') }}" placeholder="User email" />
+                  </div>
+                  @if ($errors->has('email'))
+                  <span class="text-danger text-left">{{ $errors->first('email') }}</span>
+                  @endif
                 </div>
               </div>
 
-              {{-- Password --}}
+               <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="title">Mobile<span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="mobile" id="mobile"
+                      value="{{ $user->mobile ?? old('mobile') }}" placeholder="User mobile" />
+                  </div>
+                  @if ($errors->has('mobile'))
+                  <span class="text-danger text-left">{{ $errors->first('mobile') }}</span>
+                  @endif
+                </div>
+              </div>
+              
+
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Password <small class="text-muted">(leave blank to keep unchanged)</small></label>
-                  <input type="password" class="form-control" name="password" placeholder="New Password">
-                  @error('password') <span class="text-danger">{{ $message }}</span> @enderror
+                  <label class="form-label" for="designation">Designation</label>
+                  <div class="input-group input-group-merge">
+                    <span id="designation-icon" class="input-group-text">
+                      <i class="bx bx-briefcase"></i>
+                    </span>
+                    <input type="text" class="form-control" name="designation" id="designation"
+                      value="{{$user->designation ?? old('designation') }}" placeholder="Enter designation" />
+                  </div>
+                  @if ($errors->has('designation'))
+                  <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
+                  @endif
                 </div>
               </div>
 
-              {{-- Images --}}
-              {{-- <div class="col-6">
+              <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Profile Photo</label>
-                  <input type="file" class="form-control" name="frontimage">
+                  <label class="form-label" for="tags">Tags</label>
+                  <div class="input-group input-group-merge">
+                    <span id="tags-icon" class="input-group-text">
+                      <i class="bx bx-purchase-tag"></i>
+                    </span>
+                    <input type="text" class="form-control" name="tags" id="tags"
+                      value="{{$user->tags ?? old('tags') }}" data-role="tagsinput"
+                      placeholder="Add tags (comma separated)" />
+                  </div>
+                  @if ($errors->has('tags'))
+                  <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
+                  @endif
                 </div>
-              </div> --}}
+              </div>
 
-              {{-- <div class="col-6">
+            <div class="col-12">
+              <div class="mb-3">
+                 <label class="form-label">Bio <span class="text-danger">*</span></label>
+                  <textarea name="bio" id="bio" class="form-control" placeholder="Speaker Bio" rows="8">{{$user->bio ?? old('bio') }}</textarea>
+                  @if ($errors->has('bio'))
+                      <span class="text-danger">{{ $errors->first('bio') }}</span>
+                  @endif
+
+              </div>
+            </div>
+
+              <div class="col-12">
                 <div class="mb-3">
-                  <label class="form-label">Background Image</label>
-                  <input type="file" class="form-control" name="image">
+                  <label class="form-label" for="website_url">Website</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bx-link"></i></span>
+                    <input type="text" class="form-control" name="website_url" id="website_url"
+                      value="{{$user->website_url ?? old('website_url') }}" placeholder="https://example.com" />
+                  </div>
+                  @if ($errors->has('website_url'))
+                  <span class="text-danger">{{ $errors->first('website_url') }}</span>
+                  @endif
                 </div>
-              </div> --}}
+              </div>
 
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="linkedin_url">LinkedIn</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
+                    <input type="text" class="form-control" name="linkedin_url" id="linkedin_url"
+                      value="{{$user->linkedin_url ?? old('linkedin_url') }}" placeholder="https://linkedin.com/in/username" />
+                  </div>
+                  @if ($errors->has('linkedin_url'))
+                  <span class="text-danger">{{ $errors->first('linkedin_url') }}</span>
+                  @endif
+                </div>
+              </div>
+               <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="facebook_url">Facebook</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
+                    <input type="text" class="form-control" name="facebook_url" id="facebook_url"
+                      value="{{ $user->facebook_url ?? old('facebook_url') }}" placeholder="https://facebook.com" />
+                  </div>
+                  @if ($errors->has('facebook_url'))
+                  <span class="text-danger">{{ $errors->first('facebook_url') }}</span>
+                  @endif
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="instagram">Instagram</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
+                    <input type="text" class="form-control" name="instagram_url" id="instagram_url"
+                      value="{{$user->instagram_url ?? old('instagram_url') }}" placeholder="https://instagram.com" />
+                  </div>
+                  @if ($errors->has('instagram_url'))
+                  <span class="text-danger">{{ $errors->first('instagram_url') }}</span>
+                  @endif
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="twitter">Twitter</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
+                    <input type="text" class="form-control" name="twitter_url" id="twitter_url"
+                      value="{{ $user->twitter_url ?? old('twitter_url') }}" placeholder="https://twitter.com" />
+                  </div>
+                  @if ($errors->has('twitter_url'))
+                  <span class="text-danger">{{ $errors->first('twitter_url') }}</span>
+                  @endif
+                </div>
+              </div>
               {{-- Submit --}}
               <div class="col-12">
                 <div class="d-flex justify-content-end pt-3">

@@ -96,30 +96,14 @@ class SpeakerController extends Controller
     public function store(Request $request)
     {
         //
-        $validator = Validator::make($request->all(), [
-        // 'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        // 'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'username' => 'required|string|unique:users,username',
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|string|max:255|email|unique:users,email',
-        'designation' => 'nullable|string|max:255' ,
-        'tags' => 'nullable|string|max:255'  ,
-         'bio'       => 'required|string',
-        'website_url' => 'nullable|url|max:255',
-        'linkedin_url' => 'nullable|url|max:255',
-        'mobile' => 'required|string|digits:10|unique:users,mobile',
-        'dob' => 'required|date|max:255',
-        'gender' => 'nullable|string|max:255',
-        'street' => 'nullable|string|max:255',
-        'zipcode' => 'nullable|string|max:255',
-        'city' => 'nullable|string|max:255',
-        'state' => 'nullable|string|max:255',
-        'country' => 'nullable|string|max:255',
-        'place' => 'nullable|string|max:255',
-        'password' => 'nullable|string|min:8',
-       
-    ]);
+         $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|max:255|email|unique:users,email',
+            'mobile' => 'required|string|unique:users,mobile',
+            'bio'    => 'required|string|max:500',
+
+        ]);
 
     if ($validator->fails()) {
         return redirect(route('speaker.create'))->withInput()
@@ -127,36 +111,26 @@ class SpeakerController extends Controller
     }
 
     $user = new User();
-    $user->username = $request->username;
     $user->name = $request->first_name;
     $user->lastname = $request->last_name;
     $user->email = $request->email;
     $user->designation = $request->designation;
     $user->tags = $request->tags;
-     $user->bio = $request->bio;
     $user->website_url = $request->website_url;
     $user->linkedin_url = $request->linkedin_url;
+    $user->instagram_url = $request->linkedin_url;
+    $user->facebook_url = $request->facebook_url;
+    $user->twitter_url = $request->twitter_url;
     $user->mobile = $request->mobile;
-    $user->dob = $request->dob;
-    $user->gender = $request->gender;
-    $user->street = $request->street;
-    $user->zipcode = $request->zipcode;
-    $user->city = $request->city;
-    $user->state = $request->state;
-    $user->country = $request->country;
-    $user->place = $request->place;
-   
-    $user->password = Hash::make($request->password);
+    $user->bio = $request->bio;
     $user->save();
+    $user->assignRole('Speaker');
 
-    $user->assignRole($request->user_type);
 
-    // if ($request->file("frontimage")) {
-    //     $this->imageUpload($request->file("frontimage"), 'users', $user->id, 'users', 'photo');
-    // }
-    // if ($request->file("image")) {
-    //     $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'background');
-    // }
+     if ($request->file("image")) {
+         $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'photo');
+     }
+    
 
     return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');
@@ -167,10 +141,8 @@ class SpeakerController extends Controller
      */
     public function show($id)
     {
-        //
-        //  return view('users.speaker.view', ['user' => $user]);
         $user = User::findOrFail($id); // ensures fresh data
-    return view('users.speaker.view', compact('user'));
+        return view('users.speaker.view', compact('user'));
 
     }
 
@@ -190,66 +162,38 @@ class SpeakerController extends Controller
     public function update(Request $request, string $id)
     {
         
-        $user = User::findOrFail($id);
+    $user = User::findOrFail($id);
 
     $validator = Validator::make($request->all(), [
-        // 'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        // 'frontimage' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.adhaar_image_size'),
-        'username' => 'required|string|unique:users,username,' . $user->id,
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
-        'designation' => 'nullable|string|max:255' ,
-        'tags' => 'nullable|string|max:255'  ,
-        'bio' => 'required|string',
-        'website_url' => 'nullable|url|max:255',
-        'linkedin_url' => 'nullable|url|max:255',
         'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
-        'dob' => 'required|date',
-        'gender' => 'nullable|string|max:255',
-        'street' => 'nullable|string|max:255',
-        'zipcode' => 'nullable|string|max:255',
-        'city' => 'nullable|string|max:255',
-        'state' => 'nullable|string|max:255',
-        'country' => 'nullable|string|max:255',
-        'place' => 'nullable|string|max:255',
-        'password' => 'nullable|string|min:8',
-        'user_type' => 'required|string'
+        'bio'    => 'required|string|max:500',
+
     ]);
 
     if ($validator->fails()) {
         return redirect()->back()->withInput()->withErrors($validator);
     }
 
-    $user->username = $request->username;
     $user->name = $request->first_name;
     $user->lastname = $request->last_name;
     $user->email = $request->email;
     $user->designation = $request->designation;
     $user->tags = $request->tags;
-    $user->bio = $request->bio;
     $user->website_url = $request->website_url;
     $user->linkedin_url = $request->linkedin_url;
+    $user->instagram_url = $request->linkedin_url;
+    $user->facebook_url = $request->facebook_url;
+    $user->twitter_url = $request->twitter_url;
     $user->mobile = $request->mobile;
-    $user->dob = $request->dob;
-    $user->gender = $request->gender;
-    $user->street = $request->street;
-    $user->zipcode = $request->zipcode;
-    $user->city = $request->city;
-    $user->state = $request->state;
-    $user->country = $request->country;
-    $user->place = $request->place;
-
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
-    }
-
+    $user->bio = $request->bio;
     $user->save();
 
-    $user->syncRoles([]);
-    $user->assignRole($request->user_type);
-
-
+    if ($request->file("image")) {
+         $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'photo',$user->id);
+     }
 
     return redirect(route('speaker.index'))->withSuccess('Speaker data has been updated successfully.');
     }
@@ -267,9 +211,6 @@ class SpeakerController extends Controller
 
     // Admin or Admin can block
     if ($currentUser->hasRole(['Admin', 'Admin'])) {
-        // $user->is_block = true;
-        // $user->save();
-        // return back()->withSuccess('User has been blocked successfully.');
         $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
 
         if ($user->hasAnyRole($allowedRoles)) {

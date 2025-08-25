@@ -33,6 +33,7 @@ class HomeController extends Controller
     public function index()
     {  
         if ( Auth::user()->hasRole('Admin') 
+            || Auth::user()->hasRole('Exhibitor')
             || Auth::user()->hasRole('Representative')
             || Auth::user()->hasRole('Attendee')
             || Auth::user()->hasRole('Speaker')
@@ -112,7 +113,7 @@ class HomeController extends Controller
     }
 
      public function changePassword(Request $request)
-    {
+     {
         try {
             $validator = Validator::make($request->all(), [
                 'old_password' => 'required',
@@ -136,7 +137,30 @@ class HomeController extends Controller
 
             
         }catch(\Exception $e) {
-            dd($e);
+            return redirect()->route('admin.change.password')->withError('Sorry some problem occoured, please try again.');
+        }
+    }
+
+
+    public function changeUserPassword(Request $request)
+     {
+        try {
+            
+            $validator = Validator::make($request->all(), [
+                'password' => 'required|min:8',
+                'confirm_password' => 'min:8|same:confirm_password',
+            ]);
+            
+            if($validator->fails()) {
+               return redirect()->back()->withInput()->withErrors($validator);
+            }
+         
+            $user = User::where('id',$request->user_id)->firstOrFail();
+            $user->password = Hash::make($request->password);
+            $user->save();
+            return redirect()->back()->withSuccess('Your password changed successfully.');
+   
+        }catch(\Exception $e) {
             return redirect()->route('admin.change.password')->withError('Sorry some problem occoured, please try again.');
         }
     }

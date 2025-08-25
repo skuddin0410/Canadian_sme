@@ -6,17 +6,17 @@
 
 @section('content')
 <div class="container flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light"> Admin User/</span>Lists</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Team/</span>Lists</h4>
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
 				<div class="card-header d-flex justify-content-between align-items-center">
-				    <h5 class="mb-0"> Admin User List</h5>
+				    <h5 class="mb-0"> Team List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
 						<div class="dt-buttons"> 
 							<a href="{{route('admin-users.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
 								<span><i class="bx bx-plus me-sm-1"></i> 
-									<span class="d-none d-sm-inline-block">Add Admin User</span>
+									<span class="d-none d-sm-inline-block">Add Team</span>
 								</span>
 							</a> 
 						</div>
