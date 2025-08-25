@@ -44,7 +44,7 @@ class CalendarController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
 
-        $query = Session::with(['booth', 'speakers'])
+        $query = Session::with(['booth', 'speakers','exhibitors','sponsors'])
             ->where('event_id', $eventId)
             ->where('status', 'published');
 
@@ -64,10 +64,12 @@ class CalendarController extends Controller
                 'status' => $session->status,
                 'start' => $session->start_time->toISOString(),
                 'end' => $session->end_time->toISOString(),
-                'backgroundColor' =>  '#3498db',
-                'borderColor' =>  '#3498db',
+                'backgroundColor' =>  $session->color,
+                'borderColor' =>  $session->color,
                 'textColor' => '#ffffff',
                 'description' => $session->description,
+                'location' => $session->location,
+                'track' => $session->track,
                 'type' => $session->type,
                 'venue' => !empty($session->booth) ? $session->booth->title : 'No Booth' ,
                 'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
@@ -80,6 +82,20 @@ class CalendarController extends Controller
                     'venue' => !empty($session->booth) ? $session->booth->title .'('. $session->booth->booth_number .')': 'No Booth' ,
                     'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
                     'speakers' => $session->speakers->map(function ($speaker) {
+                        return [
+                            'id' => $speaker->id,
+                            'name' => $speaker->full_name,
+                            'role' => $speaker->pivot->role
+                        ];
+                    }),
+                    'sponsors' => $session->sponsors->map(function ($speaker) {
+                        return [
+                            'id' => $speaker->id,
+                            'name' => $speaker->full_name,
+                            'role' => $speaker->pivot->role
+                        ];
+                    }),
+                    'exhibitors' => $session->exhibitors->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
                             'name' => $speaker->full_name,
@@ -152,7 +168,7 @@ class CalendarController extends Controller
             }
         }
 
-        $session->load(['booth', 'speakers']);
+        $session->load(['booth', 'speakers','exhibitors','sponsors']);
 
         return response()->json([
             'message' => 'Session created successfully',
