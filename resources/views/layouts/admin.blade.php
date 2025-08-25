@@ -61,11 +61,15 @@
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
         <!-- Menu -->
-
+         
         @if(Auth::user()->hasRole('Admin') )
-            @include('partial.admin-side-bar')
-            {{-- @include('partial.exhibitor-side-bar') --}}
-        @endif    
+           @include('partial.admin-side-bar')
+             
+        @endif  
+
+        @if(Auth::user()->hasRole('Exhibitor') )
+           @include('partial.exhibitor-side-bar')
+        @endif  
         
         @if(Auth::user()->hasRole('Registration Desk'))
            @include('partial.registration-desk-sidebar')

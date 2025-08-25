@@ -33,6 +33,7 @@ class HomeController extends Controller
     public function index()
     {  
         if ( Auth::user()->hasRole('Admin') 
+            || Auth::user()->hasRole('Exhibitor')
             || Auth::user()->hasRole('Representative')
             || Auth::user()->hasRole('Attendee')
             || Auth::user()->hasRole('Speaker')
