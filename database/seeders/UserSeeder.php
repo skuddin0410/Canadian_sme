@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
             'bio'=>"This is a short bio for Exhibitor $i. Experienced in event management and exhibitions.",
             'password' => Hash::make('password')
         ]);
-        $exhibitorAdmin->assignRole('Admin');
+        $exhibitorAdmin->assignRole('Exhibitor');
         qrCode($exhibitorAdmin->id);
 
             $companies= [
