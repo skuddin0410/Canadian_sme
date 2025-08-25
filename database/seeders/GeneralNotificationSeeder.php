@@ -10,55 +10,52 @@ class GeneralNotificationSeeder extends Seeder
 {
 public function run(): void
 {
-// Ensure some users exist
-if (User::count() === 0) {
-User::factory()->count(2)->create();
-}
+	if (User::count() === 0) {
+	   User::factory()->count(2)->create();
+	}
 
 
 $alice = User::first();
 
 
-// 1) Simple broadcast (no user_id) about app update
-GeneralNotification::create([
-'user_id' => null,
-'title' => 'App Update Available',
-'body' => 'Version 2.3 brings performance improvements and dark mode.',
-'related_type' => null,
-'related_id' => null,
-'related_name' => null,
-'scheduled_at' => now()->addHours(2),
-'delivered_at' => null,
-'meta' => ['level' => 'info'],
-]);
+	// 1) Simple broadcast (no user_id) about app update
+	GeneralNotification::create([
+		'user_id' => null,
+		'title' => 'App Update Available',
+		'body' => 'Version 2.3 brings performance improvements and dark mode.',
+		'related_type' => null,
+		'related_id' => null,
+		'related_name' => null,
+		'scheduled_at' => now()->addHours(2),
+		'delivered_at' => null,
+		'meta' => ['level' => 'info'],
+	]);
 
 
-// 2) User-targeted with related Booking (example model)
-// If you have a Booking model, fill it in; otherwise use placeholders
-$bookingId = 123; // demo id
-GeneralNotification::create([
-'user_id' => $alice->id,
-'title' => 'Booking Confirmed',
-'body' => 'Your booking has been confirmed. Tap to view details.',
-'related_type' => 'App\\Models\\Booking',
-'related_id' => $bookingId,
-'related_name' => 'Booking #'.$bookingId,
-'delivered_at' => now(),
-'meta' => ['badge' => 1, 'sound' => 'default'],
-]);
+
+	$bookingId = 123; // demo id
+	GeneralNotification::create([
+		'user_id' => $alice->id,
+		'title' => 'Booking Confirmed',
+		'body' => 'Your booking has been confirmed. Tap to view details.',
+		'related_type' => 'App\\Models\\Booking',
+		'related_id' => $bookingId,
+		'related_name' => 'Booking #'.$bookingId,
+		'delivered_at' => now(),
+		'meta' => ['badge' => 1, 'sound' => 'default'],
+	]);
 
 
-// 3) User-targeted with related Event
-$eventId = 45; // demo id
-GeneralNotification::create([
-'user_id' => $alice->id,
-'title' => 'Event Reminder',
-'body' => 'Laravel Summit starts tomorrow at 10:00 AM.',
-'related_type' => 'App\\Models\\Event',
-'related_id' => $eventId,
-'related_name' => 'Laravel Summit',
-'scheduled_at' => now()->addDay()->setTime(8, 0),
-'meta' => ['priority' => 'high'],
-]);
-}
+    $eventId = 45; // demo id
+	GeneralNotification::create([
+		'user_id' => $alice->id,
+		'title' => 'Event Reminder',
+		'body' => 'Laravel Summit starts tomorrow at 10:00 AM.',
+		'related_type' => 'App\\Models\\Event',
+		'related_id' => $eventId,
+		'related_name' => 'Laravel Summit',
+		'scheduled_at' => now()->addDay()->setTime(8, 0),
+		'meta' => ['priority' => 'high'],
+	]);
+    }
 }
