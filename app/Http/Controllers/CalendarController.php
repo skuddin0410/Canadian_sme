@@ -75,6 +75,9 @@ class CalendarController extends Controller
                 'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
                 'capacity' => $session->capacity,
                 'duration' => $session->getDurationInMinutes(),
+                'keynote' => $session->keynote,
+                'demoes' => $session->demoes,
+                'panels' => $session->panels,
 
                 'extendedProps' => [
                     'description' => $session->description,
@@ -105,6 +108,9 @@ class CalendarController extends Controller
                     'capacity' => $session->capacity,
                     'duration' => $session->getDurationInMinutes(),
                     'status' => $session->status,
+                    'keynote' => $session->keynote,
+                    'demoes' => $session->demoes,
+                    'panels' => $session->panels,
                 ]
             ];
         });
