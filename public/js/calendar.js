@@ -4,7 +4,11 @@ class LaravelEventCalendar {
         this.currentView = 'calendar';
         this.events = [];
         this.speakers = [];
+        this.exhibitors = [];
+        this.sponsors = [];
         this.selectedSpeakers = [];
+        this.selectedExhibitors = [];
+        this.selectedSponsors = [];
         this.currentSession = null;
         this.isEditing = false;
         this.config = window.calendarConfig || {};
@@ -20,6 +24,8 @@ class LaravelEventCalendar {
         this.initializeCalendar();
         this.bindEvents();
         this.loadSpeakers();
+        this.loadExhibitor();
+        this.loadSponsors();
         this.loadSessions();
     }
 
@@ -159,6 +165,14 @@ class LaravelEventCalendar {
             this.addSelectedSpeaker();
         });
 
+         document.getElementById('addExhibitorBtn')?.addEventListener('click', () => {
+            this.addSelectedExhibitor();
+        });
+
+          document.getElementById('addSponsorBtn')?.addEventListener('click', () => {
+            this.addSelectedSponsor();
+        });
+
         // Time field auto-calculation
         document.getElementById('startTime')?.addEventListener('change', (e) => {
             this.autoCalculateEndTime(e.target.value);
@@ -197,6 +211,26 @@ class LaravelEventCalendar {
             this.populateSpeakerSelect();
         } catch (error) {
             console.error('Error loading speakers:', error);
+        }
+    }
+
+    async loadExhibitor() {
+        try {
+            const response = await this.apiCall('GET', this.config.apiUrls.exhibitors);
+            this.exhibitors = response.data || response;
+            this.populateExhibitorSelect();
+        } catch (error) {
+            console.error('Error loading exhibitors:', error);
+        }
+    }
+
+    async loadSponsors() {
+        try {
+            const response = await this.apiCall('GET', this.config.apiUrls.sponsors);
+            this.sponsors = response.data || response;
+            this.populateSponsorSelect();
+        } catch (error) {
+            console.error('Error loading sponsors:', error);
         }
     }
 
@@ -823,7 +857,34 @@ class LaravelEventCalendar {
         this.speakers.forEach(speaker => {
             const option = document.createElement('option');
             option.value = speaker.id;
-            option.textContent = `${speaker.name} - ${speaker.title || 'Speaker'}`;
+            option.textContent = `${speaker.full_name} - ${speaker.email || 'Speaker'}`;
+            select.appendChild(option);
+        });
+    }
+
+    populateExhibitorSelect() {
+        console.log(this.exibitors);
+        const select = document.getElementById('exhibitorSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select a exibitor...</option>';
+        this.exhibitors.forEach(exibitor => {
+            const option = document.createElement('option');
+            option.value = exibitor.id;
+            option.textContent = `${exibitor.full_name} - ${exibitor.email || 'Exibitor'}`;
+            select.appendChild(option);
+        });
+    }
+
+     populateSponsorSelect() {
+        const select = document.getElementById('sponsorSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select a sponsor...</option>';
+        this.sponsors.forEach(sponsor => {
+            const option = document.createElement('option');
+            option.value = sponsor.id;
+            option.textContent = `${sponsor.full_name} - ${sponsor.email || 'Exibitor'}`;
             select.appendChild(option);
         });
     }
@@ -831,7 +892,6 @@ class LaravelEventCalendar {
     addSelectedSpeaker() {
         const select = document.getElementById('speakerSelect');
         const speakerId = select.value;
-        alert(1)
         if (!speakerId) return;
         
         const speaker = this.speakers.find(s => s.id == speakerId);
@@ -848,6 +908,45 @@ class LaravelEventCalendar {
         select.value = '';
     }
 
+    addSelectedExhibitor() {
+        const select = document.getElementById('exhibitorSelect');
+        const exibitorId = select.value;
+        if (!exibitorId) return;
+        
+        const exhibitor = this.exhibitors.find(s => s.id == exibitorId);
+        if (!exhibitor) return;
+
+        // Check if speaker is already selected
+        if (this.selectedSpeakers.find(s => s.id == exibitorId)) {
+            this.showAlert('Exhibitor is already selected', 'warning');
+            return;
+        }
+
+        this.selectedExhibitors.push(exhibitor);
+        this.renderSelectedExhibitors();
+        select.value = '';
+    }
+
+      addSelectedSponsor() {
+        const select = document.getElementById('sponsorSelect');
+        const sponsorId = select.value;
+        if (!sponsorId) return;
+        
+        const sponsor = this.sponsors.find(s => s.id == sponsorId);
+        if (!sponsor) return;
+
+        // Check if speaker is already selected
+        if (this.selectedSponsors.find(s => s.id == sponsorId)) {
+            this.showAlert('Sponsors is already selected', 'warning');
+            return;
+        }
+
+        this.selectedSponsors.push(sponsor);
+        this.renderSelectedSponsors();
+        select.value = '';
+    }
+
+
     renderSelectedSpeakers() {
         const container = document.getElementById('selectedSpeakers');
         if (!container) return;
@@ -860,8 +959,52 @@ class LaravelEventCalendar {
         container.innerHTML = this.selectedSpeakers.map((speaker, index) => `
             <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
                 <div>
-                    <strong>${speaker.name}</strong>
+                    <strong>${speaker.full_name}</strong>
                     ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    renderSelectedExhibitors() {
+        const container = document.getElementById('selectedExhibitors');
+        if (!container) return;
+
+        if (this.selectedExhibitors.length === 0) {
+            container.innerHTML = '<div class="text-muted small">No exhibitors selected</div>';
+            return;
+        }
+
+        container.innerHTML = this.selectedExhibitors.map((speaker, index) => `
+            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
+                <div>
+                    <strong>${speaker.full_name}</strong>
+                    ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    renderSelectedSponsors() {
+        const container = document.getElementById('selectedSponsors');
+        if (!container) return;
+
+        if (this.selectedSponsors.length === 0) {
+            container.innerHTML = '<div class="text-muted small">No exhibitors selected</div>';
+            return;
+        }
+
+        container.innerHTML = this.selectedSponsors.map((sponsor, index) => `
+            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
+                <div>
+                    <strong>${sponsor.full_name}</strong>
+                    ${sponsor.title ? `<span class="text-muted">- ${sponsor.title}</span>` : ''}
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
                     <i class="fas fa-times"></i>

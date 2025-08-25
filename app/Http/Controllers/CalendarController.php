@@ -22,19 +22,43 @@ class CalendarController extends Controller
                 })->orderBy('created_at', 'DESC')->get();
 
         $exhibitors = User::whereHas("roles", function ($q) {
-                    $q->where("name", 'Admin');
+                    $q->where("name", 'Exhibitor');
+                })->orderBy('created_at', 'DESC')->get();
+
+        $sponsors = User::whereHas("roles", function ($q) {
+                    $q->where("name", 'Sponsors');
                 })->orderBy('created_at', 'DESC')->get();
         
-        return view('calendar.index', compact('event','speakers','exhibitors','booths'));
+        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths'));
     }
 
     public function speakers(Request $request)
     {
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Admin','Admin','Admin']);
+                    $q->whereNotIn("name", ['Speaker']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
+        
+    }
+
+    public function exhibitors(Request $request)
+    {
+
+        $exhibitors = User::select('id','name')->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ['Exhibitor']);
+                })->orderBy('created_at', 'DESC')->get();
+        return response()->json($exhibitors);
+        
+    }
+
+    public function sponsors(Request $request)
+    {
+
+        $sponsors = User::select('id','name')->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ['Sponsors']);
+                })->orderBy('created_at', 'DESC')->get();
+        return response()->json($sponsors);
         
     }
 

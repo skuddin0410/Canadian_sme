@@ -178,13 +178,47 @@
                                     <select class="form-select" id="speakerSelect">
                                         <option value="">Select a speaker...</option>
                                          @foreach($speakers as $speaker)
-                                          <option value="{{ $speaker->id }}">{{ $speaker->full_name }}({{ $speaker->email}}, {{$speaker->mobile ?? ''}})</option>
+                                          <option value="{{ $speaker->id }}">{{ $speaker->full_name }}</option>
                                          @endforeach 
                                        
                                     </select>
                                     <button type="button" class="btn btn-outline-secondary" id="addSpeakerBtn">Add</button>
                                 </div>
                                  <div id="selectedSpeakers"></div>
+                            </div>
+                        </div>
+
+                         <div class="col-12">
+                            <label class="form-label">Exhibitors</label>
+                            <div id="exhibitorSelection">
+                                <div class="input-group mb-2">
+                                    <select class="form-select" id="exhibitorSelect">
+                                        <option value="">Select a exhibitor...</option>
+                                         @foreach($exhibitors as $exhibitor)
+                                          <option value="{{ $exhibitor->id }}">{{ $exhibitor->full_name }}</option>
+                                         @endforeach 
+                                       
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary" id="addExhibitorBtn">Add</button>
+                                </div>
+                                 <div id="selectedExhibitors"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Sponsors</label>
+                            <div id="SponsorSelection">
+                                <div class="input-group mb-2">
+                                    <select class="form-select" id="sponsorSelect">
+                                        <option value="">Select a sponsors...</option>
+                                         @foreach($sponsors as $sponsor)
+                                          <option value="{{ $sponsor->id }}">{{ $sponsor->full_name }}</option>
+                                         @endforeach 
+                                       
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary" id="addSponsorBtn">Add</button>
+                                </div>
+                                 <div id="selectedSponsors"></div>
                             </div>
                         </div>
 
@@ -242,7 +276,9 @@
             createSession: '{{ route('calendar.sessions.store') }}',
             updateSession: '{{ route('calendar.sessions.update', ':id') }}',
             deleteSession: '{{ route('calendar.sessions.destroy', ':id') }}',
-            speakers: '{{ route('speakers.list') }}'
+            speakers: '{{ route('speakers.list') }}',
+            exhibitors: '{{ route('exhibitors.list') }}',
+            sponsors: '{{ route('sponsors.list') }}'
         },
         csrfToken: '{{ csrf_token() }}'
     };
