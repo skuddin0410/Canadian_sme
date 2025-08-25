@@ -20,6 +20,16 @@ return new class extends Migration
             $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
+
+        Schema::create('session_sponsors', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('session_id');
+            $table->unsignedBigInteger('user_id');
+            $table->timestamps();
+
+            $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**
@@ -28,5 +38,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('session_exhibitors');
+        Schema::dropIfExists('session_sponsors');
     }
 };
