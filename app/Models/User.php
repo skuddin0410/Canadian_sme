@@ -110,6 +110,11 @@ class User extends Authenticatable implements JWTSubject
             ->where('file_type', 'photo')
             ->whereNotNull('file_name');
     }
+    public function sponsoredSessions()
+{
+    return $this->belongsToMany(Session::class, 'session_sponsors', 'user_id', 'session_id');
+}
+
 
     public function bank()
     {
