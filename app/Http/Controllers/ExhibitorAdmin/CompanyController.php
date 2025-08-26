@@ -58,8 +58,8 @@ class CompanyController extends Controller
             'linkedin'      => 'nullable|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
-            'certifications' => 'nullable|string',
-            'certification_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
+            // 'certifications' => 'nullable|string',
+            // 'certification_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -76,10 +76,10 @@ class CompanyController extends Controller
         $user->company_id = $company->id;
         $user->save();
         
-        if ($request->file("certification_image")) {
-            $uploadPath = 'certifications';
-            $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications');
-        }
+        // if ($request->file("certification_image")) {
+        //     $uploadPath = 'certifications';
+        //     $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications');
+        // }
 
         if ($request->file("logo")) {
             $this->imageUpload($request->file("logo"), 'logo', $company->id, 'companies', 'logo');
@@ -131,11 +131,11 @@ class CompanyController extends Controller
             'phone'         => 'required|string|max:20',
             'description'   => 'required|string',
             'website'       => 'required|url',
-            'linkedin'      => 'required|url',
+            'linkedin'      => 'nullable|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
-            'certifications' => 'required|string',
-            'certification_image' => 'nullable|image|max:2048',
+            // 'certifications' => 'nullable|string',
+            // 'certification_image' => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -154,14 +154,14 @@ class CompanyController extends Controller
             'linkedin',
             'twitter',
             'facebook',
-            'certifications'
+            // 'certifications'
         ]));
 
         // Handle image upload
-        if ($request->file("certification_image")) {
-            $uploadPath = 'certifications';
-            $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications', $idForUpdate = $company->id);
-        }
+        // if ($request->file("certification_image")) {
+        //     $uploadPath = 'certifications';
+        //     $this->imageUpload($request->file("certification_image"), $uploadPath, $company->id, 'companies', 'certifications', $idForUpdate = $company->id);
+        // }
 
         if ($request->file("logo")) {
             $this->imageUpload($request->file("logo"), 'logo', $company->id, 'companies', 'logo', $idForUpdate = $company->id);
