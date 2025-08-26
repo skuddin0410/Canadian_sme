@@ -13,8 +13,13 @@ class CalendarController extends Controller
 {
     public function index(Request $request)
     {
-        $eventId = $request->get('event_id');
-        $event = Event::findOrFail($eventId);
+        $slug = $request->get('slug');
+        if(!empty($slug)){
+          $event = Event::where('slug',$slug)->firstOrFail();
+        }else{
+            $event = Event::firstOrFail();
+        }
+        
         $booths = Booth::all();
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
@@ -22,19 +27,43 @@ class CalendarController extends Controller
                 })->orderBy('created_at', 'DESC')->get();
 
         $exhibitors = User::whereHas("roles", function ($q) {
-                    $q->where("name", 'Admin');
+                    $q->where("name", 'Exhibitor');
+                })->orderBy('created_at', 'DESC')->get();
+
+        $sponsors = User::whereHas("roles", function ($q) {
+                    $q->where("name", 'Sponsors');
                 })->orderBy('created_at', 'DESC')->get();
         
-        return view('calendar.index', compact('event','speakers','exhibitors','booths'));
+        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths'));
     }
 
     public function speakers(Request $request)
     {
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ['Admin','Admin','Admin']);
+                    $q->whereIn("name", ['Speaker']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
+        
+    }
+
+    public function exhibitors(Request $request)
+    {
+
+        $exhibitors = User::select('id','name')->whereHas("roles", function ($q) {
+                    $q->whereIn("name", ['Exhibitor']);
+                })->orderBy('created_at', 'DESC')->get();
+        return response()->json($exhibitors);
+        
+    }
+
+    public function sponsors(Request $request)
+    {
+
+        $sponsors = User::select('id','name')->whereHas("roles", function ($q) {
+                    $q->whereIn("name", ['Sponsors']);
+                })->orderBy('created_at', 'DESC')->get();
+        return response()->json($sponsors);
         
     }
 
@@ -44,7 +73,7 @@ class CalendarController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
 
-        $query = Session::with(['booth', 'speakers'])
+        $query = Session::with(['booth', 'speakers','exhibitors','sponsors'])
             ->where('event_id', $eventId)
             ->where('status', 'published');
 
@@ -64,15 +93,20 @@ class CalendarController extends Controller
                 'status' => $session->status,
                 'start' => $session->start_time->toISOString(),
                 'end' => $session->end_time->toISOString(),
-                'backgroundColor' =>  '#3498db',
-                'borderColor' =>  '#3498db',
+                'backgroundColor' =>  $session->color,
+                'borderColor' =>  $session->color,
                 'textColor' => '#ffffff',
                 'description' => $session->description,
+                'location' => $session->location,
+                'track' => $session->track,
                 'type' => $session->type,
                 'venue' => !empty($session->booth) ? $session->booth->title : 'No Booth' ,
                 'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
                 'capacity' => $session->capacity,
                 'duration' => $session->getDurationInMinutes(),
+                'keynote' => $session->keynote,
+                'demoes' => $session->demoes,
+                'panels' => $session->panels,
 
                 'extendedProps' => [
                     'description' => $session->description,
@@ -86,9 +120,26 @@ class CalendarController extends Controller
                             'role' => $speaker->pivot->role
                         ];
                     }),
+                    'sponsors' => $session->sponsors->map(function ($speaker) {
+                        return [
+                            'id' => $speaker->id,
+                            'name' => $speaker->full_name,
+                            'role' => $speaker->pivot->role
+                        ];
+                    }),
+                    'exhibitors' => $session->exhibitors->map(function ($speaker) {
+                        return [
+                            'id' => $speaker->id,
+                            'name' => $speaker->full_name,
+                            'role' => $speaker->pivot->role
+                        ];
+                    }),
                     'capacity' => $session->capacity,
                     'duration' => $session->getDurationInMinutes(),
                     'status' => $session->status,
+                    'keynote' => $session->keynote,
+                    'demoes' => $session->demoes,
+                    'panels' => $session->panels,
                 ]
             ];
         });
@@ -152,7 +203,7 @@ class CalendarController extends Controller
             }
         }
 
-        $session->load(['booth', 'speakers']);
+        $session->load(['booth', 'speakers','exhibitors','sponsors']);
 
         return response()->json([
             'message' => 'Session created successfully',

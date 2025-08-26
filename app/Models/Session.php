@@ -11,7 +11,7 @@ class Session extends Model
     protected $table = "event_sessions";
     protected $fillable = [
         'event_id', 'booth_id', 'title', 'description',
-        'start_time', 'end_time', 'status', 'type', 'capacity', 'metadata'
+        'start_time', 'end_time', 'status', 'type', 'capacity', 'metadata','keynote','demoes','panels','location','color','track'
     ];
 
     protected $casts = [
