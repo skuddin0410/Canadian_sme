@@ -83,116 +83,112 @@
                 </li>
             </ul>
         </li>
+        
+
+        <li class="menu-item {{ request()->is('attendee-users*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class=" menu-link menu-toggle">
+                 <i class="menu-icon tf-icons fa fa-user"></i>
+                <div data-i18n="tickets">People</div>
+            </a>
+            <ul class="menu-sub">
+            <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
+                <a href="#" class="menu-link">
+                    <div data-i18n="ticket-categories"> User Groups</div>
+                </a>
+            </li>
+              <li class="menu-item {{ request()->is('attendee-users*') ? 'active' : '' }}">
+                    <a href="{{ url('attendee-users') }}" class="menu-link">
+                        <div data-i18n="Attendee">Attendee </div>
+                    </a>
+                </li>
+            </ul>
+        </li>
 
 
-         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('attendee-users*') ? 'active' : '' }} {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }} {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }} {{ request()->is('attendee-users*') ? 'active' : '' }} {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }} {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('pages*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
             </a>
 
-        <ul class="menu-sub">
-         <li class="menu-item {{ request()->is('admin-users*') ? 'active' : '' }}">
-            <a href="{{ url('admin-users') }}" class="menu-link">
-                <i class="menu-icon tf-icons fa fa-users"></i>
-                <div data-i18n="events">Team Managment</div>
-            </a>
-        </li>
+           <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('calendar*') ? 'active' : '' }}">
+                        <a href="{{ route('calendar.index') }}" class="menu-link">
+                            <i class="menu-icon tf-icons fa fa-calendar  me-1"></i>
+                            <div data-i18n="Schedules">Schedules </div>
+                        </a>
+                    </li>
 
-        <li class="menu-item {{ request()->is('attendee-users*') ? 'active' : '' }}">
-            <a href="{{ url('attendee-users') }}" class="menu-link">
-                <i class="menu-icon tf-icons fa fa-user"></i>
-                <div data-i18n="Attendee">Attendee Managment</div>
-            </a>
-        </li>
+                    <li class="menu-item {{ request()->is('admin-users*') ? 'active' : '' }}">
+                        <a href="{{ url('admin-users') }}" class="menu-link">
+                            <i class="menu-icon tf-icons fa fa-users  me-1"></i>
+                            <div data-i18n="events">Team </div>
+                        </a>
+                    </li>
 
-        <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active' : '' }}">
-           <a href="{{ url('exhibitor-users') }}" class="menu-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-person-square" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-              <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
-            </svg>
-            <div data-i18n="Users">Exhibitor Managment</div>
-           </a>
-        </li>
-        <li class="menu-item {{ request()->is('speaker*') ? 'active' : '' }}">
-           <a href="{{ url('speaker') }}" class="menu-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-speaker" viewBox="0 0 16 16">
-              <path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-              <path d="M8 4.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5M8 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-3.5 1.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-            </svg>
-            <div data-i18n="Users">Speaker Managment</div>
-           </a>
-        </li>
-
-         <li class="menu-item {{ request()->is('sponsors*') ? 'active' : '' }}">
-           <a href="{{ url('sponsors') }}" class="menu-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-buildings-fill" viewBox="0 0 16 16">
-              <path d="M15 .5a.5.5 0 0 0-.724-.447l-8 4A.5.5 0 0 0 6 4.5v3.14L.342 9.526A.5.5 0 0 0 0 10v5.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V14h1v1.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zM2 11h1v1H2zm2 0h1v1H4zm-1 2v1H2v-1zm1 0h1v1H4zm9-10v1h-1V3zM8 5h1v1H8zm1 2v1H8V7zM8 9h1v1H8zm2 0h1v1h-1zm-1 2v1H8v-1zm1 0h1v1h-1zm3-2v1h-1V9zm-1 2h1v1h-1zm-2-4h1v1h-1zm3 0v1h-1V7zm-2-2v1h-1V5zm1 0h1v1h-1z"/>
-            </svg>
-            <div data-i18n="Users">Sponsors Managment</div>
-           </a>
-         </li>
-
-          <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
-                    <a href="{{ route('events.index') }}" class="menu-link">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="menu-icon tf-icons bi bi-calendar2-event-fill" viewBox="0 0 16 16">
-                          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5m9.954 3H2.545c-.3 0-.545.224-.545.5v1c0 .276.244.5.545.5h10.91c.3 0 .545-.224.545-.5v-1c0-.276-.244-.5-.546-.5M11.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                    <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active' : '' }}">
+                       <a href="{{ url('exhibitor-users') }}" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="menu-icon tf-icons bi bi-person-square me-1" viewBox="0 0 16 16">
+                          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                          <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
                         </svg>
-                        <div data-i18n="events">Event Lists</div>
-                    </a>
-                </li>
+                        <div data-i18n="Users">Exhibitor </div>
+                       </a>
+                    </li>
+                    <li class="menu-item {{ request()->is('speaker*') ? 'active' : '' }}">
+                       <a href="{{ url('speaker') }}" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="menu-icon tf-icons bi bi-speaker me-1" viewBox="0 0 16 16">
+                          <path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                          <path d="M8 4.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5M8 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-3.5 1.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                        </svg>
+                        <div data-i18n="Users">Speaker </div>
+                       </a>
+                    </li>
 
-                <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
-                    <a href="{{ route('categories.index') }}" class="menu-link">
+                     <li class="menu-item {{ request()->is('sponsors*') ? 'active' : '' }}">
+                       <a href="{{ url('sponsors') }}" class="menu-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="menu-icon tf-icons bi bi-buildings-fill  me-1" viewBox="0 0 16 16">
+                          <path d="M15 .5a.5.5 0 0 0-.724-.447l-8 4A.5.5 0 0 0 6 4.5v3.14L.342 9.526A.5.5 0 0 0 0 10v5.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V14h1v1.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zM2 11h1v1H2zm2 0h1v1H4zm-1 2v1H2v-1zm1 0h1v1H4zm9-10v1h-1V3zM8 5h1v1H8zm1 2v1H8V7zM8 9h1v1H8zm2 0h1v1h-1zm-1 2v1H8v-1zm1 0h1v1h-1zm3-2v1h-1V9zm-1 2h1v1h-1zm-2-4h1v1h-1zm3 0v1h-1V7zm-2-2v1h-1V5zm1 0h1v1h-1z"/>
+                        </svg>
+                        <div data-i18n="Users">Sponsors </div>
+                       </a>
+                     </li>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="menu-icon tf-icons bi bi-calendar-event" viewBox="0 0 16 16">
-                      <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
-                      <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
-                    </svg>
-                    <div data-i18n="categories">Categories & Tags</div>
-                    </a>
-                </li>
+                    <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                        <a href="{{ route('events.index') }}" class="menu-link">
 
-            </ul>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="menu-icon tf-icons bi bi-calendar2-event-fill me-1" viewBox="0 0 16 16">
+                              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5m9.954 3H2.545c-.3 0-.545.224-.545.5v1c0 .276.244.5.545.5h10.91c.3 0 .545-.224.545-.5v-1c0-.276-.244-.5-.546-.5M11.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                            </svg>
+                            <div data-i18n="events">Events</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
+                        <a href="{{ route('categories.index') }}" class="menu-link">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="menu-icon tf-icons bi bi-calendar-event me-1" viewBox="0 0 16 16">
+                          <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
+                          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                        </svg>
+                        <div data-i18n="categories">Categories & Tags</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
+                        <a href="{{ route('pages.index') }}" class="menu-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="menu-icon tf-icons bi bi-file-earmark-richtext-fill me-1" viewBox="0 0 16 16">
+                              <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M7 6.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m-.861 1.542 1.33.886 1.854-1.855a.25.25 0 0 1 .289-.047l1.888.974V9.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V9s1.54-1.274 1.639-1.208M5 11h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1"/>
+                            </svg>
+                            <div data-i18n="Coupons">Webview</div>
+                        </a>
+                    </li>
+
+                </ul>
 
          </li>   
 
-        
-        
-         <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon tf-icons bi bi-calendar2-event" viewBox="0 0 16 16">
-                  <path d="M11 7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
-                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/>
-                  <path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5z"/>
-                </svg>
-                <div data-i18n="events">Events Managment</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
-                    <a href="{{ route('events.index') }}" class="menu-link">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="menu-icon tf-icons bi bi-calendar2-event-fill" viewBox="0 0 16 16">
-                          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5m9.954 3H2.545c-.3 0-.545.224-.545.5v1c0 .276.244.5.545.5h10.91c.3 0 .545-.224.545-.5v-1c0-.276-.244-.5-.546-.5M11.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-                        </svg>
-                        <div data-i18n="events">Event Lists</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
-                    <a href="{{ route('categories.index') }}" class="menu-link">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="menu-icon tf-icons bi bi-calendar-event" viewBox="0 0 16 16">
-                      <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
-                      <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
-                    </svg>
-                    <div data-i18n="categories">Categories & Tags</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
+    
 
          <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class=" menu-link menu-toggle">
@@ -235,15 +231,6 @@
                 <div data-i18n="formbuilder">Settings</div>
             </a>
             <ul class="menu-sub">
-
-                <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
-                    <a href="{{ route('pages.index') }}" class="menu-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-icon tf-icons bi bi-file-earmark-richtext-fill" viewBox="0 0 16 16">
-                          <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M7 6.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m-.861 1.542 1.33.886 1.854-1.855a.25.25 0 0 1 .289-.047l1.888.974V9.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V9s1.54-1.274 1.639-1.208M5 11h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1"/>
-                        </svg>
-                        <div data-i18n="Coupons">Cms Pages</div>
-                    </a>
-                </li>
 
                 <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }}">
                     <a href="{{route('leads.index')}}" class="menu-link">

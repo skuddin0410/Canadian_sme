@@ -13,8 +13,13 @@ class CalendarController extends Controller
 {
     public function index(Request $request)
     {
-        $eventId = $request->get('event_id');
-        $event = Event::findOrFail($eventId);
+        $slug = $request->get('slug');
+        if(!empty($slug)){
+          $event = Event::where('slug',$slug)->firstOrFail();
+        }else{
+            $event = Event::firstOrFail();
+        }
+        
         $booths = Booth::all();
 
         $speakers = User::select('id','name')->whereHas("roles", function ($q) {
