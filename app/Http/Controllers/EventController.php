@@ -104,13 +104,12 @@ class EventController extends Controller
     }
 
     public function edit(Event $event)
-    {
-        return view('events.edit', compact('event'));
+    {   $availableTags = Category::where('type','tags')->pluck('name');
+        return view('events.edit', compact('event','availableTags'));
     }
 
     public function update(Request $request, Event $event)
     {   
-    
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:events,slug,' . $event->id,
@@ -124,23 +123,29 @@ class EventController extends Controller
             'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
         ],
             'status' => 'required|in:draft,published,cancelled',
-            'visibility' => 'required|in:public,private,unlisted',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:1000',
-            'meta_keywords' => 'nullable|string|max:1000',
-            'tags'=>'nullable|string|max:1000',
+            'visibility' => 'required|in:listed,unlisted',
+            // 'meta_title' => 'nullable|string|max:255',
+            // 'meta_description' => 'nullable|string|max:1000',
+            // 'meta_keywords' => 'nullable|string|max:1000',
+            'tags'=>'nullable|array',
             'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
         ]);
+        
+  
+
+        if (isset($request->tags)) {
+            $validated['tags'] = implode(',', $request->tags);
+        } else {
+            $validated['tags'] = ''; // Set an empty string if no tags are selected
+        }
 
         $event->update($validated);
-        $event->tags = $request->tags;
-        $event->save();
         $uploadPath = 'events';
         if($request->file("image")){
           $this->imageUpload($request->file("image"),$uploadPath,$event->id,'events','photo',$idForUpdate=$event->id);   
         }
-
-        return redirect()->route('events.index')->with('success', 'Event updated.');
+     
+        return redirect()->route('events.edit',['event'=>$event->id])->with('success', 'Event updated.');
     }
 
     public function destroy(Event $event)

@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->enum('status', ['draft', 'published', 'cancelled'])->default('draft');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('tags')->nullable();
+            $table->text('tags')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->enum('visibility', ['public', 'private', 'unlisted'])->default('public');
 
