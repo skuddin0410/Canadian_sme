@@ -234,29 +234,46 @@ class TicketSystemSeeder extends Seeder
 
         $events = Event::all();
         $boothIds = Booth::pluck('id')->toArray();
-
+        $calendarColors = [
+            '#FF5733', // Red-Orange
+            '#33C1FF', // Sky Blue
+            '#28A745', // Green
+            '#FFC107', // Amber
+            '#6F42C1', // Purple
+            '#E83E8C', // Pink
+            '#20C997', // Teal
+            '#FD7E14', // Orange
+            '#17A2B8', // Cyan
+            '#343A40', // Dark Gray
+        ];
         foreach ($events as $event) {
             for ($i = 1; $i <= 30; $i++) {
-                $start = $event->start_date->copy()->addHours($i * 2);
-                $end   = $start->copy()->addHour();
-
-                Session::create([
-                    'event_id'    => $event->id,
-                    'booth_id'    => $boothIds[array_rand($boothIds)], // assign booth from DB
-                    'title'       => "Session $i for " . $event->title,
-                    'description' => "This is session $i of the event " . $event->title,
-                    'keynote' => "This is session keynote$i of the event " . $event->title,
-                    'demoes' => "This is session panels$i of the event " . $event->title,
-                    'panels' => "This is session panels$i of the event " . $event->title,
-                    'track'=>'Test1,Test2',
-                    'color'=>'#' . substr(\Str::random(6), 0, 6),
-                    'start_time'  => $start,
-                    'end_time'    => $end,
-                    'status'      => 'published',
-                    'is_featured'=>rand(0, 1),
-                    'type'        => ['session','workshop','keynote'][array_rand(['session','workshop','keynote'])],
-                    'capacity'    => rand(50, 200),
-                ]);
+                for ($slot = 1; $slot <= 3; $slot++) { // 3 sessions per day
+                    $start = $event->start_date
+                        ->copy()
+                        ->addDays($i - 1)
+                        ->setTime(9 + ($slot * 2), 0); // 11 AM, 1 PM, 3 PM
+                    $end = $start->copy()->addHour();
+                
+                    Session::create([
+                        'event_id'    => $event->id,
+                        'booth_id'    => $boothIds[array_rand($boothIds)], // assign booth from DB
+                        'title'       => "Session $start - $end for " . $event->title,
+                        'location'       => "Location-".$i,
+                        'description' => "This is session  $start - $end of the event " . $event->title,
+                        'keynote' => "This is session keynote $start - $end of the event " . $event->title,
+                        'demoes' => "This is session panels $start - $end of the event " . $event->title,
+                        'panels' => "This is session panels $start - $end of the event " . $event->title,
+                        'track'=>'Test1,Test2',
+                        'color'=>$calendarColors[array_rand($calendarColors)],
+                        'start_time'  => $start,
+                        'end_time'    => $end,
+                        'status'      => 'published',
+                        'is_featured'=>rand(0, 1),
+                        'type'        => ['session','workshop','keynote'][array_rand(['session','workshop','keynote'])],
+                        'capacity'    => rand(50, 200),
+                    ]);
+                }
             }
         }
 

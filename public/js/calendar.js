@@ -4,7 +4,11 @@ class LaravelEventCalendar {
         this.currentView = 'calendar';
         this.events = [];
         this.speakers = [];
+        this.exhibitors = [];
+        this.sponsors = [];
         this.selectedSpeakers = [];
+        this.selectedExhibitors = [];
+        this.selectedSponsors = [];
         this.currentSession = null;
         this.isEditing = false;
         this.config = window.calendarConfig || {};
@@ -20,6 +24,8 @@ class LaravelEventCalendar {
         this.initializeCalendar();
         this.bindEvents();
         this.loadSpeakers();
+        this.loadExhibitor();
+        this.loadSponsors();
         this.loadSessions();
     }
 
@@ -85,6 +91,13 @@ class LaravelEventCalendar {
                 
                 // Add tooltip
                 info.el.title = info.event.extendedProps.description || info.event.title;
+                const color = info.event.backgroundColor || info.event.extendedProps.color || info.event.extendedProps.backgroundColor;
+                  if (color) {
+                    // Works with FC v5/v6 CSS variables
+                    info.el.style.setProperty('--fc-event-bg-color', color);
+                    info.el.style.setProperty('--fc-event-border-color', color);
+                    info.el.style.setProperty('--fc-event-text-color', '#fff');
+                  }
             }
         });
 
@@ -152,6 +165,14 @@ class LaravelEventCalendar {
             this.addSelectedSpeaker();
         });
 
+         document.getElementById('addExhibitorBtn')?.addEventListener('click', () => {
+            this.addSelectedExhibitor();
+        });
+
+          document.getElementById('addSponsorBtn')?.addEventListener('click', () => {
+            this.addSelectedSponsor();
+        });
+
         // Time field auto-calculation
         document.getElementById('startTime')?.addEventListener('change', (e) => {
             this.autoCalculateEndTime(e.target.value);
@@ -193,6 +214,26 @@ class LaravelEventCalendar {
         }
     }
 
+    async loadExhibitor() {
+        try {
+            const response = await this.apiCall('GET', this.config.apiUrls.exhibitors);
+            this.exhibitors = response.data || response;
+            this.populateExhibitorSelect();
+        } catch (error) {
+            console.error('Error loading exhibitors:', error);
+        }
+    }
+
+    async loadSponsors() {
+        try {
+            const response = await this.apiCall('GET', this.config.apiUrls.sponsors);
+            this.sponsors = response.data || response;
+            this.populateSponsorSelect();
+        } catch (error) {
+            console.error('Error loading sponsors:', error);
+        }
+    }
+
     updateCalendarEvents() {
         if (!this.calendar) return;
         this.calendar.removeAllEvents();
@@ -204,8 +245,8 @@ class LaravelEventCalendar {
                 title: session.title,
                 start: session.start,
                 end: session.end,
-                backgroundColor: session.color,
-                borderColor: session.color,
+                backgroundColor: session.backgroundColor,
+                borderColor: session.borderColor,
                 textColor: '#fff', // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
@@ -213,19 +254,26 @@ class LaravelEventCalendar {
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
+                    exhibitors: session.extendedProps.exhibitors || [],
+                    sponsors: session.extendedProps.sponsors || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
                     //duration: session.extendedProps.duration,
                     type:session.extendedProps.type,
-                    backgroundColor: session.color,
-                    borderColor: session.color,
+                    backgroundColor: session.borderColor,
+                    borderColor: session.borderColor,
                     textColor: '#fff', // better contrast
+                    track: session.track, 
+                    location: session.location,
+                    keynote: session.keynote,
+                    demoes: session.demoes,
+                    panels: session.panels,
                 }
             };
         });
 
         
-        console.log(events)
+
         this.calendar.addEventSource(events); 
     }
 
@@ -292,7 +340,6 @@ class LaravelEventCalendar {
             sessions.forEach(session => {
                 const statusBadge = this.getStatusBadge(session.status);
                 const typeBadge = this.getTypeBadge(session.type);
-                
 
                 gridHTML += `
                 <div class="col-md-6 col-lg-4">
@@ -307,14 +354,27 @@ class LaravelEventCalendar {
                             </div>
                             <div class="text-muted small mb-2">
                                 <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
-                                ${session.venue ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</div>` : ''}
+                                ${session.venue ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} (${session.venue})</div>` : ''}
                                 ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
                             <div class="mt-auto">
-                                ${session.speakers && session.speakers.length ? session.speakers.map(s => `
-                                    <span class="badge bg-primary me-1 mb-1" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
+                                ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
+                                    <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
                                 `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No speakers assigned</span>'}
                             </div>
+
+                            <div class="mt-auto">
+                                ${session.extendedProps.exhibitors && session.extendedProps.exhibitors.length ? session.extendedProps.exhibitors.map(s => `
+                                    <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Exhibitor'})</span>
+                                `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No exhibitors assigned</span>'}
+                            </div> 
+
+                            <div class="mt-auto">
+                                ${session.extendedProps.sponsors && session.extendedProps.sponsors.length ? session.extendedProps.sponsors.map(s => `
+                                    <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Sponsor'})</span>
+                                `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No sponsors assigned</span>'}
+                            </div>     
+
                         </div>
                     </div>
                 </div>
@@ -346,7 +406,6 @@ class LaravelEventCalendar {
             sortedSessions.forEach(session => {
             const statusBadge = this.getStatusBadge(session.status);
             const typeBadge = this.getTypeBadge(session.type);
-            console.log(session)
 
 
            
@@ -364,7 +423,7 @@ class LaravelEventCalendar {
                 <div class="small text-muted mb-1">
                     <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
                     <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
-                    ${session.venue ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session.venue.name}</span>` : ''}
+                    ${session.venue ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''} (${session.venue})</span>` : ''}
                 </div>
                 ${description}
             </div>
@@ -384,7 +443,6 @@ class LaravelEventCalendar {
     openSessionModal(eventData = {}) {
         this.isEditing = !!eventData.id;
         this.selectedSpeakers = [];
-        console.log(eventData);
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionModal'));
         const title = document.getElementById('modalTitle');
         const deleteBtn = document.getElementById('deleteBtn');
@@ -437,6 +495,22 @@ class LaravelEventCalendar {
           `).join('')
         : '<span class="text-muted">No speakers assigned</span>';
 
+         const exhibitorsHTML = event.extendedProps?.exhibitors?.length
+        ? event.extendedProps.exhibitors.map(exhibitor => `
+            <span class="badge bg-primary me-1 mb-1">
+                ${exhibitor.name} (${exhibitor.pivot?.role || 'Exhibitor'})
+            </span>
+          `).join('')
+        : '<span class="text-muted">No exhibitors assigned</span>';
+
+        const sponsorHTML = event.extendedProps?.sponsors?.length
+        ? event.extendedProps.sponsors.map(sponsor => `
+            <span class="badge bg-primary me-1 mb-1">
+                ${sponsor.name} (${sponsor.pivot?.role || 'Exhibitor'})
+            </span>
+          `).join('')
+        : '<span class="text-muted">No sponsors assigned</span>';
+
 
         content.innerHTML = `
     <div class="session-meta row g-3">
@@ -457,6 +531,7 @@ class LaravelEventCalendar {
         </div>
         <div class="col-12 col-md-6">
             <div class="fw-bold">Venue</div>
+            <div>${event?.location?? ''}</div>
             <div>${event.extendedProps?.venue || 'No Venue'}</div>
         </div>
         <div class="col-12 col-md-6">
@@ -472,9 +547,41 @@ class LaravelEventCalendar {
         </div>
     ` : ''}
 
+
+     ${event.extendedProps?.keynote ? `
+        <div class="mt-3">
+            <div class="fw-bold">Keynote</div>
+            <div class="mt-2">${event.extendedProps.keynote}</div>
+        </div>
+    ` : ''}
+
+     ${event.extendedProps?.demoes ? `
+        <div class="mt-3">
+            <div class="fw-bold">Demoes</div>
+            <div class="mt-2">${event.extendedProps.demoes}</div>
+        </div>
+    ` : ''}
+
+      ${event.extendedProps?.panels ? `
+        <div class="mt-3">
+            <div class="fw-bold">Panels</div>
+            <div class="mt-2">${event.extendedProps.panels}</div>
+        </div>
+    ` : ''}
+
     <div class="mt-3">
         <div class="fw-bold">Speakers</div>
         <div class="mt-2">${speakersHTML}</div>
+    </div>
+
+     <div class="mt-3">
+        <div class="fw-bold">Exhibitors</div>
+        <div class="mt-2">${exhibitorsHTML}</div>
+    </div>
+
+     <div class="mt-3">
+        <div class="fw-bold">Sponsors</div>
+        <div class="mt-2">${sponsorHTML}</div>
     </div>
 `;
 
@@ -499,12 +606,20 @@ class LaravelEventCalendar {
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
+                    exhibitors: session.extendedProps.exhibitors || [],
+                    sponsors: session.extendedProps.sponsors || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
+                    //duration: session.extendedProps.duration,
                     type:session.extendedProps.type,
                     backgroundColor: session.color,
                     borderColor: session.color,
                     textColor: '#fff', // better contrast
+                    track: session.track, 
+                    location: session.location,
+                    keynote: session.keynote,
+                    demoes: session.demoes,
+                    panels: session.panels,
                 }
             };
             this.showSessionDetails(eventData);
@@ -529,6 +644,8 @@ class LaravelEventCalendar {
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
+                    exhibitors: session.extendedProps.exhibitors || [],
+                    sponsors: session.extendedProps.sponsors || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
                     //duration: session.extendedProps.duration,
@@ -536,6 +653,11 @@ class LaravelEventCalendar {
                     backgroundColor: session.color,
                     borderColor: session.color,
                     textColor: '#fff', // better contrast
+                    track: session.track, 
+                    location: session.location,
+                    keynote: session.keynote,
+                    demoes: session.demoes,
+                    panels: session.panels,
                 }
             };
             this.openSessionModal(eventData);
@@ -692,12 +814,15 @@ class LaravelEventCalendar {
                 backgroundColor: session.color,
                 borderColor: session.color,
                 textColor: '#fff', // better contrast
+                color: session.color,
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
                     speakers: session.extendedProps.speakers || [],
+                    exhibitors: session.extendedProps.exhibitors || [],
+                    sponsors: session.extendedProps.sponsors || [],
                     capacity: session.extendedProps.capacity,
                     duration: this.calculateDuration(session.start, session.end),
                     //duration: session.extendedProps.duration,
@@ -705,6 +830,11 @@ class LaravelEventCalendar {
                     backgroundColor: session.color,
                     borderColor: session.color,
                     textColor: '#fff', // better contrast
+                    track: session.track, 
+                    location: session.location,
+                    keynote: session.keynote,
+                    demoes: session.demoes,
+                    panels: session.panels,
                 }
             })));
         }
@@ -727,7 +857,34 @@ class LaravelEventCalendar {
         this.speakers.forEach(speaker => {
             const option = document.createElement('option');
             option.value = speaker.id;
-            option.textContent = `${speaker.name} - ${speaker.title || 'Speaker'}`;
+            option.textContent = `${speaker.full_name} - ${speaker.email || 'Speaker'}`;
+            select.appendChild(option);
+        });
+    }
+
+    populateExhibitorSelect() {
+        console.log(this.exibitors);
+        const select = document.getElementById('exhibitorSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select a exibitor...</option>';
+        this.exhibitors.forEach(exibitor => {
+            const option = document.createElement('option');
+            option.value = exibitor.id;
+            option.textContent = `${exibitor.full_name} - ${exibitor.email || 'Exibitor'}`;
+            select.appendChild(option);
+        });
+    }
+
+     populateSponsorSelect() {
+        const select = document.getElementById('sponsorSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select a sponsor...</option>';
+        this.sponsors.forEach(sponsor => {
+            const option = document.createElement('option');
+            option.value = sponsor.id;
+            option.textContent = `${sponsor.full_name} - ${sponsor.email || 'Exibitor'}`;
             select.appendChild(option);
         });
     }
@@ -735,7 +892,6 @@ class LaravelEventCalendar {
     addSelectedSpeaker() {
         const select = document.getElementById('speakerSelect');
         const speakerId = select.value;
-        alert(1)
         if (!speakerId) return;
         
         const speaker = this.speakers.find(s => s.id == speakerId);
@@ -752,6 +908,45 @@ class LaravelEventCalendar {
         select.value = '';
     }
 
+    addSelectedExhibitor() {
+        const select = document.getElementById('exhibitorSelect');
+        const exibitorId = select.value;
+        if (!exibitorId) return;
+        
+        const exhibitor = this.exhibitors.find(s => s.id == exibitorId);
+        if (!exhibitor) return;
+
+        // Check if speaker is already selected
+        if (this.selectedSpeakers.find(s => s.id == exibitorId)) {
+            this.showAlert('Exhibitor is already selected', 'warning');
+            return;
+        }
+
+        this.selectedExhibitors.push(exhibitor);
+        this.renderSelectedExhibitors();
+        select.value = '';
+    }
+
+      addSelectedSponsor() {
+        const select = document.getElementById('sponsorSelect');
+        const sponsorId = select.value;
+        if (!sponsorId) return;
+        
+        const sponsor = this.sponsors.find(s => s.id == sponsorId);
+        if (!sponsor) return;
+
+        // Check if speaker is already selected
+        if (this.selectedSponsors.find(s => s.id == sponsorId)) {
+            this.showAlert('Sponsors is already selected', 'warning');
+            return;
+        }
+
+        this.selectedSponsors.push(sponsor);
+        this.renderSelectedSponsors();
+        select.value = '';
+    }
+
+
     renderSelectedSpeakers() {
         const container = document.getElementById('selectedSpeakers');
         if (!container) return;
@@ -764,8 +959,52 @@ class LaravelEventCalendar {
         container.innerHTML = this.selectedSpeakers.map((speaker, index) => `
             <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
                 <div>
-                    <strong>${speaker.name}</strong>
+                    <strong>${speaker.full_name}</strong>
                     ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    renderSelectedExhibitors() {
+        const container = document.getElementById('selectedExhibitors');
+        if (!container) return;
+
+        if (this.selectedExhibitors.length === 0) {
+            container.innerHTML = '<div class="text-muted small">No exhibitors selected</div>';
+            return;
+        }
+
+        container.innerHTML = this.selectedExhibitors.map((speaker, index) => `
+            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
+                <div>
+                    <strong>${speaker.full_name}</strong>
+                    ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    renderSelectedSponsors() {
+        const container = document.getElementById('selectedSponsors');
+        if (!container) return;
+
+        if (this.selectedSponsors.length === 0) {
+            container.innerHTML = '<div class="text-muted small">No exhibitors selected</div>';
+            return;
+        }
+
+        container.innerHTML = this.selectedSponsors.map((sponsor, index) => `
+            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
+                <div>
+                    <strong>${sponsor.full_name}</strong>
+                    ${sponsor.title ? `<span class="text-muted">- ${sponsor.title}</span>` : ''}
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
                     <i class="fas fa-times"></i>

@@ -70,7 +70,7 @@
 			</div>
 
       <div class="col-3 p-1">
-        <a href="{{ route("calendar.index",["event_id"=> $event->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-calendar"></i></a>
+        <a href="{{ route("calendar.index",["slug"=> $event->slug ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-calendar"></i></a>
       </div> 
 
       <div class="col-3 p-1">
