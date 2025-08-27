@@ -13,12 +13,14 @@ use App\Models\Session;
 use App\Models\Booth;
 use App\Models\Track;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
 
 class TicketSystemSeeder extends Seeder
 {
     public function run()
     {
         // Create ticket categories
+         $faker = Faker::create();
         $categories = [
             ['name' => 'General Admission', 'color' => '#007bff', 'description' => 'Standard access tickets'],
             ['name' => 'VIP', 'color' => '#ffc107', 'description' => 'Premium access with additional benefits'],
@@ -149,15 +151,18 @@ class TicketSystemSeeder extends Seeder
             $end   = (clone $start)->addYears(100);
 
             $events[] = [
-                'title' => "Summit ".$start,
-                'description' => "This is past event number $i",
-                'location' => "City $i",
-                'tags' => 'past,event',
+                'title' => "Canadian sme Summit ".$start->year,
+                'description' => $faker->paragraph(3),
+                'location' => $faker->address,
+                'tags' => implode(',', $faker->randomElements(
+                        ['past','event','future','conference','workshop','online','tech','health'],
+                        rand(1, 3)
+                    )),
                 'start_date' => $start,
                 'end_date' => $end,
                 'is_featured' => 1,
                 'visibility' => 'public',
-                'created_by' => rand(1,3),
+                'created_by' => 1,
                 'status' => 'published',
                 'category_id' => $categoryIds[array_rand($categoryIds)],
             ];
@@ -258,13 +263,16 @@ class TicketSystemSeeder extends Seeder
                     Session::create([
                         'event_id'    => $event->id,
                         'booth_id'    => $boothIds[array_rand($boothIds)], // assign booth from DB
-                        'title'       => "Session $start - $end for " . $event->title,
-                        'location'       => "Location-".$i,
-                        'description' => "This is session  $start - $end of the event " . $event->title,
-                        'keynote' => "This is session keynote $start - $end of the event " . $event->title,
-                        'demoes' => "This is session panels $start - $end of the event " . $event->title,
-                        'panels' => "This is session panels $start - $end of the event " . $event->title,
-                        'track'=>'Test1,Test2',
+                        'title'       => "Session $start - $end ",
+                        'location'       =>$faker->city . ', ' . $faker->country,
+                        'description' => $faker->paragraph(1),
+                        'keynote' => $faker->paragraph(1),
+                        'demoes' => $faker->paragraph(1),
+                        'panels' => $faker->paragraph(1),
+                        'track'=>implode(',', $faker->randomElements(
+                        ['Test1', 'Test2', 'Test3', 'Keynote', 'Workshop', 'Panel', 'Demo'],
+                        rand(1, 3)
+                        )),
                         'color'=>$calendarColors[array_rand($calendarColors)],
                         'start_time'  => $start,
                         'end_time'    => $end,
