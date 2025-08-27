@@ -38,7 +38,6 @@ class Controller extends BaseController
             if($idForUpdate){
                $drive = Drive::where('table_id',$idForUpdate)->where('table_type',$table_type)->where('file_type',$file_type)->first();
             }
-
             if($drive == null){
                $drive = new Drive();  
             }

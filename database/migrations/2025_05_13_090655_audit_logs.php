@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('url')->nullable();
             $table->ipAddress('ip_address')->nullable();
             $table->text('user_agent')->nullable();
-            $table->string('tags')->nullable();
+            $table->text('tags')->nullable();
             $table->timestamps();
             
             $table->index(['user_id', 'user_type']);

@@ -21,40 +21,65 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('company/details') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('company/media-gallery') ? 'active' : '' }} {{ request()->is('trainings') ? 'active' : '' }} {{ request()->is('company/media-gallery') ? 'active' : '' }} {{ request()->is('company/videos') ? 'active' : '' }} {{ request()->is('product-categories*') ? 'active' : '' }} {{ request()->is('products*') ? 'active open' : '' }} {{ request()->is('account-information*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
-                <div data-i18n="events">Setup</div>
+                <div data-i18n="events">Profile</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
-                    <a href="{{ route("events.edit",["event"=> 1 ]) }}" class="menu-link">
-                        <div data-i18n="events">Basic Info</div>
+                <li class="menu-item {{ request()->is('account-information*') ? 'active open' : '' }}">
+                    <a href="{{route('change.account.information')}}" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-user"></i>
+                        <div data-i18n="events">Profile Information</div>
                     </a>
                 </li>
 
                 <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
                     <a href="{{ route('company.details') }}" class="menu-link">
-                        <div data-i18n="events">Features</div>
+                        <i class="menu-icon tf-icons fa fa-building"></i>
+                        <div data-i18n="events">Company Information</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
-                    <a href="javascript:void(0);"  class="menu-link menu-toggle">
-                        <div data-i18n="Booth Management">Branding</div>
+                <li class="menu-item {{ request()->is('booths*') ? 'active' : '' }}">
+                    <a href="{{route('booths.index')}}" class="menu-link">
+                        <i class="menu-icon tf-icons fa fa-address-book"></i>
+                        <div data-i18n="Booth Management">Booth Management</div>
                     </a>
-                     <ul class="menu-sub">
-                        <a href="{{route('brand')}}" class="menu-link {{ request()->is('brand*') ? 'active' : '' }}" >
-                           <div data-i18n="Booth Management">App Branding</div>
-                        </a>
-                         <a href="{{route('booths.index')}}" class="menu-link">
-                           <div data-i18n="Booth Management">App Menu</div>
-                        </a>
+                </li>
 
-                        <a href="{{route('splash')}}" class="menu-link {{ request()->is('splash*') ? 'active' : '' }}">
-                           <div data-i18n="Booth Management">Splash Screen</div>
-                        </a>
-                     </ul>
+                <li class="menu-item {{ request()->is('company/media-gallery') ? 'active' : '' }}">
+                    <a href="{{ route('company.media.gallery') }}" class="menu-link">
+                         <i class="menu-icon tf-icons fa fa-file-image"></i>
+                        <div data-i18n="Gallery">Image Gallery</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('company/videos') ? 'active' : '' }}">
+                    <a href="{{ route('company.videos.gallery') }}" class="menu-link">
+                        <i class="menu-icon tf-icons fa fa-file-video"></i>
+                        <div data-i18n="Video Gallery">Video Gallery</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('trainings') ? 'active' : '' }}">
+                    <a href="{{ route('trainings.index') }}" class="menu-link">
+                         <i class="menu-icon tf-icons fa fa-building"></i>
+                        <div data-i18n="Marketing Materials">Marketing Materials</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('product-categories*') ? 'active' : '' }}">
+                    <a href="{{route('product-categories.index')}}" class="menu-link">
+                        <i class="menu-icon tf-icons fa fa-tags"></i>
+                        <div data-i18n="Product Categories">Product Categories</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('products*') ? 'active open' : '' }}">
+                    <a href="{{ route('products.index') }}" class="menu-link">
+                        <i class="menu-icon tf-icons fa fa-list-alt"></i>
+                        <div data-i18n="Products">Products</div>
+                    </a>
                 </li>
             </ul>
         </li>
@@ -67,7 +92,7 @@
             </a>
             <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
-                <a href="{{url('usergroup')}}" class="menu-link">
+                <a href="#" class="menu-link">
                     <i class="menu-icon tf-icons fas fa-user-friends"></i>
                     <div data-i18n="ticket-categories"> User Groups</div>
                 </a>
@@ -130,6 +155,16 @@
                         <div data-i18n="Users">Sponsors </div>
                        </a>
                      </li>
+
+                    <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                        <a href="{{ route('events.index') }}" class="menu-link">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="menu-icon tf-icons bi bi-calendar2-event-fill me-1" viewBox="0 0 16 16">
+                              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5m9.954 3H2.545c-.3 0-.545.224-.545.5v1c0 .276.244.5.545.5h10.91c.3 0 .545-.224.545-.5v-1c0-.276-.244-.5-.546-.5M11.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+                            </svg>
+                            <div data-i18n="events">Events</div>
+                        </a>
+                    </li>
 
                     <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
                         <a href="{{ route('categories.index') }}" class="menu-link">
