@@ -168,33 +168,84 @@ class HomeController extends Controller
 
 
     public function brand(Request $request){
-       
-        $eventLogo = Setting::where('key','logo')->first();
-        $eventLogo->save();
+        if($request->mode =='save'){
+            $eventLogo = Setting::where('key','logo')->first();
+            $eventLogo->save();
 
-        if(!empty($request->file("event_logo"))){
-                $this->deleteFile($eventLogo->id,'settings');    
-                $this->imageUpload($request->file("event_logo"),"settings",$eventLogo->id,'settings','photo',$eventLogo->id);
-        }
+            if(!empty($request->file("event_logo"))){
+                    $this->deleteFile($eventLogo->id,'settings');    
+                    $this->imageUpload($request->file("event_logo"),"settings",$eventLogo->id,'settings','photo',$eventLogo->id);
+            }
 
-        $brand_cover = Setting::where('key','cover')->first();
-        $brand_cover->save();
+            $brand_cover = Setting::where('key','cover')->first();
+            $brand_cover->save();
 
-        if(!empty($request->file("brand_cover"))){
-                $this->deleteFile($brand_cover->id,'settings');    
-                $this->imageUpload($request->file("brand_cover"),"settings",$brand_cover->id,'settings','photo',$brand_cover->id);
-        }
+            if(!empty($request->file("brand_cover"))){
+                    $this->deleteFile($brand_cover->id,'settings');    
+                    $this->imageUpload($request->file("brand_cover"),"settings",$brand_cover->id,'settings','photo',$brand_cover->id);
+            }
 
-        $theme_color = Setting::where('key','color')->first();
-        $theme_color->value = $request->theme_color;
-        $theme_color->save();
-
+            $theme_color = Setting::where('key','color')->first();
+            $theme_color->value = $request->theme_color;
+            $theme_color->save();
+        } 
 
         return view('brand');
     }
 
     public function splash(Request $request){
 
+        if($request->mode =='save'){
+            $ios_iphone_image = Setting::where('key','ios_iphone_image')->first();
+            $ios_iphone_image->save();
+
+            if(!empty($request->file("ios_iphone_image"))){
+                    $this->deleteFile($ios_iphone_image->id,'settings');    
+                    $this->imageUpload($request->file("ios_iphone_image"),"settings",$ios_iphone_image->id,'settings','photo',$ios_iphone_image->id);
+            }
+
+            $ios_ipad_image = Setting::where('key','ios_ipad_image')->first();
+            $ios_ipad_image->save();
+
+            if(!empty($request->file("ios_ipad_image"))){
+                    $this->deleteFile($ios_ipad_image->id,'settings');    
+                    $this->imageUpload($request->file("ios_ipad_image"),"settings",$ios_ipad_image->id,'settings','photo',$ios_ipad_image->id);
+            }
+
+            $android_hdpi_image = Setting::where('key','android_hdpi_image')->first();
+            $android_hdpi_image->save();
+
+            if(!empty($request->file("android_hdpi_image"))){
+                    $this->deleteFile($android_hdpi_image->id,'settings');    
+                    $this->imageUpload($request->file("android_hdpi_image"),"settings",$android_hdpi_image->id,'settings','photo',$android_hdpi_image->id);
+            }
+
+            $android_mdpi_image = Setting::where('key','android_mdpi_image')->first();
+            $android_mdpi_image->save();
+
+            if(!empty($request->file("android_mdpi_image"))){
+                    $this->deleteFile($android_mdpi_image->id,'settings');    
+                    $this->imageUpload($request->file("android_mdpi_image"),"settings",$android_mdpi_image->id,'settings','photo',$android_mdpi_image->id);
+            }
+
+
+            $android_xhdpi_image = Setting::where('key','android_xhdpi_image')->first();
+            $android_xhdpi_image->save();
+
+            if(!empty($request->file("android_xhdpi_image"))){
+                    $this->deleteFile($android_xhdpi_image->id,'settings');    
+                    $this->imageUpload($request->file("android_xhdpi_image"),"settings",$android_xhdpi_image->id,'settings','photo',$android_xhdpi_image->id);
+            }
+
+            $android_xxhdpi_image = Setting::where('key','android_xxhdpi_image')->first();
+            $android_xxhdpi_image->save();
+
+            if(!empty($request->file("android_xxhdpi_image"))){
+                    $this->deleteFile($android_xxhdpi_image->id,'settings');    
+                    $this->imageUpload($request->file("android_xxhdpi_image"),"settings",$android_xxhdpi_image->id,'settings','photo',$android_xxhdpi_image->id);
+            }
+
+        }
         return view('splash'); 
     }
 }

@@ -107,6 +107,7 @@
         </div>
 
         <div class="card-footer text-end">
+          <input type="hidden" name="mode" value="save">
           <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </div>
