@@ -23,8 +23,10 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::resource('testimonials', App\Http\Controllers\TestimonialController::class);
     Route::resource('affiliates', App\Http\Controllers\AffiliateController::class);
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
+
+    Route::post('/delete/photo', [App\Http\Controllers\EventController::class, 'removePhoto'])->name('events.removePhoto');
     Route::resource('events', App\Http\Controllers\EventController::class);
-   
+    
 
 
     Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
@@ -108,4 +110,5 @@ Route::group(['middleware' => ['webauth']], function () {
  require __DIR__.'/newsletters.php';
  require __DIR__.'/formbuilder.php';
   require __DIR__.'/lead.php';
+
 });

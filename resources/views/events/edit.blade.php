@@ -45,6 +45,81 @@
           <div class="card-body">
             {{-- Title + Slug --}}
             <div class="row">
+                @php
+                    $exts = array_map('trim', explode(',', config('app.image_mime_types')));
+                    $acceptList = implode(',', array_map(fn($e) => (stripos($e, 'image/') === 0 ? $e : 'image/'.$e), $exts));
+                  @endphp
+
+                  <div class="mb-2">
+                    <label class="form-label">
+                      Image 
+                      <span class="text-danger">
+                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
+                      </span>
+                    </label>
+
+                    <div class="row g-3 align-items-start">
+                      <!-- LEFT: Dropzone -->
+                      <div class="col-12 col-md-12">
+                        <!-- Real input (hidden) -->
+                        <input
+                          type="file"
+                          class="form-control d-none @error('image') is-invalid @enderror"
+                          name="image"
+                          id="image"
+                          accept="{{ $acceptList ?: 'image/*' }}"
+                          data-max-size-kb="{{ (int) config('app.blog_image_size') }}"
+                        />
+
+
+                            @php
+                              $hasImage = !empty($event->photo) && !empty($event->photo->file_path);
+                              $imgSrc = $hasImage ? (Str::startsWith($event->photo->file_path, ['http://','https://'])
+                                          ? $event->photo->file_path
+                                          : Storage::url($event->photo->file_path)) : '';
+                            @endphp
+
+                           <div id="image-dropzone"
+                               class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+                               style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+
+                            {{-- Placeholder --}}
+                            <div id="dz-placeholder" class="d-flex flex-column align-items-center gap-2 {{ $hasImage ? 'd-none' : '' }}">
+                              <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+                              <div>
+                                <strong>Drag & drop</strong> an image here, or
+                                <button type="button" id="dz-browse" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+                              </div>
+                              <small class="text-muted d-block">Max {{ (int) config('app.blog_image_size') }} KB</small>
+                            </div>
+
+                            {{-- Inline preview --}}
+                            <img id="dz-image"
+                                 src="{{ $imgSrc }}"
+                                 alt="Preview"
+                                 class="{{ $hasImage ? '' : 'd-none' }} rounded"
+                                 style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+
+                            {{-- Remove button --}}
+                           
+                            <button type="button"
+                                    id="dz-remove"
+                                    class="btn btn-sm btn-danger position-absolute {{ $hasImage ? '' : 'd-none' }}"
+                                    style="top: .5rem; right: .5rem;" data-photoid=" {{!empty($event->photo) ? $event->photo->id : ''}}">
+                              <i class="bx bx-x"></i> Remove
+                            </button>
+
+                            <input type="file" id="dz-input" name="image" accept="image/*" class="d-none">
+                          </div>
+
+
+                        @error('image')
+                          <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                      </div>
+                    </div>
+                  </div>
+
               <div class="col-md-7">
                 <div class="mb-3">
                   <label class="form-label" for="title">Event Name <span class="text-danger">*</span></label>
@@ -173,102 +248,7 @@
                @enderror
             </div>
 
-                  @php
-                    $exts = array_map('trim', explode(',', config('app.image_mime_types')));
-                    $acceptList = implode(',', array_map(fn($e) => (stripos($e, 'image/') === 0 ? $e : 'image/'.$e), $exts));
-                  @endphp
-
-                  <div class="mb-2">
-                    <label class="form-label">
-                      Image 
-                      <span class="text-danger">
-                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
-                      </span>
-                    </label>
-
-                    <div class="row g-3 align-items-start">
-                      <!-- LEFT: Dropzone -->
-                      <div class="col-12 col-md-8">
-                        <!-- Real input (hidden) -->
-                        <input
-                          type="file"
-                          class="form-control d-none @error('image') is-invalid @enderror"
-                          name="image"
-                          id="image"
-                          accept="{{ $acceptList ?: 'image/*' }}"
-                          data-max-size-kb="{{ (int) config('app.blog_image_size') }}"
-                        />
-
-                        <!-- Dropzone -->
-                        <div id="image-dropzone"
-                            class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-                            style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
-                          <!-- Placeholder -->
-                          <div id="dz-placeholder" class="d-flex flex-column align-items-center gap-2">
-                            <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-                            <div>
-                              <strong>Drag & drop</strong> an image here, or
-                              <button type="button" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-                            </div>
-                            <small class="text-muted d-block">Max {{ (int) config('app.blog_image_size') }} KB</small>
-                          </div>
-
-                          <!-- Inline preview -->
-                          <img id="dz-image" src="" alt="Preview"
-                              class="d-none rounded"
-                              style="max-height: 100%; max-width: 100%; object-fit: contain;"/>
-
-                          <!-- Remove button -->
-                          <button type="button"
-                                  id="dz-remove"
-                                  class="btn btn-sm btn-danger position-absolute d-none"
-                                  style="top: .5rem; right: .5rem;">
-                            <i class="bx bx-x"></i> Remove
-                          </button>
-                        </div>
-
-                        @error('image')
-                          <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                      <div class="col-12 col-md-4">
-                        @if(!empty($event->photo) && $event->photo->file_path)
-                          <div class="card shadow-sm">
-                            <div class="card-body text-center p-2">
-                              <div class="preview-wrap position-relative d-inline-block w-100">
-                                <img
-                                  src="{{ asset($event->photo->file_path) }}"
-                                  alt="{{ $e->title ?? '' }}"
-                                  class="rounded border w-100"
-                                  style="max-height: 220px; object-fit: cover;">
-
-                                <!-- Remove button (reveals on hover) -->
-                                <form action="#" method="POST"
-                                      class="hover-reveal position-absolute top-0 end-0 m-2">
-                                  @csrf
-                                  @method('DELETE')
-                                  <button type="submit" class="btn btn-sm btn-danger shadow">
-                                    <i class="bx bx-x"></i>Remove
-                                  </button>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
-                        @else
-                          <div class="card border-0 bg-light">
-                            <div class="card-body text-center text-muted py-5">
-                              <i class="bx bx-image-alt d-block mb-2" style="font-size: 2rem;"></i>
-                              No current image
-                            </div>
-                          </div>
-                        @endif
-                      </div>
-
-
-                    </div>
-                  </div>
-
+                
           </div>
         </div>
       </div>
@@ -479,129 +459,6 @@
     tagsInput.addEventListener('blur', (e) => renderTagsPreview(e.target.value));
   }
 
-
-(function() {
-  const dz = document.getElementById('image-dropzone');
-  const input = document.getElementById('image');
-  const placeholder = document.getElementById('dz-placeholder');
-  const img = document.getElementById('dz-image');
-  const removeBtn = document.getElementById('dz-remove');
-
-  if (!dz || !input) return;
-
-  // Open file picker on click
-  dz.addEventListener('click', (e) => {
-    // allow inner button to work without double trigger
-    if (e.target.tagName !== 'BUTTON') e.preventDefault();
-    input.click();
-  });
-  placeholder.querySelector('button')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    input.click();
-  });
-
-  // Drag styling
-  const setHover = (on) => {
-    dz.style.background = on ? 'rgba(0,0,0,0.02)' : 'var(--bs-body-bg)';
-    dz.style.borderColor = on ? 'var(--bs-primary)' : 'var(--bs-border-color)';
-  };
-  ['dragenter','dragover'].forEach(evt =>
-    dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); setHover(true); })
-  );
-  ['dragleave','dragend','drop'].forEach(evt =>
-    dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); if (evt !== 'drop') setHover(false); })
-  );
-
-  dz.addEventListener('drop', (e) => {
-    const files = e.dataTransfer.files;
-    if (files && files.length) {
-      assignFile(files[0]);
-      setHover(false);
-    }
-  });
-
-  // From picker
-  input.addEventListener('change', () => {
-    if (input.files && input.files[0]) {
-      assignFile(input.files[0]);
-    }
-  });
-
-  // Remove / clear
-  removeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    clearSelection();
-  });
-
-  // Helpers
-  function assignFile(file) {
-    const maxKB = parseInt(input.dataset.maxSizeKb || '0', 10);
-    const sizeKB = Math.round(file.size / 1024);
-    const accept = (input.getAttribute('accept') || '').split(',').map(s => s.trim()).filter(Boolean);
-
-    const typeOk = !accept.length || accept.some(a => {
-      if (a.endsWith('/*')) return file.type.startsWith(a.replace('/*','/'));
-      return file.type === a;
-    });
-    if (!typeOk) return showToast('This file type is not allowed.');
-
-    if (maxKB && sizeKB > maxKB) {
-      return showToast(`Selected file is ${sizeKB} KB; max allowed is ${maxKB} KB.`);
-    }
-
-    // set file on input
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    input.files = dt.files;
-
-    // preview inside dropzone
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      img.src = ev.target.result;
-      img.classList.remove('d-none');
-      placeholder.classList.add('d-none');
-      removeBtn.classList.remove('d-none');
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function clearSelection() {
-    input.value = '';
-    if (input.files && input.files.length) {
-      const dt = new DataTransfer();
-      input.files = dt.files;
-    }
-    img.src = '';
-    img.classList.add('d-none');
-    removeBtn.classList.add('d-none');
-    placeholder.classList.remove('d-none');
-  }
-
-  // Minimal toast using Bootstrap if available
-  function showToast(msg) {
-    // fallback alert if no toast system
-    if (!window.bootstrap) { alert(msg); return; }
-    let toastWrap = document.getElementById('dz-toast-wrap');
-    if (!toastWrap) {
-      toastWrap = document.createElement('div');
-      toastWrap.id = 'dz-toast-wrap';
-      toastWrap.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-      document.body.appendChild(toastWrap);
-    }
-    const el = document.createElement('div');
-    el.className = 'toast align-items-center text-bg-danger border-0';
-    el.role = 'alert'; el.ariaLive = 'assertive'; el.ariaAtomic = 'true';
-    el.innerHTML = `<div class="d-flex">
-        <div class="toast-body">${msg}</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>`;
-    toastWrap.appendChild(el);
-    const t = new bootstrap.Toast(el, { delay: 2500 });
-    t.show();
-    el.addEventListener('hidden.bs.toast', () => el.remove());
-  }
-})();
-
 </script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -767,4 +624,60 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 </script>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const dropzone = document.getElementById('image-dropzone');
+  const img = document.getElementById('dz-image');
+  const placeholder = document.getElementById('dz-placeholder');
+  const removeBtn = document.getElementById('dz-remove');
+  const input = document.getElementById('dz-input');
+  const browse = document.getElementById('dz-browse');
+
+  const showPreview = (file) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.src = e.target.result;
+      img.classList.remove('d-none');
+      placeholder.classList.add('d-none');
+      removeBtn.classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  browse?.addEventListener('click', () => input.click());
+  input?.addEventListener('change', e => {
+    const file = e.target.files?.[0]; if (file) showPreview(file);
+  });
+
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); });
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0]; if (file) { input.files = e.dataTransfer.files; showPreview(file); }
+  });
+
+  removeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    img.src = '';
+    img.classList.add('d-none');
+    placeholder.classList.remove('d-none');
+    removeBtn.classList.add('d-none');
+    input.value = ''; // clears chosen file
+    const photoId = removeBtn.dataset.photoid;
+      $.ajax({
+        url: `/delete/photo`, 
+        type: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        data: { photo_id: photoId },
+        success: function (res) {
+            console.log('Image removed successfully:', res);
+        },
+        error: function (xhr) {
+            console.error('Error removing image:', xhr.responseText);
+        }
+      });
+  });
+});
+
+</script>
 @endsection

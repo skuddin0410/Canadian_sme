@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use DataTables;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Drive;
 
 class EventController extends Controller
 {
@@ -124,33 +125,41 @@ class EventController extends Controller
         ],
             'status' => 'required|in:draft,published,cancelled',
             'visibility' => 'required|in:listed,unlisted',
-            // 'meta_title' => 'nullable|string|max:255',
-            // 'meta_description' => 'nullable|string|max:1000',
-            // 'meta_keywords' => 'nullable|string|max:1000',
-            'tags'=>'nullable|array',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:255', // each tag must be a string (optional but safer)
             'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
         ]);
-        
-  
 
-        if (isset($request->tags)) {
-            $validated['tags'] = implode(',', $request->tags);
-        } else {
-            $validated['tags'] = ''; // Set an empty string if no tags are selected
-        }
-
-        $event->update($validated);
-        $uploadPath = 'events';
+        $validated['tags'] = $request->has('tags') ? implode(',', $request->tags) : '';
+        $event->title        = $validated['title'];
+        $event->slug         = $validated['slug'] ?? $event->slug;
+        $event->description  = $validated['description'] ?? null;
+        $event->location     = $validated['location'] ?? null;
+        $event->start_date   = $validated['start_date'];
+        $event->end_date     = $validated['end_date'];
+        $event->youtube_link = $validated['youtube_link'] ?? null;
+        $event->status       = $validated['status'];
+        $event->visibility   = $validated['visibility'];
+        $event->tags         = $validated['tags'];
+        $event->save();
         if($request->file("image")){
-          $this->imageUpload($request->file("image"),$uploadPath,$event->id,'events','photo',$idForUpdate=$event->id);   
+          $this->imageUpload($request->file("image"),'events',$event->id,'events','photo',$idForUpdate=$event->id);   
         }
      
-        return redirect()->route('events.edit',['event'=>$event->id])->with('success', 'Event updated.');
+        return redirect()->route('events.edit',['event'=>$event->id])->with('success', 'Event updated successfully');
     }
 
     public function destroy(Event $event)
-    {
+    {   
         $event->delete();
         return redirect()->route('events.index')->with('success', 'Event deleted.');
+    }
+
+    public function removePhoto(Request $request){
+        $drive = Drive::where('id',$request->photo_id)->first();
+        if ($drive) {
+            $drive->delete();
+        }
+        return response()->json(['message' => 'Photo deleted successfully.']);
     }
 }

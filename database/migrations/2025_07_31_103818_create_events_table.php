@@ -20,8 +20,8 @@ return new class extends Migration {
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->text('tags')->nullable();
-            $table->boolean('is_featured')->default(false);
-            $table->enum('visibility', ['public', 'private', 'unlisted'])->default('public');
+            $table->boolean('is_featured')->default(true);
+            $table->enum('visibility', ['listed', 'unlisted'])->default('listed');
 
             // SEO Fields
             $table->string('meta_title')->nullable();
