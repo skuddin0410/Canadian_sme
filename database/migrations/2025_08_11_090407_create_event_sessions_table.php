@@ -27,7 +27,7 @@ class CreateEventSessionsTable extends Migration
             $table->enum('type', ['presentation', 'workshop', 'panel', 'break', 'networking'])->default('presentation');
             $table->integer('capacity')->nullable();
             $table->json('metadata')->nullable();
-            $table->string('tags')->nullable();
+            $table->text('tags')->nullable();
             $table->timestamps();
         });
     }

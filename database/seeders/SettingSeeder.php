@@ -13,82 +13,65 @@ class SettingSeeder extends Seeder
    */
   public function run(): void
   {
-    $settings = [[
-      'key' => 'referrer',
-      'value' => 10.00,
+    $settings = [
+      [
+      'key' => 'color',
+      'value' => '#0d6efd',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'contact_email',
+      ], 
+      [
+      'key' => 'logo',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'contact_phone',
+      ], 
+      [
+      'key' => 'cover',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'contact_whatsapp',
+      ],
+      [
+      'key' => 'ios_iphone_image',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'contact_address',
+      ], 
+      [
+      'key' => 'ios_ipad_image',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'profile_referral',
+      ], 
+      [
+      'key' => 'android_hdpi_image',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'giveaway_on_top',
-      'value' => 1,
-      'created_at' => now(),
-      'updated_at' => now(),
-    ], [
-      'key' => 'quiz_on_top',
-      'value' => 0,
-      'created_at' => now(),
-      'updated_at' => now(),
-    ], [
-      'key' => 'home_page_giveaways',
-      'value' => '/giveaways',
-      'created_at' => now(),
-      'updated_at' => now(),
-    ], [
-      'key' => 'home_page_quizzes',
-      'value' => '/quizzes',
-      'created_at' => now(),
-      'updated_at' => now(),
-    ], [
-      'key' => 'home_page_spinners',
-      'value' => '/spinners',
-      'created_at' => now(),
-      'updated_at' => now(),
-    ], [
-      'key' => 'home_page_link_1',
+      ],
+
+      [
+      'key' => 'android_mdpi_image',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'home_page_link_2',
+      ], 
+      [
+      'key' => 'android_xhdpi_image',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'home_page_link_3',
+      ], 
+      [
+      'key' => 'android_xxhdpi_image',
       'value' => '',
       'created_at' => now(),
       'updated_at' => now(),
-    ], [
-      'key' => 'home_page_link_4',
-      'value' => '',
-      'created_at' => now(),
-      'updated_at' => now(),
-    ]];
+      ]
+    ];
+
+    
     Setting::upsert($settings, ['key'], ['value']);
   }
 }

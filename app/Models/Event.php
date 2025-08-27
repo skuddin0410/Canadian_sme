@@ -33,7 +33,7 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'tags' => 'array',
+        //'tags' => 'array',
         'is_featured' => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',

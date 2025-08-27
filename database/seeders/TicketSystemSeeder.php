@@ -52,73 +52,11 @@ class TicketSystemSeeder extends Seeder
         ];
 
         $tags = [
-            // Event Formats
-            'Conference',
-            'Workshop',
-            'Webinar',
-            'Networking',
-            'Training',
-            'Summit',
-            'Seminar',
-            'Panel Discussion',
-            'Roundtable',
-            'Hackathon',
-            'Bootcamp',
-            'Expo',
-            'Festival',
-            'Product Launch',
-            'Meetup',
-            'Trade Show',
-            'Fair',
-            'Showcase',
-            'Competition',
-            'Ceremony',
-
-            // Topics / Themes
-            'Technology',
-            'Innovation',
-            'Leadership',
-            'Marketing',
-            'Sales',
-            'Finance',
-            'Startups',
-            'Entrepreneurship',
-            'Healthcare',
-            'Education',
-            'Sustainability',
-            'Climate Change',
-            'Artificial Intelligence',
-            'Machine Learning',
-            'Blockchain',
-            'Cybersecurity',
-            'Data Science',
-            'Software Development',
-            'Design Thinking',
-            'UI/UX',
-
-            // Audience & Engagement
-            'Students',
-            'Professionals',
-            'Executives',
-            'Investors',
-            'Mentorship',
-            'Career Growth',
-            'Community Building',
-            'Networking',
-            'Collaboration',
-            'Innovation Labs',
-
-            // Event Styles
-            'Virtual',
-            'Hybrid',
-            'In-Person',
-            'On-Demand',
-            'Interactive',
-            'Panel',
-            'Keynote',
-            'Fireside Chat',
-            'Case Study',
-            'Demo Day'
+          "event",
+          "CloudTrends",
+          "DataSecurity",
+          "Techinnovation",
+          "ContainersAndCloud"
         ];
 
 
@@ -240,16 +178,16 @@ class TicketSystemSeeder extends Seeder
         $events = Event::all();
         $boothIds = Booth::pluck('id')->toArray();
         $calendarColors = [
-            '#FF5733', // Red-Orange
-            '#33C1FF', // Sky Blue
-            '#28A745', // Green
-            '#FFC107', // Amber
-            '#6F42C1', // Purple
-            '#E83E8C', // Pink
-            '#20C997', // Teal
-            '#FD7E14', // Orange
-            '#17A2B8', // Cyan
-            '#343A40', // Dark Gray
+            '#FF6347', // Tomato (Vibrant Red)
+            '#00BFFF', // Deep Sky Blue (Bright Sky Blue)
+            '#32CD32', // Lime Green (Fresh Green)
+            '#FFD700', // Gold (Warm Amber)
+            '#8A2BE2', // Blue Violet (Bold Purple)
+            '#FF69B4', // Hot Pink (Bold Pink)
+            '#20B2AA', // Light Sea Green (Calm Teal)
+            '#FF8C00', // Dark Orange (Energetic Orange)
+            '#00CED1', // Dark Turquoise (Vibrant Cyan)
+            '#2F4F4F', // Dark Slate Gray (Subtle Dark Gray)
         ];
         foreach ($events as $event) {
             for ($i = 1; $i <= 30; $i++) {
