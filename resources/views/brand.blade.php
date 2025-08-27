@@ -36,9 +36,9 @@
             <img id="dz-image" 
              src="{{ $imgLogoSrc }}"
              alt="Preview"
-             class="{{ $hasLogoImage ? '' : 'd-none' }} rounded"
+             class="dz-image {{ $hasLogoImage ? '' : 'd-none' }} rounded"
              style="max-height: 180px; max-width: 100%; object-fit: contain;" />
-            <button type="button" class="btn btn-sm btn-danger dz-remove d-none">
+            <button type="button" class="btn btn-sm btn-danger dz-remove {{ $hasLogoImage ? '' : 'd-none' }}" data-photoid=" {{!empty($logo->photo) ? $logo->photo->id : ''}}">
               <i class="bi bi-x-lg"></i> Remove
             </button>
             <input class="dz-input d-none" type="file" name="event_logo" accept="image/*">
@@ -70,15 +70,14 @@
               <div class="small text-muted mb-2">Drag & drop a wide cover image</div>
               <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
             </div>
-            <img class="dz-image d-none" alt="Cover preview"/>
 
              <img id="dz-image" 
              src="{{ $imgBrandSrc }}"
              alt="Preview"
-             class="{{ $hasBrandImage ? '' : 'd-none' }} rounded"
+             class="dz-image {{ $hasBrandImage ? '' : 'd-none' }} rounded"
              style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-            <button type="button" class="btn btn-sm btn-danger dz-remove d-none">
+            <button type="button" class="btn btn-sm btn-danger dz-remove {{ $hasBrandImage ? '' : 'd-none' }}" data-photoid=" {{!empty($brand->photo) ? $brand->photo->id : ''}}">
               <i class="bi bi-x-lg"></i> Remove
             </button>
             <input class="dz-input d-none" type="file" name="brand_cover" accept="image/*">
@@ -222,8 +221,19 @@
     removeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       clearPreview();
-      // Optionally call your AJAX delete here for existing images
-      // fetch('/events/123/photo', { method: 'DELETE', headers: {'X-CSRF-TOKEN': '...'} })
+      const photoId = removeBtn.dataset.photoid;
+      $.ajax({
+        url: `/delete/photo`, 
+        type: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        data: { photo_id: photoId },
+        success: function (res) {
+            console.log('Image removed successfully:', res);
+        },
+        error: function (xhr) {
+            console.error('Error removing image:', xhr.responseText);
+        }
+      });
     });
 
     return { showPreview, clearPreview, input };

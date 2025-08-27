@@ -100,7 +100,7 @@
                   <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
                 </div>
                 <img src="{{ $android_hdpi_image_src }}" class="{{ $has_android_hdpi_image ? '' : 'd-none' }} rounded" alt="HDPI Preview" id="android-hdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove d-none" id="android-hdpi-remove">
+                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_hdpi_image ? '' : 'd-none' }}" id="android-hdpi-remove" data-photoid=" {{!empty($android_hdpi_image->photo) ? $android_hdpi_image->photo->id : ''}}">
                   <i class="fa fa-times"></i> Remove
                 </button>
                 <input class="dz-input d-none" type="file" name="android_hdpi_image" accept="image/*">
@@ -126,7 +126,7 @@
                   <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
                 </div>
                 <img src="{{ $android_mdpi_image_src }}" class="{{ $has_android_mdpi_image ? '' : 'd-none' }} rounded" alt="MDPI Preview" id="android-mdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove d-none" id="android-mdpi-remove">
+                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_mdpi_image ? '' : 'd-none' }}" id="android-mdpi-remove" data-photoid=" {{!empty($android_mdpi_image->photo) ? $android_mdpi_image->photo->id : ''}}">
                   <i class="fa fa-times"></i> Remove
                 </button>
                 <input class="dz-input d-none" type="file" name="android_mdpi_image" accept="image/*">
@@ -151,7 +151,8 @@
                   <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
                 </div>
                 <img src="{{ $android_xhdpi_image_src }}" class="{{ $has_android_xhdpi_image ? '' : 'd-none' }} rounded" alt="XHDPI Preview" id="android-xhdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove d-none" id="android-xhdpi-remove">
+                
+                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_xhdpi_image ? '' : 'd-none' }}" id="android-xhdpi-remove" data-photoid=" {{!empty($android_xhdpi_image->photo) ? $android_xhdpi_image->photo->id : ''}}">
                   <i class="fa fa-times"></i> Remove
                 </button>
                 <input class="dz-input d-none" type="file" name="android_xhdpi_image" accept="image/*">
@@ -178,7 +179,7 @@
                   <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
                 </div>
                 <img src="{{ $android_xxhdpi_image_src }}" class="{{ $has_android_xxhdpi_image ? '' : 'd-none' }} rounded" alt="XXHDPI Preview" id="android-xxhdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove d-none" id="android-xxhdpi-remove">
+                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_xxhdpi_image ? '' : 'd-none' }}" id="android-xxhdpi-remove" data-photoid=" {{!empty($android_xxhdpi_image->photo) ? $android_xxhdpi_image->photo->id : ''}}">
                   <i class="fa fa-times"></i> Remove
                 </button>
                 <input class="dz-input d-none" type="file" name="android_xxhdpi_image" accept="image/*">
@@ -282,6 +283,19 @@
       browseBtn.classList.remove('d-none');
       dzPlaceholder.classList.remove('d-none');
       input.value = '';
+      const photoId = removeBtn.dataset.photoid;
+      $.ajax({
+        url: `/delete/photo`, 
+        type: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        data: { photo_id: photoId },
+        success: function (res) {
+            console.log('Image removed successfully:', res);
+        },
+        error: function (xhr) {
+            console.error('Error removing image:', xhr.responseText);
+        }
+      });
     });
   };
 
