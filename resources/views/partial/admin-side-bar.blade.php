@@ -33,11 +33,11 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
+               {{--  <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
                     <a href="{{ route('company.details') }}" class="menu-link">
                         <div data-i18n="events">Features</div>
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="menu-item {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
                     <a href="javascript:void(0);"  class="menu-link menu-toggle">
@@ -47,10 +47,9 @@
                         <a href="{{route('brand')}}" class="menu-link {{ request()->is('brand*') ? 'active' : '' }}" >
                            <div data-i18n="Booth Management">App Branding</div>
                         </a>
-                         <a href="{{route('booths.index')}}" class="menu-link">
+                        {{--  <a href="{{route('booths.index')}}" class="menu-link">
                            <div data-i18n="Booth Management">App Menu</div>
-                        </a>
-
+                        </a>--}}
                         <a href="{{route('splash')}}" class="menu-link {{ request()->is('splash*') ? 'active' : '' }}">
                            <div data-i18n="Booth Management">Splash Screen</div>
                         </a>
