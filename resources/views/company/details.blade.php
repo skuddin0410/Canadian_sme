@@ -65,45 +65,45 @@
             </div>
           </div>
 
-            <div class="col-6">
+            {{-- <div class="col-6">
                    
             <div class="mb-3">
                   <label class="form-label">Certifications<span class="text-danger">*</span></label>
                 <text name="certifications" rows="6" class="form-control" placeholder="Enter certifications">{{ old('certifications', $company->certifications ?? '') }}</text>
               </div>
-            </div>
+            </div> --}}
 
             <div class="col-6">
                 <div class="mb-3 ">
-              <label class="form-label">LinkedIn <span class="text-danger">*</span></label>
+              <label class="form-label">LinkedIn</label>
               <input type="url" name="linkedin" value="{{ old('linkedin', $company->linkedin ?? '') }}" class="form-control">
             </div>
           </div>
            <div class="col-6">
                 <div class="mb-3 ">
-              <label class="form-label">Twitter<span class="text-danger">*</span></label>
+              <label class="form-label">Twitter</label>
               <input type="url" name="twitter" value="{{ old('twitter', $company->twitter ?? '') }}" class="form-control">
             </div>
           </div>
 
            <div class="col-6">
                 <div class="mb-3 ">
-              <label class="form-label">Facebook<span class="text-danger">*</span></label>
+              <label class="form-label">Facebook</label>
               <input type="url" name="facebook" value="{{ old('facebook', $company->facebook ?? '') }}" class="form-control">
             </div>
 
           </div>
 
-           <div class="col-6">
+           {{-- <div class="col-6">
                 <div class="mb-3 ">
               <label class="form-label">Twitter<span class="text-danger">*</span></label>
               <input type="url" name="twitter" value="{{ old('twitter', $company->twitter ?? '') }}" class="form-control">
             </div>
 
-          </div>
+          </div> --}}
         
         
-          <div class="col-12">
+          <div class="col-6">
                
           <div class="mb-3">
               <label class="form-label">Description<span class="text-danger">*</span></label>
@@ -111,7 +111,7 @@
           </div>
         </div>
 
-           <div class="col-6">
+           {{-- <div class="col-6">
                 <div class="mb-3 ">
             <label for="certification_image" class="form-label">Upload Certification Image</label>
             <input type="file" name="certification_image" id="certification_image" class="form-control" accept="image/*">
@@ -121,7 +121,7 @@
               <img src="{{ asset($company->certificationFile->file_path) }}" alt="Certification Image" width="200" class="mt-2">
             </div> @endif
           </div>
-        </div>
+        </div> --}}
         
          <div class="col-6">
               <div class="mb-3 ">

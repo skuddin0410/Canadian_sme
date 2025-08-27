@@ -66,7 +66,7 @@
             </a>
             <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
-                <a href="#" class="menu-link">
+                <a href="{{url('usergroup')}}" class="menu-link">
                     <i class="menu-icon tf-icons fas fa-user-friends"></i>
                     <div data-i18n="ticket-categories"> User Groups</div>
                 </a>

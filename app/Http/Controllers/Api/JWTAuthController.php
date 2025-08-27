@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Drive;
 use App\Models\Wallet;
 use App\Models\Company;
 use App\Models\Setting;
@@ -424,114 +425,6 @@ public function updateUser(Request $request)
 }
 
 
-// public function updateUserImage(Request $request)
-// {
-//     try {
-//         if (! $user = JWTAuth::parseToken()->authenticate()) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'User not found.',
-//                 'data' => collect(),
-//             ], 404);
-//         }
-
-//         // Custom validation with error handling
-//         $validator = Validator::make($request->all(), [
-//               'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size')
-
-//         ]);
-//           if ($request->file("profile_image")) {
-//             $uploadPath = 'users';
-//             $this->imageUpload($request->file("profile_image"), $uploadPath, $user->id, 'users', 'certifications', $idForUpdate = $user->id);
-//         }
-
-     
-       
-
-          
-       
-
-//         if ($validator->fails()) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'Failed to update profile image.',
-//                 'errors'  => $validator->errors(),
-//             ], 422);
-//         }
-
-//         $validated = $validator->validated();
-
-//         // --- Update user basic info ---
-//         $user->update($validated);
-
-
-//         return response()->json([
-//             'success' => true,
-//             'message' => 'Profile updated successfully.',
-//             'data'    => $user,
-//         ]);
-
-//     } catch (JWTException $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Unauthorized',
-//             'data'    => null,
-//         ], 401);
-//     }
-// }
-// public function updateUserImage(Request $request)
-// {
-//     try {
-//         if (! $user = JWTAuth::parseToken()->authenticate()) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'User not found.',
-//             ], 404);
-//         }
-
-      
-//         $validator = Validator::make($request->all(), [
-//             'image' => 'required|file|mimetypes:' 
-//                                 . config('app.image_mime_types') 
-//                                 . '|max:' . config('app.user_image_size'),
-//         ]);
-
-//         if ($validator->fails()) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'Validation failed.',
-//                 'errors'  => $validator->errors(),
-//             ], 422);
-//         }
-
-      
-//         $uploadPath = 'users';
-//         $this->imageUpload(
-//             $request->file('image'),
-//             $uploadPath,
-//             $user->id,
-//             'users',
-//             'profile',
-//             $user->id
-//         );
-
-//         // Reload user with photo relation
-//         $user->load('photo');
-
-//         return response()->json([
-//             'success' => true,
-//             'message' => 'Profile image updated successfully.',
-//             'image_url' => $user->photo->url ?? null, // return uploaded image URL
-//             'data' => $user,
-//         ]);
-
-//     } catch (JWTException $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Unauthorized',
-//         ], 401);
-//     }
-// }
 public function updateUserImage(Request $request)
 {
     try {
@@ -567,10 +460,7 @@ public function updateUserImage(Request $request)
         $imageUrl = asset('storage/' . $uploadPath . '/' . $filename);
 
       
-        // $user->photo()->updateOrCreate(
-        //     ['user_id' => $user->id],
-        //     ['url' => $imageUrl]
-        // );
+        
         auth()->user()->photo()->updateOrCreate(
     ['table_type' => 'users'], // match existing photo record for this user
     [
@@ -833,6 +723,184 @@ public function getExhibitor($exhibitorId)
         ], 500);
     }
 }
+
+
+public function uploadExhibitorFiles(Request $request, $exhibitorId)
+{
+    try {
+        if (! $user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        $exhibitor = User::find($exhibitorId);
+      
+        if (! $exhibitor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load exhibitor details!',
+                'data'    => collect(),
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:' . config('app.user_image_size'),
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        if ($request->file("file")) {
+            
+            $fileRecord = $this->imageUpload(
+                $request->file("file"),
+                'users',
+                $exhibitor->id,
+                'users',
+                'photo',
+                $idForUpdate = $exhibitor->id
+            );
+         
+        }
+
+       
+        $exhibitor = User::where('id', $exhibitor->id)->with('photo')->first();
+
+        return response()->json([
+          
+            'message'   => 'File uploaded successfully.',
+            'file_id'   =>  $exhibitor->photo ? $exhibitor->photo->id : null,
+            'image_url' => $exhibitor->photo ? $exhibitor->photo->file_path : null,
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+// public function deleteExhibitorFiles(Request $request, $exhibitorId, $fileId)
+// {
+//     try {
+//         if (! $user = JWTAuth::parseToken()->authenticate()) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'User not found.',
+//             ], 404);
+//         }
+
+//         // Check exhibitor exists
+//         $exhibitor = User::with('photo')->find($exhibitorId);
+//         if (! $exhibitor) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'Exhibitor not found.',
+//             ], 404);
+//         }
+
+       
+//         $file = File::where('id', $fileId)
+//             ->where('fileable_id', $exhibitor->id)
+//             ->where('fileable_type', User::class)
+//             ->first();
+
+//         if (! $file) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'File not found for this exhibitor.',
+//             ], 404);
+//         }
+
+//         // Delete from storage
+//         if (Storage::disk('public')->exists($file->file_path)) {
+//             Storage::disk('public')->delete($file->file_path);
+//         }
+
+//         // Delete DB record
+//         $file->delete();
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Exhibitor file deleted successfully.',
+//             'deleted_file_id' => $fileId,
+//         ]);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => $e->getMessage(),
+//         ], 500);
+//     }
+// }
+public function deleteExhibitorFiles($exhibitorId, $fileId)
+{
+    try {
+        if (! $user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        $exhibitor = User::find($exhibitorId);
+
+        if (! $exhibitor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Exhibitor not found!',
+            ], 404);
+        }
+
+        // Fetch file record from Drive table
+        $file = Drive::where('id', $fileId)
+            ->where('table_id', $exhibitor->id)
+            ->where('table_type', 'users')
+            ->where('file_type', 'photo')
+            ->first();
+
+        if (! $file) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found!',
+            ], 404);
+        }
+
+        // Delete from storage
+        if (\Storage::disk('public')->exists($file->file_path)) {
+            \Storage::disk('public')->delete($file->file_path);
+        }
+
+        // Delete record from DB
+        $file->delete();
+
+        return response()->json([
+            // 'success' => true,
+            'message' => 'Exhibitor file deleted successfully.',
+            'file_id' => $fileId,
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+
+
+
+
+
 public function getSpeaker()
 {
     try {

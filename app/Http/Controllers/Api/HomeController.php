@@ -9,6 +9,7 @@ use App\Models\Session;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\GeneralNotification;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 class HomeController extends Controller
@@ -17,8 +18,7 @@ class HomeController extends Controller
 {
     // ================= Banner =================
     $featuredEvent = Event::where('start_date', '>=', now())
-    // where('is_featured', true)
-    //     ->
+    
         ->inRandomOrder()
         ->first();
 
@@ -85,24 +85,7 @@ class HomeController extends Controller
             });
     }
 
-    // ================= Quick Links =================
-    // $homeConnections = [
-    //     [
-    //         "id" => "con-1",
-    //         "name" => "Networking",
-    //         "avatarUrl" => url('icons/networking.png'),
-    //     ],
-    //     [
-    //         "id" => "con-2",
-    //         "name" => "Events & Sessions",
-    //         "avatarUrl" => url('icons/events.png'),
-    //     ],
-    //     [
-    //         "id" => "con-3",
-    //         "name" => "Resources",
-    //         "avatarUrl" => url('icons/resources.png'),
-    //     ],
-    // ];
+   
     // ================= Home Connections (from session_sponsors) =================
  $homeConnections = User::with('photo')
     ->whereHas('sponsoredSessions') // only users who are sponsors
@@ -173,160 +156,141 @@ class HomeController extends Controller
 }
 
 
-
-
-
-
-
-
-
- 
-// public function index(Request $request)
-// {
+public function getNotifications(Request $request)
+{
    
-//     $featuredEvent = Event::where('is_featured', true)
-//         ->where('start_date', '>=', now())
-//         ->inRandomOrder()
-//         ->first();
+    if (!$user = JWTAuth::parseToken()->authenticate()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized'
+        ], 401);
+    }
 
-//     $banner = $featuredEvent ? [
-//         "id" => $featuredEvent->id,
-//         "title" => $featuredEvent->title,
-//         "description" => $featuredEvent->description,
-//         "location" => $featuredEvent->location,
-//         "imageUrl" => $featuredEvent->image_url ?? url('images/default_event.jpg'),
-//         "videoUrl" => $featuredEvent->youtube_link ?? '',
-//         "startTime" => $featuredEvent->start_date?->toIso8601String(),
-//         "endTime" => $featuredEvent->end_date?->toIso8601String(),
-//         "status" => $featuredEvent->status,
-//     ] : [
-//         "title" => "No Featured Event Available",
-//         "imageUrl" => url('images/default_event.jpg'),
-//     ];
+    
+    $isSpeaker = $user->hasRole('Speaker');
 
- 
-//     $upcomingEvent = Event::where('start_date', '>=', now())
-//         ->orderBy('start_date', 'ASC')
-//         ->first();
+    
+    $photo = $user->photo;
+   
+    $userPhoto = $user->photo
+        ? Storage::url('users/' . $user->photo->file_name)
+        : url('images/default.jpg');
 
-//     $upcomingEventData = $upcomingEvent ? [
-//         "title" => $upcomingEvent->title,
-//         "startDateTime" => $upcomingEvent->start_date->toIso8601String(),
-//         "status" => "upcoming"
-//     ] : null;
+    
+    $notifications = GeneralNotification::query()
+        ->where(function ($q) use ($user) {
+            $q->whereNull('user_id');          
+            $q->orWhere('user_id', $user->id); 
+        })
+        ->latest()
+        ->take(20)
+        ->get()
+        ->map(function ($n) use ($isSpeaker, $userPhoto) {
+            return [
+                'imageUrl'   => $userPhoto, 
+                'heading'    => $n->title ?? $n->body ?? '',
+                'created_at' => $n->created_at?->toIso8601String(),
+                'isRead'     => $n->read_at ? true : false,
+                'isSpeaker'  => $isSpeaker,
+            ];
+        });
 
- 
-//     $homeSessions = collect(); 
-//     if ($upcomingEvent) {
-//         $homeSessions = Session::with(['speakers','booth'])
-//             ->where('event_id', $upcomingEvent->id)
-//             ->orderBy('start_time', 'ASC')
-//             ->get()
-//             ->map(function ($session) {
-//                 return [
-//                     "id" => "sub-session-" . $session->id,
-//                     "title" => $session->title,
-//                     "description" => $session->description,
-//                     "keynote" => $session->keynote ?? '',
-//                     "demoes" => $session->demoes ?? '',
-//                     "panels" => $session->panels ?? '',
-//                     "start_time" => $session->start_time?->toIso8601String(),
-//                     "end_time" => $session->end_time?->toIso8601String(),
-//                     "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
-//                     "location" => !empty($session->booth) ? $session->booth->title : 'No Booth',
-//                     "status" => $session->status ?? 'Upcoming',
-//                     "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
-//                     "isFavorite" => true
-//                 ];
-//             });
-//     }
+    return response()->json([
+        'success' => true,
+        'data'    => $notifications,
+    ], 200);
+}
+public function getSession($sessionId)
+{
+    try {
+          if (!$user = JWTAuth::parseToken()->authenticate()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized'
+        ], 401);
+    }
+        $session = Session::with(['event', 'speakers', 'booth'])
+            ->find($sessionId);
 
-//     $homeConnections = [
-//         [
-//             "id" => "con-1",
-//             "name" => "Networking",
-//             "avatarUrl" => url('icons/networking.png'),
-//         ],
-//         [
-//             "id" => "con-2",
-//             "name" => "Events & Sessions",
-//             "avatarUrl" => url('icons/events.png'),
-//         ],
-//         [
-//             "id" => "con-3",
-//             "name" => "Resources",
-//             "avatarUrl" => url('icons/resources.png'),
-//         ],
-//     ];
-//     $allNotifications = $query->take(20)->get();
+        if (! $session) {
+            return response()->json([
+                "success" => false,
+                "message" => "Session not found!",
+            ], 404);
+        }
 
-//     $notifications = [
-//         "count" => $allNotifications->count(),
-//         "hasNew" => $allNotifications->whereNull('read_at')->isNotEmpty(),
-//         "data" => $allNotifications->map(function ($n) {
-//             return [
-//                 "id" => $n->id,
-//                 "title" => $n->title,
-//                 "message" => $n->body,
-//                 "is_read" => !is_null($n->read_at),
-//                 "created_at" => $n->created_at->toDateTimeString(),
-//                 "related" => [
-//                     "type" => $n->related_type,
-//                     "id"   => $n->related_id,
-//                     "name" => $n->related_name,
-//                 ],
-//                 "meta" => $n->meta ? json_decode($n->meta, true) : null,
-//             ];
-//         }),
-//     ];
+        $sessionData = [
+            "id" => $session->id,
+            "title" => $session->title,
+            "description" => $session->description,
+          
+            "status" => $session->status ?? 'Upcoming',
+            
+            "speakers" => $session->speakers->map(fn ($sp) => [
+                "id" => $sp->id,
+                "name" => $sp->name,
+           
 
-//     $notifications = [
-//     "count" => 3,  // static count
-//     "hasNew" => true, // static flag for new notifications
-//     "data" => [
-//         [
-//             "id" => 1,
-//             "title" => "Welcome to the platform",
-//             "message" => "Thanks for joining us! Explore features and get started.",
-//             "is_read" => false,
-//             "created_at" => now()->subMinutes(10)->toDateTimeString()
-//         ],
-//         [
-//             "id" => 2,
-//             "title" => "New Event Available",
-//             "message" => "A new session has been scheduled. Don’t miss it!",
-//             "is_read" => true,
-//             "created_at" => now()->subHours(2)->toDateTimeString()
-//         ],
-//         [
-//             "id" => 3,
-//             "title" => "Profile Reminder",
-//             "message" => "Complete your profile to get personalized recommendations.",
-//             "is_read" => true,
-//             "created_at" => now()->subDay()->toDateTimeString()
-//         ],
-//     ]
-// ];
-
-
-//     $myStats = [
-//         "totalAgents" => User::count(),
-//         "totalConnections" => User::count(),
-//         "totalSessionAttendee" => User::whereHas("roles", function ($q) {
-//             $q->where("name", "Attendee");
-//         })->count(),
+            ]),
+             "isFavorite" =>  $session->is_featured == 1,
+            "isInAgenda" => true, 
+        ];
         
-//     ];
 
-//     return response()->json([
-//         "banner" => $banner,
-//         "upcomingEvent" => $upcomingEventData,
-//         "home_sessions" => $homeSessions,
-//         "home_connections" => $homeConnections,
-//         "myStats" => $myStats,
-//         "notifications" =>  $notifications
-//     ]);
-// }
+        return response()->json([
+            "success" => true,
+            "data" => $sessionData,
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            "success" => false,
+            "message" => $e->getMessage(),
+        ], 500);
+    }
+}
+public function getConnections(Request $request)
+{
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        
+        $connections = User::with(['photo', 'company']) // eager load relations
+            ->limit(50)
+            ->get()
+            ->map(function ($connection) {
+                return [
+                    "id" => (string) $connection->id,
+                    "name" => $connection->full_name ?? $connection->name,
+                    "connection_role" => $connection->getRoleNames(),
+                    "company_name" => $connection->company_name ,
+                    "connection_image" => $connection->photo ? $connection->photo->file_path : null,
+                        // ? asset('storage/' . $connection->photo->file_path . '/' . $connection->photo->file_name)
+                        // : url('images/default_avatar.png'),
+                        // $exhibitor->photo ? $exhibitor->photo->file_path : null,
+                ];
+            });
+
+        return response()->json([
+            "success" => true,
+            "data" => $connections
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            "success" => false,
+            "message" => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+
 
 
 }
