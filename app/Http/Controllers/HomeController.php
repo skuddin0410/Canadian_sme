@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Event;
+use App\Models\Setting;
 
 use Validator;
 use Illuminate\Support\Facades\Hash;
@@ -163,5 +164,37 @@ class HomeController extends Controller
         }catch(\Exception $e) {
             return redirect()->route('admin.change.password')->withError('Sorry some problem occoured, please try again.');
         }
+    }
+
+
+    public function brand(Request $request){
+       
+        $eventLogo = Setting::where('key','logo')->first();
+        $eventLogo->save();
+
+        if(!empty($request->file("event_logo"))){
+                $this->deleteFile($eventLogo->id,'settings');    
+                $this->imageUpload($request->file("event_logo"),"settings",$eventLogo->id,'settings','photo',$eventLogo->id);
+        }
+
+        $brand_cover = Setting::where('key','cover')->first();
+        $brand_cover->save();
+
+        if(!empty($request->file("brand_cover"))){
+                $this->deleteFile($brand_cover->id,'settings');    
+                $this->imageUpload($request->file("brand_cover"),"settings",$brand_cover->id,'settings','photo',$brand_cover->id);
+        }
+
+        $theme_color = Setting::where('key','color')->first();
+        $theme_color->value = $request->theme_color;
+        $theme_color->save();
+
+
+        return view('brand');
+    }
+
+    public function splash(Request $request){
+
+        return view('splash'); 
     }
 }

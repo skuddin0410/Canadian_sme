@@ -21,7 +21,7 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Setup</div>
@@ -29,23 +29,32 @@
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
                     <a href="{{ route("events.edit",["event"=> 1 ]) }}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-user"></i>
                         <div data-i18n="events">Basic Info</div>
                     </a>
                 </li>
 
                 <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
                     <a href="{{ route('company.details') }}" class="menu-link">
-                        <i class="menu-icon tf-icons fa fa-building"></i>
                         <div data-i18n="events">Features</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('booths*') ? 'active' : '' }}">
-                    <a href="{{route('booths.index')}}" class="menu-link">
-                        <i class="menu-icon tf-icons fa fa-address-book"></i>
+                <li class="menu-item {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
+                    <a href="javascript:void(0);"  class="menu-link menu-toggle">
                         <div data-i18n="Booth Management">Branding</div>
                     </a>
+                     <ul class="menu-sub">
+                        <a href="{{route('brand')}}" class="menu-link {{ request()->is('brand*') ? 'active' : '' }}" >
+                           <div data-i18n="Booth Management">App Branding</div>
+                        </a>
+                         <a href="{{route('booths.index')}}" class="menu-link">
+                           <div data-i18n="Booth Management">App Menu</div>
+                        </a>
+
+                        <a href="{{route('splash')}}" class="menu-link {{ request()->is('splash*') ? 'active' : '' }}">
+                           <div data-i18n="Booth Management">Splash Screen</div>
+                        </a>
+                     </ul>
                 </li>
             </ul>
         </li>

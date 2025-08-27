@@ -11,3 +11,5 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::post('change-user-password', [App\Http\Controllers\HomeController::class, 'changeUserPassword'])->name('change.user.password');
 
+Route::any('brand', [App\Http\Controllers\HomeController::class, 'brand'])->name('brand');
+Route::any('splash', [App\Http\Controllers\HomeController::class, 'splash'])->name('splash');
