@@ -984,7 +984,7 @@ class LaravelEventCalendar {
                     <strong>${speaker.full_name}</strong>
                     ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeExhibitor(${index})">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1006,7 +1006,7 @@ class LaravelEventCalendar {
                     <strong>${sponsor.full_name}</strong>
                     ${sponsor.title ? `<span class="text-muted">- ${sponsor.title}</span>` : ''}
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSponsor(${index})">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1017,6 +1017,16 @@ class LaravelEventCalendar {
         this.selectedSpeakers.splice(index, 1);
         this.renderSelectedSpeakers();
     }
+
+    removeSponsor(index) {
+        this.selectedSponsors.splice(index, 1);
+        this.renderSelectedSponsors();
+    }
+    removeExhibitor(index) {
+        this.selectedExhibitors.splice(index, 1);
+        this.renderSelectedExhibitors();
+    }
+    
 
     autoCalculateEndTime(startTime) {
         if (!startTime) return;

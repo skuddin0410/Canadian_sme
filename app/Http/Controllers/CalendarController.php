@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use App\Models\Track;
+use Illuminate\Support\Facades\DB;
 
 class CalendarController extends Controller
 {
@@ -33,14 +35,14 @@ class CalendarController extends Controller
         $sponsors = User::whereHas("roles", function ($q) {
                     $q->where("name", 'Sponsors');
                 })->orderBy('created_at', 'DESC')->get();
-        
-        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths'));
+        $tracks = Track::orderBy('created_at', 'DESC')->get();
+        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths','tracks'));
     }
 
     public function speakers(Request $request)
     {
 
-        $speakers = User::select('id','name')->whereHas("roles", function ($q) {
+        $speakers = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Speaker']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
@@ -50,7 +52,7 @@ class CalendarController extends Controller
     public function exhibitors(Request $request)
     {
 
-        $exhibitors = User::select('id','name')->whereHas("roles", function ($q) {
+        $exhibitors = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Exhibitor']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($exhibitors);
@@ -60,7 +62,7 @@ class CalendarController extends Controller
     public function sponsors(Request $request)
     {
 
-        $sponsors = User::select('id','name')->whereHas("roles", function ($q) {
+        $sponsors = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Sponsors']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($sponsors);
@@ -116,21 +118,21 @@ class CalendarController extends Controller
                     'speakers' => $session->speakers->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->full_name,
+                            'name' => $speaker->name.' '.$speaker->lastname,
                             'role' => $speaker->pivot->role
                         ];
                     }),
                     'sponsors' => $session->sponsors->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->full_name,
+                            'name' => $speaker->name.' '.$speaker->lastname,
                             'role' => $speaker->pivot->role
                         ];
                     }),
                     'exhibitors' => $session->exhibitors->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->full_name,
+                            'name' => $speaker->name.' '.$speaker->lastname,
                             'role' => $speaker->pivot->role
                         ];
                     }),
@@ -157,7 +159,8 @@ class CalendarController extends Controller
         $request->merge([
          'speaker_ids' => $speakerIds
         ]);
-
+        
+        dd($request->all()); 
 
         $request->validate([
             'event_id' => 'required|exists:events,id',
@@ -226,7 +229,6 @@ class CalendarController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'start_time' => 'sometimes|required|date',
             'end_time' => 'sometimes|required|date|after:start_time',
-            'booth_id' => 'nullable|exists:booths,id',
             'type' => 'sometimes|required|in:presentation,workshop,panel,break,networking',
             'description' => 'nullable|string',
             'capacity' => 'nullable|integer|min:1',
@@ -234,7 +236,7 @@ class CalendarController extends Controller
         ]);
 
         // Check for venue conflicts if venue or time is being updated
-        if (($request->has('booth_id') || $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
+        if (( $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
             $startTime = $request->start_time ?? $session->start_time;
             $endTime = $request->end_time ?? $session->end_time;
             

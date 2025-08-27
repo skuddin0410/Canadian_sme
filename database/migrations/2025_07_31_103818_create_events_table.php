@@ -13,6 +13,8 @@ return new class extends Migration {
             $table->string('slug')->nullable()->unique();
             $table->text('description')->nullable();
             $table->string('location')->nullable();
+            $table->string('tracks')->nullable();
+            $table->string('color')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->string('youtube_link')->nullable();
@@ -20,7 +22,7 @@ return new class extends Migration {
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->text('tags')->nullable();
-            $table->boolean('is_featured')->default(true);
+            $table->boolean('is_featured')->default(false);
             $table->enum('visibility', ['listed', 'unlisted'])->default('listed');
 
             // SEO Fields
