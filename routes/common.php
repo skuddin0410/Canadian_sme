@@ -13,3 +13,5 @@ Route::post('change-user-password', [App\Http\Controllers\HomeController::class,
 
 Route::any('brand', [App\Http\Controllers\HomeController::class, 'brand'])->name('brand');
 Route::any('splash', [App\Http\Controllers\HomeController::class, 'splash'])->name('splash');
+
+Route::any('registration-settings', [App\Http\Controllers\HomeController::class, 'registrationSettings'])->name('registration-settings');

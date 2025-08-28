@@ -248,4 +248,32 @@ class HomeController extends Controller
         }
         return view('splash'); 
     }
+
+    public function registrationSettings(Request $request){
+        
+        if($request->mode == 'save'){
+               $data = $request->validate([
+                'company_name'     => ['required','string','max:255'],
+                'company_address'  => ['required','string'],
+                'support_email'    => ['required','email'],
+                'tax_name'         => ['required','string','max:100'],
+                'tax_percentage'   => ['required','numeric','between:0,100'],
+                'company_number'   => ['required','string','max:100'],
+                'privacy_policy'   => ['nullable','string'],
+                'terms_conditions' => ['nullable','string'],
+                'thank_you_page'   => ['nullable','string'],
+               ]);
+
+            foreach ($data as $key => $value) {
+                \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            } 
+            session()->flash('success', 'Saved successfully.');
+
+            return redirect()->route('registration-settings'); 
+        }
+       
+
+        return view('registration-settings');
+    }
+    
 }
