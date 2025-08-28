@@ -268,11 +268,9 @@ public function getConnections(Request $request)
                     "id" => (string) $connection->id,
                     "name" => $connection->full_name ?? $connection->name,
                     "connection_role" => $connection->getRoleNames(),
-                    "company_name" => $connection->company_name ,
+                    "company_name" =>$connection->company ? $connection->company->name : null,
                     "connection_image" => $connection->photo ? $connection->photo->file_path : null,
-                        // ? asset('storage/' . $connection->photo->file_path . '/' . $connection->photo->file_name)
-                        // : url('images/default_avatar.png'),
-                        // $exhibitor->photo ? $exhibitor->photo->file_path : null,
+                       
                 ];
             });
 
