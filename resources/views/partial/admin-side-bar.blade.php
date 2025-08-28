@@ -21,6 +21,27 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+                <div data-i18n="events">Registration</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                    <a href="{{ route("events.edit",["event"=> 1 ]) }}" class="menu-link">
+                        <div data-i18n="events">Registration Settings</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }}">
+                    <a href="{{ route('form-builder.index') }}" class="menu-link">
+                        <div data-i18n="events">Registration Forms</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+
         <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
@@ -32,12 +53,6 @@
                         <div data-i18n="events">Basic Info</div>
                     </a>
                 </li>
-
-               {{--  <li class="menu-item {{ request()->is('company/details') ? 'active' : '' }}">
-                    <a href="{{ route('company.details') }}" class="menu-link">
-                        <div data-i18n="events">Features</div>
-                    </a>
-                </li> --}}
 
                 <li class="menu-item {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
                     <a href="javascript:void(0);"  class="menu-link menu-toggle">
@@ -67,13 +82,11 @@
             <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
                 <a href="{{url('usergroup')}}" class="menu-link">
-                    <i class="menu-icon tf-icons fas fa-user-friends"></i>
                     <div data-i18n="ticket-categories"> User Groups</div>
                 </a>
             </li>
               <li class="menu-item {{ request()->is('attendee-users*') ? 'active' : '' }}">
                     <a href="{{ url('attendee-users') }}" class="menu-link">
-                        <i class="menu-icon tf-icons fas fa-user"></i>
                         <div data-i18n="Attendee">Attendee </div>
                     </a>
                 </li>
@@ -223,13 +236,6 @@
                     <a href="{{ route('roles.matrix') }}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-spreadsheet"></i>
                         <div data-i18n="audit">Roles</div>
-                    </a>
-                </li>
-
-                <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }}">
-                    <a href="{{ route('form-builder.index') }}" class="menu-link">
-                          <i class="menu-icon tf-icons fa fa-plus"></i>
-                        <div data-i18n="events">FormBuilder</div>
                     </a>
                 </li>
                 
