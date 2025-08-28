@@ -92,4 +92,45 @@ class Controller extends BaseController
         }
     }
 
+    public static function imageBase64Upload($file , string $uploadPath=null,$table_id,$table_type,$file_type,$idForUpdate=null) : ?string
+    {
+    
+        if($file  && $uploadPath) {
+           try {
+                $directoryPath = storage_path('app/public/' . $uploadPath);
+
+            // Check if the directory exists, and create it if it does not
+            if (!File::exists($directoryPath)) {
+                File::makeDirectory($directoryPath, 0755, true); // Recursive directory creation
+            }
+
+            // Extract the base64 image data by removing the data URI scheme (e.g., "data:image/jpeg;base64,")
+            list($type, $imageData) = explode(';', $file); 
+            $imageData = explode(',', $imageData)[1]; // Get the actual base64 data
+            $mimeType = explode(':', $type)[1];  // Extract the mime type (e.g., image/jpeg)
+            $extension = explode('/', $mimeType)[1];  // Extract the extension (e.g., jpeg, png)
+            
+            // Decode the base64 string into image binary
+            $image = base64_decode($imageData);
+
+            // Generate a unique filename using current timestamp and CRC32 of the unique id
+            $filename = now()->format('Y-m-d') . '-' . abs(crc32(uniqid())) . '-' . Carbon\Carbon::now()->timestamp . '.' . $extension;
+
+            // Define the full path where the file will be saved
+            $file_path = $directoryPath . '/' . $filename;
+
+            // Save the file (base64 decoded image data) to the specified file path
+            file_put_contents($file_path, $image);
+
+            // Call a function to save image data (e.g., store the image filename in a database)
+            static::saveImageDataIntoDrive($filename, $file_type, $table_id, $table_type, $idForUpdate);
+
+            return $filename;
+            } catch (\Exception $e) {
+                return "null";
+            }
+        }
+
+    }
+
 }

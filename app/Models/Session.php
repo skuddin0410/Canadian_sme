@@ -62,4 +62,12 @@ class Session extends Model
         return $this->start_time < $otherSession->end_time && 
                $this->end_time > $otherSession->start_time;
     }
+
+    public function photo()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'event_sessions')
+            ->where('file_type', 'photo')
+            ->whereNotNull('file_name');
+    }
 }
