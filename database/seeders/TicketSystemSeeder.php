@@ -55,7 +55,6 @@ class TicketSystemSeeder extends Seeder
         [ 'name' => 'Startup & Investment', 'type' => 'event' ],
         [ 'name' => 'Digital Marketing', 'type' => 'event' ],
         [ 'name' => 'Sustainability & Environment', 'type' => 'event' ],
-        [ 'name' => 'AI & Machine Learning', 'type' => 'event' ],
         [ 'name' => 'Blockchain & FinTech', 'type' => 'event' ],
         [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
         [ 'name' => 'Government & Policy', 'type' => 'event' ],
@@ -70,7 +69,6 @@ class TicketSystemSeeder extends Seeder
                 [ 'name' => 'Product Management',           'slug' => 'product-management',         'type' => 'track' ],
                 [ 'name' => 'Design & UX',                  'slug' => 'design-ux',                  'type' => 'track' ],
                 [ 'name' => 'Engineering & Architecture',   'slug' => 'engineering-architecture',   'type' => 'track' ],
-                [ 'name' => 'AI & Machine Learning',        'slug' => 'ai-ml',                      'type' => 'track' ],
                 [ 'name' => 'Generative AI & LLMs',         'slug' => 'genai-llms',                 'type' => 'track' ],
                 [ 'name' => 'Data & Analytics',             'slug' => 'data-analytics',             'type' => 'track' ],
                 [ 'name' => 'MLOps & Model Ops',            'slug' => 'mlops-modelops',             'type' => 'track' ],
@@ -98,8 +96,8 @@ class TicketSystemSeeder extends Seeder
 
          foreach ($tracks as $track) {
             Track::create([
-                'name' => $track,
-                'slug' => Str::slug($track)
+                'name' => $track['name'],
+                'slug' => Str::slug($track['name'])
             ]);
         }
 
