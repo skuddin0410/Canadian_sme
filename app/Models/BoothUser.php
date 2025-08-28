@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BoothUser extends Model
 {
@@ -12,9 +13,10 @@ class BoothUser extends Model
     protected $fillable = [
         'session_id',
         'booth_id',
+        'company_id'
     ];
 
-    // Relationships
+    
     public function session()
     {
         return $this->belongsTo(Session::class);
@@ -23,5 +25,9 @@ class BoothUser extends Model
     public function booth()
     {
         return $this->belongsTo(Booth::class);
+    }
+      public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

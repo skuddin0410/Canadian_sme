@@ -17,6 +17,7 @@ return new class extends Migration
             // Basic Company Details
             $table->string('name')->nullable();
             $table->foreignId('booth_id')->nullable()->constrained('booths')->onDelete('cascade');
+            $table->boolean('is_sponsor')->default(false);
             $table->string('industry')->nullable();
             $table->string('size')->nullable();
             $table->string('location')->nullable();

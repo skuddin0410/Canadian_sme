@@ -65,7 +65,16 @@
 	<td>{{ $user->company->name ?? '-' }}</td>
 
 	{{-- Booth ID --}}
-	<td>{{ $user->company->booth->id ?? '-' }}</td>
+	<td>
+@if($user->company && $user->company->boothUsers->count())
+    @foreach($user->company->boothUsers as $bu)
+        {{ $bu->booth->id ?? '-' }}<br>
+    @endforeach
+@else
+    -
+@endif
+</td>
+
 
 	{{-- Download QR --}}
 	<td>

@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\Wallet;
 
 use App\Models\Company;
+use App\Models\BoothUser;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
@@ -191,18 +192,35 @@ public function index(Request $request)
     }
 
 
-    public function show(User $exhibitor_user, Request $request)
-        {   
-            
-            $company = Company::with(['certificationFile', 'logoFile', 'mediaGallery', 'videos','booths'])
-                ->where('user_id', $exhibitor_user->id)
-                ->first();
+    
+// public function show(User $exhibitor_user, Request $request)
+// {   
+//     $company = Company::with(['boothUsers.booth', 'certificationFile', 'logoFile', 'mediaGallery', 'videos'])
+//         ->where('user_id', $exhibitor_user->id)
+//         ->firstOrFail();
 
-            return view('users.exhibitor_users.view', [
-                'user'      => $exhibitor_user,
-                'company' => $company,
-            ]);
-        }
+//     $booths = Booth::all(); // For the assign form
+
+//     return view('users.exhibitor_users.view', [
+//         'user' => $exhibitor_user,
+//         'company' => $company,
+//         'booths' => $booths
+//     ]);
+// }
+public function show(User $exhibitor_user, Request $request)
+{   
+    $company = Company::with(['boothUsers.booth', 'certificationFile', 'logoFile', 'mediaGallery', 'videos'])
+        ->where('user_id', $exhibitor_user->id)
+        ->firstOrFail();
+
+    $booths = Booth::all(); // For assign form
+
+    return view('users.exhibitor_users.view', [
+        'user' => $exhibitor_user,
+        'company' => $company,
+        'booths' => $booths
+    ]);
+}
 
 
 
@@ -270,36 +288,88 @@ public function index(Request $request)
     }
 
 
-    public function assignBoothForm($id)
-    {
-        $user = User::with('company')->findOrFail($id);
-        $booths = Booth::all(); 
+    public function assignBoothForm($companyId)
+{
+    $company = Company::findOrFail($companyId);
+    $booths = Booth::all(); // Fetch all booths
 
-        return view('users.exhibitor_users.show', compact('user', 'booths'));
+    return view('users.exhibitor_users.show', compact('company', 'booths'));
+}
+
+
+// public function assignBooth(Request $request, $companyId)
+// {
+//     $company = Company::findOrFail($companyId);
+
+//     $request->validate([
+//         'booth_id' => 'required|exists:booths,id',
+//     ]);
+
+//     // Avoid duplicate assignments
+//     if (BoothUser::where('company_id', $company->id)
+//         ->where('booth_id', $request->booth_id)
+//         ->exists()) {
+//         return redirect()->route('exhibitor-users.show', $company->user_id)
+//             ->with('error', 'This booth is already assigned to the company.');
+//     }
+
+//     // Assign the booth
+//     BoothUser::create([
+//         'company_id' => $company->id,
+//         'booth_id'   => $request->booth_id,
+//     ]);
+
+//     return redirect()->route('exhibitor-users.show', $company->user_id)
+//         ->with('success', 'Booth assigned successfully.');
+// }
+// public function assignBooth(Request $request, $companyId)
+// {
+//     $company = Company::findOrFail($companyId);
+
+//     $request->validate([
+//         'booth_id' => 'required|exists:booths,id',
+//     ]);
+
+//     $boothId = $request->input('booth_id');
+
+//     // Prevent the same booth being assigned to multiple companies
+//     if (BoothUser::where('booth_id', $boothId)->exists()) {
+//         return redirect()->back()->withErrors('This booth is already assigned to another company.');
+//     }
+
+//     // Assign booth to company
+//     BoothUser::create([
+//         'company_id' => $company->id,
+//         'booth_id' => $boothId,
+//     ]);
+
+//     return redirect()->route('exhibitor-users.show', $company->user_id)
+//         ->with('success', 'Booth assigned successfully.');
+// }
+public function assignBooth(Request $request, $companyId)
+{
+    $company = Company::findOrFail($companyId);
+
+    $request->validate([
+        'booth_id' => 'required|exists:booths,id',
+    ]);
+
+    // Prevent assigning the same booth twice
+    if (BoothUser::where('booth_id', $request->booth_id)->exists()) {
+        return redirect()->back()->withErrors('This booth is already assigned.');
     }
 
-    public function assignBooth(Request $request, $id)
-    {
-        $user = User::with('company')->findOrFail($id);
-        $boothId = $request->input('booth_id');
+    BoothUser::create([
+        'company_id' => $company->id,
+        'booth_id' => $request->booth_id,
+    ]);
 
-        $request->validate([
-            'booth_id' => 'required|exists:booths,id',
-        ]);
+    return redirect()->route('exhibitor-users.show', $company->user_id)
+                     ->with('success', 'Booth assigned successfully.');
+}
 
-        $booth = Booth::findOrFail($boothId);
 
-        // Assign booth to user's company
-        if (!$user->company) {
-          return redirect()->back()->with('error', 'User does not have an associated company.');
-        }
 
-        $booth->company_id = $user->company->id;
-        $booth->save();
-
-        return redirect()->route('exhibitor-users.show', $user->id)
-            ->with('success', 'Booth assigned successfully.');
-    }
 
     public function toggleBlock(User $user)
     {

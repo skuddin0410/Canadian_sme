@@ -10,13 +10,16 @@ return new class extends Migration
     {
         Schema::create('booth_users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('session_id');
-            $table->unsignedBigInteger('booth_id');
+            $table->unsignedBigInteger('session_id')->nullable();
+            $table->unsignedBigInteger('booth_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
+
             $table->timestamps();
 
             // Foreign keys (if you have related tables)
             $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
             $table->foreign('booth_id')->references('id')->on('booths')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 
