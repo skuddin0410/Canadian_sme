@@ -194,7 +194,7 @@ public function index(Request $request)
     public function show(User $exhibitor_user, Request $request)
         {   
             
-            $company = Company::with(['certificationFile', 'logoFile', 'mediaGallery', 'videos'])
+            $company = Company::with(['certificationFile', 'logoFile', 'mediaGallery', 'videos','booths'])
                 ->where('user_id', $exhibitor_user->id)
                 ->first();
 

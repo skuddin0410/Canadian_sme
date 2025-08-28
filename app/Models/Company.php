@@ -77,6 +77,10 @@ public function quickLinkIconFile()
    {
     return $this->belongsTo(Product::class,'company_id');
    }
+    public function booths()
+    {
+        return $this->hasMany(Booth::class, 'company_id');
+    }
 
 
 }

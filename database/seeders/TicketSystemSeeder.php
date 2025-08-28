@@ -99,7 +99,7 @@ class TicketSystemSeeder extends Seeder
          foreach ($tracks as $track) {
             Track::create([
                 'name' => $track,
-                'slug' => Str::slug($track)
+                'slug' => Str::slug(implode('-',$track))
             ]);
         }
 
