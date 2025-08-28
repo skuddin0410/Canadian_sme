@@ -11,7 +11,7 @@ class CreateEventSessionsTable extends Migration
         Schema::create('event_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreignId('booth_id')->constrained('booths')->onDelete('cascade');
+            $table->foreignId('booth_id')->nullable()->constrained('booths')->onDelete('cascade');
             $table->string('title');
             $table->string('location')->nullable();
             $table->string('track')->nullable();

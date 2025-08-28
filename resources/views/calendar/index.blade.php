@@ -113,7 +113,7 @@
                 <h5 class="modal-title text-white" id="modalTitle">Add New Session</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form id="sessionForm">
+            <form id="sessionForm" enctype="multipart/form-data" method="POST">
                 @csrf
                 <input type="hidden" id="sessionId" name="session_id">
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
@@ -137,30 +137,30 @@
                                alt="Profile preview" />
 
                           
-                              <button type="button" id="dz-remove" class="btn btn-sm btn-danger d-none" aria-label="Remove image">
+                              <button type="button" id="dz-remove" class="btn btn-sm btn-danger d-none" aria-label="Remove image" data-photoid="">
                                 Remove
                               </button>
 
                           <!-- Hidden file input (kept for form submission) -->
-                          <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
+                          <input type="file" id="profileImageInput" name="image" accept="image/*" value="" class="d-none">
                         </div>
 
                          <p class="text-muted mt-2">JPG/PNG recommended. Square works best.</p>
                     </div>
 
-                        <div class="col-12">
-                            <label for="sessionTitle" class="form-label">Session Title *</label>
+                        <div class="col-6">
+                            <label for="sessionTitle" class="form-label">Title *</label>
                             <input type="text" class="form-control" id="sessionTitle" name="title" required>
                         </div>
 
                         <div class="col-6">
-                            <label for="sessionTitle" class="form-label">Session Location *</label>
-                            <input type="text" class="form-control" id="sessionTitle" name="location" required>
+                            <label for="sessionTitle" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="venueSelect" name="location" required>
                         </div>
 
                         <div class="col-md-6">
                             <label for="tracks" class="form-label">Tracks *</label>
-                            <select class="form-select" id="tracks" name="type" required>
+                            <select class="form-select" id="tracks" name="track" required>
                                 @if(!empty($tracks))
                                 @foreach($tracks as  $track)
                                 <option value="{{$track->name}}">{{$track->name}}</option>
@@ -174,6 +174,13 @@
                                 </label>
                              </div>
                         </div>
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div> 
                         
                         <div class="col-md-6">
                             <label for="startTime" class="form-label">Start Time *</label>
@@ -185,23 +192,16 @@
                             <input type="datetime-local" class="form-control" id="endTime" name="end_time" required>
                         </div>
 
-                         <div class="col-md-6">
-                            <label for="status" class="form-label">Status *</label>
-                            <select class="form-select" id="status" name="status" required>
-                                <option value="published">Published</option>
-                                <option value="draft">Draft</option>
-                            </select>
-                        </div> 
 
-                        <div class="col-md-6">
+                      {{--   <div class="col-md-6">
                             <label for="capacity" class="form-label">Capacity</label>
                             <input type="number" class="form-control" id="capacity" name="capacity" min="1">
-                        </div>
+                        </div> --}}
                      
 
                         <!-- Speaker Assignment -->
                         <div class="col-4">
-                            <label class="form-label">Speakers *</label>
+                            <label class="form-label">Choose Speakers *</label>
                             <div id="speakerSelection">
                                 <div class="input-group mb-2">
                                     <select class="form-select" id="speakerSelect">
@@ -218,7 +218,7 @@
                         </div>
 
                          <div class="col-4">
-                            <label class="form-label">Exhibitors </label>
+                            <label class="form-label">Link Exhibitors </label>
                             <div id="exhibitorSelection">
                                 <div class="input-group mb-2">
                                     <select class="form-select" id="exhibitorSelect">
@@ -235,7 +235,7 @@
                         </div>
 
                         <div class="col-4">
-                            <label class="form-label">Sponsors</label>
+                            <label class="form-label">Link Sponsors</label>
                             <div id="SponsorSelection">
                                 <div class="input-group mb-2">
                                     <select class="form-select" id="sponsorSelect">
@@ -253,22 +253,22 @@
 
                         <div class="col-6">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description2" name="description" rows="3"></textarea>
+                            <textarea class="form-control" id="description2" name="description" rows="3" maxlength="300"></textarea>
                         </div>
 
                         <div class="col-6">
                             <label for="keynote" class="form-label">Keynote</label>
-                            <textarea class="form-control" id="keynote2" name="keynote" rows="3"></textarea>
+                            <textarea class="form-control" id="keynote2" name="keynote" rows="3" maxlength="250"></textarea>
                         </div>
 
                         <div class="col-6">
                             <label for="panels" class="form-label">Panels</label>
-                            <textarea class="form-control" id="panels2" name="panels" rows="3"></textarea>
+                            <textarea class="form-control" id="panels2" name="panels" rows="3" maxlength="250"></textarea>
                         </div>
 
                         <div class="col-6">
                             <label for="demoes" class="form-label">Demoes</label>
-                            <textarea class="form-control" id="demoes2" name="demoes" rows="3"></textarea>
+                            <textarea class="form-control" id="demoes2" name="demoes" rows="3" maxlength="250"></textarea>
                         </div>
 
                     </div>
@@ -391,19 +391,23 @@
 
     function setFile(file){
       if (!file.type.startsWith('image/')) return;
+      const dt = new DataTransfer();
       const reader = new FileReader();
       reader.onload = (ev) => {
         preview.src = ev.target.result;
         preview.classList.remove('d-none');
         removeBtn.classList.remove('d-none');
         placeholder.style.display = 'none';
+
+        document.getElementById('profileImageInput').files = dt.files;
       };
       reader.readAsDataURL(file);
 
       // keep file in input so it submits with the form
-      const dt = new DataTransfer();
+      
       dt.items.add(file);
       input.files = dt.files;
+
     }
 
     function clearSelection(){

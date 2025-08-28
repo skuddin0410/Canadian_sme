@@ -11,6 +11,7 @@ class LaravelEventCalendar {
         this.selectedSponsors = [];
         this.currentSession = null;
         this.isEditing = false;
+        this.image = '';
         this.config = window.calendarConfig || {};
         this.init();
     }
@@ -268,6 +269,8 @@ class LaravelEventCalendar {
                     keynote: session.keynote,
                     demoes: session.demoes,
                     panels: session.panels,
+                    img: session.img,
+                    img_id: session.img_id,
                 }
             };
         });
@@ -455,17 +458,33 @@ class LaravelEventCalendar {
 
         // Populate form if editing
         if (eventData.id) {
+            console.log(eventData.extendedProps?.img)
             document.getElementById('sessionId').value = eventData.id;
             document.getElementById('sessionTitle').value = eventData.title || '';
             document.getElementById('description2').value = eventData.extendedProps?.description || '';
-            document.getElementById('sessionType').value = eventData.extendedProps?.type || 'presentation';
-            document.getElementById('capacity').value = eventData.extendedProps?.capacity || '';
-            document.getElementById('venueSelect').value = eventData.extendedProps?.venue_id || '';
+           // document.getElementById('sessionType').value = presentation;
+            //document.getElementById('capacity').value =  '';
+            document.getElementById('venueSelect').value = eventData.extendedProps?.location || '';
             document.getElementById('status').value = eventData.extendedProps?.status || 'draft';
-            
+
+            document.getElementById('keynote2').value = eventData.extendedProps?.keynote || '';
+            document.getElementById('panels2').value = eventData.extendedProps?.demoes || '';
+            document.getElementById('demoes2').value = eventData.extendedProps?.panels || '';
+
+            document.getElementById('profileImagePreview').src = eventData.extendedProps?.img || '';
+            document.getElementById('dz-remove').setAttribute('data-photoid', eventData.extendedProps?.img_id);
+
+            const preview = document.getElementById('profileImagePreview');
+            preview.classList.remove('d-none');  // Optionally, hide the preview image
             // Set selected speakers
             this.selectedSpeakers = eventData.extendedProps?.speakers || [];
             this.renderSelectedSpeakers();
+            
+            this.selectedSponsors = eventData.extendedProps?.sponsors || [];
+            this.renderSelectedSponsors();
+
+            this.selectedExhibitors = eventData.extendedProps?.exhibitors || [];
+            this.renderSelectedExhibitors();
         }
 
         if (eventData.start) {
@@ -537,8 +556,15 @@ class LaravelEventCalendar {
         <div class="col-12 col-md-6">
             <div class="fw-bold">Capacity</div>
             <div>${event.extendedProps?.capacity || 'Unlimited'}</div>
-        </div>
+         </div>
     </div>
+
+    ${event.extendedProps?.img ? `
+        <div class="mt-3" style="width:100%;">
+            <div class="fw-bold">Description</div>
+            <div class="mt-2"><img src="${event.extendedProps.img}" /></div>
+        </div>
+    ` : ''}        
 
     ${event.extendedProps?.description ? `
         <div class="mt-3">
@@ -620,6 +646,8 @@ class LaravelEventCalendar {
                     keynote: session.keynote,
                     demoes: session.demoes,
                     panels: session.panels,
+                    img: session.img,
+                    img_id: session.img_id,
                 }
             };
             this.showSessionDetails(eventData);
@@ -658,6 +686,8 @@ class LaravelEventCalendar {
                     keynote: session.keynote,
                     demoes: session.demoes,
                     panels: session.panels,
+                    img: session.img,
+                    img_id: session.img_id,
                 }
             };
             this.openSessionModal(eventData);
@@ -667,12 +697,22 @@ class LaravelEventCalendar {
     async saveSession() {
         try {
             const form = document.getElementById('sessionForm');
-            const formData = new FormData(form);
-            
-            // Add selected speakers
+            let formData = new FormData(form)
+            const base64Image = document.getElementById('profileImagePreview').src;
+            if (base64Image) {
+               formData.append('session_image',base64Image)
+            }
             this.selectedSpeakers.forEach((speaker, index) => {
                 formData.append(`speaker_ids[${index}]`, speaker.id);
             });
+          
+            this.selectedExhibitors.forEach((exhibitor, index) => {
+                formData.append(`exhibitor_ids[${index}]`, exhibitor.id);
+            });
+
+            this.selectedSponsors.forEach((sponsor, index) => {
+                formData.append(`sponsor_ids[${index}]`, sponsor.id);
+            });  
 
             const sessionData = Object.fromEntries(formData.entries());
 
@@ -707,7 +747,7 @@ class LaravelEventCalendar {
             
             setTimeout(() => {
                 bootstrap.Modal.getInstance(document.getElementById('sessionModal')).hide();
-            }, 1500);
+            }, 1000);
 
         } catch (error) {
             console.error('Error saving session:', error);
@@ -835,6 +875,8 @@ class LaravelEventCalendar {
                     keynote: session.keynote,
                     demoes: session.demoes,
                     panels: session.panels,
+                    img: session.img,
+                    img_id: session.img_id,
                 }
             })));
         }
@@ -959,7 +1001,7 @@ class LaravelEventCalendar {
         container.innerHTML = this.selectedSpeakers.map((speaker, index) => `
             <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
                 <div>
-                    <strong>${speaker.full_name}</strong>
+                    <strong>${speaker.name}</strong>
                     ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
@@ -981,7 +1023,7 @@ class LaravelEventCalendar {
         container.innerHTML = this.selectedExhibitors.map((speaker, index) => `
             <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
                 <div>
-                    <strong>${speaker.full_name}</strong>
+                    <strong>${speaker.name}</strong>
                     ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeExhibitor(${index})">
@@ -1003,7 +1045,7 @@ class LaravelEventCalendar {
         container.innerHTML = this.selectedSponsors.map((sponsor, index) => `
             <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
                 <div>
-                    <strong>${sponsor.full_name}</strong>
+                    <strong>${sponsor.name}</strong>
                     ${sponsor.title ? `<span class="text-muted">- ${sponsor.title}</span>` : ''}
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSponsor(${index})">
@@ -1071,6 +1113,11 @@ class LaravelEventCalendar {
         if (form) {
             form.reset();
             document.getElementById('sessionId').value = '';
+       
+            const preview = document.getElementById('profileImagePreview');
+            preview.src = '';  // Clear the base64 image
+            preview.classList.add('d-none');  // Optionally, hide the preview image
+          
         }
         this.selectedSpeakers = [];
         this.renderSelectedSpeakers();
@@ -1125,6 +1172,7 @@ class LaravelEventCalendar {
     }
 
     async apiCall(method, url, data = null) {
+
         const options = {
             method: method,
             headers: {
