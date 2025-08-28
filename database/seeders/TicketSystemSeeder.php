@@ -40,31 +40,66 @@ class TicketSystemSeeder extends Seeder
             ]);
         }
 
-         $categories = [
-            [ 'name' => 'Technology', 'type' => 'event' ],
-            [ 'name' => 'Health & Wellness', 'type' => 'event' ],
-            [ 'name' => 'Business & Entrepreneurship', 'type' => 'event' ],
-            [ 'name' => 'Education & Training', 'type' => 'event' ],
-            [ 'name' => 'Arts & Culture', 'type' => 'event' ],
-            [ 'name' => 'Sports & Fitness', 'type' => 'event' ],
-            [ 'name' => 'Music & Entertainment', 'type' => 'event' ],
-            [ 'name' => 'Science & Innovation', 'type' => 'event' ],
-        ];
+    $categories = [
+        [ 'name' => 'Technology', 'type' => 'event' ],
+        [ 'name' => 'Health & Wellness', 'type' => 'event' ],
+        [ 'name' => 'Business & Entrepreneurship', 'type' => 'event' ],
+        [ 'name' => 'Education & Training', 'type' => 'event' ],
+        [ 'name' => 'Arts & Culture', 'type' => 'event' ],
+        [ 'name' => 'Sports & Fitness', 'type' => 'event' ],
+        [ 'name' => 'Music & Entertainment', 'type' => 'event' ],
+        [ 'name' => 'Science & Innovation', 'type' => 'event' ],
 
-        $tags = [
-          "event",
-          "CloudTrends",
-          "DataSecurity",
-          "Techinnovation",
-          "ContainersAndCloud"
-        ];
+        // 🔹 Summit / Conference related
+        [ 'name' => 'Leadership Summit', 'type' => 'event' ],
+        [ 'name' => 'Startup & Investment', 'type' => 'event' ],
+        [ 'name' => 'Digital Marketing', 'type' => 'event' ],
+        [ 'name' => 'Sustainability & Environment', 'type' => 'event' ],
+        [ 'name' => 'AI & Machine Learning', 'type' => 'event' ],
+        [ 'name' => 'Blockchain & FinTech', 'type' => 'event' ],
+        [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
+        [ 'name' => 'Government & Policy', 'type' => 'event' ],
+        [ 'name' => 'Women in Leadership', 'type' => 'event' ],
+        [ 'name' => 'Global Innovation Forum', 'type' => 'event' ],
+    ];
 
+    $tracks = [
+                [ 'name' => 'Keynotes & Vision',            'slug' => 'keynotes-vision',            'type' => 'track' ],
+                [ 'name' => 'Leadership & Strategy',        'slug' => 'leadership-strategy',        'type' => 'track' ],
+                [ 'name' => 'Startup & Investment',         'slug' => 'startup-investment',         'type' => 'track' ],
+                [ 'name' => 'Product Management',           'slug' => 'product-management',         'type' => 'track' ],
+                [ 'name' => 'Design & UX',                  'slug' => 'design-ux',                  'type' => 'track' ],
+                [ 'name' => 'Engineering & Architecture',   'slug' => 'engineering-architecture',   'type' => 'track' ],
+                [ 'name' => 'AI & Machine Learning',        'slug' => 'ai-ml',                      'type' => 'track' ],
+                [ 'name' => 'Generative AI & LLMs',         'slug' => 'genai-llms',                 'type' => 'track' ],
+                [ 'name' => 'Data & Analytics',             'slug' => 'data-analytics',             'type' => 'track' ],
+                [ 'name' => 'MLOps & Model Ops',            'slug' => 'mlops-modelops',             'type' => 'track' ],
+                [ 'name' => 'Cloud & Infrastructure',       'slug' => 'cloud-infrastructure',       'type' => 'track' ],
+                [ 'name' => 'DevOps & Platform Eng',        'slug' => 'devops-platform',            'type' => 'track' ],
+                [ 'name' => 'Cybersecurity & Privacy',      'slug' => 'cybersecurity-privacy',      'type' => 'track' ],
+                [ 'name' => 'Blockchain & Web3',            'slug' => 'blockchain-web3',            'type' => 'track' ],
+                [ 'name' => 'FinTech & Payments',           'slug' => 'fintech-payments',           'type' => 'track' ],
+                [ 'name' => 'HealthTech & Bio',             'slug' => 'healthtech-bio',             'type' => 'track' ],
+                [ 'name' => 'EdTech & Learning',            'slug' => 'edtech-learning',            'type' => 'track' ],
+                [ 'name' => 'Retail & E-commerce',          'slug' => 'retail-ecommerce',           'type' => 'track' ],
+                [ 'name' => 'SaaS & B2B Growth',            'slug' => 'saas-b2b-growth',            'type' => 'track' ],
+                [ 'name' => 'Marketing & Growth',           'slug' => 'marketing-growth',           'type' => 'track' ],
+                [ 'name' => 'Sales & GTM',                  'slug' => 'sales-gtm',                  'type' => 'track' ],
+                [ 'name' => 'Customer Success',             'slug' => 'customer-success',           'type' => 'track' ],
+                [ 'name' => 'Sustainability & Climate',     'slug' => 'sustainability-climate',     'type' => 'track' ],
+                [ 'name' => 'GovTech & Policy',             'slug' => 'govtech-policy',             'type' => 'track' ],
+                [ 'name' => 'IoT & Edge',                   'slug' => 'iot-edge',                   'type' => 'track' ],
+                [ 'name' => 'Robotics & Automation',        'slug' => 'robotics-automation',        'type' => 'track' ],
+                [ 'name' => 'AR/VR & Spatial',              'slug' => 'ar-vr-spatial',              'type' => 'track' ],
+                [ 'name' => 'Mobile & Frontend',            'slug' => 'mobile-frontend',            'type' => 'track' ],
+                [ 'name' => 'Open Source',                  'slug' => 'open-source',                'type' => 'track' ],
+                [ 'name' => 'Women in Tech & DEI',          'slug' => 'women-tech-dei',             'type' => 'track' ],
+            ];
 
-        foreach ($tags as $tag) {
-            Category::create([
-                'name' => $tag,
-                'slug' => Str::slug($tag),
-                'type' => 'tags'
+         foreach ($tracks as $track) {
+            Track::create([
+                'name' => $track,
+                'slug' => Str::slug($track)
             ]);
         }
 
@@ -85,7 +120,7 @@ class TicketSystemSeeder extends Seeder
 
         // --- 7 past events ---
         for ($i = 1; $i <=1; $i++) {
-            $start = now();
+            $start = now()->subDay();
             $end   = (clone $start)->addYears(100);
 
             $events[] = [
@@ -177,18 +212,7 @@ class TicketSystemSeeder extends Seeder
 
         $events = Event::all();
         $boothIds = Booth::pluck('id')->toArray();
-        $calendarColors = [
-            '#FF6347', // Tomato (Vibrant Red)
-            '#00BFFF', // Deep Sky Blue (Bright Sky Blue)
-            '#32CD32', // Lime Green (Fresh Green)
-            '#FFD700', // Gold (Warm Amber)
-            '#8A2BE2', // Blue Violet (Bold Purple)
-            '#FF69B4', // Hot Pink (Bold Pink)
-            '#20B2AA', // Light Sea Green (Calm Teal)
-            '#FF8C00', // Dark Orange (Energetic Orange)
-            '#00CED1', // Dark Turquoise (Vibrant Cyan)
-            '#2F4F4F', // Dark Slate Gray (Subtle Dark Gray)
-        ];
+        $calendarColors = config('calendar.colors');
         foreach ($events as $event) {
             for ($i = 1; $i <= 30; $i++) {
                 for ($slot = 1; $slot <= 3; $slot++) { // 3 sessions per day
@@ -201,7 +225,23 @@ class TicketSystemSeeder extends Seeder
                     Session::create([
                         'event_id'    => $event->id,
                         'booth_id'    => $boothIds[array_rand($boothIds)], // assign booth from DB
-                        'title'       => "Session $start - $end ",
+                        'title'       =>  $faker->randomElement([
+                            'Future of Technology Summit',
+                            'AI & Machine Learning Workshop',
+                            'Digital Transformation Panel',
+                            'Healthcare Innovation Forum',
+                            'Women in Leadership Conference',
+                            'Blockchain & FinTech Meetup',
+                            'Global Sustainability Roundtable',
+                            'E-commerce Growth Strategies',
+                            'Startup & Investment Pitch Day',
+                            'Creative Arts & Culture Expo',
+                            'Sports Science Symposium',
+                            'Music & Entertainment Festival',
+                            'Education & Training Masterclass',
+                            'Science & Innovation Showcase',
+                            'Business & Entrepreneurship Bootcamp',
+                        ]),
                         'location'       =>$faker->city . ', ' . $faker->country,
                         'description' => $faker->paragraph(1),
                         'keynote' => $faker->paragraph(1),
