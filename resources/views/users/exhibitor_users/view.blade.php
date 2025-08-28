@@ -56,7 +56,7 @@
                             Back
                         </button>
                     </form>
-
+                
                     </div>
 
 
@@ -67,7 +67,7 @@
                             <ul class="list-unstyled">
                                 <li class="mb-3"><strong>Name:</strong> {{ $user->name }} {{ $user->lastname }}</li>
                                 <li class="mb-3"><strong>Email:</strong> {{ $user->email }}</li>
-                                <li class="mb-3"><strong>Mobile:</strong> {{ $user->mobile ?? '' }}</li>
+                                {{-- <li class="mb-3"><strong>Mobile:</strong> {{ $user->mobile ?? '' }}</li> --}}
                             </ul>
                         </div>
                             
@@ -81,10 +81,10 @@
                                 <button class="nav-link active" id="company-tab" data-bs-toggle="tab" 
                                         data-bs-target="#company" type="button" role="tab">Company</button>
                               </li>
-                              <li class="nav-item" role="presentation">
+                              {{-- <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="booth-tab" data-bs-toggle="tab" 
                                         data-bs-target="#booth" type="button" role="tab">Booth</button>
-                              </li>
+                              </li> --}}
                               <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="images-tab" data-bs-toggle="tab" 
                                         data-bs-target="#images" type="button" role="tab">Images</button>
@@ -119,23 +119,23 @@
                                          class="card-img-top mb-2" style="height: 100px; object-fit: cover;">
                                 @endif
 
-                                <p><strong>Name:</strong> </p>
+                                <p><strong>Name:</strong>{{ $company->name }} </p>
                                 <p><strong>Industry:</strong> {{ $company->industry }}</p>
                                 <p><strong>Size:</strong> {{ $company->size }}</p>
                                 <p><strong>Location:</strong> {{ $company->location }}</p>
                                 <p><strong>Email:</strong> {{ $company->email }}</p>
                                 <p><strong>Phone:</strong> {{ $company->phone }}</p>
-                                <p><strong>Certifications:</strong> {{ $company->certifications ?? '-' }}</p>
+                              
                                 
                             @else
                                 <p class="text-muted">No companies registered by this exhibitor.</p>
                             @endif
                               </div>
 
-                              <div class="tab-pane fade" id="booth" role="tabpanel">
+                              {{-- <div class="tab-pane fade" id="booth" role="tabpanel">
                                 <h3>Booth Details</h3>
                                 <p>This is the Profile tab content with padding.</p>
-                              </div>
+                              </div> --}}
 
                               <div class="tab-pane fade" id="images" role="tabpanel">
                                 <h3>Media Gallery</h3>

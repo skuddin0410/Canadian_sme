@@ -34,97 +34,109 @@
 }
 </style>
 
-<table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
+<table id="post-manager" 
+       class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
 	<tr>
+		<th>Content Icon</th>
 		<th>Name</th>
-		<th>Role</th>
-		<th>User name</th>
-		<th>Email</th>
-		<th>Mobile</th>
-		<th>Status</th>
-		{{-- <th>Referral coupon</th> --}}
-		<th>Created At</th>
-		<th width="8%">Action</th>
+		<th>Booth ID</th>
+		<th>QR</th> {{-- New QR Download column --}}
+		<th width="20%">Actions</th>
 	</tr>
 </thead>
+
 <tbody>	
-    @foreach($users as $user)
-    <tr>
-    	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th>{{!empty($user->roles) ? $user->roles[0]->name : ''}}</th>
-		<th style="text-transform:none">{{$user->username ?? ''}}</th>
-		<th style="text-transform:none">{{$user->email ?? ''}}</th>
-		<th>{{$user->mobile ?? ''}}</th>
-		<th>
-             @if($user->is_approve)
-                <span class="badge bg-success">Approved</span>
-             @else
-                <span class="badge bg-warning">Pending</span>
-             @endif
-       </th>
+@foreach($users as $user)
+<tr>
+	{{-- Content Icon --}}
+	<td>
+		@if($user->company && $user->company->content_icon)
+			<img src="{{ asset('storage/companies/'.$user->company->id.'/content_icon/'.$user->company->content_icon) }}" 
+			     alt="Content Icon" 
+			     width="40" height="40" 
+			     class="rounded">
+		@else
+			<span class="text-muted">-</span>
+		@endif
+	</td>
 
-		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}
-		<th>{{dateFormat($user->created_at) ?? '' }}</th>
-		<th>
-			<div class="row">
-			<div class="col-4 p-1">	
-				<a href="{{ route('exhibitor-users.show', ['exhibitor_user' => $user->id]) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
-            </div>
-		    <div class="col-4 p-1">	
-			<a href="{{ route('exhibitor-users.edit', ['exhibitor_user' => $user->id]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            </div>
-			 <!-- Representative Users Index -->
-        <div class="col-4 p-1">    
-            <a href="{{ route('representative-users.index', ['exhibitor_id' => $user->id]) }}" class="btn btn-sm btn-icon item-representative">
-                <i class="bx bxs-user-detail"></i>
-            </a>
-        </div>
+	{{-- Company Name --}}
+	<td>{{ $user->company->name ?? '-' }}</td>
 
-        <!-- Attendee Users Index (filtered by exhibitor) -->
-        <div class="col-4 p-1">    
-            <a href="{{ route('attendee-users.index', ['exhibitor_id' => $user->id]) }}" class="btn btn-sm btn-icon item-attendee">
-                <i class="bx bxs-group"></i>
-            </a>
-        </div>
+	{{-- Booth ID --}}
+	<td>{{ $user->company->booth->id ?? '-' }}</td>
+
+	{{-- Download QR --}}
+	<td>
 		
-       </th>
-	   
-	   
-	</tr>
-	@endforeach
-	@if(count($users) <=0)
-	    <tr>
-          <td colspan="14">No data available</td>
-        </tr>
-	@endif
+			<a href="" 
+			   class="btn btn-sm btn-primary" title="Download QR">
+				Download QR
+			</a>
+		
+	</td>
+
+	{{-- Actions --}}
+	<td>
+		<div class="d-flex flex-wrap gap-1">
+			<a href="{{ route('exhibitor-users.show', ['exhibitor_user' => $user->id]) }}" 
+			   class="btn btn-sm btn-icon item-show" title="Show">
+				<i class="bx bxs-show"></i>
+			</a>
+			<a href="{{ route('exhibitor-users.edit', ['exhibitor_user' => $user->id]) }}" 
+			   class="btn btn-sm btn-icon item-edit" title="Edit">
+				<i class="bx bxs-edit"></i>
+			</a>
+
+			{{-- Delete button --}}
+			<form action="{{ route('exhibitor-users.destroy', $user->id) }}" 
+			      method="POST" 
+			      onsubmit="return confirm('Are you sure you want to delete this Exhibitor?');">
+				@csrf
+				@method('DELETE')
+				<button type="submit" class="btn btn-sm btn-icon btn-danger" title="Delete">
+					<i class="bx bxs-trash"></i>
+				</button>
+			</form>
+		</div>
+	</td>
+</tr>
+@endforeach
+
+@if($users->count() <= 0)
+<tr>
+	<td colspan="5" class="text-center">No data available</td>
+</tr>
+@endif
 </tbody>
 </table>
+
+
 	<div class="text-xs-center">
-	    @if ($users->hasPages())
-	        <div class="custom_pagination">
-	            @if (!$users->onFirstpage())
-	                <a href="{{ $users->appends(request()->input())->url(1) }}" class="pagination-link">
-	                    <i class="bx bx-chevron-left"></i>
-	                    <i class="bx bx-chevron-left"></i>
-	                </a>
-	                <a href="{{ $users->appends(request()->input())->previousPageUrl() }}" class="pagination-link">
-	                    <i class="bx bx-chevron-left"></i>
-	                </a>
-	            @endif
+	   @if ($users->hasPages())
+    <div class="custom_pagination">
+        @if (!$users->onFirstPage())
+            <a href="{{ $users->appends(request()->input())->url(1) }}" class="pagination-link">
+                <i class="bx bx-chevron-left"></i><i class="bx bx-chevron-left"></i>
+            </a>
+            <a href="{{ $users->appends(request()->input())->previousPageUrl() }}" class="pagination-link">
+                <i class="bx bx-chevron-left"></i>
+            </a>
+        @endif
 
-	            <span class="page-count"> <a href="#"> Page {{ number_format($users->currentPage()) }} of
-	                    {{ number_format($users->lastPage()) }} </a></span>
-	            @if (!$users->onLastpage())
-	                <a href="{{ $users->appends(request()->input())->nextPageUrl() }}" class="pagination-link">
-	                    <i class="bx bx-chevron-right"></i>
+        <span class="page-count">
+            <a href="#"> Page {{ $users->currentPage() }} of {{ $users->lastPage() }} </a>
+        </span>
 
-	                </a>
-	                <a href="{{ $users->appends(request()->input())->url($users->lastPage()) }}" class="pagination-link">
-	                    <i class="bx bx-chevron-right"></i>
-	                    <i class="bx bx-chevron-right"></i>
-	                </a>
-	            @endif
-	        </div>
-	    @endif
-	</div>
+        @if (!$users->onLastPage())
+            <a href="{{ $users->appends(request()->input())->nextPageUrl() }}" class="pagination-link">
+                <i class="bx bx-chevron-right"></i>
+            </a>
+            <a href="{{ $users->appends(request()->input())->url($users->lastPage()) }}" class="pagination-link">
+                <i class="bx bx-chevron-right"></i><i class="bx bx-chevron-right"></i>
+            </a>
+        @endif
+    </div>
+@endif
+</div>

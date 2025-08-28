@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use DB;
+// use DB;
 use Carbon;
 // use Storage;
 use DataTables;
@@ -18,76 +18,81 @@ use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Storage;
 
 class ExhibitorUserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
 public function index(Request $request)
 {
     $perPage = (int) $request->input('perPage', 20);
     $pageNo = (int) $request->input('page', 1);
-    $offset = $perPage * ($pageNo - 1);
-  
-    $users = User::with("roles")
-        ->whereHas("roles", function ($q) {
-            $q->whereIn("name", ['Exhibitor']);
-        })
-        ->orderBy('created_at', 'DESC');
 
     
-    if ($request->filled('search')) {
-        $search = '%' . $request->search . '%';
-        $users = $users->where(function ($query) use ($search) {
-            $query->where('users.name', 'LIKE', $search)
-                  ->orWhere('users.username', 'LIKE', $search)
-                  ->orWhere('users.mobile', 'LIKE', $search)
-                  ->orWhere('users.email', 'LIKE', $search);
+    $query = User::with("roles" , "company")
+        ->whereHas("roles", function ($q) {
+            $q->where("name", "Exhibitor");
+        })
+        ->orderBy("created_at", "DESC");
+
+   
+    if ($request->filled("search")) {
+        $search = "%" . $request->search . "%";
+        $query->where(function ($q) use ($search) {
+            $q->where("users.name", "LIKE", $search)
+              ->orWhere("users.username", "LIKE", $search)
+              ->orWhere("users.mobile", "LIKE", $search)
+              ->orWhere("users.email", "LIKE", $search);
         });
     }
 
-    // Filter by created_at date range if given
-    if ($request->filled('start_at') && $request->filled('end_at')) {
-        $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
+   
+    if ($request->filled("start_at") && $request->filled("end_at")) {
+        $query->whereBetween("created_at", [$request->start_at, $request->end_at]);
     }
 
-    // Clone for count
-    $usersCount = clone $users;
-    $totalRecords = $usersCount->count();
+   
+    $users = $query->paginate($perPage, ["*"], "page", $pageNo);
 
-    // Pagination
-    $users = $users->offset($offset)->limit($perPage)->get();
+   
+    $users->appends($request->all());
 
-    // Convert to LengthAwarePaginator for proper pagination links
-    $users = new \Illuminate\Pagination\LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
-        'path'  => $request->url(),
-        'query' => $request->query(),
-    ]);
+   
+    $offset = ($users->currentPage() - 1) * $perPage;
 
-    $data['offset'] = $offset;
-    $data['pageNo'] = $pageNo;
-    $users->setPath(route('exhibitor-users.index'));
     
-    // Return AJAX response with HTML partial
     if ($request->ajax() && $request->ajax_request == true) {
-        $data['html'] = view('users.exhibitor_users.table', compact('users', 'perPage'))
-            ->with('i', $offset)
+        $html = view("users.exhibitor_users.table", compact("users", "perPage"))
+            ->with("i", $offset)
             ->render();
 
-        return response()->json($data);
+        return response()->json([
+            "html"   => $html,
+            "offset" => $offset,
+            "pageNo" => $users->currentPage(),
+            "total"  => $users->total(),
+        ]);
     }
 
-    // Normal page load
-    return view('users.exhibitor_users.index', ["kyc" => ""]);
+    
+    return view("users.exhibitor_users.index", [
+        "users"  => $users,
+        "perPage" => $perPage,
+        "offset" => $offset,
+        "kyc"    => "",
+    ]);
 }
+
 
 
     /**
@@ -104,17 +109,19 @@ public function index(Request $request)
      */
     public function store(Request $request)
     {
-        //
+        
          $validator = Validator::make($request->all(), [
           
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
-            'mobile' => 'required|string|digits:10|unique:users,mobile',
             'company_name'          => 'required|string|max:255',
             'company_email'         => 'required|email|max:255',
             'company_phone'         => 'required|string|max:20',
-            'company_description'   => 'nullable|string'
+            'company_description'   => 'nullable|string',
+            'website'       => 'required|url',
+            'linkedin'      => 'nullable|url',
+            'twitter'       => 'nullable|url',
+            'facebook'      => 'nullable|url',
+            'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
 
 
         ]);
@@ -123,36 +130,68 @@ public function index(Request $request)
                 ->withErrors($validator);
         }
 
+       DB::beginTransaction();
+       try {
+  
+    $user = User::create([
+        'name'       => $request->company_name,
+        'email'      => $request->company_email,
+        'password'   => Hash::make('password'),
+    ]);
+    $user->assignRole('Exhibitor');
+
+    
+    $company = Company::create([
+        'user_id'     => $user->id,
+        'name'        => $request->company_name,
+        'email'       => $request->company_email,
+        'phone'       => $request->company_phone,
+        'description' => $request->company_description,
+        'website'     => $request->website,
+        'linkedin'    => $request->linkedin,
+        'twitter'     => $request->twitter,
+        'facebook'    => $request->facebook,
+    ]);
+
    
-        $user = new User();
-        $user->name = $request->first_name;
-        $user->lastname = $request->last_name;
-        $user->email = $request->email;
-        $user->mobile = $request->mobile;
-        $user->save();
-        $user->assignRole('Exhibitor');
+    $user->company_id = $company->id;
+    $user->save();
+       if ($request->file("content_icon")) {
+        $this->imageUpload(
+        $request->file("content_icon"),
+        'content_icon',
+        $company->id,
+        'companies',
+        'content_icon'
+        );
+    } 
 
-        $company = Company::create(
-                [
-                'user_id'      => $user->id,
-                'name'         => $request->company_name,
-                'email'        => $request->company_email,
-                'phone'        => $request->company_phone,
-                'description'  => $request->company_description,
-               ]
-          );
+    if ($request->file("quick_link_icon")) {
+    $this->imageUpload(
+        $request->file("quick_link_icon"),
+        'quick_link_icon',
+        $company->id,
+        'companies',
+        'quick_link_icon'
+    );
+    }
 
-         $user->company_id = $company->id;
-         $user->save();
 
-        
-        return redirect(route('exhibitor-users.index'))
-            ->withSuccess('Exhibitor User data has been saved successfully');
+    DB::commit();
+
+    return redirect(route('exhibitor-users.index'))
+        ->withSuccess('Exhibitor Created');
+    }   catch (\Exception $e) {
+    DB::rollBack();
+    return redirect(route('exhibitor-users.create'))
+        ->withInput()
+        ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
+     }
 
     }
 
 
-        public function show(User $exhibitor_user, Request $request)
+    public function show(User $exhibitor_user, Request $request)
         {   
             
             $company = Company::with(['certificationFile', 'logoFile', 'mediaGallery', 'videos'])
