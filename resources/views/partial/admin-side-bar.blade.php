@@ -21,19 +21,19 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }} {{ request()->is('registration-settings*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Registration</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
-                    <a href="{{ route("events.edit",["event"=> 1 ]) }}" class="menu-link">
+                <li class="menu-item {{ request()->is('registration-settings*') ? 'active' : '' }}">
+                    <a href="{{ route("registration-settings") }}" class="menu-link">
                         <div data-i18n="events">Registration Settings</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('form-builder*') ? 'active' : '' }}">
                     <a href="{{ route('form-builder.index') }}" class="menu-link">
                         <div data-i18n="events">Registration Forms</div>
                     </a>
