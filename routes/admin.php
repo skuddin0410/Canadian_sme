@@ -13,7 +13,6 @@ use App\Http\Controllers\ExhibitorAdmin\BoothController;
 use App\Http\Controllers\EventTrackController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
-    Route::resource('banners', App\Http\Controllers\BannerController::class);
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
     Route::resource('coupons', App\Http\Controllers\CouponController::class);
