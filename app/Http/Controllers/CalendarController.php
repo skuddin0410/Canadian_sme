@@ -96,7 +96,7 @@ class CalendarController extends Controller
                 'end' => $session->end_time->toISOString(),
                 'backgroundColor' =>  $session->color,
                 'borderColor' =>  $session->color,
-                'textColor' => '#ffffff',
+                'textColor' => '#000000',
                 'description' => $session->description,
                 'location' => $session->location,
                 'track' => $session->track,

@@ -97,7 +97,7 @@ class LaravelEventCalendar {
                     // Works with FC v5/v6 CSS variables
                     info.el.style.setProperty('--fc-event-bg-color', color);
                     info.el.style.setProperty('--fc-event-border-color', color);
-                    info.el.style.setProperty('--fc-event-text-color', '#fff');
+                    info.el.style.setProperty('--fc-event-text-color', '#000000');
                   }
             }
         });
@@ -248,7 +248,7 @@ class LaravelEventCalendar {
                 end: session.end,
                 backgroundColor: session.backgroundColor,
                 borderColor: session.borderColor,
-                textColor: '#fff', // better contrast
+                textColor: session.textColor, // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
@@ -263,7 +263,7 @@ class LaravelEventCalendar {
                     type:session.extendedProps.type,
                     backgroundColor: session.borderColor,
                     borderColor: session.borderColor,
-                    textColor: '#fff', // better contrast
+                    textColor: session.textColor, // better contrast
                     track: session.track, 
                     location: session.location,
                     keynote: session.keynote,
@@ -625,7 +625,7 @@ class LaravelEventCalendar {
                 end: session.end,
                 backgroundColor: session.color,
                 borderColor: session.color,
-                textColor: '#fff', // better contrast
+                textColor: session.textColor, // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
@@ -640,7 +640,7 @@ class LaravelEventCalendar {
                     type:session.extendedProps.type,
                     backgroundColor: session.color,
                     borderColor: session.color,
-                    textColor: '#fff', // better contrast
+                    textColor: session.textColor, // better contrast
                     track: session.track, 
                     location: session.location,
                     keynote: session.keynote,
@@ -664,7 +664,7 @@ class LaravelEventCalendar {
                 end: session.end,
                 backgroundColor: session.color,
                 borderColor: session.color,
-                textColor: '#fff', // better contrast
+                textColor: session.textColor, // better contrast
                 description: session.description,
                 extendedProps: {
                     description: session.extendedProps.description,
@@ -680,7 +680,7 @@ class LaravelEventCalendar {
                     type:session.extendedProps.type,
                     backgroundColor: session.color,
                     borderColor: session.color,
-                    textColor: '#fff', // better contrast
+                    textColor: session.textColor, // better contrast
                     track: session.track, 
                     location: session.location,
                     keynote: session.keynote,
@@ -853,7 +853,7 @@ class LaravelEventCalendar {
                 end: session.end,
                 backgroundColor: session.color,
                 borderColor: session.color,
-                textColor: '#fff', // better contrast
+                textColor: session.textColor, // better contrast
                 color: session.color,
                 extendedProps: {
                     description: session.extendedProps.description,
@@ -869,7 +869,7 @@ class LaravelEventCalendar {
                     type:session.extendedProps.type,
                     backgroundColor: session.color,
                     borderColor: session.color,
-                    textColor: '#fff', // better contrast
+                    textColor: session.textColor, // better contrast
                     track: session.track, 
                     location: session.location,
                     keynote: session.keynote,
