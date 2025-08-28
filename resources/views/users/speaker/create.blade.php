@@ -5,6 +5,51 @@
 @endsection
 
 @section('content')
+<style>
+  /* Style for the drag-and-drop area (the square box with dashed circle border) */
+.image-upload-area {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 300px;
+  border-radius: 10px; /* rounded corners for the square box */
+  border: 3px dashed #007bff; /* dashed border for drag-and-drop look */
+  background-color: #f9f9f9;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+/* Image Preview inside the drop area */
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Hover effect for drag-and-drop area */
+.image-upload-area:hover {
+  background-color: #e9f7ff; /* light blue background on hover */
+  border-color: #0056b3; /* darker blue dashed border on hover */
+}
+
+/* Dot effect when no image is uploaded */
+.image-upload-area::before {
+  content: '⭕
+
+   Drag & Drop';
+  font-size: 1rem;
+  color: #007bff;
+  position: absolute;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+</style>
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">Speaker/</span>Create</h4>
   <div class="row">
@@ -31,16 +76,22 @@
              @method('PUT')
             @endif
             <div class="row">
-             <div class="text-left">
-              <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
-              <label for="profileImageInput">
-                <img id="profileImagePreview" 
-                     src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
-                     class="rounded-circle border border-2" 
-                     style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
-              </label>
-              <p class="mt-2 text-muted">Click image to upload</p>
-            </div>
+            <div class="text-left">
+  <!-- Hidden File Input -->
+  <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
+
+  <!-- Label with Image Preview -->
+  <label for="profileImageInput" class="image-upload-area">
+    <img id="profileImagePreview" 
+         src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
+         class="image-preview" 
+         style=" object-fit: cover;">
+  </label>
+
+  <!-- Text below image -->
+  <p class="mt-2 text-muted">Click image to upload</p>
+</div>
+
              
             <div class="col-6">
                 <div class="mb-3">
@@ -114,19 +165,17 @@
                 </div>
               </div>
 
-              <div class="col-6">
+             
+               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="tags">Tags</label>
+                  <label class="form-label" for="company">Company</label>
                   <div class="input-group input-group-merge">
-                    <span id="tags-icon" class="input-group-text">
-                      <i class="bx bx-purchase-tag"></i>
-                    </span>
-                    <input type="text" class="form-control" name="tags" id="tags"
-                      value="{{$user->tags ?? old('tags') }}" data-role="tagsinput"
-                      placeholder="Add tags (comma separated)" />
+                    <span class="input-group-text"><i class="bx bx-book"></i></span>
+                    <input type="text" class="form-control" name="company" id="company"
+                      value="{{$user->company ?? old('company') }}" />
                   </div>
-                  @if ($errors->has('tags'))
-                  <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
+                  @if ($errors->has('company'))
+                  <span class="text-danger">{{ $errors->first('company') }}</span>
                   @endif
                 </div>
               </div>
@@ -183,6 +232,7 @@
                 </div>
               </div>
 
+
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label" for="instagram">Instagram</label>
@@ -224,8 +274,6 @@
           </div>
           </form>
         </div>
-
-      </div>
     </div>
   </div>
 </div>

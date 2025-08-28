@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use App\Models\Track;
+use Illuminate\Support\Facades\DB;
 
 class CalendarController extends Controller
 {
@@ -33,14 +35,14 @@ class CalendarController extends Controller
         $sponsors = User::whereHas("roles", function ($q) {
                     $q->where("name", 'Sponsors');
                 })->orderBy('created_at', 'DESC')->get();
-        
-        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths'));
+        $tracks = Track::orderBy('created_at', 'DESC')->get();
+        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths','tracks'));
     }
 
     public function speakers(Request $request)
     {
 
-        $speakers = User::select('id','name')->whereHas("roles", function ($q) {
+        $speakers = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Speaker']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
@@ -50,7 +52,7 @@ class CalendarController extends Controller
     public function exhibitors(Request $request)
     {
 
-        $exhibitors = User::select('id','name')->whereHas("roles", function ($q) {
+        $exhibitors = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Exhibitor']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($exhibitors);
@@ -60,7 +62,7 @@ class CalendarController extends Controller
     public function sponsors(Request $request)
     {
 
-        $sponsors = User::select('id','name')->whereHas("roles", function ($q) {
+        $sponsors = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Sponsors']);
                 })->orderBy('created_at', 'DESC')->get();
         return response()->json($sponsors);
@@ -73,9 +75,8 @@ class CalendarController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
 
-        $query = Session::with(['booth', 'speakers','exhibitors','sponsors'])
-            ->where('event_id', $eventId)
-            ->where('status', 'published');
+        $query = Session::with(['speakers','exhibitors','sponsors','photo'])
+            ->where('event_id', $eventId);
 
         if ($start && $end) {
             $query->whereBetween('start_time', [
@@ -95,51 +96,55 @@ class CalendarController extends Controller
                 'end' => $session->end_time->toISOString(),
                 'backgroundColor' =>  $session->color,
                 'borderColor' =>  $session->color,
-                'textColor' => '#ffffff',
+                'textColor' => '#000000',
                 'description' => $session->description,
                 'location' => $session->location,
                 'track' => $session->track,
                 'type' => $session->type,
-                'venue' => !empty($session->booth) ? $session->booth->title : 'No Booth' ,
-                'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
-                'capacity' => $session->capacity,
+                'venue' => '' ,
+                'venue_id' => '' ,
+                'capacity' => '',
                 'duration' => $session->getDurationInMinutes(),
                 'keynote' => $session->keynote,
                 'demoes' => $session->demoes,
                 'panels' => $session->panels,
+                'img'=> !empty($session->photo) ? $session->photo->file_path : '',
+                'img_id'=> !empty($session->photo) ? $session->photo->id : '',
 
                 'extendedProps' => [
                     'description' => $session->description,
                     'type' => $session->type,
-                    'venue' => !empty($session->booth) ? $session->booth->title .'('. $session->booth->booth_number .')': 'No Booth' ,
-                    'venue_id' => !empty($session->booth) ? $session->booth->id : null ,
+                    'venue' => $session->location ,
+                    'venue_id' => '' ,
                     'speakers' => $session->speakers->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->full_name,
+                            'name' => $speaker->name.' '.$speaker->lastname,
                             'role' => $speaker->pivot->role
                         ];
                     }),
                     'sponsors' => $session->sponsors->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->full_name,
+                            'name' => $speaker->name.' '.$speaker->lastname,
                             'role' => $speaker->pivot->role
                         ];
                     }),
                     'exhibitors' => $session->exhibitors->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
-                            'name' => $speaker->full_name,
+                            'name' => $speaker->name.' '.$speaker->lastname,
                             'role' => $speaker->pivot->role
                         ];
                     }),
-                    'capacity' => $session->capacity,
+                    'capacity' => '',
                     'duration' => $session->getDurationInMinutes(),
                     'status' => $session->status,
                     'keynote' => $session->keynote,
                     'demoes' => $session->demoes,
                     'panels' => $session->panels,
+                    'img'=> !empty($session->photo) ? $session->photo->file_path : '',
+                    'img_id'=> !empty($session->photo) ? $session->photo->id : '',
                 ]
             ];
         });
@@ -149,13 +154,27 @@ class CalendarController extends Controller
 
     public function createSession(Request $request): JsonResponse
     {   
+       
         $speakerIds = collect($request->all())
         ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
         ->values()
         ->all();
 
+        $exhibitorIds = collect($request->all())
+        ->filter(fn($value, $key) => str_starts_with($key, 'exhibitor_ids['))
+        ->values()
+        ->all();
+
+        $sponsorIds = collect($request->all())
+        ->filter(fn($value, $key) => str_starts_with($key, 'sponsor_ids['))
+        ->values()
+        ->all();
+         $calendarColors = config('calendar.colors');
         $request->merge([
-         'speaker_ids' => $speakerIds
+         'speaker_ids' =>  $speakerIds,
+         'exhibitor_ids'=> $exhibitorIds,
+         'sponsor_ids'=>   $sponsorIds,
+         'color'=> $calendarColors[array_rand( config('calendar.colors'))]
         ]);
 
 
@@ -164,10 +183,8 @@ class CalendarController extends Controller
             'title' => 'required|string|max:255',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'booth_id' => 'required|exists:booths,id',
-            'type' => 'required|in:presentation,workshop,panel,break,networking',
+            'track' => 'required',
             'description' => 'nullable|string',
-            'capacity' => 'required|integer|min:1',
             'speaker_ids' => 'required|array',
             'speaker_ids.*' => 'exists:users,id'
         ]);
@@ -194,8 +211,12 @@ class CalendarController extends Controller
             }
         }
 
-        $session = Session::create($request->except(['speaker_ids']));
-        
+        $session = Session::create($request->except(['speaker_ids','exhibitor_ids','sponsor_ids']));
+
+       
+        if($request->session_image){
+          $this->imageBase64Upload($request->session_image,'event_sessions',$session->id,'event_sessions','photo',$session->id); 
+        }
         // Attach speakers if provided
         if ($speakerIds) {
             foreach ($speakerIds as $index => $speakerId) {
@@ -203,7 +224,19 @@ class CalendarController extends Controller
             }
         }
 
-        $session->load(['booth', 'speakers','exhibitors','sponsors']);
+        if ($exhibitorIds) {
+            foreach ($exhibitorIds as $index => $exhibitorId) {
+                $session->exhibitors()->attach($exhibitorId);
+            }
+        }
+
+        if ($sponsorIds) {
+            foreach ($sponsorIds as $index => $sponsorId) {
+                $session->sponsors()->attach($sponsorId);
+            }
+        }
+
+        $session->load(['speakers','exhibitors','sponsors','photo']);
 
         return response()->json([
             'message' => 'Session created successfully',
@@ -212,29 +245,42 @@ class CalendarController extends Controller
     }
 
     public function updateSession(Request $request, Session $session): JsonResponse
-    {   
+    {    
+        
         $speakerIds = collect($request->all())
         ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
         ->values()
         ->all();
 
+        $exhibitorIds = collect($request->all())
+        ->filter(fn($value, $key) => str_starts_with($key, 'exhibitor_ids['))
+        ->values()
+        ->all();
+
+        $sponsorIds = collect($request->all())
+        ->filter(fn($value, $key) => str_starts_with($key, 'sponsor_ids['))
+        ->values()
+        ->all();
+ 
         $request->merge([
-         'speaker_ids' => $speakerIds
+         'speaker_ids' =>  $speakerIds,
+         'exhibitor_ids'=> $exhibitorIds,
+         'sponsor_ids'=>   $sponsorIds,
         ]);
 
         $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'start_time' => 'sometimes|required|date',
-            'end_time' => 'sometimes|required|date|after:start_time',
-            'booth_id' => 'nullable|exists:booths,id',
-            'type' => 'sometimes|required|in:presentation,workshop,panel,break,networking',
+            'event_id' => 'required|exists:events,id',
+            'title' => 'required|string|max:255',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+            'track' => 'required',
             'description' => 'nullable|string',
-            'capacity' => 'nullable|integer|min:1',
-            'status' => 'sometimes|in:draft,published,cancelled'
+            'speaker_ids' => 'required|array',
+            'speaker_ids.*' => 'exists:users,id'
         ]);
 
         // Check for venue conflicts if venue or time is being updated
-        if (($request->has('booth_id') || $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
+        if (( $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
             $startTime = $request->start_time ?? $session->start_time;
             $endTime = $request->end_time ?? $session->end_time;
             
@@ -258,8 +304,14 @@ class CalendarController extends Controller
                 ], 422);
             }
         }
-      
+        
         $session->update($request->all());
+
+        if($request->session_image){
+          $this->imageBase64Upload($request->session_image,'event_sessions',$session->id,'event_sessions','photo',$session->id); 
+        }
+        
+
         $session->speakers()->detach();
         if ($speakerIds) {
             foreach ($speakerIds as $index => $speakerId) {
@@ -268,7 +320,23 @@ class CalendarController extends Controller
             }
         }
 
-        $session->load(['booth', 'speakers']);
+        $session->exhibitors()->detach();
+        if ($exhibitorIds) {
+            foreach ($exhibitorIds as $index => $exhibitorId) {
+                $session->exhibitors()->detach($exhibitorId);
+                $session->exhibitors()->attach($exhibitorId);
+            }
+        }
+
+        $session->sponsors()->detach();
+        if ($sponsorIds) {
+            foreach ($sponsorIds as $index => $sponsorId) {
+                $session->sponsors()->detach($sponsorId);
+                $session->sponsors()->attach($sponsorId);
+            }
+        }
+      
+        $session->load(['speakers','exhibitors','sponsors','photo']);
 
         return response()->json([
             'message' => 'Session updated successfully',

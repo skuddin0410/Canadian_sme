@@ -10,6 +10,7 @@ use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
+use App\Http\Controllers\EventTrackController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::resource('banners', App\Http\Controllers\BannerController::class);
@@ -28,7 +29,11 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::post('/delete/photo', [App\Http\Controllers\EventController::class, 'removePhoto'])->name('events.removePhoto');
     Route::resource('events', App\Http\Controllers\EventController::class);
     
-
+    Route::get('/event-tracks', [EventTrackController::class, 'index'])->name('event-tracks.index');
+    // Show form to create a new event track (modal can trigger this)
+    Route::get('/event-tracks/create', [EventTrackController::class, 'create'])->name('event-tracks.create');
+    // Store new event track
+    Route::post('/event-tracks', [EventTrackController::class, 'store'])->name('event-tracks.store');
 
     Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
     Route::post('/assign-permission', [App\Http\Controllers\RoleController::class, 'assignPermission'])->name('roles.assign.permission');
