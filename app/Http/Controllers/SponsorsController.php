@@ -28,60 +28,61 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class SponsorsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $perPage = (int) $request->input('perPage', 20);
-        $pageNo = (int) $request->input('page', 1);
-        $offset = $perPage * ($pageNo - 1);
-        $search = $request->input('search', '');
-        $kyc = $request->input('kyc', '');
-        if ($request->ajax() && $request->ajax_request == true) {
-        $users = User::with("roles")->whereHas("roles", function ($q) {
-            $q->whereIn("name", ['Sponsors']);
-            })->orderBy('created_at', 'DESC');
+   
+public function index(Request $request)
+{
+    $perPage = (int) $request->input('perPage', 20);
+    $pageNo  = (int) $request->input('page', 1);
 
- 
-            if ($request->filled('search')) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('username', 'LIKE', '%' . $request->search . '%')
-                        //   ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('email', 'LIKE', '%' . $request->search . '%');
-                });
-            }
+    
+    $query = Company::with('user')
+        ->where('is_sponsor', true)
+        ->orderBy('created_at', 'DESC');
 
-            // Filters (triggered by filter button, add your filter logic here)
-            if ($request->filled('start_at') && $request->filled('end_at')) {
-                $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
-            }
-            
-            if ($request->has('exhibitor_id')) {
-                $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
-            }
-                     
-         
-            $usersCount = clone $users;
-            $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
-            $users = $users->offset($offset)->limit($perPage)->get();
-            $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
-                'path'  => $request->url(),
-                'query' => $request->query(),
-            ]);
-            $data['offset'] = $offset;
-            $data['pageNo'] = $pageNo;
-            $users->setPath(route('users.index'));
-            $data['html'] = view('users.sponsors.table', compact('users', 'perPage'))
-                ->with('i', $pageNo * $perPage)
-                ->render();
-
-            return response($data);
-        }
-
-        return view('users.sponsors.index', ["kyc" => ""]);
+   
+    if ($request->filled("search")) {
+        $search = "%" . $request->search . "%";
+        $query->where(function ($q) use ($search) {
+            $q->where("companies.name", "LIKE", $search)
+              ->orWhere("companies.email", "LIKE", $search)
+              ->orWhere("companies.phone", "LIKE", $search)
+              ->orWhere("companies.industry", "LIKE", $search);
+        });
     }
+
+    
+    if ($request->filled("start_at") && $request->filled("end_at")) {
+        $query->whereBetween("created_at", [$request->start_at, $request->end_at]);
+    }
+
+    
+    $companies = $query->paginate($perPage, ["*"], "page", $pageNo);
+    $companies->appends($request->all());
+
+    $offset = ($companies->currentPage() - 1) * $perPage;
+
+   
+    if ($request->ajax() && $request->ajax_request == true) {
+        $html = view("users.sponsors.table", compact("companies", "perPage"))
+            ->with("i", $offset)
+            ->render();
+
+        return response()->json([
+            "html"   => $html,
+            "offset" => $offset,
+            "pageNo" => $companies->currentPage(),
+            "total"  => $companies->total(),
+        ]);
+    }
+
+    
+    return view("users.sponsors.index", [
+        "companies" => $companies,
+        "perPage"   => $perPage,
+        "offset"    => $offset,
+    ]);
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -94,100 +95,103 @@ class SponsorsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //     'first_name' => 'required|string|max:255',
-    //     'last_name' => 'required|string|max:255',
-    //     'email' => 'required|string|max:255|email|unique:users,email',
-    //     'designation' => 'nullable|string|max:255',
-    //     'tags' => 'nullable|string|max:255',
-    //     'website_url' => 'nullable|string|max:255',
-    //     'linkedin_url' => 'nullable|string|max:255',
-    //     'instagram_url' => 'nullable|string|max:255',
-    //     'facebook_url' => 'nullable|string|max:255',
-    //     'twitter_url' => 'nullable|string|max:255',
-    //     'mobile' => 'required|string|digits:10|unique:users,mobile',
-    //     'user_type' => 'required|string',
-    //     'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-    //     'bio' => 'string|string|max:500',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return redirect(route('sponsors.create'))->withInput()
-    //             ->withErrors($validator);
-    //     }
-
-    //     $user = new User();
-    //     $user->name = $request->first_name;
-    //     $user->lastname = $request->last_name;
-    //     $user->email = $request->email;
-    //     $user->designation = $request->designation;
-    //     $user->tags = $request->tags;
-    //     $user->website_url = $request->website_url;
-    //     $user->linkedin_url = $request->linkedin_url;
-    //     $user->instagram_url = $request->linkedin_url;
-    //     $user->facebook_url = $request->facebook_url;
-    //     $user->twitter_url = $request->twitter_url;
-    //     $user->mobile = $request->mobile;
-    //     $user->bio=$request->bio;
-    //     $user->save();
-    //     $user->assignRole($request->user_type);
-           
-    //     if ($request->hasFile('image')) {
-    //       $this->imageUpload($request->file("image"),"users",$user->id,'users','photo');
-    //     }
-    //     return redirect(route('sponsors.index'))
-    //         ->withSuccess('Sponsors data has been saved successfully');
-
-    // }
-    public function store(Request $request){
+    public function store(Request $request)
+    {
+        
          $validator = Validator::make($request->all(), [
-        'name'     => 'required|string|max:255',
-        'industry' => 'required|string|max:255',
-        'size'     => 'required|string|max:255',
-        'location' => 'required|string|max:255',
-        'email'    => 'required|email|unique:users,email',
-        'phone'    => 'required|string|max:20',
-        'website'  => 'required|url',
-        'logo'     => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+          
+            'company_name'          => 'required|string|max:255',
+            'company_email'         => 'required|email|max:255',
+            'company_phone'         => 'required|string|max:20',
+            'company_description'   => 'nullable|string',
+            'website'       => 'nullable|url',
+            'linkedin'      => 'nullable|url',
+            'twitter'       => 'nullable|url',
+            'facebook'      => 'nullable|url',
+            'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'banner'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+
+
+        ]);
+        if ($validator->fails()) {
+            return redirect(route('sponsors.create'))->withInput()
+                ->withErrors($validator);
+        }
+
+       DB::beginTransaction();
+       try {
+  
+    $user = User::create([
+        'name'       => $request->company_name,
+        'email'      => $request->company_email,
+        'password'   => Hash::make('password'),
+    ]);
+    $user->assignRole('Sponsors');
+
+    
+    $company = Company::create([
+        'user_id'     => $user->id,
+        'name'        => $request->company_name,
+        'email'       => $request->company_email,
+        'is_sponsor' => true,
+        'phone'       => $request->company_phone,
+        'description' => $request->company_description,
+        'website'     => $request->website,
+        'linkedin'    => $request->linkedin,
+        'twitter'     => $request->twitter,
+        'facebook'    => $request->facebook,
+
     ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
-    }
-
-    // Step 1: Create Company
-    $company = new Company();
-    $company->fill($request->only(['name', 'industry', 'size', 'location', 'email', 'phone', 'website']));
-    $company->save();
-
-    // Upload logo
-    if ($request->hasFile('logo')) {
-        $this->imageUpload($request->file('logo'), 'logo', $company->id, 'companies', 'logo');
-    }
-
-    // Step 2: Create User linked to this company
-    $user = new User();
-    $user->name       = $company->name;
-    $user->email      = $company->email;
+   
     $user->company_id = $company->id;
-    $user->password   = bcrypt(Str::random(10)); // random password
     $user->save();
+       if ($request->file("logo")) {
+        $this->imageUpload(
+        $request->file("logo"),
+        'logo',
+        $company->id,
+        'companies',
+        'logo'
+        );
+    } 
 
-    $user->assignRole('Sponsor');
+    if ($request->file("banner")) {
+    $this->imageUpload(
+        $request->file("banner"),
+        'banner',
+        $company->id,
+        'companies',
+        'banner'
+    );
+    }
+    qrCode($user->id);
 
-    return redirect()->route('sponsors.index')->with('success', 'Sponsor and Company created successfully.');
+
+    DB::commit();
+
+    return redirect(route('sponsors.index'))
+        ->withSuccess('Sponsor Created');
+    }   catch (\Exception $e) {
+    DB::rollBack();
+    return redirect(route('sponsors.create'))
+        ->withInput()
+        ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
+     }
+
     }
 
+
+    
+   
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        $user = User::findOrFail($id); // ensures fresh data
-        $user->load('photo');
-        return view('users.sponsors.view', compact('user'));
+        $company = Company::findOrFail($id); // ensures fresh data
+        $company->load('logo' , 'banner');
+        return view('users.sponsors.view', compact('company'));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Booth;
 use App\Models\Drive;
+use App\Models\BoothUser;
 use App\Traits\Auditable;
 use App\Models\CompanyContact;
 use App\Traits\AutoHtmlDecode;
@@ -16,8 +17,11 @@ class Company extends Model
     use  Auditable;
     use AutoHtmlDecode;
     protected $fillable = [
-        'user_id','name', 'industry', 'size', 'location', 'email', 'phone',
-        'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image'
+        'user_id','name', 'industry', 'size', 'booth_id', 'location', 'email', 'phone',
+        'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image','is_sponsor'
+    ];
+    protected $casts = [
+        'is_sponsor' => 'boolean',
     ];
    public function contacts()
     {
@@ -47,7 +51,18 @@ public function quickLinkIconFile()
         ->where('table_type', 'companies')
         ->where('file_type', 'quick_link_icon');
 }
-
+public function logo()
+{
+    return $this->hasOne(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'companies')
+        ->where('file_type', 'logo');
+}
+public function banner()
+{
+    return $this->hasOne(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'companies')
+        ->where('file_type', 'banner');
+}
 
 
     public function logoFile()
@@ -77,6 +92,30 @@ public function quickLinkIconFile()
    {
     return $this->belongsTo(Product::class,'company_id');
    }
+    // public function booths()
+    // {
+    //     return $this->hasMany(Booth::class, 'company_id');
+    // }
+//     public function booth()
+// {
+//     return $this->belongsTo(Booth::class);
+// }
+public function boothUsers()
+{
+    return $this->hasMany(BoothUser::class);
+}
+public function booths()
+{
+    return $this->hasManyThrough(
+        Booth::class,   // Target
+        BoothUser::class, // Pivot
+        'company_id',    // Foreign key on BoothUser
+        'id',            // Foreign key on Booth
+        'id',            // Local key on Company
+        'booth_id'       // Local key on BoothUser
+    );
+}
+
 
 
 }

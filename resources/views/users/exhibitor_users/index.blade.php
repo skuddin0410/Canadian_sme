@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin | Exhibitor Users
+    Admin | Exhibitor
 @endsection
 
 @section('content')
 <div class="container flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light"> Exhibitor User/</span>Lists</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light"> Exhibitor/</span>Lists</h4>
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
 				<div class="card-header d-flex justify-content-between align-items-center">
-				    <h5 class="mb-0"> Exhibitor User List</h5>
+				    <h5 class="mb-0"> Exhibitor List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
                          @if(Auth::user()->hasRole('Admin')  ||  Auth::user()->hasRole('Admin') )
 

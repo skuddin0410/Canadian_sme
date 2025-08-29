@@ -1,6 +1,5 @@
 <style>
 .custom_pagination {
-  /* display: inline-block; */
   float: right;
   margin: 10px;
 }
@@ -10,106 +9,105 @@
   padding: 8px 16px;
   text-decoration: none;
   border: 1px solid transparent;
-
+  border-radius: 7px;
+}
+.custom_pagination a.pagination-link {
+  box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
+  margin: 10px 2px;
+  font-size: 12px;
+  font-weight: 300;
 }
 .custom_pagination a.pagination-link:hover {
   background: linear-gradient(90deg, #F5286E 0%, #FC6D43 100%);
   color: #FFF;
-
-}
-.custom_pagination a {
-  color: #78818b;
-  border-radius: 7px;
-
-}
-.custom_pagination a.pagination-link {
-  box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
-  margin: 10px 2px 10px 2px;
-  font-size: 12px;
-  font-weight: 300;
 }
 .page-count a {
   border: none;
-  margin: 10px 0 10px 0;
+  margin: 10px 0;
 }
 </style>
-<table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
-<thead>
-	<tr>
-		<th>Name</th>
-		<th>Role</th>
-		<th>Email</th>
-		<th>Mobile</th>
-		<th>Created At</th>
-		<th width="8%">Action</th>
-	</tr>
-</thead>
-<tbody>	
-    @foreach($users as $user)
+
+<table id="post-manager" class="table table-striped table-bordered dt-responsive nowrap">
+  <thead>
     <tr>
-    	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th>{{!empty($user->roles) ? $user->roles[0]->name : ''}}</th>
-		<th style="text-transform:none">{{$user->email ?? ''}}</th>
-		<th>{{$user->mobile ?? ''}}</th>
-		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}
-		<th>{{dateFormat($user->created_at) ?? '' }}</th>
-		
-         <th>
-  <div class="d-flex gap-2">
-    {{-- View --}}
-    <a href="{{ route('sponsors.show', $user->id) }}" class="btn btn-sm btn-icon btn-primary" title="View">
-      <i class="bx bx-show"></i>
-    </a>
-
-    {{-- Edit --}}
-    <a href="{{ route('sponsors.edit', $user->id) }}" class="btn btn-sm btn-icon item-edit" title="Edit">
-      <i class="bx bx-edit-alt"></i>
-    </a>
-
-    {{-- Delete --}}
-    <form action="{{ route('sponsors.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this representative user?');">
-      @csrf
-      @method('DELETE')
-      <button class="btn btn-sm btn-danger btn-icon" type="submit" title="Delete">
-        <i class="bx bx-trash"></i>
-      </button>
-    </form>
-  </div>
-</th>
-	</tr>
-	@endforeach
-	@if(count($users) <=0)
-	    <tr>
-          <td colspan="14">No data available</td>
-        </tr>
-	@endif
+      <th>Logo</th>
+      <th>Name</th>
+      <th>QR</th>
+      <th width="20%">Actions</th>
+    </tr>
+  </thead>
+ <tbody>
+  @forelse($companies as $company)
+    <tr>
+      <td>
+        @if($company->logo)
+          <img src="{{ asset('storage/companies/'.$company->id.'/logo/'.$company->logo) }}"
+               alt="Logo" width="40" height="40" class="rounded">
+        @else
+          <span class="text-muted">-</span>
+        @endif
+      </td>
+      <td>{{ $company->name ?? '-' }}</td>
+      <td>
+        <a href="#" class="btn btn-sm btn-primary" title="Download QR">
+          Download QR
+        </a>
+      </td>
+      <td>
+        <div class="d-flex gap-2">
+          <a href="{{ route('sponsors.show', $company->id) }}" class="btn btn-sm btn-icon btn-primary" title="View">
+            <i class="bx bx-show"></i>
+          </a>
+          <a href="{{ route('sponsors.edit', $company->id) }}" class="btn btn-sm btn-icon item-edit" title="Edit">
+            <i class="bx bx-edit-alt"></i>
+          </a>
+          <form action="{{ route('sponsors.destroy', $company->id) }}" method="POST"
+                onsubmit="return confirm('Are you sure you want to delete this sponsor?');">
+            @csrf
+            @method('DELETE')
+            <button class="btn btn-sm btn-danger btn-icon" type="submit" title="Delete">
+              <i class="bx bx-trash"></i>
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+  @empty
+    <tr>
+      <td colspan="4" class="text-center">No data available</td>
+    </tr>
+  @endforelse
 </tbody>
+
 </table>
-	<div class="text-xs-center">
-	    @if ($users->hasPages())
-	        <div class="custom_pagination">
-	            @if (!$users->onFirstpage())
-	                <a href="{{ $users->appends(request()->input())->url(1) }}" class="pagination-link">
-	                    <i class="bx bx-chevron-left"></i>
-	                    <i class="bx bx-chevron-left"></i>
-	                </a>
-	                <a href="{{ $users->appends(request()->input())->previousPageUrl() }}" class="pagination-link">
-	                    <i class="bx bx-chevron-left"></i>
-	                </a>
-	            @endif
 
-	            <span class="page-count"> <a href="#"> Page {{ number_format($users->currentPage()) }} of
-	                    {{ number_format($users->lastPage()) }} </a></span>
-	            @if (!$users->onLastpage())
-	                <a href="{{ $users->appends(request()->input())->nextPageUrl() }}" class="pagination-link">
-	                    <i class="bx bx-chevron-right"></i>
+<div class="text-xs-center">
+  @if ($companies->hasPages())
+  <div class="custom_pagination">
+    {{-- Previous --}}
+    @if (!$companies->onFirstPage())
+      <a href="{{ $companies->appends(request()->input())->url(1) }}" class="pagination-link">
+        <i class="bx bx-chevron-left"></i><i class="bx bx-chevron-left"></i>
+      </a>
+      <a href="{{ $companies->appends(request()->input())->previousPageUrl() }}" class="pagination-link">
+        <i class="bx bx-chevron-left"></i>
+      </a>
+    @endif
 
-	                </a>
-	                <a href="{{ $users->appends(request()->input())->url($users->lastPage()) }}" class="pagination-link">
-	                    <i class="bx bx-chevron-right"></i>
-	                    <i class="bx bx-chevron-right"></i>
-	                </a>
-	            @endif
-	        </div>
-	    @endif
-	</div>
+    <span class="page-count">
+      <a href="#"> Page {{ number_format($companies->currentPage()) }} of {{ number_format($companies->lastPage()) }} </a>
+    </span>
+
+    {{-- Next --}}
+    @if ($companies->hasMorePages())
+      <a href="{{ $companies->appends(request()->input())->nextPageUrl() }}" class="pagination-link">
+        <i class="bx bx-chevron-right"></i>
+      </a>
+      <a href="{{ $companies->appends(request()->input())->url($companies->lastPage()) }}" class="pagination-link">
+        <i class="bx bx-chevron-right"></i><i class="bx bx-chevron-right"></i>
+      </a>
+    @endif
+  </div>
+@endif
+
+</div>
