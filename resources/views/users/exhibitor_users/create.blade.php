@@ -56,37 +56,37 @@
       @endphp
 
       <div id="content-icon-dropzone"
-           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-        {{-- Placeholder --}}
-        <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $contentIconFile ? 'd-none' : '' }}">
-          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-          <div>
-            <strong>Drag & drop</strong> an image here, or
-            <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-          </div>
-          <small class="text-muted d-block">Max 2048 KB</small>
-        </div>
-
-        {{-- Inline preview --}}
-        <img id="dz-image-content"
-             src="{{ $contentIconSrc }}"
-             alt="Preview"
-             class="{{ $contentIconFile ? '' : 'd-none' }} rounded"
-             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
-
-        {{-- Remove button --}}
-        <button type="button"
-                id="dz-remove-content"
-                class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
-                style="top: .5rem; right: .5rem;">
-          <i class="bx bx-x"></i> Remove
-        </button>
-
-        {{-- Hidden input --}}
-        <input type="file" id="dz-input-content" name="content_icon" accept="image/*" class="d-none">
+    {{-- Placeholder --}}
+    <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $contentIconFile ? 'd-none' : '' }}">
+      <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+      <div>
+        <strong>Drag & drop</strong> an image here, or
+        <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
       </div>
+      <small class="text-muted d-block">Max 2048 KB</small>
+    </div>
+
+    {{-- Inline preview --}}
+    <img id="dz-image-content"
+         src="{{ $contentIconSrc }}"
+         alt="Preview"
+         class="{{ $contentIconFile ? '' : 'd-none' }} rounded"
+         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+
+    {{-- Remove button --}}
+    <button type="button"
+            id="dz-remove-content"
+            class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
+            style="top: .5rem; right: .5rem;">
+      <i class="bx bx-x"></i> Remove
+    </button>
+
+    {{-- Hidden input --}}
+    <input type="file" id="dz-input-content" name="content_icon" accept="image/*" class="d-none">
+</div>
 
       @error('content_icon')
         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -108,38 +108,38 @@
             : '';
       @endphp
 
-      <div id="quick-link-icon-dropzone"
-           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+     <div id="quick-link-icon-dropzone"
+     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-        {{-- Placeholder --}}
-        <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $quickLinkFile ? 'd-none' : '' }}">
-          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-          <div>
+    {{-- Placeholder --}}
+    <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $quickLinkFile ? 'd-none' : '' }}">
+        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+        <div>
             <strong>Drag & drop</strong> an image here, or
             <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-          </div>
-          <small class="text-muted d-block">Max 2048 KB</small>
         </div>
+        <small class="text-muted d-block">Max 2048 KB</small>
+    </div>
 
-        {{-- Inline preview --}}
-        <img id="dz-image-quick"
-             src="{{ $quickLinkSrc }}"
-             alt="Preview"
-             class="{{ $quickLinkFile ? '' : 'd-none' }} rounded"
-             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+    {{-- Inline preview --}}
+    <img id="dz-image-quick"
+         src="{{ $quickLinkSrc }}"
+         alt="Preview"
+         class="{{ $quickLinkFile ? '' : 'd-none' }} rounded"
+         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-        {{-- Remove button --}}
-        <button type="button"
-                id="dz-remove-quick"
-                class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
-                style="top: .5rem; right: .5rem;">
-          <i class="bx bx-x"></i> Remove
-        </button>
+    {{-- Remove button --}}
+    <button type="button"
+            id="dz-remove-quick"
+            class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
+            style="top: .5rem; right: .5rem;">
+        <i class="bx bx-x"></i> Remove
+    </button>
 
-        {{-- Hidden input --}}
-        <input type="file" id="dz-input-quick" name="quick_link_icon" accept="image/*" class="d-none">
-      </div>
+    {{-- Hidden input --}}
+    <input type="file" id="dz-input-quick" name="quick_link_icon" accept="image/*" class="d-none">
+</div>
 
       @error('quick_link_icon')
         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -266,194 +266,145 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropzone = document.getElementById('content-icon-dropzone');
+    const input = document.getElementById('dz-input-content');
+    const preview = document.getElementById('dz-image-content');
+    const placeholder = document.getElementById('dz-placeholder-content');
+    const removeBtn = document.getElementById('dz-remove-content');
+
+    // Trigger file input when dropzone is clicked
+    dropzone.addEventListener('click', function() {
+      input.click();
+    });
+
+    // Handle file input change (when user selects a file)
+    input.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          preview.src = event.target.result;
+          preview.classList.remove('d-none');
+          placeholder.classList.add('d-none');
+          removeBtn.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle drag over and drop events
+    dropzone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', function() {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          preview.src = event.target.result;
+          preview.classList.remove('d-none');
+          placeholder.classList.add('d-none');
+          removeBtn.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Remove the selected image
+    removeBtn.addEventListener('click', function() {
+      preview.src = '';
+      preview.classList.add('d-none');
+      placeholder.classList.remove('d-none');
+      removeBtn.classList.add('d-none');
+      input.value = ''; // Clear the file input
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropzoneQuick = document.getElementById('quick-link-icon-dropzone');
+    const inputQuick = document.getElementById('dz-input-quick');
+    const previewQuick = document.getElementById('dz-image-quick');
+    const placeholderQuick = document.getElementById('dz-placeholder-quick');
+    const removeBtnQuick = document.getElementById('dz-remove-quick');
+    let fileRemoved = false; // Flag to track if the file has been removed
+
+    // Trigger file input when dropzone is clicked
+    dropzoneQuick.addEventListener('click', function() {
+      if (!fileRemoved) { // Only trigger file input if the file wasn't removed
+        inputQuick.click();
+      }
+    });
+
+    // Handle file input change (when user selects a file)
+    inputQuick.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          previewQuick.src = event.target.result;
+          previewQuick.classList.remove('d-none');
+          placeholderQuick.classList.add('d-none');
+          removeBtnQuick.classList.remove('d-none');
+          fileRemoved = false; // Reset the file removed flag
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle drag over and drop events
+    dropzoneQuick.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropzoneQuick.classList.add('dragover');
+    });
+
+    dropzoneQuick.addEventListener('dragleave', function() {
+      dropzoneQuick.classList.remove('dragover');
+    });
+
+    dropzoneQuick.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropzoneQuick.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          previewQuick.src = event.target.result;
+          previewQuick.classList.remove('d-none');
+          placeholderQuick.classList.add('d-none');
+          removeBtnQuick.classList.remove('d-none');
+          fileRemoved = false; // Reset the file removed flag
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Remove the selected image
+    removeBtnQuick.addEventListener('click', function() {
+      previewQuick.src = '';
+      previewQuick.classList.add('d-none');
+      placeholderQuick.classList.remove('d-none');
+      removeBtnQuick.classList.add('d-none');
+      inputQuick.value = ''; // Clear the file input
+      fileRemoved = true; // Set flag to indicate file is removed
+    });
+  });
+</script>
 @endsection
 
 
-@push('scripts')
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  function setupDropzone(wrapperId, inputId, previewId, placeholderId, removeId, browseId) {
-    // Add detailed logging to identify missing elements
-    console.log(`Setting up dropzone: ${wrapperId}`);
-    
-    const wrapper = document.getElementById(wrapperId);
-    const input = document.getElementById(inputId);
-    const preview = document.getElementById(previewId);
-    const placeholder = document.getElementById(placeholderId);
-    const removeBtn = document.getElementById(removeId);
-    const browseBtn = document.getElementById(browseId);
 
-    // Detailed error reporting
-    const elements = {
-      wrapper: { element: wrapper, id: wrapperId },
-      input: { element: input, id: inputId },
-      preview: { element: preview, id: previewId },
-      placeholder: { element: placeholder, id: placeholderId },
-      removeBtn: { element: removeBtn, id: removeId },
-      browseBtn: { element: browseBtn, id: browseId }
-    };
-
-    // Check which elements are missing
-    const missingElements = Object.entries(elements).filter(([key, obj]) => !obj.element);
-    
-    if (missingElements.length > 0) {
-      console.error(`Missing elements for ${wrapperId}:`, missingElements.map(([key, obj]) => `${key} (ID: ${obj.id})`));
-      return false;
-    }
-
-    console.log(`✅ All elements found for ${wrapperId}`);
-
-    // Handle browse button click
-    browseBtn.addEventListener("click", (e) => {
-      console.log(`Browse button clicked for ${wrapperId}`);
-      e.preventDefault();
-      e.stopPropagation();
-      input.click();
-    });
-
-    // Handle wrapper click (avoid conflicts with browse/remove buttons)
-    wrapper.addEventListener("click", (e) => {
-      // Check if click is on browse button, remove button, or their children
-      if (e.target === browseBtn || e.target === removeBtn || 
-          browseBtn.contains(e.target) || removeBtn.contains(e.target)) {
-        return;
-      }
-      e.preventDefault();
-      input.click();
-    });
-
-    // Handle input file selection
-    input.addEventListener("change", (e) => {
-      console.log(`File input changed for ${wrapperId}`);
-      if (e.target.files && e.target.files[0]) {
-        const file = e.target.files[0];
-        
-        // File size validation (2MB = 2048KB)
-        if (file.size > 2 * 1024 * 1024) {
-          alert('File size must be less than 2MB');
-          input.value = '';
-          return;
-        }
-        
-        // File type validation
-        if (!file.type.startsWith('image/')) {
-          alert('Please select an image file');
-          input.value = '';
-          return;
-        }
-        
-        showPreview(file);
-      }
-    });
-
-    // Show preview helper
-    function showPreview(file) {
-      console.log(`Showing preview for ${wrapperId}`);
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        preview.src = ev.target.result;
-        preview.classList.remove("d-none");
-        placeholder.classList.add("d-none");
-        removeBtn.classList.remove("d-none");
-      };
-      reader.onerror = () => {
-        console.error('Error reading file');
-        alert('Error reading file. Please try again.');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // Remove file
-    removeBtn.addEventListener("click", (e) => {
-      console.log(`Remove button clicked for ${wrapperId}`);
-      e.preventDefault();
-      e.stopPropagation();
-      
-      input.value = "";
-      preview.src = "";
-      preview.classList.add("d-none");
-      placeholder.classList.remove("d-none");
-      removeBtn.classList.add("d-none");
-    });
-
-    // Drag and drop handlers
-    wrapper.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      wrapper.style.borderColor = "var(--bs-primary)";
-    });
-
-    wrapper.addEventListener("dragleave", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      wrapper.style.borderColor = "var(--bs-border-color)";
-    });
-
-    wrapper.addEventListener("drop", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      wrapper.style.borderColor = "var(--bs-border-color)";
-
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        
-        // File size validation
-        if (file.size > 2 * 1024 * 1024) {
-          alert('File size must be less than 2MB');
-          return;
-        }
-        
-        // File type validation
-        if (!file.type.startsWith('image/')) {
-          alert('Please select an image file');
-          return;
-        }
-
-        // Set the files property correctly
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        input.files = dataTransfer.files;
-
-        showPreview(file);
-      }
-    });
-
-    return true;
-  }
-
-  // Add a small delay to ensure all elements are rendered
-  setTimeout(() => {
-    console.log('🚀 Starting dropzone initialization...');
-    
-    // Initialize content icon dropzone
-    const contentSuccess = setupDropzone(
-      "content-icon-dropzone",
-      "dz-input-content",
-      "dz-image-content",
-      "dz-placeholder-content",
-      "dz-remove-content",
-      "dz-browse-content"
-    );
-
-    // Initialize quick link icon dropzone
-    const quickSuccess = setupDropzone(
-      "quick-link-icon-dropzone",
-      "dz-input-quick",
-      "dz-image-quick",
-      "dz-placeholder-quick",
-      "dz-remove-quick",
-      "dz-browse-quick"
-    );
-
-    if (contentSuccess && quickSuccess) {
-      console.log('✅ All dropzones initialized successfully');
-    } else {
-      console.error('❌ Some dropzones failed to initialize');
-    }
-  }, 100);
-});
-</script>
-@endpush
 
 
 
