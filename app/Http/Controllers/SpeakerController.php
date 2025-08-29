@@ -22,6 +22,7 @@ use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon;
+use App\Models\Company;
 
 class SpeakerController extends Controller
 {
@@ -86,53 +87,115 @@ class SpeakerController extends Controller
      */
     public function create()
     {
-        //
-           return view('users.speaker.create');
+        $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
+                $q->whereIn("name", ['Speaker']);
+            })->orderBy('created_at', 'DESC')->get();
+
+        $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+        $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+        $groups = config('roles.groups');
+        return view('users.speaker.create',compact('groups','exhibitors','sponsors','speakers'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
-         $validator = Validator::make($request->all(), [
+    {  
+       $validator = Validator::make($request->all(), [
+         
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
+            'designation' => 'nullable|string|max:255' ,
+            'tags' => 'nullable|string|max:255'  ,
+            'website_url' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'required|string|unique:users,mobile',
-            'bio'    => 'required|string|max:500',
+            'bio' => 'required|string',
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'], 
+            'tags'   => ['nullable','array'],
+            'tags.*' => ['string'], 
 
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'],  
+            'primary_group' => 'required|string', 
+
+          'access_speaker_ids'    => ['nullable','array'],
+          'access_speaker_ids.*'  => ['integer','exists:users,id'],
+          'access_exhibitor_ids'  => ['nullable','array'],
+          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
+          'access_sponsor_ids'    => ['nullable','array'],
+          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],                
         ]);
 
-    if ($validator->fails()) {
-        return redirect(route('speaker.create'))->withInput()
-            ->withErrors($validator);
-    }
+        if ($validator->fails()) {
+            return redirect(route('attendee-users.create'))->withInput()
+                ->withErrors($validator);
+        }
 
-    $user = new User();
-    $user->name = $request->first_name;
-    $user->lastname = $request->last_name;
-    $user->email = $request->email;
-    $user->designation = $request->designation;
-    $user->tags = $request->tags;
-    $user->website_url = $request->website_url;
-    $user->linkedin_url = $request->linkedin_url;
-    $user->instagram_url = $request->linkedin_url;
-    $user->facebook_url = $request->facebook_url;
-    $user->twitter_url = $request->twitter_url;
-    $user->mobile = $request->mobile;
-    $user->bio = $request->bio;
-    $user->save();
-    $user->assignRole('Speaker');
+        $user = new User();
+        $user->name = $request->first_name;
+        $user->lastname = $request->last_name;
+        $user->email = $request->email;
+        $user->company = $request->company;
+        $user->primary_group = $request->primary_group;
+        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
+        $user->status = $request->status;
+        $user->gdpr_consent = $request->gdpr_consent;
+        $user->designation = $request->designation;
+        $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
+        $user->website_url = $request->website_url;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->instagram_url = $request->linkedin_url;
+        $user->facebook_url = $request->facebook_url;
+        $user->twitter_url = $request->twitter_url;
+        $user->mobile = $request->mobile;
+        $user->bio = $request->bio;
+        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
+        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
+        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
+        $user->save();
+        
+        $primaryGroupArray= [];
+        $secondaryGroupArray=[];
+         
+        if(!empty($request->primary_group)) {
+          $primaryGroupArray = explode(',', $request->primary_group);   
+        }
+        if(!empty($request->secondary_group)) {
+          $secondaryGroupArray = $request->secondary_group ?? [];
+        }
+          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
+          $combinedGroups = array_unique($combinedGroups); 
+        
+        if(!empty($combinedGroups)){
+          $user->syncRoles($combinedGroups);  
+        }
+        
 
+        if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        }
 
-     if ($request->file("image")) {
-         $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'photo');
-     }
+         if ($request->hasFile('cover_image')) {
+          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+        }
+
+        if (!empty($request->private_docs)) {
+
+          foreach($request->private_docs as $img){
+             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
+          }  
+          
+        }
+        qrCode($user->id);
     
 
-    return redirect(route('speaker.index'))
+      return redirect(route('speaker.edit', $user->id))
         ->withSuccess('Speaker data has been saved successfully');
     }
 
@@ -152,8 +215,19 @@ class SpeakerController extends Controller
     public function edit(string $id)
     {
         
-     $user = User::findOrFail($id);
-    return view('users.speaker.edit', compact('user'));
+    $user = User::findOrFail($id);
+
+    $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
+                $q->whereIn("name", ['Speaker']);
+            })->orderBy('created_at', 'DESC')->get();
+
+    $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+    $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+    $groups = config('roles.groups');
+
+    return view('users.speaker.edit', compact('user','groups','exhibitors','sponsors','speakers'));
     }
 
     /**
@@ -163,39 +237,95 @@ class SpeakerController extends Controller
     {
         
     $user = User::findOrFail($id);
+        $validator = Validator::make($request->all(), [
+            
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+            'designation' => 'nullable|string|max:255' ,
+            'tags' => 'nullable|string|max:255'  ,
+            'website_url' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|string|max:255',
+            'mobile' => 'required|string|unique:users,mobile,' . $user->id,
+            'bio' => 'required|string',
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'], 
+            'tags'   => ['nullable','array'],
+            'tags.*' => ['string'], 
 
-    $validator = Validator::make($request->all(), [
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
-        'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
-        'bio'    => 'required|string|max:500',
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'],  
+            'primary_group' => 'required|string', 
 
-    ]);
+         'access_speaker_ids'    => ['nullable','array'],
+          'access_speaker_ids.*'  => ['integer','exists:users,id'],
+          'access_exhibitor_ids'  => ['nullable','array'],
+          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
+          'access_sponsor_ids'    => ['nullable','array'],
+          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],        
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()->withInput()->withErrors($validator);
-    }
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
 
-    $user->name = $request->first_name;
-    $user->lastname = $request->last_name;
-    $user->email = $request->email;
-    $user->designation = $request->designation;
-    $user->tags = $request->tags;
-    $user->website_url = $request->website_url;
-    $user->linkedin_url = $request->linkedin_url;
-    $user->instagram_url = $request->linkedin_url;
-    $user->facebook_url = $request->facebook_url;
-    $user->twitter_url = $request->twitter_url;
-    $user->mobile = $request->mobile;
-    $user->bio = $request->bio;
-    $user->save();
+        $user->name = $request->first_name;
+        $user->lastname = $request->last_name;
+        $user->email = $request->email;
+        $user->company = $request->company;
+        $user->primary_group = $request->primary_group;
+        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
+        $user->status = $request->status;
+        $user->gdpr_consent = $request->gdpr_consent;
+        $user->designation = $request->designation;
+        $user->tags = !empty($request->tags) ? implode(',',$request->tags) : '';
+        $user->website_url = $request->website_url;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->instagram_url = $request->linkedin_url;
+        $user->facebook_url = $request->facebook_url;
+        $user->twitter_url = $request->twitter_url;
+        $user->mobile = $request->mobile;
+        $user->bio = $request->bio;
+        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
+        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
+        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
+        $user->save();
 
-    if ($request->file("image")) {
-         $this->imageUpload($request->file("image"), 'users', $user->id, 'users', 'photo',$user->id);
-     }
+        $primaryGroupArray= [];
+        $secondaryGroupArray=[];
+         
+        if(!empty($request->primary_group)) {
+          $primaryGroupArray = explode(',', $request->primary_group);   
+        }
+        if(!empty($request->secondary_group)) {
+          $secondaryGroupArray = $request->secondary_group ?? [];
+        }
+          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
+          $combinedGroups = array_unique($combinedGroups); 
+        
+        if(!empty($combinedGroups)){
+          $user->syncRoles($combinedGroups);  
+        }
 
-    return redirect(route('speaker.index'))->withSuccess('Speaker data has been updated successfully.');
+        if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        }
+
+         if ($request->hasFile('cover_image')) {
+          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+        }
+
+        if (!empty($request->private_docs)) {
+
+          foreach($request->private_docs as $img){
+             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
+          }  
+          
+        }
+        qrCode($user->id);
+
+     return redirect(route('speaker.edit', $user->id))
+        ->withSuccess('Speaker data has been saved successfully');
     }
 
     /**

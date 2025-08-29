@@ -98,7 +98,7 @@ class AttendeeUserController extends Controller
 
         $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
 
-        $groups=['Attendee','Speaker','Sponsor','Exhibitor','Admin'];
+        $groups = config('roles.groups');
         return view('users.attendee_users.create',compact('groups','exhibitors','sponsors','speakers'));
     }
 
@@ -140,7 +140,7 @@ class AttendeeUserController extends Controller
             return redirect(route('attendee-users.create'))->withInput()
                 ->withErrors($validator);
         }
-
+        
         $user = new User();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
@@ -159,10 +159,26 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
-        $user->access_speaker_ids =  implode(',',$request->access_speaker_ids) ?? '';
-        $user->access_exhibitor_ids =  implode(',',$request->access_exhibitor_ids) ?? '';
-        $user->access_sponsor_ids =  implode(',',$request->access_sponsor_ids) ?? '';
+        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
+        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
+        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
         $user->save();
+
+        $primaryGroupArray= [];
+        $secondaryGroupArray=[];
+         
+        if(!empty($request->primary_group)) {
+          $primaryGroupArray = explode(',', $request->primary_group);   
+        }
+        if(!empty($request->secondary_group)) {
+          $secondaryGroupArray = $request->secondary_group ?? [];
+        }
+          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
+          $combinedGroups = array_unique($combinedGroups); 
+        
+        if(!empty($combinedGroups)){
+          $user->syncRoles($combinedGroups);  
+        }
 
         if ($request->hasFile('image')) {
           $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
@@ -211,7 +227,7 @@ class AttendeeUserController extends Controller
 
     $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
 
-    $groups=['Attendee','Speaker','Sponsor','Exhibitor','Admin'];
+    $groups = config('roles.groups');
 
     return view('users.attendee_users.edit', compact('user','groups','exhibitors','sponsors','speakers'));
 
@@ -272,10 +288,26 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
-        $user->access_speaker_ids =   !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
-        $user->access_exhibitor_ids = !empty($request->access_exhibitor_ids) ? implode(',',$request->access_exhibitor_ids) : '';
+        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
+        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
         $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
         $user->save();
+
+        $primaryGroupArray= [];
+        $secondaryGroupArray=[];
+         
+        if(!empty($request->primary_group)) {
+          $primaryGroupArray = explode(',', $request->primary_group);   
+        }
+        if(!empty($request->secondary_group)) {
+          $secondaryGroupArray = $request->secondary_group ?? [];
+        }
+          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
+          $combinedGroups = array_unique($combinedGroups); 
+        
+        if(!empty($combinedGroups)){
+          $user->syncRoles($combinedGroups);  
+        }
 
         if ($request->hasFile('image')) {
           $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);

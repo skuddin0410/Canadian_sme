@@ -66,7 +66,7 @@ Admin | Add Attendee
 
   {{-- MAIN FORM --}}
   <form
-    action="@if(!empty($user)) {{ route('attendee-users.update',['user'=>$user->id]) }} @else {{ route('attendee-users.store') }} @endif"
+    action="{{ route('attendee-users.store') }}"
     method="POST" enctype="multipart/form-data">
     @csrf
     @if(!empty($user)) @method('PUT') @endif
