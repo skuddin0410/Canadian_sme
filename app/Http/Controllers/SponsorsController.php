@@ -165,7 +165,8 @@ public function index(Request $request)
         'banner'
     );
     }
-    qrCode($user->id);
+    // qrCode($user->id);
+    qrCode($user->id, "user");
 
 
     DB::commit();
@@ -189,9 +190,10 @@ public function index(Request $request)
      */
     public function show(string $id)
     {
+        $user = User ::findOrFail($id);
         $company = Company::findOrFail($id); // ensures fresh data
         $company->load('logo' , 'banner');
-        return view('users.sponsors.view', compact('company'));
+        return view('users.sponsors.view', compact('company','user'));
     }
 
     /**
@@ -199,74 +201,158 @@ public function index(Request $request)
      */
     public function edit(string $id)
     {
+    $company = Company::findOrFail($id); 
+
     $user = User::findOrFail($id);
-    return view('users.sponsors.edit', compact('user'));
+    return view('users.sponsors.edit', compact('user','company'));
         
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $user = User::findOrFail($id);
+    // public function update(Request $request, string $id)
+    // {
+    //     $user = User::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
+    //     $validator = Validator::make($request->all(), [
             
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
-            'designation' => 'nullable|string|max:255' ,
-            'tags' => 'nullable|string|max:255'  ,
-            'website_url' => 'nullable|string|max:255',
-            'linkedin_url' => 'nullable|string|max:255',
-            'instagram_url' => 'nullable|string|max:255',
-            'facebook_url' => 'nullable|string|max:255',
-            'twitter_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'bio' => 'string|string|max:500',
-        ]);
+    //         'first_name' => 'required|string|max:255',
+    //         'last_name' => 'required|string|max:255',
+    //         'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+    //         'designation' => 'nullable|string|max:255' ,
+    //         'tags' => 'nullable|string|max:255'  ,
+    //         'website_url' => 'nullable|string|max:255',
+    //         'linkedin_url' => 'nullable|string|max:255',
+    //         'instagram_url' => 'nullable|string|max:255',
+    //         'facebook_url' => 'nullable|string|max:255',
+    //         'twitter_url' => 'nullable|string|max:255',
+    //         'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
+    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+    //         'bio' => 'string|string|max:500',
+    //     ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withInput()->withErrors($validator);
-        }
+    //     if ($validator->fails()) {
+    //         return redirect()->back()->withInput()->withErrors($validator);
+    //     }
 
-        $user->name = $request->first_name;
-        $user->lastname = $request->last_name;
-        $user->email = $request->email;
-        $user->designation = $request->designation;
-        $user->tags = $request->tags;
-        $user->website_url = $request->website_url;
-        $user->linkedin_url = $request->linkedin_url;
-        $user->instagram_url = $request->linkedin_url;
-        $user->facebook_url = $request->facebook_url;
-        $user->twitter_url = $request->twitter_url;
-        $user->mobile = $request->mobile;
-        $user->bio=$request->bio;
-        $user->save();
+    //     $user->name = $request->first_name;
+    //     $user->lastname = $request->last_name;
+    //     $user->email = $request->email;
+    //     $user->designation = $request->designation;
+    //     $user->tags = $request->tags;
+    //     $user->website_url = $request->website_url;
+    //     $user->linkedin_url = $request->linkedin_url;
+    //     $user->instagram_url = $request->linkedin_url;
+    //     $user->facebook_url = $request->facebook_url;
+    //     $user->twitter_url = $request->twitter_url;
+    //     $user->mobile = $request->mobile;
+    //     $user->bio=$request->bio;
+    //     $user->save();
  
         
-        if ($request->hasFile('image')) {
-            if ($request->hasFile('image')) {
-             $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
-            }
-        }
+    //     if ($request->hasFile('image')) {
+    //         if ($request->hasFile('image')) {
+    //          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+    //         }
+    //     }
 
    
 
-    return redirect(route('sponsors.index'))->withSuccess('Sponsors data has been updated successfully.');
+    // return redirect(route('sponsors.index'))->withSuccess('Sponsors data has been updated successfully.');
+    // }
+    public function update(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'company_name'        => 'required|string|max:255',
+        'company_email'       => 'required|email|max:255',
+        'company_phone'       => 'required|string|max:20',
+        'company_description' => 'nullable|string',
+        'website'             => 'nullable|url',
+        'linkedin'            => 'nullable|url',
+        'twitter'             => 'nullable|url',
+        'facebook'            => 'nullable|url',
+        'logo'                => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+        'banner'              => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()->withInput()->withErrors($validator);
     }
+
+    DB::beginTransaction();
+    try {
+       
+        $company = Company::findOrFail($id);
+        $user    = User::findOrFail($company->user_id);
+
+      
+        $user->update([
+            'name'  => $request->company_name,
+            'email' => $request->company_email,
+        ]);
+
+      
+        $company->update([
+            'name'        => $request->company_name,
+            'email'       => $request->company_email,
+            'phone'       => $request->company_phone,
+            'description' => $request->company_description,
+            'website'     => $request->website,
+            'linkedin'    => $request->linkedin,
+            'twitter'     => $request->twitter,
+            'facebook'    => $request->facebook,
+        ]);
+
+        
+        if ($request->file("logo")) {
+            $this->imageUpload(
+                $request->file("logo"),
+                'logo',
+                $company->id,
+                'companies',
+                'logo'
+            );
+        }
+
+       
+        if ($request->file("banner")) {
+            $this->imageUpload(
+                $request->file("banner"),
+                'banner',
+                $company->id,
+                'companies',
+                'banner'
+            );
+        }
+
+        
+        qrCode($user->id, "user");
+
+        DB::commit();
+
+        return redirect(route('sponsors.index'))
+            ->withSuccess('Sponsor Updated');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
+    }
+}
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
-        $user->roles()->detach();
-        $user->delete();
+        // $user = User::findOrFail($id);
+        // $user->roles()->detach();
+        // $user->delete();
 
+         $company = Company::findOrFail($id);
+         $company->delete();
         return redirect()
             ->route('sponsors.index')
             ->withSuccess('Sponsor user deleted successfully.');

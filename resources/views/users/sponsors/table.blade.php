@@ -49,10 +49,19 @@
       </td>
       <td>{{ $company->name ?? '-' }}</td>
       <td>
-        <a href="#" class="btn btn-sm btn-primary" title="Download QR">
-          Download QR
-        </a>
-      </td>
+		
+  @if($company->user && $company->user->qr_code)
+    <a href="{{ route('sponsors.qr.download', $company->user->id) }}" 
+       class="btn btn-sm btn-primary" 
+       title="Download QR">
+      Download QR
+	 
+    </a>
+  @else
+    <span class="text-muted">No QR</span>
+  @endif
+</td>
+
       <td>
         <div class="d-flex gap-2">
           <a href="{{ route('sponsors.show', $company->id) }}" class="btn btn-sm btn-icon btn-primary" title="View">
