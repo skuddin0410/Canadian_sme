@@ -21,8 +21,6 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::resource('orders', App\Http\Controllers\OrderController::class);
     Route::resource('transactions', App\Http\Controllers\TransactionController::class);
     Route::resource('settings', App\Http\Controllers\SettingController::class);
-    Route::resource('testimonials', App\Http\Controllers\TestimonialController::class);
-    Route::resource('affiliates', App\Http\Controllers\AffiliateController::class);
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
 
     Route::post('/delete/photo', [App\Http\Controllers\EventController::class, 'removePhoto'])->name('events.removePhoto');
@@ -59,10 +57,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::resource('speaker', SpeakerController::class);
     Route::resource('booths', BoothController::class);
 
-    Route::any('faqs/{id}/order/{order}', '\App\Http\Controllers\FaqController@order');
-    Route::any('banners/{id}/order/{order}', '\App\Http\Controllers\BannerController@order');
+
     Route::any('categories/{id}/order/{order}', '\App\Http\Controllers\CategoryController@order');
-    Route::any('testimonials/{id}/order/{order}', '\App\Http\Controllers\TestimonialController@order');
     Route::any('categories/tags/store', '\App\Http\Controllers\CategoryController@storeTags')->name('categories.store');
     
     
@@ -103,7 +99,6 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 
     Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
-    
     Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
 

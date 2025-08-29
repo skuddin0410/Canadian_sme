@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name')->nullable()->index();
             $table->string('lastname')->nullable()->index();
             $table->string('email')->nullable()->unique();
+            $table->string('company')->nullable();
             $table->string('designation')->nullable();
             $table->text('tags')->nullable();
             $table->timestamp('email_verified_at')->nullable();
@@ -31,9 +32,14 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->text('bio')->nullable();
 
-            $table->boolean('is_block')->default(false);
+            
             $table->rememberToken();
-            $table->boolean('is_approve')->default(false)->comment('Approval status by admin');
+            $table->boolean('is_approve')->default(true)->comment('Approval status by admin');
+            $table->boolean('is_block')->default(false);
+            $table->boolean('gdpr_consent')->default(false);
+            $table->string('status')->nullable();
+            $table->string('primary_group')->nullable();
+            $table->string('secondary_group')->nullable();
             $table->date('dob')->nullable()->index();
             $table->string('gender')->default('male')->comment('male, female, other')->nullable()->index();
             $table->string('place')->nullable()->index();
@@ -44,6 +50,10 @@ return new class extends Migration
             $table->string('country')->nullable()->index();
             $table->string('qr_code')->nullable()->index();
             $table->string('company_id')->nullable()->index();
+            $table->string('access_speaker_ids')->nullable()->index();
+            $table->string('access_exhibitor_ids')->nullable()->index();
+            $table->string('access_sponsor_ids')->nullable()->index();
+            
             $table->timestamps();
             $table->softDeletes();
         });
