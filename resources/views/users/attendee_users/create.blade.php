@@ -138,7 +138,7 @@ Admin | Add Attendee
 
                         {{-- NEW: Primary & Secondary Groups --}}
                       <div class="col-md-6">
-                        <label class="form-label">User Primary Group</label>
+                        <label class="form-label">User Primary Group<span class="text-danger">*</span></label>
                         <select class="form-select mb-3" name="primary_group">
                           <option value="">Select primary group</option>
                           @foreach(($groups ?? []) as $g)
@@ -484,6 +484,36 @@ Admin | Add Attendee
     });
     input.addEventListener('change',(e)=>handle(e.target.files));
   })();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tabKey = 'attendee.activeTab';
+  const tabsEl = document.getElementById('attendeeTabs');
+  if (!tabsEl) return;
+
+  function showTab(target) {
+    const trigger = tabsEl.querySelector(`button[data-bs-target="${target}"]`);
+    if (!trigger) return;
+    const tab = new bootstrap.Tab(trigger);
+    tab.show();
+  }
+
+  // Priority for which tab to show on load:
+  // 1) URL hash (#access / #docs / #basic)
+  // 2) Last tab saved in localStorage
+  // 3) Default to #basic
+  const candidates = [window.location.hash, localStorage.getItem(tabKey), '#basic'];
+  const desired = candidates.find(sel => sel && tabsEl.querySelector(`button[data-bs-target="${sel}"]`));
+  if (desired) showTab(desired);
+
+  // When user changes tab, remember it and update the URL hash (without reload)
+  tabsEl.addEventListener('shown.bs.tab', function (e) {
+    const target = e.target.getAttribute('data-bs-target'); // e.g. "#access"
+    localStorage.setItem(tabKey, target);
+    history.replaceState(null, '', target); // set hash without jumping/reloading
+  });
+});
 </script>
 @endsection
 

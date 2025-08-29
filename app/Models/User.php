@@ -63,7 +63,10 @@ class User extends Authenticatable implements JWTSubject
         'primary_group',
         'company',
         'status',
-        'gdpr_consent'
+        'gdpr_consent',
+        'access_speaker_ids',
+        'access_exhibitor_ids',
+        'access_sponsor_ids'
     ];
 
     /**
@@ -74,7 +77,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
-        'secondary_group' => 'array',
+
     ];
 
     /**
@@ -91,6 +94,11 @@ class User extends Authenticatable implements JWTSubject
             'dob' => 'date',
             'is_approve' => 'boolean',
             'is_block' => 'boolean',
+            // 'secondary_group' => 'array',
+            // 'tags' => 'array',
+            // 'access_speaker_ids' => 'array',
+            // 'access_exhibitor_ids' => 'array',
+            // 'access_sponsor_ids' => 'array',
         ];
     }
 
@@ -116,10 +124,27 @@ class User extends Authenticatable implements JWTSubject
             ->where('file_type', 'photo')
             ->whereNotNull('file_name');
     }
+    public function coverphoto()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'users')
+            ->where('file_type', 'cover_photo')
+            ->whereNotNull('file_name');
+    }
+    
+    public function privateDocs()
+    {
+        return $this->hasMany(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'users')
+            ->where('file_type', 'private_docs')
+            ->whereNotNull('file_name');
+    }
+    
+
     public function sponsoredSessions()
-{
+    {
     return $this->belongsToMany(Session::class, 'session_sponsors', 'user_id', 'session_id');
-}
+    }
 
 
     public function bank()
@@ -138,7 +163,8 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Company::class,'user_id','id');
     }
-  protected function approvalStatusLabel(): Attribute
+
+    protected function approvalStatusLabel(): Attribute
     {
         return Attribute::get(fn () => $this->is_approve ? 'Approved' : 'Pending Approval');
     }

@@ -23,6 +23,7 @@ use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon;
+use App\Models\Company;
 
 
 class AttendeeUserController extends Controller
@@ -100,15 +101,31 @@ class AttendeeUserController extends Controller
     {
    
         $validator = Validator::make($request->all(), [
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|string|max:255|email|unique:users,email',
-        'designation' => 'nullable|string|max:255',
-        'tags' => 'nullable|string|max:255',
-        'website_url' => 'nullable|string|max:255',
-        'linkedin_url' => 'nullable|string|max:255',
-        'mobile' => 'required|string|digits:10|unique:users,mobile',
-        'bio' => 'required|string'
+         
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+            'designation' => 'nullable|string|max:255' ,
+            'tags' => 'nullable|string|max:255'  ,
+            'website_url' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|string|max:255',
+            'mobile' => 'required|string|unique:users,mobile,' . $user->id,
+            'bio' => 'required|string',
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'], 
+            'tags'   => ['nullable','array'],
+            'tags.*' => ['string'], 
+
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'],  
+            'primary_group' => 'required|string', 
+
+          'access_speaker_ids'    => ['nullable','array'],
+          'access_speaker_ids.*'  => ['integer','exists:users,id'],
+          'access_exhibitor_ids'  => ['nullable','array'],
+          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
+          'access_sponsor_ids'    => ['nullable','array'],
+          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],                
         ]);
 
         if ($validator->fails()) {
@@ -120,8 +137,13 @@ class AttendeeUserController extends Controller
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
         $user->email = $request->email;
+        $user->company = $request->company;
+        $user->primary_group = $request->primary_group;
+        $user->secondary_group = implode(',',$request->secondary_group) ?? '';
+        $user->status = $request->status;
+        $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags = $request->tags;
+        $user->tags =  implode(',',$request->tags) ?? '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->linkedin_url;
@@ -129,14 +151,20 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->access_speaker_ids =  implode(',',$request->access_speaker_ids) ?? '';
+        $user->access_exhibitor_ids =  implode(',',$request->access_exhibitor_ids) ?? '';
+        $user->access_sponsor_ids =  implode(',',$request->access_sponsor_ids) ?? '';
         $user->save();
-        $user->assignRole('Attendee');
 
         if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo');
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
         }
-        return redirect(route('attendee-users.index'))
-            ->withSuccess('Attendee data has been saved successfully');
+
+         if ($request->hasFile('cover_image')) {
+          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+        }
+
+        return redirect()->to(route('attendee-users.edit', $user->id))->withSuccess('Saved successfully.');
     }
 
     /**
@@ -156,9 +184,19 @@ class AttendeeUserController extends Controller
      */
     public function edit(string $id)
     {
-        //
-          $user = User::findOrFail($id);
-    return view('users.attendee_users.edit', compact('user'));
+        
+    $user = User::findOrFail($id);
+    $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
+                $q->whereIn("name", ['Speaker']);
+            })->orderBy('created_at', 'DESC')->get();
+
+    $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+    $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+    $groups=['Attendee','Speaker','Sponsor','Exhibitor','Admin'];
+
+    return view('users.attendee_users.edit', compact('user','groups','exhibitors','sponsors','speakers'));
 
     }
 
@@ -166,9 +204,8 @@ class AttendeeUserController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
+    {    
         $user = User::findOrFail($id);
-
         $validator = Validator::make($request->all(), [
             
             'first_name' => 'required|string|max:255',
@@ -178,8 +215,23 @@ class AttendeeUserController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|digits:10|unique:users,mobile,' . $user->id,
-            'bio' => 'required|string'
+            'mobile' => 'required|string|unique:users,mobile,' . $user->id,
+            'bio' => 'required|string',
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'], 
+            'tags'   => ['nullable','array'],
+            'tags.*' => ['string'], 
+
+            'secondary_group'   => ['nullable','array'],
+            'secondary_group.*' => ['string'],  
+            'primary_group' => 'required|string', 
+
+            'access_speaker_ids'    => ['nullable','array'],
+          'access_speaker_ids.*'  => ['integer','exists:users,id'],
+          'access_exhibitor_ids'  => ['nullable','array'],
+          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
+          'access_sponsor_ids'    => ['nullable','array'],
+          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],        
         ]);
 
         if ($validator->fails()) {
@@ -189,8 +241,13 @@ class AttendeeUserController extends Controller
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
         $user->email = $request->email;
+        $user->company = $request->company;
+        $user->primary_group = $request->primary_group;
+        $user->secondary_group = implode(',',$request->secondary_group) ?? '';
+        $user->status = $request->status;
+        $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags = $request->tags;
+        $user->tags =  implode(',',$request->tags) ?? '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->linkedin_url;
@@ -198,13 +255,29 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->access_speaker_ids =   !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
+        $user->access_exhibitor_ids = !empty($request->access_exhibitor_ids) ? implode(',',$request->access_exhibitor_ids) : '';
+        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
         $user->save();
 
         if ($request->hasFile('image')) {
           $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
         }
 
-        return redirect(route('attendee-users.index'))->withSuccess('Attendee data has been updated successfully.');
+         if ($request->hasFile('cover_image')) {
+          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+        }
+
+        if (!empty($request->private_docs)) {
+
+          foreach($request->private_docs as $img){
+             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
+          }  
+          
+        }
+        
+        return redirect()->to(route('attendee-users.edit', $user->id))->withSuccess('Saved successfully.');   
+    
 
     }
 
