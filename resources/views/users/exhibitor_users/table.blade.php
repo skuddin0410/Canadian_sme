@@ -71,8 +71,9 @@
         {{ $bu->booth->id ?? '-' }}<br>
     @endforeach
 @else
-    -
+    
 @endif
+
 </td>
 
 

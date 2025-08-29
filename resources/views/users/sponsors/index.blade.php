@@ -18,7 +18,7 @@
                         <a href="{{ route('sponsors.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
 
                         <a href="{{ route('sponsors.create') }}" class="btn btn-primary dt-button create-new">
-                                <i class="bx bx-plus me-sm-1"></i> Add Sponsors
+                                <i class="bx bx-plus me-sm-1"></i> Add New
                             </a>
                     
                     </div>

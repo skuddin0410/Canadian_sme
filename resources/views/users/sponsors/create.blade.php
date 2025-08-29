@@ -44,190 +44,211 @@ Admin | Add Sponsors
 
 
           <div class="row">
+              <div class="row">
+                 {{--Logo --}}
+  <div class="col-md-6">
+    <div class="mb-3">
+      <label class="form-label">Logo</label>
 
-          <div class="text-left">
-            <input type="file" id="profileImageInput" name="image" accept="image/*" class="d-none">
-            <label for="profileImageInput">
-              <img id="profileImagePreview" 
-                   src="" 
-                   class="rounded-circle border border-2" 
-                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
-            </label>
-            <p class="mt-2 text-muted">Click image to upload</p>
+      @php
+        $logoFile = !empty($company?->logoFile) && !empty($company->logoFile->file_path);
+        $logoSrc = $logoFile 
+            ? (Str::startsWith($company->logoFile->file_path, ['http://','https://'])
+                ? $company->logoFile->file_path
+                : Storage::url($company->logoFile->file_path))
+            : '';
+      @endphp
+
+      <div id="logo-dropzone"
+           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+
+        {{-- Placeholder --}}
+        <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $logoFile ? 'd-none' : '' }}">
+          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+          <div>
+            <strong>Drag & drop</strong> an image here, or
+            <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
           </div>
+          <small class="text-muted d-block">Max 2048 KB</small>
+        </div>
 
-        
-            <div class="row">
+        {{-- Inline preview --}}
+        <img id="dz-image-content"
+             src="{{ $logoSrc }}"
+             alt="Preview"
+             class="{{ $logoFile ? '' : 'd-none' }} rounded"
+             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+
+        {{-- Remove button --}}
+        <button type="button"
+                id="dz-remove-content"
+                class="btn btn-sm btn-danger position-absolute {{ $logoFile ? '' : 'd-none' }}"
+                style="top: .5rem; right: .5rem;">
+          <i class="bx bx-x"></i> Remove
+        </button>
+
+        {{-- Hidden input --}}
+        <input type="file" id="dz-input-content" name="logo" accept="image/*" class="d-none">
+      </div>
+
+      @error('logo')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+      @enderror
+    </div>
+  </div>
+
+  {{--Banner Icon --}}
+  <div class="col-md-6">
+    <div class="mb-3">
+      <label class="form-label">Banner</label>
+
+      @php
+        $bannerFile = !empty($company?->bannerFile) && !empty($company->bannerFile->file_path);
+        $bannerSrc = $bannerFile
+            ? (Str::startsWith($company->bannerFile->file_path, ['http://','https://'])
+                ? $company->bannerFile->file_path
+                : Storage::url($company->bannerFile->file_path))
+            : '';
+      @endphp
+
+      <div id="banner-icon-dropzone"
+           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+
+        {{-- Placeholder --}}
+        <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $bannerFile ? 'd-none' : '' }}">
+          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+          <div>
+            <strong>Drag & drop</strong> an image here, or
+            <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+          </div>
+          <small class="text-muted d-block">Max 2048 KB</small>
+        </div>
+
+        {{-- Inline preview --}}
+        <img id="dz-image-quick"
+             src="{{ $bannerSrc }}"
+             alt="Preview"
+             class="{{ $bannerFile ? '' : 'd-none' }} rounded"
+             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+
+        {{-- Remove button --}}
+        <button type="button"
+                id="dz-remove-quick"
+                class="btn btn-sm btn-danger position-absolute {{ $bannerFile ? '' : 'd-none' }}"
+                style="top: .5rem; right: .5rem;">
+          <i class="bx bx-x"></i> Remove
+        </button>
+
+        {{-- Hidden input --}}
+        <input type="file" id="dz-input-quick" name="banner" accept="image/*" class="d-none">
+      </div>
+
+      @error('banner')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+      @enderror
+    </div>
+  </div>
+
+
+
+             <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bx-buildings"></i></span>
+                    <input type="text" name="company_name" class="form-control"
+                           value="{{ old('company_name') }}" placeholder="Company Name" required>
+                  </div>
+                </div>
+              </div>
+
+              {{-- Company Email --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="title">First Name<span class="text-danger">*</span></label>
+                  <label class="form-label">Company Email <span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
-                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                    <input type="text" class="form-control" name="first_name" id="slug-source"
-                      value="{{ old('first_name') }}" placeholder="User first name" />
+                    <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                    <input type="email" name="company_email" class="form-control"
+                           value="{{ old('company_email') }}" placeholder="Company Email" required>
                   </div>
-                  @if ($errors->has('first_name'))
-                  <span class="text-danger text-left">{{ $errors->first('first_name') }}</span>
-                  @endif
                 </div>
               </div>
+
+              {{-- Company Phone --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="title">last name<span class="text-danger">*</span></label>
+                  <label class="form-label">Company Phone <span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
-                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                    <input type="text" class="form-control" name="last_name" id="last-name-target"
-                      value="{{ old('last_name') }}" placeholder="User last name" />
+                    <span class="input-group-text"><i class="bx bx-phone"></i></span>
+                    <input type="text" name="company_phone" class="form-control"
+                           value="{{ old('company_phone') }}" placeholder="Company Phone" required>
                   </div>
-                  @if ($errors->has('last_name'))
-                  <span class="text-danger text-left">{{ $errors->first('last_name') }}</span>
-                  @endif
                 </div>
               </div>
 
+             
+
+              {{-- Company Description --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="title">Email<span class="text-danger">*</span></label>
-                  <div class="input-group input-group-merge">
-                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                    <input type="text" class="form-control" name="email" id="email"
-                      value="{{ old('email') }}" placeholder="User email" />
-                  </div>
-                  @if ($errors->has('email'))
-                  <span class="text-danger text-left">{{ $errors->first('email') }}</span>
-                  @endif
+                  <label class="form-label">Company Description</label>
+                  <textarea name="company_description" class="form-control" rows="4"
+                            placeholder="Brief description about the company">{{ old('company_description') }}</textarea>
                 </div>
               </div>
 
-               <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label" for="title">Mobile<span class="text-danger">*</span></label>
-                  <div class="input-group input-group-merge">
-                    <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
-                    <input type="text" class="form-control" name="mobile" id="mobile"
-                      value="{{ old('mobile') }}" placeholder="User mobile" />
-                  </div>
-                  @if ($errors->has('mobile'))
-                  <span class="text-danger text-left">{{ $errors->first('mobile') }}</span>
-                  @endif
-                </div>
-              </div>
-              
-
+               {{-- Website --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="designation">Designation</label>
-                  <div class="input-group input-group-merge">
-                    <span id="designation-icon" class="input-group-text">
-                      <i class="bx bx-briefcase"></i>
-                    </span>
-                    <input type="text" class="form-control" name="designation" id="designation"
-                      value="{{ old('designation') }}" placeholder="Enter designation" />
-                  </div>
-                  @if ($errors->has('designation'))
-                  <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
-                  @endif
-                </div>
-              </div>
-
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label" for="tags">Tags</label>
-                  <div class="input-group input-group-merge">
-                    <span id="tags-icon" class="input-group-text">
-                      <i class="bx bx-purchase-tag"></i>
-                    </span>
-                    <input type="text" class="form-control" name="tags" id="tags"
-                      value="{{ old('tags') }}" data-role="tagsinput"
-                      placeholder="Add tags (comma separated)" />
-                  </div>
-                  @if ($errors->has('tags'))
-                  <span class="text-danger text-left">{{ $errors->first('tags') }}</span>
-                  @endif
-                </div>
-              </div>
-
-              <div class="col-12">
-                <div class="mb-3">
-                   <label class="form-label">Bio <span class="text-danger">*</span></label>
-                    <textarea name="bio" id="bio" class="form-control" placeholder="Speaker Bio" rows="8">{{old('bio') }}</textarea>
-                    @if ($errors->has('bio'))
-                        <span class="text-danger">{{ $errors->first('bio') }}</span>
-                    @endif
-
-                </div>
-              </div>
-
-              <div class="col-12">
-                <div class="mb-3">
-                  <label class="form-label" for="website_url">Website</label>
+                  <label class="form-label">Website <span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-link"></i></span>
-                    <input type="text" class="form-control" name="website_url" id="website_url"
-                      value="{{ old('website_url') }}" placeholder="https://example.com" />
+                    <input type="url" name="website" class="form-control"
+                           value="{{ old('website') }}" placeholder="https://example.com" required>
                   </div>
-                  @if ($errors->has('website_url'))
-                  <span class="text-danger">{{ $errors->first('website_url') }}</span>
-                  @endif
                 </div>
               </div>
 
+              {{-- LinkedIn --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="linkedin_url">LinkedIn</label>
+                  <label class="form-label">LinkedIn</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
-                    <input type="text" class="form-control" name="linkedin_url" id="linkedin_url"
-                      value="{{ old('linkedin_url') }}" placeholder="https://linkedin.com/in/username" />
+                    <input type="url" name="linkedin" class="form-control"
+                           value="{{ old('linkedin') }}" placeholder="https://linkedin.com/company/...">
                   </div>
-                  @if ($errors->has('linkedin_url'))
-                  <span class="text-danger">{{ $errors->first('linkedin_url') }}</span>
-                  @endif
-                </div>
-              </div>
-               <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label" for="facebook_url">Facebook</label>
-                  <div class="input-group input-group-merge">
-                    <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
-                    <input type="text" class="form-control" name="facebook_url" id="facebook_url"
-                      value="{{ old('facebook_url') }}" placeholder="https://facebook.com" />
-                  </div>
-                  @if ($errors->has('facebook_url'))
-                  <span class="text-danger">{{ $errors->first('facebook_url') }}</span>
-                  @endif
                 </div>
               </div>
 
+              {{-- Twitter --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label" for="instagram">Instagram</label>
-                  <div class="input-group input-group-merge">
-                    <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
-                    <input type="text" class="form-control" name="instagram_url" id="instagram_url"
-                      value="{{ old('instagram_url') }}" placeholder="https://instagram.com" />
-                  </div>
-                  @if ($errors->has('instagram_url'))
-                  <span class="text-danger">{{ $errors->first('instagram_url') }}</span>
-                  @endif
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label" for="twitter">Twitter</label>
+                  <label class="form-label">Twitter</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
-                    <input type="text" class="form-control" name="twitter_url" id="twitter_url"
-                      value="{{ old('twitter_url') }}" placeholder="https://twitter.com" />
+                    <input type="url" name="twitter" class="form-control"
+                           value="{{ old('twitter') }}" placeholder="https://twitter.com/...">
                   </div>
-                  @if ($errors->has('twitter_url'))
-                  <span class="text-danger">{{ $errors->first('twitter_url') }}</span>
-                  @endif
+                </div>
+              </div>
+
+              {{-- Facebook --}}
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Facebook</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
+                    <input type="url" name="facebook" class="form-control"
+                           value="{{ old('facebook') }}" placeholder="https://facebook.com/...">
+                  </div>
                 </div>
               </div>
 
 
-              <input type="hidden" name="user_type" value="Sponsors"/>
+              <input type="hidden" name="is_sponsor" value="true"/>
 
             </div>
 
@@ -281,5 +302,188 @@ Admin | Add Sponsors
       .replace(/-+/g, '-'); // remove consecutive hyphens
     return str.replace(/^-+|-+$/g, '');
   }
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  function setupDropzone(wrapperId, inputId, previewId, placeholderId, removeId, browseId) {
+    // Add detailed logging to identify missing elements
+    console.log(`Setting up dropzone: ${wrapperId}`);
+    
+    const wrapper = document.getElementById(wrapperId);
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const placeholder = document.getElementById(placeholderId);
+    const removeBtn = document.getElementById(removeId);
+    const browseBtn = document.getElementById(browseId);
+
+    // Detailed error reporting
+    const elements = {
+      wrapper: { element: wrapper, id: wrapperId },
+      input: { element: input, id: inputId },
+      preview: { element: preview, id: previewId },
+      placeholder: { element: placeholder, id: placeholderId },
+      removeBtn: { element: removeBtn, id: removeId },
+      browseBtn: { element: browseBtn, id: browseId }
+    };
+
+    // Check which elements are missing
+    const missingElements = Object.entries(elements).filter(([key, obj]) => !obj.element);
+    
+    if (missingElements.length > 0) {
+      console.error(`Missing elements for ${wrapperId}:`, missingElements.map(([key, obj]) => `${key} (ID: ${obj.id})`));
+      return false;
+    }
+
+    console.log(`✅ All elements found for ${wrapperId}`);
+
+    // Handle browse button click
+    browseBtn.addEventListener("click", (e) => {
+      console.log(`Browse button clicked for ${wrapperId}`);
+      e.preventDefault();
+      e.stopPropagation();
+      input.click();
+    });
+
+    // Handle wrapper click (avoid conflicts with browse/remove buttons)
+    wrapper.addEventListener("click", (e) => {
+      // Check if click is on browse button, remove button, or their children
+      if (e.target === browseBtn || e.target === removeBtn || 
+          browseBtn.contains(e.target) || removeBtn.contains(e.target)) {
+        return;
+      }
+      e.preventDefault();
+      input.click();
+    });
+
+    // Handle input file selection
+    input.addEventListener("change", (e) => {
+      console.log(`File input changed for ${wrapperId}`);
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        
+        // File size validation (2MB = 2048KB)
+        if (file.size > 2 * 1024 * 1024) {
+          alert('File size must be less than 2MB');
+          input.value = '';
+          return;
+        }
+        
+        // File type validation
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file');
+          input.value = '';
+          return;
+        }
+        
+        showPreview(file);
+      }
+    });
+
+    // Show preview helper
+    function showPreview(file) {
+      console.log(`Showing preview for ${wrapperId}`);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        preview.src = ev.target.result;
+        preview.classList.remove("d-none");
+        placeholder.classList.add("d-none");
+        removeBtn.classList.remove("d-none");
+      };
+      reader.onerror = () => {
+        console.error('Error reading file');
+        alert('Error reading file. Please try again.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Remove file
+    removeBtn.addEventListener("click", (e) => {
+      console.log(`Remove button clicked for ${wrapperId}`);
+      e.preventDefault();
+      e.stopPropagation();
+      
+      input.value = "";
+      preview.src = "";
+      preview.classList.add("d-none");
+      placeholder.classList.remove("d-none");
+      removeBtn.classList.add("d-none");
+    });
+
+    // Drag and drop handlers
+    wrapper.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.style.borderColor = "var(--bs-primary)";
+    });
+
+    wrapper.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.style.borderColor = "var(--bs-border-color)";
+    });
+
+    wrapper.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.style.borderColor = "var(--bs-border-color)";
+
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        
+        // File size validation
+        if (file.size > 2 * 1024 * 1024) {
+          alert('File size must be less than 2MB');
+          return;
+        }
+        
+        // File type validation
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file');
+          return;
+        }
+
+        // Set the files property correctly
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        input.files = dataTransfer.files;
+
+        showPreview(file);
+      }
+    });
+
+    return true;
+  }
+
+  // Add a small delay to ensure all elements are rendered
+  setTimeout(() => {
+    console.log('🚀 Starting dropzone initialization...');
+    
+    // Initialize content icon dropzone
+    const contentSuccess = setupDropzone(
+      "logo-dropzone",
+      "dz-input-content",
+      "dz-image-content",
+      "dz-placeholder-content",
+      "dz-remove-content",
+      "dz-browse-content"
+    );
+
+    // Initialize quick link icon dropzone
+    const quickSuccess = setupDropzone(
+      "banner-dropzone",
+      "dz-input-quick",
+      "dz-image-quick",
+      "dz-placeholder-quick",
+      "dz-remove-quick",
+      "dz-browse-quick"
+    );
+
+    if (contentSuccess && quickSuccess) {
+      console.log('✅ All dropzones initialized successfully');
+    } else {
+      console.error('❌ Some dropzones failed to initialize');
+    }
+  }, 100);
+});
 </script>
 @endsection

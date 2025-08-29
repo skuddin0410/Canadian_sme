@@ -213,7 +213,7 @@ public function show(User $exhibitor_user, Request $request)
         ->where('user_id', $exhibitor_user->id)
         ->firstOrFail();
 
-    $booths = Booth::all(); // For assign form
+    $booths = Booth::all(); 
 
     return view('users.exhibitor_users.view', [
         'user' => $exhibitor_user,
@@ -237,46 +237,117 @@ public function show(User $exhibitor_user, Request $request)
      * Update the specified resource in storage.
      */
 
-    public function update(Request $request, User $exhibitor_user)
-    {
-        $validator = Validator::make($request->all(), [
-            'username'           => 'required|string|unique:users,username,' . $exhibitor_user->id,
-            'first_name'         => 'required|string|max:255',
-            'last_name'          => 'required|string|max:255',
-            'email'              => 'required|string|max:255|email|unique:users,email,' . $exhibitor_user->id,
-            'mobile'             => 'required|string|digits:10|unique:users,mobile,' . $exhibitor_user->id,
-            'company_name'       => 'required|string|max:255',
-            'company_email'      => 'required|email|max:255',
-            'company_phone'      => 'required|string|max:20',
-            'company_description'=> 'nullable|string'
-        ]);
+    // public function update(Request $request, User $exhibitor_user)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'username'           => 'required|string|unique:users,username,' . $exhibitor_user->id,
+    //         'first_name'         => 'required|string|max:255',
+    //         'last_name'          => 'required|string|max:255',
+    //         'email'              => 'required|string|max:255|email|unique:users,email,' . $exhibitor_user->id,
+    //         'mobile'             => 'required|string|digits:10|unique:users,mobile,' . $exhibitor_user->id,
+    //         'company_name'       => 'required|string|max:255',
+    //         'company_email'      => 'required|email|max:255',
+    //         'company_phone'      => 'required|string|max:20',
+    //         'company_description'=> 'nullable|string'
+    //     ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withInput()->withErrors($validator);
+    //     if ($validator->fails()) {
+    //         return redirect()->back()->withInput()->withErrors($validator);
+    //     }
+
+
+    //         $exhibitor_user->username = $request->username;
+    //         $exhibitor_user->name = $request->first_name;
+    //         $exhibitor_user->lastname = $request->last_name;
+    //         $exhibitor_user->email = $request->email;
+    //         $exhibitor_user->mobile = $request->mobile;
+
+
+    //         $exhibitor_user->save();
+    //         $exhibitor_user->company()->updateOrCreate(
+    //             ['user_id' => $exhibitor_user->id],
+    //             [
+    //                 'name'        => $request->company_name,
+    //                 'email'       => $request->company_email,
+    //                 'phone'       => $request->company_phone,
+    //                 'description' => $request->company_description,
+    //             ]
+    //         );
+
+    //     return redirect(route('exhibitor-users.index'))
+    //         ->withSuccess('User and company data have been updated successfully.');
+    // }
+public function update(Request $request, User $exhibitor_user)
+{
+    $validator = Validator::make($request->all(), [
+        'company_name'        => 'required|string|max:255',
+        'company_email'       => 'required|email|max:255|unique:companies,email,' . optional($exhibitor_user->company)->id,
+        'company_phone'       => 'required|string|max:20',
+        'company_description' => 'nullable|string',
+        'website'             => 'nullable|url',
+        'linkedin'            => 'nullable|url',
+        'twitter'             => 'nullable|url',
+        'facebook'            => 'nullable|url',
+        'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+        'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()->withInput()->withErrors($validator);
+    }
+
+    DB::beginTransaction();
+    try {
+     
+        $company = Company::updateOrCreate(
+            ['user_id' => $exhibitor_user->id], 
+            [
+                'name'        => $request->company_name,
+                'email'       => $request->company_email,
+                'phone'       => $request->company_phone,
+                'description' => $request->company_description,
+                'website'     => $request->website,
+                'linkedin'    => $request->linkedin,
+                'twitter'     => $request->twitter,
+                'facebook'    => $request->facebook,
+            ]
+        );
+
+     
+        if ($request->hasFile('content_icon')) {
+            $this->imageUpload(
+                $request->file("content_icon"),
+                'content_icon',
+                $company->id,
+                'companies',
+                'content_icon'
+            );
         }
 
-
-            $exhibitor_user->username = $request->username;
-            $exhibitor_user->name = $request->first_name;
-            $exhibitor_user->lastname = $request->last_name;
-            $exhibitor_user->email = $request->email;
-            $exhibitor_user->mobile = $request->mobile;
-
-
-            $exhibitor_user->save();
-            $exhibitor_user->company()->updateOrCreate(
-                ['user_id' => $exhibitor_user->id],
-                [
-                    'name'        => $request->company_name,
-                    'email'       => $request->company_email,
-                    'phone'       => $request->company_phone,
-                    'description' => $request->company_description,
-                ]
+      
+        if ($request->hasFile('quick_link_icon')) {
+            $this->imageUpload(
+                $request->file("quick_link_icon"),
+                'quick_link_icon',
+                $company->id,
+                'companies',
+                'quick_link_icon'
             );
+        }
+
+        DB::commit();
 
         return redirect(route('exhibitor-users.index'))
-            ->withSuccess('User and company data have been updated successfully.');
+            ->withSuccess('Exhibitor updated successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
     }
+}
+
+
 
     public function approve($id)
     {
@@ -297,55 +368,7 @@ public function show(User $exhibitor_user, Request $request)
 }
 
 
-// public function assignBooth(Request $request, $companyId)
-// {
-//     $company = Company::findOrFail($companyId);
 
-//     $request->validate([
-//         'booth_id' => 'required|exists:booths,id',
-//     ]);
-
-//     // Avoid duplicate assignments
-//     if (BoothUser::where('company_id', $company->id)
-//         ->where('booth_id', $request->booth_id)
-//         ->exists()) {
-//         return redirect()->route('exhibitor-users.show', $company->user_id)
-//             ->with('error', 'This booth is already assigned to the company.');
-//     }
-
-//     // Assign the booth
-//     BoothUser::create([
-//         'company_id' => $company->id,
-//         'booth_id'   => $request->booth_id,
-//     ]);
-
-//     return redirect()->route('exhibitor-users.show', $company->user_id)
-//         ->with('success', 'Booth assigned successfully.');
-// }
-// public function assignBooth(Request $request, $companyId)
-// {
-//     $company = Company::findOrFail($companyId);
-
-//     $request->validate([
-//         'booth_id' => 'required|exists:booths,id',
-//     ]);
-
-//     $boothId = $request->input('booth_id');
-
-//     // Prevent the same booth being assigned to multiple companies
-//     if (BoothUser::where('booth_id', $boothId)->exists()) {
-//         return redirect()->back()->withErrors('This booth is already assigned to another company.');
-//     }
-
-//     // Assign booth to company
-//     BoothUser::create([
-//         'company_id' => $company->id,
-//         'booth_id' => $boothId,
-//     ]);
-
-//     return redirect()->route('exhibitor-users.show', $company->user_id)
-//         ->with('success', 'Booth assigned successfully.');
-// }
 public function assignBooth(Request $request, $companyId)
 {
     $company = Company::findOrFail($companyId);
@@ -354,20 +377,23 @@ public function assignBooth(Request $request, $companyId)
         'booth_id' => 'required|exists:booths,id',
     ]);
 
-    // Prevent assigning the same booth twice
-    if (BoothUser::where('booth_id', $request->booth_id)->exists()) {
-        return redirect()->back()->withErrors('This booth is already assigned.');
+    $boothId = $request->input('booth_id');
+
+   
+    if (BoothUser::where('booth_id', $boothId)->exists()) {
+        return redirect()->back()->withErrors('This booth is already assigned to another company.');
     }
 
     BoothUser::create([
         'company_id' => $company->id,
-        'booth_id' => $request->booth_id,
+        'booth_id' => $boothId,
     ]);
+        // dd($company->id);
 
-    return redirect()->route('exhibitor-users.show', $company->user_id)
+
+    return redirect()->route('exhibitor-users.index')
                      ->with('success', 'Booth assigned successfully.');
 }
-
 
 
 

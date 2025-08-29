@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
             $table->foreign('booth_id')->references('id')->on('booths')->onDelete('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+              $table->unique(['booth_id', 'company_id']);
         });
     }
 

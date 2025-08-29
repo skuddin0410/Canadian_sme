@@ -51,7 +51,18 @@ public function quickLinkIconFile()
         ->where('table_type', 'companies')
         ->where('file_type', 'quick_link_icon');
 }
-
+public function logo()
+{
+    return $this->hasOne(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'companies')
+        ->where('file_type', 'logo');
+}
+public function banner()
+{
+    return $this->hasOne(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'companies')
+        ->where('file_type', 'banner');
+}
 
 
     public function logoFile()
