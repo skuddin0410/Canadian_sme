@@ -277,12 +277,7 @@
 }
 </style>
 
-<div class="dropzone" id="dropzone">
-  <p>Click or drag an image here</p>
-  <input type="file" id="fileInput" accept="image/*" hidden />
-  <img id="preview" style="display:none;" />
-  <button type="button" class="remove-btn" id="removeBtn" style="display:none;">Remove</button>
-</div>
+
 
 <script>
 const dropzone = document.getElementById("dropzone");
