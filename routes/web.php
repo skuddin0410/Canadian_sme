@@ -31,8 +31,6 @@ Route::group(['middleware' => 'auth:web'], function () {
    require __DIR__.'/common.php'; //used by all users in web
    require __DIR__.'/admin.php';  //Admin and Admin 
    require __DIR__.'/exhibitor.php';
-   require __DIR__.'/speaker.php';
-   require __DIR__.'/attendee.php';
    require __DIR__.'/helpdesk.php';
    require __DIR__.'/ticket.php';
 });
