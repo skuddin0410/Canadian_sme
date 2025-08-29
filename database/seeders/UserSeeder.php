@@ -90,33 +90,28 @@ class UserSeeder extends Seeder
         $sizes      = ['1-10','11-50','51-200','201-500','500+'];
 
         foreach($exhibitorsNames as $exhibitor) {
-
+            $name = $faker->company;
+            $email = $faker->companyEmail; 
+            $phone= $faker->e164PhoneNumber;
+            
             $exhibitorAdmin = User::create([
-                'name' => $exhibitor['first_name'],
-                'lastname'=>$exhibitor['last_name'],
-                'email' => strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']) . '@example.com',
-                'mobile' => $faker->numerify('##########'),
-                'tags'=>implode(',', $faker->randomElements($roles, rand(1, 3))),
-                'designation'=>$faker->jobTitle,
-                'bio'=>$faker->paragraph(3),
-                'password' => Hash::make('password'),
-                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name'])
+                'name' => $name,
+                'email' => $email,
+                'mobile' => $phone,
+                'password'   => Hash::make('password')
             ]);
+
             $exhibitorAdmin->assignRole('Exhibitor');
-            qrCode($exhibitorAdmin->id);
+             qrCode($exhibitorAdmin->id);
 
             $companies = [
                 'user_id'             => $exhibitorAdmin->id, // or assign dynamically
-                'name'                => $faker->company,
+                'name'                => $name,
                 'industry'            => $faker->randomElement($industries),
                 'size'                => $faker->randomElement($sizes),
                 'location'            => $faker->city . ', ' . $faker->country,
-                'email'               => $faker->companyEmail,
-                'phone'               => $faker->e164PhoneNumber, // +14155552671 format
+                'email'               => $email,
+                'phone'               => $phone, // +14155552671 format
                 'description'         => $faker->paragraph(3),
                 'website'             => $faker->url,
                 'linkedin'            => "https://www.linkedin.com/company/" . $faker->slug,
@@ -136,32 +131,27 @@ class UserSeeder extends Seeder
         }
 
         foreach ($sponsorsNames as $sponsor) {
+            $name = $faker->company;
+            $email = $faker->companyEmail; 
+            $phone= $faker->e164PhoneNumber;
+
             $sponsors = User::create([
-                'name' => $sponsor['first_name'],
-                'lastname'=>$sponsor['last_name'],
-                'email' => strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']) . '@example.com',
-                'mobile' => $faker->numerify('##########'),
-                'tags'=>implode(',', $faker->randomElements($roles, rand(1, 3))),
-                'designation'=>$faker->jobTitle,
-                'bio'=>$faker->paragraph(3),
-                'password' => Hash::make('password'),
-                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name'])
+                'name' => $name,
+                'email' => $email,
+                'mobile' => $phone,
+                'password'   => Hash::make('password')
             ]);
              $sponsors->assignRole('Sponsors');
              qrCode($sponsors->id);
 
              $companies = [
                 'user_id'             => $sponsors->id, // or assign dynamically
-                'name'                => $faker->company,
+                'name'                => $name,
                 'industry'            => $faker->randomElement($industries),
                 'size'                => $faker->randomElement($sizes),
                 'location'            => $faker->city . ', ' . $faker->country,
-                'email'               => $faker->companyEmail,
-                'phone'               => $faker->e164PhoneNumber, // +14155552671 format
+                'email'               => $email,
+                'phone'               => $phone, // +14155552671 format
                 'description'         => $faker->paragraph(3),
                 'website'             => $faker->url,
                 'linkedin'            => "https://www.linkedin.com/company/" . $faker->slug,
