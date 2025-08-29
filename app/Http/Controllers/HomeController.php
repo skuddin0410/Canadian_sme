@@ -59,9 +59,6 @@ class HomeController extends Controller
             return view('home',compact('evntCount','userCount','logs','loginlogs'));
         }
 
-        if (Auth::user()->hasRole('Affiliate Manager')) {
-            return redirect(route('affiliate.index'));
-        }
     }
 
     public function accountInfo(Request $request)
