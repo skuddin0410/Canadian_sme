@@ -291,4 +291,21 @@ class CompanyController extends Controller
 
         return back()->with('success', 'Video deleted successfully.');
     }
+    public function downloadQr($id): StreamedResponse
+{
+    $company = Company::findOrFail($id);
+
+    if (!$company->qr_code) {
+        return back()->with('error', 'QR Code not found for this company.');
+    }
+
+    // assuming qr codes are stored in storage/app/public/companies/{id}/qr/
+    $filePath = "qrcodes/{$user->qr_code}";
+
+    if (!Storage::disk('public')->exists($filePath)) {
+        return back()->with('error', 'QR Code file missing.');
+    }
+
+    return Storage::disk('public')->download($filePath, $company->name . '-qrcode.png');
+}
 }

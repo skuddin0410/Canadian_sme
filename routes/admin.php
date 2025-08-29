@@ -83,6 +83,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
         Route::get('/speakers', [CalendarController::class, 'speakers'])->name('speakers.list');
         Route::get('/exhibitors', [CalendarController::class, 'exhibitors'])->name('exhibitors.list');
         Route::get('/sponsors', [CalendarController::class, 'sponsors'])->name('sponsors.list');
+        Route::get('/sponsors/{user}/qr/download', function ($userId) {
+        return downloadQrCode($userId);
+          })->name('sponsors.qr.download');
     });
 
      Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);

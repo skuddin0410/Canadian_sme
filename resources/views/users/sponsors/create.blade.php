@@ -98,7 +98,7 @@ Admin | Add Sponsors
     </div>
   </div>
 
-  {{--Banner Icon --}}
+  {{-- Icon --}}
   <div class="col-md-6">
     <div class="mb-3">
       <label class="form-label">Banner</label>
@@ -159,7 +159,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-buildings"></i></span>
                     <input type="text" name="company_name" class="form-control"
-                           value="{{ old('company_name') }}" placeholder="Company Name" required>
+                           value="{{ old('company_name') }}" placeholder="Sponsor Name" required>
                   </div>
                 </div>
               </div>
@@ -171,7 +171,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-envelope"></i></span>
                     <input type="email" name="company_email" class="form-control"
-                           value="{{ old('company_email') }}" placeholder="Company Email" required>
+                           value="{{ old('company_email') }}" placeholder="Sponsor Email" required>
                   </div>
                 </div>
               </div>
@@ -183,7 +183,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-phone"></i></span>
                     <input type="text" name="company_phone" class="form-control"
-                           value="{{ old('company_phone') }}" placeholder="Company Phone" required>
+                           value="{{ old('company_phone') }}" placeholder="Sponsor Phone" required>
                   </div>
                 </div>
               </div>
@@ -195,7 +195,7 @@ Admin | Add Sponsors
                 <div class="mb-3">
                   <label class="form-label">Company Description</label>
                   <textarea name="company_description" class="form-control" rows="4"
-                            placeholder="Brief description about the company">{{ old('company_description') }}</textarea>
+                            placeholder="Brief description about the Sponsor">{{ old('company_description') }}</textarea>
                 </div>
               </div>
 
