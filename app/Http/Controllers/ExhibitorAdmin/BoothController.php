@@ -27,7 +27,7 @@ class BoothController extends Controller
         $offset = $perPage * ($pageNo - 1);
 
       if($request->ajax() && $request->ajax_request == true){
-        $booths = Booth::with('company')->orderBy('id','DESC');
+        $booths = Booth::orderBy('id','DESC');
 
         if($request->search){
             $booths = $booths->where(function($query) use($request){
@@ -89,7 +89,7 @@ class BoothController extends Controller
     public function show(string $id)
     {
         //
-    $booth = Booth::with('company')->findOrFail($id);
+    $booth = Booth::findOrFail($id);
     return view('company.booths.show', compact('booth'));
     }
 
