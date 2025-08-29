@@ -90,8 +90,8 @@
             @include('partial.error')
             @yield('content')
     
-          @include('partial.footer')
-          <div class="content-backdrop fade"></div>
+            @include('partial.footer')
+            <div class="content-backdrop fade"></div>
           </div>
         </div>
         </div>

@@ -56,7 +56,7 @@ Admin | Attendee Details
                             <label for="profileImageInput">
                               <img id="profileImagePreview" 
                                    src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
-                                   class="rounded-circle border border-2" 
+                                   class="border border-2" 
                                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
                             </label>
                         </div>    
@@ -65,7 +65,7 @@ Admin | Attendee Details
                             <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
                              </ul>
                         </div>  
-                        <div class="col-6">
+                        <div class="col-4">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Name:</span> <span>{{ $user->name }}
                                             {{ $user->lastname }}</span></li>
@@ -88,7 +88,8 @@ Admin | Attendee Details
                                     </li>
                                 </ul>
                             </div>
-                            <div class="col-6">
+                           
+                            <div class="col-4">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Website:</span> <span>{{ $user->website_url }}</span></li>
                                    
@@ -98,6 +99,11 @@ Admin | Attendee Details
                                    <li class="mb-3"><span class="fw-medium me-2">Instagram:</span> <span>{{ $user->instagram_url }}</span></li>
                                    <li class="mb-3"><span class="fw-medium me-2">Twitter:</span> <span>{{ $user->twitter_url }}</span></li> 
                                 </ul>
+                            </div>
+                            <div class="col-4">
+                                 <img id="profileImagePreview" 
+                                   src="{{$user->qr_code}}" style="width: 250px; height: 250px; object-fit: cover; cursor: pointer;">
+                                 
                             </div>
 
                         </div>

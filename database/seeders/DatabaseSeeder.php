@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ProductTechnicalSpecsSeeder::class,
             ServiceCategoriesSeeder::class,
             ServicesSeeder::class,
+            SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
         ]);
     }
 }
