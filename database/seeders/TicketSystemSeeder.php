@@ -41,14 +41,6 @@ class TicketSystemSeeder extends Seeder
         }
 
     $categories = [
-        [ 'name' => 'Technology', 'type' => 'event' ],
-        [ 'name' => 'Health & Wellness', 'type' => 'event' ],
-        [ 'name' => 'Business & Entrepreneurship', 'type' => 'event' ],
-        [ 'name' => 'Education & Training', 'type' => 'event' ],
-        [ 'name' => 'Arts & Culture', 'type' => 'event' ],
-        [ 'name' => 'Sports & Fitness', 'type' => 'event' ],
-        [ 'name' => 'Music & Entertainment', 'type' => 'event' ],
-        [ 'name' => 'Science & Innovation', 'type' => 'event' ],
 
         // 🔹 Summit / Conference related
         [ 'name' => 'Leadership Summit', 'type' => 'event' ],
@@ -59,10 +51,13 @@ class TicketSystemSeeder extends Seeder
         [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
         [ 'name' => 'Government & Policy', 'type' => 'event' ],
         [ 'name' => 'Women in Leadership', 'type' => 'event' ],
-        [ 'name' => 'Global Innovation Forum', 'type' => 'event' ],
+        [ 'name' => 'Event', 'type' => 'event' ],
+        [ 'name' => 'CloudTrends', 'type' => 'event' ],
+        [ 'name' => 'DataSecurity', 'type' => 'event' ],
+        [ 'name' => 'TechnoVation', 'type' => 'event' ],
     ];
 
-    $tracks = [
+       $tracks = [
                 [ 'name' => 'Keynotes & Vision',            'slug' => 'keynotes-vision',            'type' => 'track' ],
                 [ 'name' => 'Leadership & Strategy',        'slug' => 'leadership-strategy',        'type' => 'track' ],
                 [ 'name' => 'Startup & Investment',         'slug' => 'startup-investment',         'type' => 'track' ],

@@ -14,7 +14,7 @@
           <h5 class="mb-0">Edit Exhibitor</h5>
         </div>
         <div class="card-body">
-
+         
           {{-- Main Update Form --}}
           <form 
             action="{{ route('exhibitor-users.update', $user->id) }}" 
@@ -40,37 +40,37 @@
       @endphp
 
       <div id="content-icon-dropzone"
-           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
-        
-        {{-- Placeholder --}}
-        <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $contentIconFile ? 'd-none' : '' }}">
-          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-          <div>
+     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+  
+    {{-- Placeholder --}}
+    <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $contentIconFile ? 'd-none' : '' }}">
+        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+        <div>
             <strong>Drag & drop</strong> an image here, or
             <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-          </div>
-          <small class="text-muted d-block">Max 2048 KB</small>
         </div>
+        <small class="text-muted d-block">Max 2048 KB</small>
+    </div>
 
-        {{-- Preview --}}
-        <img id="dz-image-content"
-             src="{{ $contentIconSrc }}"
-             alt="Preview"
-             class="{{ $contentIconFile ? '' : 'd-none' }} rounded"
-             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+    {{-- Preview --}}
+    <img id="dz-image-content"
+         src="{{ $contentIconSrc }}"
+         alt="Preview"
+         class="{{ $contentIconFile ? '' : 'd-none' }} rounded"
+         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-        {{-- Remove --}}
-        <button type="button"
-                id="dz-remove-content"
-                class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
-                style="top: .5rem; right: .5rem;">
-          <i class="bx bx-x"></i> Remove
-        </button>
+    {{-- Remove --}}
+    <button type="button"
+            id="dz-remove-content"
+            class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
+            style="top: .5rem; right: .5rem;">
+        <i class="bx bx-x"></i> Remove
+    </button>
 
-        {{-- Input --}}
-        <input type="file" id="dz-input-content" name="content_icon" accept="image/*" class="d-none">
-      </div>
+    {{-- Input --}}
+    <input type="file" id="dz-input-content" name="content_icon" accept="image/*" class="d-none">
+</div>
 
       @error('content_icon')
         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -93,37 +93,37 @@
       @endphp
 
       <div id="quick-link-icon-dropzone"
-           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-        {{-- Placeholder --}}
-        <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $quickLinkFile ? 'd-none' : '' }}">
-          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-          <div>
+    {{-- Placeholder --}}
+    <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $quickLinkFile ? 'd-none' : '' }}">
+        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+        <div>
             <strong>Drag & drop</strong> an image here, or
             <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-          </div>
-          <small class="text-muted d-block">Max 2048 KB</small>
         </div>
+        <small class="text-muted d-block">Max 2048 KB</small>
+    </div>
 
-        {{-- Preview --}}
-        <img id="dz-image-quick"
-             src="{{ $quickLinkSrc }}"
-             alt="Preview"
-             class="{{ $quickLinkFile ? '' : 'd-none' }} rounded"
-             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+    {{-- Preview --}}
+    <img id="dz-image-quick"
+         src="{{ $quickLinkSrc }}"
+         alt="Preview"
+         class="{{ $quickLinkFile ? '' : 'd-none' }} rounded"
+         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-        {{-- Remove --}}
-        <button type="button"
-                id="dz-remove-quick"
-                class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
-                style="top: .5rem; right: .5rem;">
-          <i class="bx bx-x"></i> Remove
-        </button>
+    {{-- Remove --}}
+    <button type="button"
+            id="dz-remove-quick"
+            class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
+            style="top: .5rem; right: .5rem;">
+        <i class="bx bx-x"></i> Remove
+    </button>
 
-        {{-- Input --}}
-        <input type="file" id="dz-input-quick" name="quick_link_icon" accept="image/*" class="d-none">
-      </div>
+    {{-- Input --}}
+    <input type="file" id="dz-input-quick" name="quick_link_icon" accept="image/*" class="d-none">
+</div>
 
       @error('quick_link_icon')
         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -247,91 +247,129 @@
     </div>
   </div>
 </div>
-@endsection
-<style>
-.dropzone {
-  border: 2px dashed #ccc;
-  border-radius: 10px;
-  padding: 30px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-}
-.dropzone.dragover {
-  border-color: #4a90e2;
-  background: #f0f8ff;
-}
-.dropzone img {
-  max-width: 150px;
-  margin-top: 10px;
-  display: block;
-}
-.dropzone .remove-btn {
-  margin-top: 5px;
-  background: red;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-</style>
-
-
 
 <script>
-const dropzone = document.getElementById("dropzone");
-const fileInput = document.getElementById("fileInput");
-const preview = document.getElementById("preview");
-const removeBtn = document.getElementById("removeBtn");
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropzone = document.getElementById('content-icon-dropzone');
+    const fileInput = document.getElementById('dz-input-content');
+    const imagePreview = document.getElementById('dz-image-content');
+    const removeButton = document.getElementById('dz-remove-content');
+    const placeholder = document.getElementById('dz-placeholder-content');
 
-// Click → open file picker
-dropzone.addEventListener("click", () => fileInput.click());
+    // Handle file selection (browse button)
+    document.getElementById('dz-browse-content').addEventListener('click', function () {
+      fileInput.click();
+    });
 
-// File picker change → preview
-fileInput.addEventListener("change", () => {
-  if (fileInput.files.length > 0) {
-    showPreview(fileInput.files[0]);
-  }
-});
+    // Handle file drop
+    dropzone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      dropzone.style.backgroundColor = '#eef6ff';  // Optional: Change background on drag over
+    });
 
-// Drag over
-dropzone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropzone.classList.add("dragover");
-});
+    dropzone.addEventListener('dragleave', function () {
+      dropzone.style.backgroundColor = '';  // Reset background on drag leave
+    });
 
-// Drag leave
-dropzone.addEventListener("dragleave", () => {
-  dropzone.classList.remove("dragover");
-});
+    dropzone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      handleFiles(e.dataTransfer.files);
+    });
 
-// Drop → preview
-dropzone.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropzone.classList.remove("dragover");
-  if (e.dataTransfer.files.length > 0) {
-    fileInput.files = e.dataTransfer.files;
-    showPreview(fileInput.files[0]);
-  }
-});
+    // Handle file input change
+    fileInput.addEventListener('change', function () {
+      handleFiles(fileInput.files);
+    });
 
-// Remove → reset
-removeBtn.addEventListener("click", () => {
-  fileInput.value = "";
-  preview.src = "";
-  preview.style.display = "none";
-  removeBtn.style.display = "none";
-});
+    // Handle file removal
+    removeButton.addEventListener('click', function () {
+      fileInput.value = '';  // Clear the file input
+      imagePreview.classList.add('d-none');  // Hide the preview image
+      placeholder.classList.remove('d-none');  // Show the placeholder
+      removeButton.classList.add('d-none');  // Hide the remove button
+    });
 
-// Preview helper
-function showPreview(file) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    preview.src = e.target.result;
-    preview.style.display = "block";
-    removeBtn.style.display = "inline-block";
-  };
-  reader.readAsDataURL(file);
-}
+    // Function to handle the selected files
+    function handleFiles(files) {
+      if (files && files[0]) {
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.classList.remove('d-none');
+            placeholder.classList.add('d-none');
+            removeButton.classList.remove('d-none');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('Please select a valid image file.');
+        }
+      }
+    }
+  });
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropzone = document.getElementById('quick-link-icon-dropzone');
+    const fileInput = document.getElementById('dz-input-quick');
+    const imagePreview = document.getElementById('dz-image-quick');
+    const removeButton = document.getElementById('dz-remove-quick');
+    const placeholder = document.getElementById('dz-placeholder-quick');
+
+    // Handle file selection (browse button)
+    document.getElementById('dz-browse-quick').addEventListener('click', function () {
+      fileInput.click();
+    });
+
+    // Handle file drop
+    dropzone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      dropzone.style.backgroundColor = '#eef6ff';  // Optional: Change background on drag over
+    });
+
+    dropzone.addEventListener('dragleave', function () {
+      dropzone.style.backgroundColor = '';  // Reset background on drag leave
+    });
+
+    dropzone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // Handle file input change
+    fileInput.addEventListener('change', function () {
+      handleFiles(fileInput.files);
+    });
+
+    // Handle file removal
+    removeButton.addEventListener('click', function () {
+      fileInput.value = '';  // Clear the file input
+      imagePreview.classList.add('d-none');  // Hide the preview image
+      placeholder.classList.remove('d-none');  // Show the placeholder
+      removeButton.classList.add('d-none');  // Hide the remove button
+    });
+
+    // Function to handle the selected files
+    function handleFiles(files) {
+      if (files && files[0]) {
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.classList.remove('d-none');
+            placeholder.classList.add('d-none');
+            removeButton.classList.remove('d-none');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('Please select a valid image file.');
+        }
+      }
+    }
+  });
+</script>
+@endsection
+

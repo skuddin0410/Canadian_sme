@@ -51,16 +51,11 @@ public function index(Request $request)
         $search = "%" . $request->search . "%";
         $query->where(function ($q) use ($search) {
             $q->where("users.name", "LIKE", $search)
-              ->orWhere("users.username", "LIKE", $search)
               ->orWhere("users.mobile", "LIKE", $search)
               ->orWhere("users.email", "LIKE", $search);
         });
     }
 
-   
-    if ($request->filled("start_at") && $request->filled("end_at")) {
-        $query->whereBetween("created_at", [$request->start_at, $request->end_at]);
-    }
 
    
     $users = $query->paginate($perPage, ["*"], "page", $pageNo);
@@ -101,7 +96,7 @@ public function index(Request $request)
      */
     public function create()
     {
-        //
+
          return view('users.exhibitor_users.create');
     }
 
@@ -192,21 +187,7 @@ public function index(Request $request)
     }
 
 
-    
-// public function show(User $exhibitor_user, Request $request)
-// {   
-//     $company = Company::with(['boothUsers.booth', 'certificationFile', 'logoFile', 'mediaGallery', 'videos'])
-//         ->where('user_id', $exhibitor_user->id)
-//         ->firstOrFail();
 
-//     $booths = Booth::all(); // For the assign form
-
-//     return view('users.exhibitor_users.view', [
-//         'user' => $exhibitor_user,
-//         'company' => $company,
-//         'booths' => $booths
-//     ]);
-// }
 public function show(User $exhibitor_user, Request $request)
 {   
     $company = Company::with(['boothUsers.booth', 'certificationFile', 'logoFile', 'mediaGallery', 'videos'])
@@ -228,124 +209,80 @@ public function show(User $exhibitor_user, Request $request)
      * Show the form for editing the specified resource.
      */
     public function edit(User $exhibitor_user)
+    {    
+        $user = User::with('company')->findOrFail($exhibitor_user->id);
+        return view('users.exhibitor_users.edit', ['user' => $user]);
+    }
+
+    public function update(Request $request, User $exhibitor_user)
     {
-        //
-         return view('users.exhibitor_users.edit', ['user' => $exhibitor_user]);
-    }
+        $validator = Validator::make($request->all(), [
+            'company_name'        => 'required|string|max:255',
+            'company_email'       => 'required|email|max:255|unique:companies,email,' . optional($exhibitor_user->company)->id,
+            'company_phone'       => 'required|string|max:20',
+            'company_description' => 'nullable|string',
+            'website'             => 'nullable|url',
+            'linkedin'            => 'nullable|url',
+            'twitter'             => 'nullable|url',
+            'facebook'            => 'nullable|url',
+            'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-
-    // public function update(Request $request, User $exhibitor_user)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'username'           => 'required|string|unique:users,username,' . $exhibitor_user->id,
-    //         'first_name'         => 'required|string|max:255',
-    //         'last_name'          => 'required|string|max:255',
-    //         'email'              => 'required|string|max:255|email|unique:users,email,' . $exhibitor_user->id,
-    //         'mobile'             => 'required|string|digits:10|unique:users,mobile,' . $exhibitor_user->id,
-    //         'company_name'       => 'required|string|max:255',
-    //         'company_email'      => 'required|email|max:255',
-    //         'company_phone'      => 'required|string|max:20',
-    //         'company_description'=> 'nullable|string'
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return redirect()->back()->withInput()->withErrors($validator);
-    //     }
-
-
-    //         $exhibitor_user->username = $request->username;
-    //         $exhibitor_user->name = $request->first_name;
-    //         $exhibitor_user->lastname = $request->last_name;
-    //         $exhibitor_user->email = $request->email;
-    //         $exhibitor_user->mobile = $request->mobile;
-
-
-    //         $exhibitor_user->save();
-    //         $exhibitor_user->company()->updateOrCreate(
-    //             ['user_id' => $exhibitor_user->id],
-    //             [
-    //                 'name'        => $request->company_name,
-    //                 'email'       => $request->company_email,
-    //                 'phone'       => $request->company_phone,
-    //                 'description' => $request->company_description,
-    //             ]
-    //         );
-
-    //     return redirect(route('exhibitor-users.index'))
-    //         ->withSuccess('User and company data have been updated successfully.');
-    // }
-public function update(Request $request, User $exhibitor_user)
-{
-    $validator = Validator::make($request->all(), [
-        'company_name'        => 'required|string|max:255',
-        'company_email'       => 'required|email|max:255|unique:companies,email,' . optional($exhibitor_user->company)->id,
-        'company_phone'       => 'required|string|max:20',
-        'company_description' => 'nullable|string',
-        'website'             => 'nullable|url',
-        'linkedin'            => 'nullable|url',
-        'twitter'             => 'nullable|url',
-        'facebook'            => 'nullable|url',
-        'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-        'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-    ]);
-
-    if ($validator->fails()) {
-        return redirect()->back()->withInput()->withErrors($validator);
-    }
-
-    DB::beginTransaction();
-    try {
-     
-        $company = Company::updateOrCreate(
-            ['user_id' => $exhibitor_user->id], 
-            [
-                'name'        => $request->company_name,
-                'email'       => $request->company_email,
-                'phone'       => $request->company_phone,
-                'description' => $request->company_description,
-                'website'     => $request->website,
-                'linkedin'    => $request->linkedin,
-                'twitter'     => $request->twitter,
-                'facebook'    => $request->facebook,
-            ]
-        );
-
-     
-        if ($request->hasFile('content_icon')) {
-            $this->imageUpload(
-                $request->file("content_icon"),
-                'content_icon',
-                $company->id,
-                'companies',
-                'content_icon'
-            );
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
         }
 
-      
-        if ($request->hasFile('quick_link_icon')) {
-            $this->imageUpload(
-                $request->file("quick_link_icon"),
-                'quick_link_icon',
-                $company->id,
-                'companies',
-                'quick_link_icon'
+        DB::beginTransaction();
+        try {
+         
+            $company = Company::updateOrCreate(
+                ['user_id' => $exhibitor_user->id], 
+                [
+                    'name'        => $request->company_name,
+                    'email'       => $request->company_email,
+                    'phone'       => $request->company_phone,
+                    'description' => $request->company_description,
+                    'website'     => $request->website,
+                    'linkedin'    => $request->linkedin,
+                    'twitter'     => $request->twitter,
+                    'facebook'    => $request->facebook,
+                ]
             );
+
+         
+            if ($request->hasFile('content_icon')) {
+                $this->imageUpload(
+                    $request->file("content_icon"),
+                    'content_icon',
+                    $company->id,
+                    'companies',
+                    'content_icon'
+                );
+            }
+
+          
+            if ($request->hasFile('quick_link_icon')) {
+                $this->imageUpload(
+                    $request->file("quick_link_icon"),
+                    'quick_link_icon',
+                    $company->id,
+                    'companies',
+                    'quick_link_icon'
+                );
+            }
+
+            DB::commit();
+
+            return redirect(route('exhibitor-users.index'))
+                ->withSuccess('Exhibitor updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
         }
-
-        DB::commit();
-
-        return redirect(route('exhibitor-users.index'))
-            ->withSuccess('Exhibitor updated successfully.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()
-            ->withInput()
-            ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
     }
-}
 
 
 
