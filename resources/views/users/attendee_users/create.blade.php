@@ -5,6 +5,15 @@ Admin | Add Attendee
 @endsection
 
 @section('content')
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+<style>
+  .select2-container--bootstrap-5 .select2-selection {
+  min-height: calc(1.5em + 0.75rem + 2px);
+}
+</style>
+
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">Attendee/</span>Create</h4>
 
@@ -12,32 +21,45 @@ Admin | Add Attendee
     <div class="card-body">
       <div class="row g-3 align-items-start">
         <div class="col-md-4">
-          <label class="form-label fw-semibold mb-2">Profile Photo</label>
-          <div id="profileDropZone" class="profile-drop-zone rounded border border-2 d-flex align-items-center justify-content-center">
-            <input type="file" id="profileImageInput" accept="image/*" class="d-none form-control">
-            <img id="profileImagePreview"
-                 src="{{ $user->photo->file_path ?? '' }}"
-                 class="w-100 h-100 object-fit-cover rounded {{ empty($user?->photo?->file_path) ? 'd-none' : '' }}">
-            <div class="dz-hint text-center p-3">
-              <i class="bx bx-user-plus fs-2 d-block mb-1"></i>
-              <small class="text-muted">Drag & drop or click</small>
-            </div>
-          </div>
-        </div>
+  <label class="form-label fw-semibold mb-2">Profile Photo</label>
+  <div id="profileDropZone" class="profile-drop-zone rounded border border-2 d-flex align-items-center justify-content-center">
+    <input type="file" id="profileImageInput" accept="image/*" class="d-none form-control">
+    <img id="profileImagePreview"
+         src="{{ $user->photo->file_path ?? '' }}"
+         class="w-100 h-100 object-fit-cover rounded {{ empty($user?->photo?->file_path) ? 'd-none' : '' }}">
+    <div class="dz-hint text-center p-3 {{ !empty($user?->photo?->file_path) ? 'd-none' : '' }}">
+      <i class="bx bx-user-plus fs-2 d-block mb-1"></i>
+      <small class="text-muted">Drag & drop or click</small>
+    </div>
 
-        <div class="col-md-8">
-          <label class="form-label fw-semibold mb-2">Cover Photo</label>
-          <div id="coverDropZone" class="cover-drop-zone rounded border border-2 d-flex align-items-center justify-content-center">
-            <input type="file" id="coverImageInput" accept="image/*" class="d-none form-control">
-            <img id="coverImagePreview"
-                 src="{{ $user->cover_photo->file_path ?? '' }}"
-                 class="w-100 h-100 object-fit-cover rounded {{ empty($user?->cover_photo?->file_path) ? 'd-none' : '' }}">
-            <div class="dz-hint text-center">
-              <i class="bx bx-image-add fs-1 d-block mb-1"></i>
-              <small class="text-muted">Drag & drop or click</small>
-            </div>
-          </div>
-        </div>
+    <!-- NEW: Remove button -->
+    <button type="button" id="profileRemoveBtn"
+            class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 {{ empty($user?->photo?->file_path) ? 'd-none' : '' }}" data-photoid="{{ !empty($user->photo) ? $user->photo->id : '' }}">
+      <i class="bx bx-trash"></i> Remove
+    </button>
+  </div>
+</div>
+
+<div class="col-md-8">
+  <label class="form-label fw-semibold mb-2">Cover Photo</label>
+  <div id="coverDropZone" class="cover-drop-zone rounded border border-2 d-flex align-items-center justify-content-center">
+    <input type="file" id="coverImageInput" accept="image/*" class="d-none form-control">
+    <img id="coverImagePreview"
+         src="{{ $user->cover_photo->file_path ?? '' }}"
+         class="w-100 h-100 object-fit-cover rounded {{ empty($user?->cover_photo?->file_path) ? 'd-none' : '' }}">
+    <div class="dz-hint text-center {{ !empty($user?->cover_photo?->file_path) ? 'd-none' : '' }}">
+      <i class="bx bx-image-add fs-1 d-block mb-1"></i>
+      <small class="text-muted">Drag & drop or click</small>
+    </div>
+
+    <!-- NEW: Remove button -->
+    <button type="button" id="coverRemoveBtn"
+            class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 {{ empty($user?->cover_photo?->file_path) ? 'd-none' : '' }}" data-photoid="{{ !empty($user->cover_photo) ? $user->cover_photo->id : '' }}">
+      <i class="bx bx-trash"></i> Remove
+    </button>
+  </div>
+</div>
+
       </div>
     </div>
   </div>
@@ -251,7 +273,7 @@ Admin | Add Attendee
                         <label class="form-label">Website</label>
                         <div class="input-group input-group-merge">
                           <span class="input-group-text"><i class="bx bx-link"></i></span>
-                          <input type="text" class="form-control" name="website_url" value="{{ $user->website_url ?? old('website_url') }}" placeholder="https://example.com">
+                          <input type="text" class="form-control" name="website_url" value="{{ old('website_url') }}" placeholder="https://example.com">
                         </div>
                         @error('website_url') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
@@ -260,7 +282,7 @@ Admin | Add Attendee
                         <label class="form-label">LinkedIn</label>
                         <div class="input-group input-group-merge">
                           <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
-                          <input type="text" class="form-control" name="linkedin_url" value="{{ $user->linkedin_url ?? old('linkedin_url') }}" placeholder="https://linkedin.com/in/username">
+                          <input type="text" class="form-control" name="linkedin_url" value="{{  old('linkedin_url') }}" placeholder="https://linkedin.com/in/username">
                         </div>
                         @error('linkedin_url') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
@@ -269,7 +291,7 @@ Admin | Add Attendee
                         <label class="form-label">Facebook</label>
                         <div class="input-group input-group-merge">
                           <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
-                          <input type="text" class="form-control" name="facebook_url" value="{{ $user->facebook_url ?? old('facebook_url') }}" placeholder="https://facebook.com/username">
+                          <input type="text" class="form-control" name="facebook_url" value="{{  old('facebook_url') }}" placeholder="https://facebook.com/username">
                         </div>
                         @error('facebook_url') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
@@ -278,7 +300,7 @@ Admin | Add Attendee
                         <label class="form-label">Instagram</label>
                         <div class="input-group input-group-merge">
                           <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
-                          <input type="text" class="form-control" name="instagram_url" value="{{ $user->instagram_url ?? old('instagram_url') }}" placeholder="https://instagram.com/username">
+                          <input type="text" class="form-control" name="instagram_url" value="{{ old('instagram_url') }}" placeholder="https://instagram.com/username">
                         </div>
                         @error('instagram_url') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
@@ -287,7 +309,7 @@ Admin | Add Attendee
                         <label class="form-label">Twitter</label>
                         <div class="input-group input-group-merge">
                           <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
-                          <input type="text" class="form-control" name="twitter_url" value="{{ $user->twitter_url ?? old('twitter_url') }}" placeholder="https://twitter.com/username">
+                          <input type="text" class="form-control" name="twitter_url" value="{{  old('twitter_url') }}" placeholder="https://twitter.com/username">
                         </div>
                         @error('twitter_url') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
@@ -296,70 +318,68 @@ Admin | Add Attendee
               </div>
               </div>
 
-              {{-- ACCESS PERMISSIONS: 3 separate selects --}}
+              {{-- ACCESS PERMISSIONS --}}
               <div class="tab-pane fade" id="access" role="tabpanel">
                 <div class="row">
-                  @php
-                    $ap = [
-                      'speaker'    => old('access_speaker',    $user->access_speaker    ?? 0),
-                      'exhibitor'  => old('access_exhibitor',  $user->access_exhibitor  ?? 0),
-                      'sponsors'   => old('access_sponsors',   $user->access_sponsors   ?? 0),
-                    ];
-                  @endphp
-                  <div class="col-md-4">
-                    <label class="form-label">Speaker</label>
-                    <select class="form-select mb-3" name="access_speaker">
-                      <option value="0" {{ !$ap['speaker']?'selected':'' }}>No</option>
-                      <option value="1" {{  $ap['speaker']?'selected':'' }}>Yes</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label">Exhibitor</label>
-                    <select class="form-select mb-3" name="access_exhibitor">
-                      <option value="0" {{ !$ap['exhibitor']?'selected':'' }}>No</option>
-                      <option value="1" {{  $ap['exhibitor']?'selected':'' }}>Yes</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label">Sponsors</label>
-                    <select class="form-select mb-3" name="access_sponsors">
-                      <option value="0" {{ !$ap['sponsors']?'selected':'' }}>No</option>
-                      <option value="1" {{  $ap['sponsors']?'selected':'' }}>Yes</option>
-                    </select>
-                  </div>
+                
+                    
+                    <div class="col-md-12">
+                      <label class="form-label">Speaker</label>
+                      <select class="form-select select2" name="access_speaker_ids[]" multiple
+                              data-placeholder="Select speaker(s)" data-allow-clear="true">
+                        @foreach($speakers as $speaker)
+                          <option value="{{ $speaker->id }}">
+                            {{ $speaker->full_name }}
+                          </option>
+                        @endforeach
+                      </select>
+                      @error('access_speaker_ids') <div class="text-danger">{{ $message }}</div> @enderror
+                    </div>
+
+                    {{-- EXHIBITORS --}}
+                   
+                    <div class="col-md-12">
+                      <label class="form-label">Exhibitor</label>
+                      <select class="form-select select2" name="access_exhibitor_ids[]" multiple
+                              data-placeholder="Select exhibitor(s)" data-allow-clear="true">
+                        @foreach($exhibitors as $exhibitor)
+                          <option value="{{ $exhibitor->id }}">
+                            {{ $exhibitor->name }}
+                          </option>
+                        @endforeach
+                      </select>
+                      @error('access_exhibitor_ids') <div class="text-danger">{{ $message }}</div> @enderror
+                    </div>
+
+      
+                    <div class="col-md-12">
+                      <label class="form-label">Sponsors</label>
+                      <select class="form-select select2" name="access_sponsor_ids[]" multiple
+                              data-placeholder="Select sponsor(s)" data-allow-clear="true">
+                        @foreach($sponsors as $sponsor)
+                          <option value="{{ $sponsor->id }}">
+                            {{ $sponsor->name }}
+                          </option>
+                        @endforeach
+                      </select>
+                      @error('access_sponsor_ids') <div class="text-danger">{{ $message }}</div> @enderror
+                    </div>
+
                 </div>
               </div>
 
               {{-- PRIVATE DOCS --}}
               <div class="tab-pane fade" id="docs" role="tabpanel">
-                <label class="form-label d-block">Upload Private Docs</label>
-                <div id="docsDropZone" class="docs-drop-zone text-center">
-                  <input type="file" id="privateDocsInput" name="private_docs[]" accept="image/*,application/pdf" class="d-none" multiple>
-                  <div class="dz-hint">
-                    <i class="bx bx-upload fs-1 d-block"></i>
-                    <span class="fw-medium">Drag & drop files here</span>
-                    <small class="d-block text-muted">PNG, JPG, PDF (multiple allowed) — or click to browse</small>
-                  </div>
-                  <div id="docsPreview" class="row g-3 mt-2"></div>
-                </div>
-
-                {{-- Existing docs list (below) --}}
-                <div class="mt-4">
-                  <h6 class="mb-3">Private Documents</h6>
-                  @php $docs = $user->privateDocs ?? []; @endphp
-                  @if (!empty($docs) && count($docs))
-                    <div class="list-group">
-                      @foreach ($docs as $doc)
-                        <a href="{{ $doc->file_path }}" target="_blank" class="list-group-item list-group-item-action d-flex align-items-center">
-                          <i class="bx bx-file me-2"></i> {{ $doc->original_name ?? basename($doc->file_path) }}
-                          <span class="ms-auto text-muted small">{{ number_format(($doc->size ?? 0)/1024, 1) }} KB</span>
-                        </a>
-                      @endforeach
+              <label class="form-label d-block">Upload Private Docs</label>
+                  <div id="docsDropZone" class="docs-drop-zone text-center">
+                    <input type="file" id="privateDocsInput" name="private_docs[]" accept="image/*" class="d-none" multiple>
+                    <div class="dz-hint">
+                      <i class="bx bx-upload fs-1 d-block"></i>
+                      <span class="fw-medium">Drag & drop files here</span>
+                      <small class="d-block text-muted">PNG, JPG, PDF (multiple allowed) — or click to browse</small>
                     </div>
-                  @else
-                    <p class="text-muted mb-0">No documents uploaded yet.</p>
-                  @endif
-                </div>
+                    <div id="docsPreview" class="row g-3 mt-2"></div>
+                  </div>
               </div>
             </div>
           </div>
@@ -417,73 +437,6 @@ Admin | Add Attendee
     const dt2=new DataTransfer(); Array.from(files).forEach(f=>dt2.items.add(f)); visibleEl.files=dt2.files;
   }
 
-  // Profile (left)
-  (function(){
-    const zone=document.getElementById('profileDropZone');
-    const visible=document.getElementById('profileImageInput');
-    const shadow=document.getElementById('profileImageInputShadow');
-    const preview=document.getElementById('profileImagePreview');
-
-    function handle(files){
-      const f=files[0]; if(!f||!f.type.startsWith('image/')) return;
-      fileToDataURL(f,(url)=>{ preview.src=url; preview.classList.remove('d-none'); zone.querySelector('.dz-hint')?.classList.add('d-none'); });
-      setShadowFile(visible,shadow,f);
-    }
-    zone.addEventListener('click',()=>visible.click());
-    ['dragover','dragleave','drop'].forEach(evt=>{
-      zone.addEventListener(evt,(e)=>{ e.preventDefault(); if(evt==='dragover') zone.classList.add('dragover'); if(evt!=='dragover') zone.classList.remove('dragover'); if(evt==='drop') handle(e.dataTransfer.files); });
-    });
-    visible.addEventListener('change',(e)=>handle(e.target.files));
-  })();
-
-  // Cover (right)
-  (function(){
-    const zone=document.getElementById('coverDropZone');
-    const visible=document.getElementById('coverImageInput');
-    const shadow=document.getElementById('coverImageInputShadow');
-    const preview=document.getElementById('coverImagePreview');
-
-    function handle(files){
-      const f=files[0]; if(!f||!f.type.startsWith('image/')) return;
-      fileToDataURL(f,(url)=>{ preview.src=url; preview.classList.remove('d-none'); zone.querySelector('.dz-hint')?.classList.add('d-none'); });
-      setShadowFile(visible,shadow,f);
-    }
-    zone.addEventListener('click',()=>visible.click());
-    ['dragover','dragleave','drop'].forEach(evt=>{
-      zone.addEventListener(evt,(e)=>{ e.preventDefault(); if(evt==='dragover') zone.classList.add('dragover'); if(evt!=='dragover') zone.classList.remove('dragover'); if(evt==='drop') handle(e.dataTransfer.files); });
-    });
-    visible.addEventListener('change',(e)=>handle(e.target.files));
-  })();
-
-  // Private Docs
-  (function(){
-    const zone=document.getElementById('docsDropZone');
-    const input=document.getElementById('privateDocsInput');
-    const previewWrap=document.getElementById('docsPreview');
-
-    function makeCard(file, dataURL){
-      const col=document.createElement('div'); col.className='col-12 col-sm-6 col-md-4 col-lg-3';
-      const card=document.createElement('div'); card.className='card h-100';
-      const body=document.createElement('div'); body.className='card-body d-flex flex-column align-items-center';
-      if(file.type.startsWith('image/')){ const img=document.createElement('img'); img.src=dataURL; img.className='img-fluid mb-2 rounded'; img.style.maxHeight='140px'; body.appendChild(img); }
-      else { const ico=document.createElement('i'); ico.className='bx bx-file fs-1 mb-2'; body.appendChild(ico); }
-      const name=document.createElement('div'); name.className='small text-center text-truncate w-100'; name.title=file.name; name.textContent=file.name;
-      body.appendChild(name); card.appendChild(body); col.appendChild(card); return col;
-    }
-
-    function handle(files){
-      const accepted=Array.from(files).filter(f=>f.type.startsWith('image/')||f.type==='application/pdf');
-      if(!accepted.length) return;
-      setMultipleShadowFiles(input,'private_docs',accepted);
-      previewWrap.innerHTML=''; accepted.forEach(f=>{ if(f.type.startsWith('image/')) fileToDataURL(f,(url)=>previewWrap.appendChild(makeCard(f,url))); else previewWrap.appendChild(makeCard(f,null)); });
-    }
-
-    zone.addEventListener('click',()=>input.click());
-    ['dragover','dragleave','drop'].forEach(evt=>{
-      zone.addEventListener(evt,(e)=>{ e.preventDefault(); if(evt==='dragover') zone.classList.add('dragover'); if(evt!=='dragover') zone.classList.remove('dragover'); if(evt==='drop') handle(e.dataTransfer.files); });
-    });
-    input.addEventListener('change',(e)=>handle(e.target.files));
-  })();
 </script>
 
 <script>
@@ -499,10 +452,6 @@ document.addEventListener('DOMContentLoaded', function () {
     tab.show();
   }
 
-  // Priority for which tab to show on load:
-  // 1) URL hash (#access / #docs / #basic)
-  // 2) Last tab saved in localStorage
-  // 3) Default to #basic
   const candidates = [window.location.hash, localStorage.getItem(tabKey), '#basic'];
   const desired = candidates.find(sel => sel && tabsEl.querySelector(`button[data-bs-target="${sel}"]`));
   if (desired) showTab(desired);
@@ -514,6 +463,270 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState(null, '', target); // set hash without jumping/reloading
   });
 });
+</script>
+
+{{-- Select2 JS --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $('.select2').each(function () {
+    const $el = $(this);
+    $el.select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: $el.data('placeholder') || '',
+      allowClear: !!$el.data('allow-clear'),
+      closeOnSelect: false
+    });
+  });
+
+
+(function(){
+  const zone     = document.getElementById('profileDropZone');
+  const visible  = document.getElementById('profileImageInput');
+  const shadow   = document.getElementById('profileImageInputShadow'); // if you have one
+  const preview  = document.getElementById('profileImagePreview');
+  const hint     = zone.querySelector('.dz-hint');
+  const removeBtn= document.getElementById('profileRemoveBtn');
+  //const removeFg = document.getElementById('remove_profile_image');
+
+  function fileToDataURL(file, cb){ const r=new FileReader(); r.onload=e=>cb(e.target.result); r.readAsDataURL(file); }
+  function setShadowFile(file){
+    if (!shadow) return;
+    const dt = new DataTransfer();
+    if (file) dt.items.add(file);
+    shadow.files = dt.files;
+  }
+  function clearInputs(){
+    if (visible) visible.value = '';
+    if (shadow) shadow.value = '';
+  }
+  function showRemove(show){
+    removeBtn?.classList.toggle('d-none', !show);
+  }
+
+  function handle(files){
+    const f = files && files[0];
+    if (!f || !f.type?.startsWith('image/')) return;
+    fileToDataURL(f, url => {
+      preview.src = url;
+      preview.classList.remove('d-none');
+      hint?.classList.add('d-none');
+      showRemove(true);
+     // not removing anymore because we have a new file
+    });
+    // mirror to shadow if you use one
+    setShadowFile(f);
+  }
+
+  // clicking zone opens file picker
+  zone.addEventListener('click', e => {
+    // don’t trigger file dialog when pressing remove
+    if (e.target === removeBtn) return;
+    visible.click();
+  });
+
+  // DnD behavior
+  ['dragover','dragleave','drop'].forEach(evt=>{
+    zone.addEventListener(evt,(e)=>{
+      e.preventDefault();
+      if (evt==='dragover') zone.classList.add('dragover');
+      if (evt!=='dragover') zone.classList.remove('dragover');
+      if (evt==='drop') handle(e.dataTransfer.files);
+    });
+  });
+
+  // File chosen
+  visible.addEventListener('change', e => handle(e.target.files));
+
+  removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+  
+      preview.src = '';
+      preview.classList.add('d-none');
+      hint?.classList.remove('d-none');
+      clearInputs();
+      showRemove(false);
+    });
+
+  // If page loads with an existing image, show button
+  if (!preview.classList.contains('d-none')) showRemove(true);
+})();
+</script>
+
+<script>
+(function(){
+  const zone      = document.getElementById('coverDropZone');
+  const visible   = document.getElementById('coverImageInput');          // picker used for UX
+  const shadow    = document.getElementById('coverImageInputShadow');    // real <input name="cover_image">
+  const preview   = document.getElementById('coverImagePreview');
+  const hint      = zone.querySelector('.dz-hint');
+  const removeBtn = document.getElementById('coverRemoveBtn');
+  //const removeFg  = document.getElementById('remove_cover_image');
+
+  function fileToDataURL(file, cb){ const r=new FileReader(); r.onload=e=>cb(e.target.result); r.readAsDataURL(file); }
+  function mirrorToShadow(file){
+    if (!shadow) return;
+    const dt = new DataTransfer();
+    if (file) dt.items.add(file);
+    shadow.files = dt.files;
+  }
+  function clearFiles(){
+    if (visible) visible.value = '';
+    if (shadow)  shadow.value  = '';
+  }
+  function showRemove(show){ removeBtn?.classList.toggle('d-none', !show); }
+
+  function handle(files){
+    const f = files && files[0];
+    if (!f || !f.type?.startsWith('image/')) return;
+    fileToDataURL(f, url => {
+      preview.src = url;
+      preview.classList.remove('d-none');
+      hint?.classList.add('d-none');
+      showRemove(true);
+      //removeFg.value = '0'; // we’re NOT removing if a new file is chosen
+    });
+    mirrorToShadow(f);
+  }
+
+  // open file dialog (don’t trigger when clicking Remove)
+  zone.addEventListener('click', e => {
+    if (e.target === removeBtn) return;
+    visible.click();
+  });
+
+  // drag & drop
+  ['dragover','dragleave','drop'].forEach(evt=>{
+    zone.addEventListener(evt,(e)=>{
+      e.preventDefault();
+      if (evt==='dragover') zone.classList.add('dragover');
+      if (evt!=='dragover') zone.classList.remove('dragover');
+      if (evt==='drop') handle(e.dataTransfer.files);
+    });
+  });
+
+  // chosen via dialog
+  visible.addEventListener('change', e => handle(e.target.files));
+
+  // remove button
+  removeBtn?.addEventListener('click', e => {
+    e.stopPropagation();
+    preview.src = '';
+    preview.classList.add('d-none');
+    hint?.classList.remove('d-none');
+    clearFiles();
+    showRemove(false);
+  });
+
+  // initial state
+  if (!preview.classList.contains('d-none')) showRemove(true);
+})();
+  </script>
+
+  <script>
+// File helpers
+function fileToDataURL(file, cb) {
+  const r = new FileReader();
+  r.onload = (e) => cb(e.target.result);
+  r.readAsDataURL(file);
+}
+
+// Function to remove document preview
+function removeDoc(fileId) {
+  const fileElement = document.getElementById(`doc-preview-${fileId}`);
+  if (fileElement) {
+    fileElement.remove(); // Remove the file from the preview
+  }
+  // Optionally, remove the file from the form data or handle the removal in your backend
+}
+
+// Function to create a preview for uploaded documents
+function makeCard(file, dataURL) {
+  const fileId = file.name + Date.now(); // Use unique identifier (you can use a better method if necessary)
+
+  const col = document.createElement('div');
+  col.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+  col.id = `doc-preview-${fileId}`;
+
+  const card = document.createElement('div');
+  card.className = 'card h-100';
+
+  const body = document.createElement('div');
+  body.className = 'card-body d-flex flex-column align-items-center';
+
+  if (file.type.startsWith('image/')) {
+    const img = document.createElement('img');
+    img.src = dataURL;
+    img.className = 'img-fluid mb-2 rounded';
+    img.style.maxHeight = '140px';
+    body.appendChild(img);
+  } else {
+    const ico = document.createElement('i');
+    ico.className = 'bx bx-file fs-1 mb-2';
+    body.appendChild(ico);
+  }
+
+  const name = document.createElement('div');
+  name.className = 'small text-center text-truncate w-100';
+  name.title = file.name;
+  name.textContent = file.name;
+  body.appendChild(name);
+
+  // Add remove button
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'btn btn-sm btn-danger mt-2';
+  removeBtn.textContent = 'Remove';
+  
+  // Attach the click event listener using `once: true` to ensure it only triggers once
+  removeBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent the click event from reaching the upload area
+    removeDoc(fileId);
+  }, { once: true });
+
+  body.appendChild(removeBtn);
+
+  card.appendChild(body);
+  col.appendChild(card);
+  return col;
+}
+
+// Handle file selection or drag-and-drop
+document.getElementById('privateDocsInput').addEventListener('change', (e) => {
+  const files = e.target.files;
+  const previewWrap = document.getElementById('docsPreview');
+
+  Array.from(files).forEach((file) => {
+    if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+      fileToDataURL(file, (url) => {
+        const docCard = makeCard(file, url);
+        previewWrap.appendChild(docCard);
+      });
+    }
+  });
+});
+
+// Drag-and-drop functionality
+const zone = document.getElementById('docsDropZone');
+zone.addEventListener('click', (e) => {
+  // Prevent the file input dialog from opening if the remove button is clicked
+  if (e.target.classList.contains('btn-danger')) return;
+  document.getElementById('privateDocsInput').click();
+});
+zone.addEventListener('dragover', (e) => e.preventDefault());
+zone.addEventListener('dragleave', (e) => e.preventDefault());
+zone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const files = e.dataTransfer.files;
+  Array.from(files).forEach((file) => {
+    if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+      fileToDataURL(file, (url) => {
+        const docCard = makeCard(file, url);
+        document.getElementById('docsPreview').appendChild(docCard);
+      });
+    }
+  });
+});
+
 </script>
 @endsection
 

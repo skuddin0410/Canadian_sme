@@ -90,8 +90,16 @@ class AttendeeUserController extends Controller
      */
     public function create()
     {   
+        $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
+                $q->whereIn("name", ['Speaker']);
+            })->orderBy('created_at', 'DESC')->get();
+
+        $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
+        $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+
         $groups=['Attendee','Speaker','Sponsor','Exhibitor','Admin'];
-        return view('users.attendee_users.create',compact('groups'));
+        return view('users.attendee_users.create',compact('groups','exhibitors','sponsors','speakers'));
     }
 
     /**
@@ -104,12 +112,12 @@ class AttendeeUserController extends Controller
          
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+            'email' => 'required|string|max:255|email|unique:users,email',
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|unique:users,mobile,' . $user->id,
+            'mobile' => 'required|string|unique:users,mobile',
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -162,6 +170,14 @@ class AttendeeUserController extends Controller
 
          if ($request->hasFile('cover_image')) {
           $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+        }
+
+        if (!empty($request->private_docs)) {
+
+          foreach($request->private_docs as $img){
+             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
+          }  
+          
         }
 
         return redirect()->to(route('attendee-users.edit', $user->id))->withSuccess('Saved successfully.');

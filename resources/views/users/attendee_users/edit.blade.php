@@ -409,15 +409,18 @@ Admin | Edit Attendee Data
                   <h6 class="mb-3">Private Documents</h6>
                   @php $docs = $user->privateDocs ?? []; @endphp
                   @if (!empty($docs) && count($docs))
-                    <div class="list-group">
-                      @foreach ($docs as $doc)
-                        <a href="{{ $doc->file_path }}" target="_blank" class="list-group-item list-group-item-action d-flex align-items-center">
+                   <div class="list-group">
+                    @foreach ($docs as $doc)
+                      <div class="d-flex align-items-center justify-content-between">
+                        <a href="{{ $doc->file_path }}" target="_blank" class="list-group-item list-group-item-action d-flex align-items-center w-75">
                           <i class="bx bx-file me-2"></i> {{ $doc->original_name ?? basename($doc->file_path) }}
                           <span class="ms-auto text-muted small">{{ number_format(($doc->size ?? 0)/1024, 1) }} KB</span>
-                          <i class="bx bx-trash ml-6"></i>
                         </a>
-                      @endforeach
-                    </div>
+                        <i class="bx bx-trash ml-3" onclick="photoDelete({{$doc->id}})"></i>
+                      </div>
+                    @endforeach
+                  </div>
+
                   @else
                     <p class="text-muted mb-0">No documents uploaded yet.</p>
                   @endif
@@ -480,41 +483,7 @@ Admin | Edit Attendee Data
     const dt2=new DataTransfer(); Array.from(files).forEach(f=>dt2.items.add(f)); visibleEl.files=dt2.files;
   }
 
-  // Profile dropzone
-  (function(){
-    const zone=document.getElementById('profileDropZone');
-    const visible=document.getElementById('profileImageInput');
-    const shadow=document.getElementById('profileImageInputShadow');
-    const preview=document.getElementById('profileImagePreview');
-    function handle(files){
-      const f=files[0]; if(!f||!f.type.startsWith('image/')) return;
-      fileToDataURL(f,(url)=>{ preview.src=url; preview.classList.remove('d-none'); zone.querySelector('.dz-hint')?.classList.add('d-none'); });
-      setShadowFile(visible,shadow,f);
-    }
-    zone.addEventListener('click',()=>visible.click());
-    ['dragover','dragleave','drop'].forEach(evt=>{
-      zone.addEventListener(evt,(e)=>{ e.preventDefault(); if(evt==='dragover') zone.classList.add('dragover'); if(evt!=='dragover') zone.classList.remove('dragover'); if(evt==='drop') handle(e.dataTransfer.files); });
-    });
-    visible.addEventListener('change',(e)=>handle(e.target.files));
-  })();
 
-  // Cover dropzone
-  (function(){
-    const zone=document.getElementById('coverDropZone');
-    const visible=document.getElementById('coverImageInput');
-    const shadow=document.getElementById('coverImageInputShadow');
-    const preview=document.getElementById('coverImagePreview');
-    function handle(files){
-      const f=files[0]; if(!f||!f.type.startsWith('image/')) return;
-      fileToDataURL(f,(url)=>{ preview.src=url; preview.classList.remove('d-none'); zone.querySelector('.dz-hint')?.classList.add('d-none'); });
-      setShadowFile(visible,shadow,f);
-    }
-    zone.addEventListener('click',()=>visible.click());
-    ['dragover','dragleave','drop'].forEach(evt=>{
-      zone.addEventListener(evt,(e)=>{ e.preventDefault(); if(evt==='dragover') zone.classList.add('dragover'); if(evt!=='dragover') zone.classList.remove('dragover'); if(evt==='drop') handle(e.dataTransfer.files); });
-    });
-    visible.addEventListener('change',(e)=>handle(e.target.files));
-  })();
 
   // Private docs dropzone
   (function(){
@@ -598,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const preview  = document.getElementById('profileImagePreview');
   const hint     = zone.querySelector('.dz-hint');
   const removeBtn= document.getElementById('profileRemoveBtn');
-  const removeFg = document.getElementById('remove_profile_image');
+  //const removeFg = document.getElementById('remove_profile_image');
 
   function fileToDataURL(file, cb){ const r=new FileReader(); r.onload=e=>cb(e.target.result); r.readAsDataURL(file); }
   function setShadowFile(file){
@@ -623,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function () {
       preview.classList.remove('d-none');
       hint?.classList.add('d-none');
       showRemove(true);
-      removeFg.value = '0'; // not removing anymore because we have a new file
+     // not removing anymore because we have a new file
     });
     // mirror to shadow if you use one
     setShadowFile(f);
@@ -686,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const preview   = document.getElementById('coverImagePreview');
   const hint      = zone.querySelector('.dz-hint');
   const removeBtn = document.getElementById('coverRemoveBtn');
-  const removeFg  = document.getElementById('remove_cover_image');
+  //const removeFg  = document.getElementById('remove_cover_image');
 
   function fileToDataURL(file, cb){ const r=new FileReader(); r.onload=e=>cb(e.target.result); r.readAsDataURL(file); }
   function mirrorToShadow(file){
@@ -709,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function () {
       preview.classList.remove('d-none');
       hint?.classList.add('d-none');
       showRemove(true);
-      removeFg.value = '0'; // we’re NOT removing if a new file is chosen
+      //removeFg.value = '0'; // we’re NOT removing if a new file is chosen
     });
     mirrorToShadow(f);
   }
@@ -759,6 +728,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // initial state
   if (!preview.classList.contains('d-none')) showRemove(true);
 })();
+
+
+function photoDelete(photoId){
+    $.ajax({
+      url: `/delete/photo`, 
+      type: 'POST',
+      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+      data: { photo_id: photoId },
+      success: function (res) {
+         
+          location.reload();
+           alert('Image removed successfully');
+      },
+      error: function (xhr) {
+          console.error('Error removing image:', xhr.responseText);
+      }
+    });
+}
 </script>
 
 @endsection
