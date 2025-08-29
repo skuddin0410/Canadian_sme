@@ -55,13 +55,15 @@ Admin | Add Attendee
 
     <div class="row">
       {{-- LEFT: Tabs --}}
-      <div class="col-lg-8">
+      <div class="col-lg-12">
         <div class="card mb-4">
           <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs" id="attendeeTabs" role="tablist">
               <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">Basic Information</button>
               </li>
+
+
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="access-tab" data-bs-toggle="tab" data-bs-target="#access" type="button" role="tab">Access Permissions</button>
               </li>
@@ -76,154 +78,222 @@ Admin | Add Attendee
               {{-- BASIC INFORMATION --}}
               <div class="tab-pane fade show active" id="basic" role="tabpanel">
                 <div class="row">
-                  <div class="col-md-6">
-                    <label class="form-label">First Name <span class="text-danger">*</span></label>
-                    <div class="input-group input-group-merge mb-3">
-                      <span class="input-group-text"><i class="bx bx-user"></i></span>
-                      <input type="text" class="form-control" name="first_name" id="slug-source"
-                             value="{{ $user->name ?? old('first_name') }}" placeholder="First name">
-                    </div>
-                    @error('first_name') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                    <div class="input-group input-group-merge mb-3">
-                      <span class="input-group-text"><i class="bx bx-user"></i></span>
-                      <input type="text" class="form-control" name="last_name" id="last-name-target"
-                             value="{{ $user->lastname ?? old('last_name') }}" placeholder="Last name">
-                    </div>
-                    @error('last_name') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  {{-- NEW: Primary & Secondary Groups --}}
-                  <div class="col-md-6">
-                    <label class="form-label">User Primary Group</label>
-                    <select class="form-select mb-3" name="primary_group_id">
-                      <option value="">Select primary group</option>
-                      @foreach(($groups ?? []) as $g)
-                        <option value="{{ $g->id }}" {{ (old('primary_group_id', $user->primary_group_id ?? null) == $g->id) ? 'selected' : '' }}>
-                          {{ $g->name }}
-                        </option>
-                      @endforeach
-                    </select>
-                    @error('primary_group_id') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">User Secondary Group</label>
-                    <select class="form-select mb-3" name="secondary_group_id">
-                      <option value="">Select secondary group</option>
-                      @foreach(($groups ?? []) as $g)
-                        <option value="{{ $g->id }}" {{ (old('secondary_group_id', $user->secondary_group_id ?? null) == $g->id) ? 'selected' : '' }}>
-                          {{ $g->name }}
-                        </option>
-                      @endforeach
-                    </select>
-                    @error('secondary_group_id') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  {{-- NEW: Status --}}
-                  <div class="col-md-6">
-                    <label class="form-label">Status</label>
-                    <select class="form-select mb-3" name="status">
-                      @php $status = old('status', $user->status ?? 'confirmed'); @endphp
-                      <option value="confirmed" {{ $status==='confirmed'?'selected':'' }}>Confirmed</option>
-                      <option value="waitlist" {{ $status==='waitlist'?'selected':'' }}>Waitlist</option>
-                      <option value="inactive" {{ $status==='inactive'?'selected':'' }}>Inactive</option>
-                    </select>
-                    @error('status') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">Company</label>
-                    <div class="input-group input-group-merge mb-3">
-                      <span class="input-group-text"><i class="bx bx-buildings"></i></span>
-                      <input type="text" class="form-control" name="company" value="{{ $user->company ?? old('company') }}" placeholder="Company / Organization">
-                    </div>
-                    @error('company') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">Email <span class="text-danger">*</span></label>
-                    <div class="input-group input-group-merge mb-3">
-                      <span class="input-group-text"><i class="bx bx-envelope"></i></span>
-                      <input type="text" class="form-control" name="email" id="email" value="{{ $user->email ?? old('email') }}" placeholder="Email">
-                    </div>
-                    @error('email') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">Mobile <span class="text-danger">*</span></label>
-                    <div class="input-group input-group-merge mb-3">
-                      <span class="input-group-text"><i class="bx bx-phone"></i></span>
-                      <input type="text" class="form-control" name="mobile" id="mobile" value="{{ $user->mobile ?? old('mobile') }}" placeholder="Mobile">
-                    </div>
-                    @error('mobile') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">Designation</label>
-                    <div class="input-group input-group-merge mb-3">
-                      <span class="input-group-text"><i class="bx bx-briefcase"></i></span>
-                      <input type="text" class="form-control" name="designation" id="designation" value="{{ $user->designation ?? old('designation') }}" placeholder="Designation">
-                    </div>
-                    @error('designation') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label class="form-label">User Interest</label>
-                      <div class="d-flex flex-wrap gap-2">
-                        
-                        <input type="checkbox" class="btn-check" id="tagEvent" name="tags[]" value="Event"
-                          {{ in_array('Event', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
-                        <label class="btn btn-outline-primary" for="tagEvent">Event</label>
-
-                        <input type="checkbox" class="btn-check" id="tagCloudTrends" name="tags[]" value="CloudTrends"
-                          {{ in_array('CloudTrends', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
-                        <label class="btn btn-outline-success" for="tagCloudTrends">CloudTrends</label>
-
-                        <input type="checkbox" class="btn-check" id="tagDataseecurity" name="tags[]" value="Dataseecurity"
-                          {{ in_array('Dataseecurity', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
-                        <label class="btn btn-outline-info" for="tagDataseecurity">Dataseecurity</label>
-
-                        <input type="checkbox" class="btn-check" id="tagTechnoVation" name="tags[]" value="TechnoVation"
-                          {{ in_array('TechnoVation', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
-                        <label class="btn btn-outline-warning" for="tagTechnoVation">TechnoVation</label>
-
-                      </div>
-                      @error('tags')
-                        <div class="text-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-
-                  </div>
-
-                  <div class="col-12">
-                    <label class="form-label">Bio <span class="text-danger">*</span></label>
-                    <textarea name="bio" id="bio" class="form-control mb-3" rows="6" placeholder="Speaker Bio">{{ $user->bio ?? old('bio') }}</textarea>
-                    @error('bio') <div class="text-danger">{{ $message }}</div> @enderror
-                  </div>
-
-                  {{-- NEW: Checkboxes --}}
-                  <div class="col-12">
+                <div class="col-lg-8">
                     <div class="row">
                       <div class="col-md-6">
-                        <div class="form-check mb-2">
-                          <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1" {{ old('send_email', $user->send_email ?? false) ? 'checked' : '' }}>
-                          <label class="form-check-label" for="send_email">Would you like to send email?</label>
+                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-user"></i></span>
+                          <input type="text" class="form-control" name="first_name" id="slug-source"
+                                 value="{{ $user->name ?? old('first_name') }}" placeholder="First name">
                         </div>
+                        @error('first_name') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
+
                       <div class="col-md-6">
-                        <div class="form-check mb-2">
-                          <input class="form-check-input" type="checkbox" id="gdpr_consent" name="gdpr_consent" value="1" {{ old('gdpr_consent', $user->gdpr_consent ?? false) ? 'checked' : '' }}>
-                          <label class="form-check-label" for="gdpr_consent">Networking / GDPR Consent (share profile & content with other users)</label>
+                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-user"></i></span>
+                          <input type="text" class="form-control" name="last_name" id="last-name-target"
+                                 value="{{ $user->lastname ?? old('last_name') }}" placeholder="Last name">
+                        </div>
+                        @error('last_name') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-envelope"></i></span>
+                          <input type="text" class="form-control" name="email" id="email" value="{{ $user->email ?? old('email') }}" placeholder="Email">
+                        </div>
+                        @error('email') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-phone"></i></span>
+                          <input type="text" class="form-control" name="mobile" id="mobile" value="{{ $user->mobile ?? old('mobile') }}" placeholder="Mobile">
+                        </div>
+                        @error('mobile') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+                    
+                      <div class="col-md-6">
+                        <label class="form-label">Company</label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-buildings"></i></span>
+                          <input type="text" class="form-control" name="company" value="{{ $user->company ?? old('company') }}" placeholder="Company / Organization">
+                        </div>
+                        @error('company') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                        <div class="col-md-6">
+                        <label class="form-label">Designation</label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-briefcase"></i></span>
+                          <input type="text" class="form-control" name="designation" id="designation" value="{{ $user->designation ?? old('designation') }}" placeholder="Designation">
+                        </div>
+                        @error('designation') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                        {{-- NEW: Primary & Secondary Groups --}}
+                      <div class="col-md-6">
+                        <label class="form-label">User Primary Group</label>
+                        <select class="form-select mb-3" name="primary_group">
+                          <option value="">Select primary group</option>
+                          @foreach(($groups ?? []) as $g)
+                            <option value="{{ $g }}" {{ (old('primary_group', $user->primary_group ?? null) == $g) ? 'selected' : '' }}>
+                              {{ $g }}
+                            </option>
+                          @endforeach
+                        </select>
+                        @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">User Other Group</label>
+                    @php
+
+                      $rawSelected = old('secondary_group', $user->secondary_group ?? []);
+                      $selectedSecondary = is_array($rawSelected)
+                          ? $rawSelected
+                          : (strlen((string) $rawSelected) ? explode(',', (string) $rawSelected) : []);
+                    @endphp
+
+                  <label class="form-label">User Secondary Group (multiple)</label>
+                  <select class="form-select mb-3" name="secondary_group[]" id="secondary_group" multiple>
+                    @foreach(($groups ?? []) as $g)
+                      <option value="{{ $g }}" {{ in_array($g, $selectedSecondary, true) ? 'selected' : '' }}>
+                        {{ $g }}
+                      </option>
+                    @endforeach
+                  </select>
+                   <small class="text-muted">Hold <kbd>Ctrl</kbd>/<kbd>⌘</kbd> to select more than one.</small>
+                       @error('secondary_group') <div class="text-danger">{{ $message }}</div> @enderror
+
+                        @error('secondary_group') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label class="form-label">User Interest</label>
+                          <div class="d-flex flex-wrap gap-2">
+                            
+                            <input type="checkbox" class="btn-check" id="tagEvent" name="tags[]" value="Event"
+                              {{ in_array('Event', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
+                            <label class="btn btn-outline-primary" for="tagEvent">Event</label>
+
+                            <input type="checkbox" class="btn-check" id="tagCloudTrends" name="tags[]" value="CloudTrends"
+                              {{ in_array('CloudTrends', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
+                            <label class="btn btn-outline-success" for="tagCloudTrends">CloudTrends</label>
+
+                            <input type="checkbox" class="btn-check" id="tagDataseecurity" name="tags[]" value="Dataseecurity"
+                              {{ in_array('Dataseecurity', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
+                            <label class="btn btn-outline-info" for="tagDataseecurity">Dataseecurity</label>
+
+                            <input type="checkbox" class="btn-check" id="tagTechnoVation" name="tags[]" value="TechnoVation"
+                              {{ in_array('TechnoVation', old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
+                            <label class="btn btn-outline-warning" for="tagTechnoVation">TechnoVation</label>
+
+                          </div>
+                          @error('tags')
+                            <div class="text-danger">{{ $message }}</div>
+                          @enderror
+                        </div>
+
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <select class="form-select mb-3" name="status">
+                          @php $status = old('status', $user->status ?? 'confirmed'); @endphp
+                          <option value="confirmed" {{ $status==='confirmed'?'selected':'' }}>Confirmed</option>
+                          <option value="waitlist" {{ $status==='waitlist'?'selected':'' }}>Waitlist</option>
+                          <option value="inactive" {{ $status==='inactive'?'selected':'' }}>Inactive</option>
+                        </select>
+                        @error('status') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+
+                      <div class="col-12">
+                        <label class="form-label">Bio <span class="text-danger">*</span></label>
+                        <textarea name="bio" id="bio" class="form-control mb-3" rows="6" placeholder="Speaker Bio">{{ $user->bio ?? old('bio') }}</textarea>
+                        @error('bio') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      {{-- NEW: Checkboxes --}}
+                      <div class="col-12">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-check mb-2">
+                              <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1" {{ old('send_email', $user->send_email ?? false) ? 'checked' : '' }}>
+                              <label class="form-check-label" for="send_email">Would you like to send email?</label>
+                            </div>
+                          </div>
+                          <div class="col-md-12">
+                            <div class="form-check mb-2">
+                              <input class="form-check-input" type="checkbox" id="gdpr_consent" name="gdpr_consent" value="1" {{ old('gdpr_consent', $user->gdpr_consent ?? false) ? 'checked' : '' }}>
+                              <label class="form-check-label" for="gdpr_consent">Networking / GDPR Consent (share profile & content with other users)</label>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
                 </div>
+
+                <div class="col-lg-4">
+                  
+                   {{--  <div class="d-flex align-items-center">
+                      <i class="bx bx-share-alt fs-4 me-2"></i><span class="fw-semibold">Social Links</span>
+                    </div> --}}
+                  
+                      <div class="mb-3">
+                        <label class="form-label">Website</label>
+                        <div class="input-group input-group-merge">
+                          <span class="input-group-text"><i class="bx bx-link"></i></span>
+                          <input type="text" class="form-control" name="website_url" value="{{ $user->website_url ?? old('website_url') }}" placeholder="https://example.com">
+                        </div>
+                        @error('website_url') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">LinkedIn</label>
+                        <div class="input-group input-group-merge">
+                          <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
+                          <input type="text" class="form-control" name="linkedin_url" value="{{ $user->linkedin_url ?? old('linkedin_url') }}" placeholder="https://linkedin.com/in/username">
+                        </div>
+                        @error('linkedin_url') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Facebook</label>
+                        <div class="input-group input-group-merge">
+                          <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
+                          <input type="text" class="form-control" name="facebook_url" value="{{ $user->facebook_url ?? old('facebook_url') }}" placeholder="https://facebook.com/username">
+                        </div>
+                        @error('facebook_url') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Instagram</label>
+                        <div class="input-group input-group-merge">
+                          <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
+                          <input type="text" class="form-control" name="instagram_url" value="{{ $user->instagram_url ?? old('instagram_url') }}" placeholder="https://instagram.com/username">
+                        </div>
+                        @error('instagram_url') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                       <div>
+                        <label class="form-label">Twitter</label>
+                        <div class="input-group input-group-merge">
+                          <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
+                          <input type="text" class="form-control" name="twitter_url" value="{{ $user->twitter_url ?? old('twitter_url') }}" placeholder="https://twitter.com/username">
+                        </div>
+                        @error('twitter_url') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+                
+                </div>
+              </div>
               </div>
 
               {{-- ACCESS PERMISSIONS: 3 separate selects --}}
@@ -300,61 +370,6 @@ Admin | Add Attendee
           </div>
         </div>
       </div>
-
-      {{-- RIGHT: Social Links panel --}}
-      <aside class="col-lg-4">
-        <div class="card mb-4">
-          <div class="card-header d-flex align-items-center">
-            <i class="bx bx-share-alt fs-4 me-2"></i><span class="fw-semibold">Social Links</span>
-          </div>
-          <div class="card-body">
-            <div class="mb-3">
-              <label class="form-label">Website</label>
-              <div class="input-group input-group-merge">
-                <span class="input-group-text"><i class="bx bx-link"></i></span>
-                <input type="text" class="form-control" name="website_url" value="{{ $user->website_url ?? old('website_url') }}" placeholder="https://example.com">
-              </div>
-              @error('website_url') <div class="text-danger">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">LinkedIn</label>
-              <div class="input-group input-group-merge">
-                <span class="input-group-text"><i class="bx bxl-linkedin"></i></span>
-                <input type="text" class="form-control" name="linkedin_url" value="{{ $user->linkedin_url ?? old('linkedin_url') }}" placeholder="https://linkedin.com/in/username">
-              </div>
-              @error('linkedin_url') <div class="text-danger">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Facebook</label>
-              <div class="input-group input-group-merge">
-                <span class="input-group-text"><i class="bx bxl-facebook"></i></span>
-                <input type="text" class="form-control" name="facebook_url" value="{{ $user->facebook_url ?? old('facebook_url') }}" placeholder="https://facebook.com/username">
-              </div>
-              @error('facebook_url') <div class="text-danger">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Instagram</label>
-              <div class="input-group input-group-merge">
-                <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
-                <input type="text" class="form-control" name="instagram_url" value="{{ $user->instagram_url ?? old('instagram_url') }}" placeholder="https://instagram.com/username">
-              </div>
-              @error('instagram_url') <div class="text-danger">{{ $message }}</div> @enderror
-            </div>
-
-            <div>
-              <label class="form-label">Twitter</label>
-              <div class="input-group input-group-merge">
-                <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
-                <input type="text" class="form-control" name="twitter_url" value="{{ $user->twitter_url ?? old('twitter_url') }}" placeholder="https://twitter.com/username">
-              </div>
-              @error('twitter_url') <div class="text-danger">{{ $message }}</div> @enderror
-            </div>
-          </div>
-        </div>
-      </aside>
     </div>
   </form>
 </div>

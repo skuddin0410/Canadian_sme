@@ -58,7 +58,12 @@ class User extends Authenticatable implements JWTSubject
         'country',
         'created_by',
         'company_id',
-        'qr_code'
+        'qr_code',
+        'secondary_group',
+        'primary_group',
+        'company',
+        'status',
+        'gdpr_consent'
     ];
 
     /**
@@ -69,6 +74,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'secondary_group' => 'array',
     ];
 
     /**

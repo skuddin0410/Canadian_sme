@@ -88,8 +88,9 @@ class AttendeeUserController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        return view('users.attendee_users.create');
+    {   
+        $groups=['Attendee','Speaker','Sponsor','Exhibitor','Admin'];
+        return view('users.attendee_users.create',compact('groups'));
     }
 
     /**
