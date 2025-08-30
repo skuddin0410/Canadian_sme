@@ -5,6 +5,7 @@
 @endsection
 
 @section('content')
+ <input type="file" id="profileImageInput" accept="image/*" class="d-none form-control">
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">Exhibitor /</span> Edit</h4>
   <div class="row">
@@ -32,11 +33,7 @@
 
       @php
         $contentIconFile = !empty($user->contentIconFile) && !empty($user->contentIconFile->file_path);
-        $contentIconSrc = $contentIconFile 
-            ? (Str::startsWith($user->contentIconFile->file_path, ['http://','https://'])
-                ? $user->contentIconFile->file_path
-                : Storage::url($user->contentIconFile->file_path))
-            : '';
+        $contentIconSrc = $user->contentIconFile->file_path ?? '';
       @endphp
 
       <div id="content-icon-dropzone"
@@ -64,7 +61,7 @@
     <button type="button"
             id="dz-remove-content"
             class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
-            style="top: .5rem; right: .5rem;">
+            style="top: .5rem; right: .5rem;" data-photoid=" {{!empty($user->contentIconFile) ? $user->contentIconFile->id : ''}}">
         <i class="bx bx-x"></i> Remove
     </button>
 
@@ -85,11 +82,7 @@
 
       @php
         $quickLinkFile = !empty($user->quickLinkIconFile) && !empty($user->quickLinkIconFile->file_path);
-        $quickLinkSrc = $quickLinkFile 
-            ? (Str::startsWith($user->quickLinkIconFile->file_path, ['http://','https://'])
-                ? $user->quickLinkIconFile->file_path
-                : Storage::url($user->quickLinkIconFile->file_path))
-            : '';
+        $quickLinkSrc = $user->quickLinkIconFile->file_path ?? '';
       @endphp
 
       <div id="quick-link-icon-dropzone"
@@ -117,7 +110,7 @@
     <button type="button"
             id="dz-remove-quick"
             class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
-            style="top: .5rem; right: .5rem;">
+            style="top: .5rem; right: .5rem;"  data-photoid=" {{!empty($user->quickLinkIconFile) ? $user->quickLinkIconFile->id : ''}}">
         <i class="bx bx-x"></i> Remove
     </button>
 
@@ -299,6 +292,19 @@
       imagePreview.classList.add('d-none');  // Hide the preview image
       placeholder.classList.remove('d-none');  // Show the placeholder
       removeButton.classList.add('d-none');  // Hide the remove button
+       const photoId = removeButton.dataset.photoid;
+        $.ajax({
+          url: `/delete/photo`, 
+          type: 'POST',
+          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data: { photo_id: photoId },
+          success: function (res) {
+              console.log('Image removed successfully:', res);
+          },
+          error: function (xhr) {
+              console.error('Error removing image:', xhr.responseText);
+          }
+        });
     });
 
     // Function to handle the selected files
@@ -361,6 +367,19 @@
       imagePreview.classList.add('d-none');  // Hide the preview image
       placeholder.classList.remove('d-none');  // Show the placeholder
       removeButton.classList.add('d-none');  // Hide the remove button
+       const photoId = removeButton.dataset.photoid;
+        $.ajax({
+          url: `/delete/photo`, 
+          type: 'POST',
+          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data: { photo_id: photoId },
+          success: function (res) {
+              console.log('Image removed successfully:', res);
+          },
+          error: function (xhr) {
+              console.error('Error removing image:', xhr.responseText);
+          }
+        });
     });
 
     // Function to handle the selected files

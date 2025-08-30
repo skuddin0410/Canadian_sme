@@ -315,7 +315,7 @@ public function show(User $exhibitor_user, Request $request){
             'booth_id' => $boothId,
         ]);
 
-        return redirect()->route('exhibitor-users.edit', ['exhibitor_user' => $company->id])->with('success', 'Booth assigned successfully.');
+        return redirect()->route('exhibitor-users.show', ['exhibitor_user' => $company->id])->with('success', 'Booth assigned successfully.');
     }
 
 
