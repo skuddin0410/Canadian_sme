@@ -311,6 +311,10 @@ class JWTAuthController extends Controller
             'company_phone'   => !empty($user->company) ? $user->company->phone : '', 
             'image_url' => $user->photo,
             'roles'     => $user->getRoleNames(),
+            'company_about_page'  => config('app.url').'/about_page',
+            'company_location_page'    => config('app.url').'/location_page',
+            'company_privacy_policy_page' => config('app.url').'/policy_page',
+            'company_terms_of_service_page' => config('app.url').'/service_page',
         ]);
 
 
