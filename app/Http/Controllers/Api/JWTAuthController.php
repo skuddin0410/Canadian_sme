@@ -636,7 +636,7 @@ public function getExhibitor($exhibitorId)
         }
 
      
-        $exhibitor = User::with('photo','usercompany.booths','files')->find($exhibitorId);
+        $exhibitor = User::with('photo','usercompany','usercompany.booths','usercompany.files')->find($exhibitorId);
 
         if (! $exhibitor) {
             return response()->json([
@@ -645,7 +645,6 @@ public function getExhibitor($exhibitorId)
                 'data'    => collect(),
             ], 404);
         }
-
         $response = [
             'name'     => $exhibitor->full_name ?? '',
             'word_no'  => $exhibitor?->usercompany?->booths[0]?->booth_number ?? '',
@@ -664,12 +663,12 @@ public function getExhibitor($exhibitorId)
             ],
             'bio' => $exhibitor->bio ?? '',
             'my_qr_code' => asset($exhibitor->qr_code) ?? '',
-            'uploaded_files' => $exhibitor->files->map(function ($file) {
+            'uploaded_files' => $exhibitor->usercompany->files->map(function ($file) {
                     return [
-                        'name' => $file->file_name, // adjust based on your column
-                        'url'  =>  $file->file_path, // adjust path
+                        'name' => $file->file_name, 
+                        'url'  => $file->file_path,
                     ];
-                })->toArray()
+             })->toArray() ?? [],
 
         ];
         
@@ -699,7 +698,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             ], 404);
         }
 
-        $exhibitor = User::find($exhibitorId);
+        $exhibitor = User::with('usercompany','usercompany.files')->find($exhibitorId);
       
         if (! $exhibitor) {
             return response()->json([
@@ -724,9 +723,9 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
         if ($request->file("file")) {
             $fileRecord = $this->imageUpload(
                 $request->file("file"),
-                'users',
-                $exhibitor->id,
-                'users',
+                'companies',
+                $exhibitor->usercompany->id,
+                'companies',
                 'files'
             );
          
@@ -856,7 +855,7 @@ public function getSpeaker()
                     ['name' => 'github', 'url' => $speaker->github_url ?? ''],
                 ],
 
-                'bio'            => $speaker->bio ?? '',
+                'bio'   => $speaker->bio ?? '',
                 // 'uploaded_files' => method_exists($speaker, 'files')
                 //     ? $speaker->files->map(function ($file) {
                 //         return [
