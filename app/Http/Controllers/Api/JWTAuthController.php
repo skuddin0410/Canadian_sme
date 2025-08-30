@@ -879,9 +879,8 @@ public function getSpeaker()
 public function getTags()
 {
     try {
-        $tags = Category::where('type', 'tags')
-            ->pluck('name') // get only names
-            ->filter() // remove null/empty
+        $tags = Category::pluck('name') 
+            ->filter() 
             ->flatMap(function ($tagString) {
                 if (is_array($tagString)) {
                     return $tagString;

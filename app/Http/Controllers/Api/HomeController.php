@@ -147,9 +147,9 @@ public function getNotifications(Request $request)
     
     $isSpeaker = $user->hasRole('Speaker');
     $photo = $user->photo;
-    $userPhoto = !empty($user->photo) ? $user->photo->file_path : url('images/default.jpg');
+    $userPhoto = !empty($user->photo) ? $user->photo->file_path : '';
     
-    $notifications = notification::query()
+    $notifications = GeneralNotification::query()
         ->where(function ($q) use ($user) {
             $q->whereNull('user_id');          
             $q->orWhere('user_id', $user->id); 
@@ -160,17 +160,15 @@ public function getNotifications(Request $request)
         ->map(function ($n) use ($isSpeaker, $userPhoto) {
             return [
                 'imageUrl'   => $userPhoto, 
-                'heading'    => $n->title ?? $n->body ?? '',
+                'heading'    => $n->title  ?? '',
+                'message'    => $n->body  ?? '',
                 'created_at' => $n->created_at?->toIso8601String(),
                 'isRead'     => $n->read_at ? true : false,
                 'isSpeaker'  => $isSpeaker,
             ];
         });
 
-    return response()->json([
-        'success' => true,
-        'data'    => $notifications,
-    ], 200);
+    return response()->json($notifications, 200);
 }
 
 public function getSession($sessionId)
