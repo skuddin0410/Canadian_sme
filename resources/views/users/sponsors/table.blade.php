@@ -41,7 +41,7 @@
     <tr>
       <td>
         @if($company->logo)
-          <img src="{{ asset('storage/companies/'.$company->id.'/logo/'.$company->logo) }}"
+          <img src="{{ $company->logo->file_path }}"
                alt="Logo" width="40" height="40" class="rounded">
         @else
           <span class="text-muted">-</span>

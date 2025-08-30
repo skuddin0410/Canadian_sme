@@ -37,8 +37,6 @@
 <thead>
 	<tr>
 		<th>Name</th>
-		<th>Role</th>
-		<th>User name</th>
 		<th>Email</th>
 		<th>Mobile</th>
 		<th>Created At</th>
@@ -49,8 +47,6 @@
     @foreach($users as $user)
     <tr>
     	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th>{{!empty($user->roles) ? $user->roles[0]->name : ''}}</th>
-		<th style="text-transform:none">{{$user->username ?? ''}}</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
 		<th>{{dateFormat($user->created_at) ?? '' }}</th>

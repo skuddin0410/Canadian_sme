@@ -24,6 +24,8 @@ class UserSeeder extends Seeder
             'mobile' => '123345678',
             'password' => Hash::make('password'),
         ]);
+        $groups = config('roles.groups');
+
         $eventAdmin->assignRole('Admin');
          qrCode($eventAdmin->id);
 
@@ -161,6 +163,7 @@ class UserSeeder extends Seeder
                 'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
                 'created_at'          => now(),
                 'updated_at'          => now(),
+                'is_sponsor' => true
             ];
 
             $company=Company::create($companies); 
@@ -172,7 +175,7 @@ class UserSeeder extends Seeder
 
 
         foreach ($speakers as $speakerVal) {
-
+            $randomThree = collect($groups)->random(3)->toArray();
             $speaker = User::create([
                 'name' => $speakerVal['first_name'],
                 'lastname'=>$speakerVal['last_name'],
@@ -186,7 +189,10 @@ class UserSeeder extends Seeder
                 'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
                 'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
                 'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name'])
+                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'primary_group'=> 'Speaker',
+                'secondary_group'=> implode(',',$randomThree)
+
             ]);
             $speaker->assignRole('Speaker');
             qrCode($speaker->id);
@@ -207,7 +213,7 @@ class UserSeeder extends Seeder
                 'instagram'           => "https://instagram.com/" . $faker->slug,
                 'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
                 'created_at'          => now(),
-                'updated_at'          => now(),
+                'updated_at'          => now()
             ];
 
             $company=Company::create($companies); 
@@ -264,6 +270,7 @@ class UserSeeder extends Seeder
         }
 
         foreach ($attendees as $attendeeVal) {
+            $randomThree = collect($groups)->random(3)->toArray();
         $attendee = User::create([
                 'name' => $attendeeVal['first_name'],
                 'lastname'=>$attendeeVal['last_name'],
@@ -277,7 +284,9 @@ class UserSeeder extends Seeder
                 'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
                 'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
                 'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name'])
+                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'primary_group'=> 'Attendee',
+                'secondary_group'=> implode(',', $randomThree)
         ]);
         $attendee->assignRole('Attendee');
         qrCode($attendee->id);

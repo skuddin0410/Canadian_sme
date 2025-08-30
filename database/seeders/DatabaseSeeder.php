@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
             AccountManagerPermissionSeeder::class,
             TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             PagesSeeder::class,
-            ProductsCategoriesSeeder::class,
-            ProductsSeeder::class,
-            ProductTechnicalSpecsSeeder::class,
-            ServiceCategoriesSeeder::class,
-            ServicesSeeder::class,
-            SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
+            //ProductsCategoriesSeeder::class,
+            //ProductsSeeder::class,
+            //ProductTechnicalSpecsSeeder::class,
+            //ServiceCategoriesSeeder::class,
+           // ServicesSeeder::class,
+            //SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
         ]);
     }
 }

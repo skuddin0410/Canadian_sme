@@ -12,12 +12,6 @@
           <h5 class="mb-0">Edit Sponsor</h5>
         </div>
         <div class="card-body">
-          @if(Session::has('success'))
-            <div class="alert alert-success">{{ Session::get('success') }}</div>
-          @endif
-          @if(Session::has('error'))
-            <div class="alert alert-danger">{{ Session::get('error') }}</div>
-          @endif
 
           <form action="{{ route('sponsors.update', $company->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -29,48 +23,45 @@
               <div class="col-md-6">
     <div class="mb-3">
       <label class="form-label">Logo</label>
-
+   
       @php
-        $logoFile = !empty($company?->logoFile) && !empty($company->logoFile->file_path);
-        $logoSrc = $logoFile 
-            ? (Str::startsWith($company->logoFile->file_path, ['http://','https://'])
-                ? $company->logoFile->file_path
-                : Storage::url($company->logoFile->file_path))
-            : '';
+        $logo = !empty($company?->logo) && !empty($company->logo->file_path);
+        $logoSrc = $company->logo->file_path ?? '';
       @endphp
 
       <div id="logo-dropzone"
-           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-        {{-- Placeholder --}}
-        <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $logoFile ? 'd-none' : '' }}">
-          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-          <div>
+    {{-- Placeholder (only visible if no logo) --}}
+    <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ isset($logo) && $logo ? 'd-none' : '' }}">
+        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+        <div>
             <strong>Drag & drop</strong> an image here, or
             <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-          </div>
-          <small class="text-muted d-block">Max 2048 KB</small>
         </div>
+        <small class="text-muted d-block">Max 2048 KB</small>
+    </div>
 
-        {{-- Inline preview --}}
-        <img id="dz-image-content"
-             src="{{ $logoSrc }}"
-             alt="Preview"
-             class="{{ $logoFile ? '' : 'd-none' }} rounded"
-             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+    {{-- Inline preview --}}
+    <img id="dz-image-content"
+         src="{{ $logoSrc ?? '' }}"
+         alt="Preview"
+         class="{{ isset($logo) && $logo ? '' : 'd-none' }} rounded"
+         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-        {{-- Remove button --}}
-        <button type="button"
-                id="dz-remove-content"
-                class="btn btn-sm btn-danger position-absolute {{ $logoFile ? '' : 'd-none' }}"
-                style="top: .5rem; right: .5rem;">
-          <i class="bx bx-x"></i> Remove
-        </button>
+    {{-- Remove button --}}
+    <button type="button"
+            id="dz-remove-content"
+            class="btn btn-sm btn-danger position-absolute {{ isset($logo) && $logo ? '' : 'd-none' }}"
+            style="top: .5rem; right: .5rem;" data-photoid=" {{!empty($company->logo) ? $company->logo->id : ''}}">
+        <i class="bx bx-x"></i> Remove
+    </button>
 
-        {{-- Hidden input --}}
-        <input type="file" id="dz-input-content" name="logo" accept="image/*" class="d-none">
-      </div>
+    {{-- Hidden file input --}}
+    <input type="file" id="dz-input-content" name="logo" accept="image/*" class="d-none">
+</div>
+
 
       @error('logo')
         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -82,46 +73,42 @@
       <label class="form-label">Banner</label>
 
       @php
-        $bannerFile = !empty($company?->bannerFile) && !empty($company->bannerFile->file_path);
-        $bannerSrc = $bannerFile
-            ? (Str::startsWith($company->bannerFile->file_path, ['http://','https://'])
-                ? $company->bannerFile->file_path
-                : Storage::url($company->bannerFile->file_path))
-            : '';
+        $banner = !empty($company?->banner) && !empty($company->banner->file_path);
+        $bannerSrc = $company->banner->file_path ?? '';
       @endphp
 
       <div id="banner-icon-dropzone"
-           class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-           style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-        {{-- Placeholder --}}
-        <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $bannerFile ? 'd-none' : '' }}">
-          <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-          <div>
+    {{-- Placeholder --}}
+    <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ isset($banner) && $banner ? 'd-none' : '' }}">
+        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+        <div>
             <strong>Drag & drop</strong> an image here, or
             <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-          </div>
-          <small class="text-muted d-block">Max 2048 KB</small>
         </div>
+        <small class="text-muted d-block">Max 2048 KB</small>
+    </div>
 
-        {{-- Inline preview --}}
-        <img id="dz-image-quick"
-             src="{{ $bannerSrc }}"
-             alt="Preview"
-             class="{{ $bannerFile ? '' : 'd-none' }} rounded"
-             style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+    {{-- Inline preview --}}
+    <img id="dz-image-quick"
+         src="{{ $bannerSrc ?? '' }}"
+         alt="Preview"
+         class="{{ isset($banner) && $banner ? '' : 'd-none' }} rounded"
+         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-        {{-- Remove button --}}
-        <button type="button"
-                id="dz-remove-quick"
-                class="btn btn-sm btn-danger position-absolute {{ $bannerFile ? '' : 'd-none' }}"
-                style="top: .5rem; right: .5rem;">
-          <i class="bx bx-x"></i> Remove
-        </button>
+    {{-- Remove button --}}
+    <button type="button"
+            id="dz-remove-quick"
+            class="btn btn-sm btn-danger position-absolute {{ isset($banner) && $banner ? '' : 'd-none' }}"
+            style="top: .5rem; right: .5rem;" data-photoid=" {{!empty($company->banner) ? $company->banner->id : ''}}">
+        <i class="bx bx-x"></i> Remove
+    </button>
 
-        {{-- Hidden input --}}
-        <input type="file" id="dz-input-quick" name="banner" accept="image/*" class="d-none">
-      </div>
+    {{-- Hidden input --}}
+    <input type="file" id="dz-input-quick" name="banner" accept="image/*" class="d-none">
+</div>
 
       @error('banner')
         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -204,6 +191,7 @@
               </div>
 
               {{-- Submit --}}
+              <input type="hidden" name="sponsor_id" value="{{$company->id??''}}">
               <div class="col-12">
                 <div class="d-flex justify-content-end">
                   <a href="{{ route('sponsors.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
@@ -218,4 +206,126 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const input     = document.getElementById("dz-input-content");
+    const browseBtn = document.getElementById("dz-browse-content");
+    const removeBtn = document.getElementById("dz-remove-content");
+    const preview   = document.getElementById("dz-image-content");
+    const placeholder = document.getElementById("dz-placeholder-content");
+
+    // Browse button opens file dialog
+    browseBtn.addEventListener("click", () => input.click());
+
+    // Show preview when file is selected
+    input.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                preview.src = event.target.result;
+                preview.classList.remove("d-none");
+                removeBtn.classList.remove("d-none");
+                placeholder.classList.add("d-none");
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Remove preview & reset
+    removeBtn.addEventListener("click", () => {
+        input.value = ""; // clear file
+        preview.src = "";
+        preview.classList.add("d-none");
+        removeBtn.classList.add("d-none");
+        placeholder.classList.remove("d-none");
+        const photoId = removeBtn.dataset.photoid;
+        $.ajax({
+          url: `/delete/photo`, 
+          type: 'POST',
+          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data: { photo_id: photoId },
+          success: function (res) {
+              console.log('Image removed successfully:', res);
+          },
+          error: function (xhr) {
+              console.error('Error removing image:', xhr.responseText);
+          }
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dropzone    = document.getElementById("banner-icon-dropzone");
+    const input       = document.getElementById("dz-input-quick");
+    const browseBtn   = document.getElementById("dz-browse-quick");
+    const removeBtn   = document.getElementById("dz-remove-quick");
+    const preview     = document.getElementById("dz-image-quick");
+    const placeholder = document.getElementById("dz-placeholder-quick");
+
+    // Browse button opens file dialog
+    browseBtn.addEventListener("click", () => input.click());
+
+    // Show preview when file is selected
+    input.addEventListener("change", (e) => handleFile(e.target.files[0]));
+
+    // Remove preview & reset
+    removeBtn.addEventListener("click", () => {
+        input.value = "";
+        preview.src = "";
+        preview.classList.add("d-none");
+        removeBtn.classList.add("d-none");
+        placeholder.classList.remove("d-none");
+
+        const photoId = removeBtn.dataset.photoid;
+        $.ajax({
+          url: `/delete/photo`, 
+          type: 'POST',
+          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data: { photo_id: photoId },
+          success: function (res) {
+              console.log('Image removed successfully:', res);
+          },
+          error: function (xhr) {
+              console.error('Error removing image:', xhr.responseText);
+          }
+        });
+    });
+
+    // --- Optional: Drag & Drop support ---
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.style.background = "rgba(0,0,0,0.05)";
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+        dropzone.style.background = "var(--bs-body-bg)";
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.style.background = "var(--bs-body-bg)";
+        if (e.dataTransfer.files.length) {
+            input.files = e.dataTransfer.files; // set dropped file to input
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                preview.src = event.target.result;
+                preview.classList.remove("d-none");
+                removeBtn.classList.remove("d-none");
+                placeholder.classList.add("d-none");
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+});
+</script>
 @endsection

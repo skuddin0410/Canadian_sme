@@ -51,8 +51,8 @@
 <tr>
 	{{-- Content Icon --}}
 	<td>
-		@if($user->company && $user->company->content_icon)
-			<img src="{{ asset('storage/companies/'.$user->company->id.'/content_icon/'.$user->company->content_icon) }}" 
+		@if($user && $user->contentIconFile)
+			<img src="{{$user->contentIconFile->file_path}}" 
 			     alt="Content Icon" 
 			     width="40" height="40" 
 			     class="rounded">
@@ -62,12 +62,12 @@
 	</td>
 
 	{{-- Company Name --}}
-	<td>{{ $user->company->name ?? '-' }}</td>
+	<td>{{ $user->name ?? '-' }}</td>
 
 	{{-- Booth ID --}}
 	<td>
-@if($user->company && $user->company->boothUsers->count())
-    @foreach($user->company->boothUsers as $bu)
+@if($user && $user->boothUsers->count())
+    @foreach($user->boothUsers as $bu)
         {{ $bu->booth->id ?? '-' }}<br>
     @endforeach
 @else

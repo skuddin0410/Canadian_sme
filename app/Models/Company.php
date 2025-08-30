@@ -39,30 +39,30 @@ class Company extends Model
             ->whereNotNull('file_name');
     }
     public function contentIconFile()
-{
-    return $this->hasOne(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'content_icon');
-}
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'content_icon');
+    }
 
-public function quickLinkIconFile()
-{
-    return $this->hasOne(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'quick_link_icon');
-}
-public function logo()
-{
-    return $this->hasOne(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'logo');
-}
-public function banner()
-{
-    return $this->hasOne(Drive::class, 'table_id', 'id')
-        ->where('table_type', 'companies')
-        ->where('file_type', 'banner');
-}
+    public function quickLinkIconFile()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'quick_link_icon');
+    }
+    public function logo()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'logo');
+    }
+    public function banner()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'banner');
+    }
 
 
     public function logoFile()
