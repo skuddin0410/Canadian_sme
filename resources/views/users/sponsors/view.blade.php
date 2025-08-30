@@ -63,8 +63,8 @@
     <div class="col-md-12 mb-3">
         <div class="card p-3 h-100">
             <h6 class="mb-2">Banner</h6>
-            @if($user->banner)
-                <img src="{{ asset('storage/users/'.$user->id.'/banner/'.$user->banner) }}"
+            @if($company->banner)
+                <img src="{{$company->banner->file_path}}"
                      alt="User Banner"
                      class="rounded border w-100"
                      style="max-height:150px; object-fit:cover;">
@@ -82,7 +82,7 @@
                 <img src="{{ asset($user->qr_code) }}"
                      alt="User QR Code"
                      class="rounded border"
-                     style="width:150px; height:150px; object-fit:contain;">
+                     style="width:200px; height:200px; object-fit:contain;">
             @else
                 <p>No QR code generated.</p>
             @endif
@@ -91,17 +91,17 @@
                             <div class="col-md-6 mb-3">
         <div class="card p-3">
             <h6 class="mb-2">Logo</h6>
-            @if($user->logo)
-                <img src="{{ asset('storage/users/'.$user->id.'/logo/'.$user->logo) }}"
+            @if($company->logo)
+                <img src="{{ $company->logo->file_path }}"
                      alt="User Logo"
                      class="rounded border"
-                     style="width:150px; height:150px; object-fit:contain;">
+                     style="width:200px; height:200px; object-fit:contain;">
             @else
                 <p>No logo uploaded.</p>
             @endif
         </div>
     </div>
-    {{-- Row 1: QR Code + Banner --}}
+    
    
 
     

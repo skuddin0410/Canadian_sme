@@ -12,12 +12,6 @@
           <h5 class="mb-0">Edit Sponsor</h5>
         </div>
         <div class="card-body">
-          @if(Session::has('success'))
-            <div class="alert alert-success">{{ Session::get('success') }}</div>
-          @endif
-          @if(Session::has('error'))
-            <div class="alert alert-danger">{{ Session::get('error') }}</div>
-          @endif
 
           <form action="{{ route('sponsors.update', $company->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -29,14 +23,10 @@
               <div class="col-md-6">
     <div class="mb-3">
       <label class="form-label">Logo</label>
-
+   
       @php
-        $logoFile = !empty($company?->logoFile) && !empty($company->logoFile->file_path);
-        $logoSrc = $logoFile 
-            ? (Str::startsWith($company->logoFile->file_path, ['http://','https://'])
-                ? $company->logoFile->file_path
-                : Storage::url($company->logoFile->file_path))
-            : '';
+        $logo = !empty($company?->logo) && !empty($company->logo->file_path);
+        $logoSrc = $company->logo->file_path ?? '';
       @endphp
 
       <div id="logo-dropzone"
@@ -44,7 +34,7 @@
            style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
         {{-- Placeholder --}}
-        <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $logoFile ? 'd-none' : '' }}">
+        <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $logo ? 'd-none' : '' }}">
           <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
           <div>
             <strong>Drag & drop</strong> an image here, or
@@ -57,13 +47,13 @@
         <img id="dz-image-content"
              src="{{ $logoSrc }}"
              alt="Preview"
-             class="{{ $logoFile ? '' : 'd-none' }} rounded"
+             class="{{ $logo ? '' : 'd-none' }} rounded"
              style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
         {{-- Remove button --}}
         <button type="button"
                 id="dz-remove-content"
-                class="btn btn-sm btn-danger position-absolute {{ $logoFile ? '' : 'd-none' }}"
+                class="btn btn-sm btn-danger position-absolute {{ $logo ? '' : 'd-none' }}"
                 style="top: .5rem; right: .5rem;">
           <i class="bx bx-x"></i> Remove
         </button>
@@ -82,12 +72,8 @@
       <label class="form-label">Banner</label>
 
       @php
-        $bannerFile = !empty($company?->bannerFile) && !empty($company->bannerFile->file_path);
-        $bannerSrc = $bannerFile
-            ? (Str::startsWith($company->bannerFile->file_path, ['http://','https://'])
-                ? $company->bannerFile->file_path
-                : Storage::url($company->bannerFile->file_path))
-            : '';
+        $banner = !empty($company?->banner) && !empty($company->banner->file_path);
+        $bannerSrc = $company->banner->file_path ?? '';
       @endphp
 
       <div id="banner-icon-dropzone"
@@ -95,7 +81,7 @@
            style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
         {{-- Placeholder --}}
-        <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $bannerFile ? 'd-none' : '' }}">
+        <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $banner ? 'd-none' : '' }}">
           <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
           <div>
             <strong>Drag & drop</strong> an image here, or
@@ -108,13 +94,13 @@
         <img id="dz-image-quick"
              src="{{ $bannerSrc }}"
              alt="Preview"
-             class="{{ $bannerFile ? '' : 'd-none' }} rounded"
+             class="{{ $banner ? '' : 'd-none' }} rounded"
              style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
         {{-- Remove button --}}
         <button type="button"
                 id="dz-remove-quick"
-                class="btn btn-sm btn-danger position-absolute {{ $bannerFile ? '' : 'd-none' }}"
+                class="btn btn-sm btn-danger position-absolute {{ $banner ? '' : 'd-none' }}"
                 style="top: .5rem; right: .5rem;">
           <i class="bx bx-x"></i> Remove
         </button>
@@ -204,6 +190,7 @@
               </div>
 
               {{-- Submit --}}
+              <input type="hidden" name="sponsor_id" value="{{$company->id??''}}">
               <div class="col-12">
                 <div class="d-flex justify-content-end">
                   <a href="{{ route('sponsors.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
