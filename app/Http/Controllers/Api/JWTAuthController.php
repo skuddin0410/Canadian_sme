@@ -280,7 +280,7 @@ class JWTAuthController extends Controller
             ], 404);
         }
 
-        $user->load('photo'); 
+    
         $token = request()->bearerToken() ?? JWTAuth::refresh();
         $roles = $user->getRoleNames();
         $address = [
@@ -290,26 +290,25 @@ class JWTAuthController extends Controller
             'country'  => $user->country ?? null,
             'zipcode'  => $user->zipcode ?? null,
         ];
-        $user->load(['photo', 'company']);
-
+        $user->load(['photo', 'usercompany']);
         return response()->json([
             'success' => true,
             'message' => 'successful',
             'id'        => $user->id,
-            'first_name'      => $user->name,
-            'lastname'  => $user->lastname,
+            'first_name'      => $user->name ?? '',
+            'lastname'  => $user->lastname ?? '',
             'name' => $user->full_name,
-            'email'     => $user->email,
-            'phone'    => $user->mobile,
+            'email'     => $user->email ?? '',
+            'phone'    => $user->mobile ?? '',
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : '',
             'designation'=> $user->designation,
             'bio'       => $user->about,
             'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
             'my_qr_code' => asset($user->qr_code),
-            'company_name'   => !empty($user->company) ? $user->company->name : '', 
-            'company_email'   => !empty($user->company) ? $user->company->email : '', 
-            'company_phone'   => !empty($user->company) ? $user->company->phone : '', 
-            'image_url' => $user->photo,
+            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
+            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 
+            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
+            'image_url' => !empty($user->photo) ? $user->photo->file_path : '' ,
             'roles'     => $user->getRoleNames(),
             'company_about_page'  => config('app.url').'/about_page',
             'company_location_page'    => config('app.url').'/location_page',
@@ -356,32 +355,33 @@ public function updateUser(Request $request)
             'company_name'     => 'required|string|max:255',
             'company_website'     => 'nullable|string|max:255'
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update profile.',
-                'errors'  => $validator->errors(),
+                'errors'  => $validator->errors()->first(),
             ], 422);
         }
         
 
-        $user->name = $request->first_name;
-        $user->lastname = $request->last_name;
-        $user->email = $request->email;
-        $user->company = $request->company_name;
-        $user->designation = $request->designation;
+        $user->name = $request->first_name ?? '';
+        $user->lastname = $request->last_name ?? '';
+        $user->email = $request->email ?? '';
+        $user->company = $request->company_name?? '';
+        $user->designation = $request->designation ?? '';
         $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
-        $user->mobile = $request->phone;
-        $user->bio = $request->bio;
-
+        $user->mobile = $request->phone ?? '';
+        $user->bio = $request->bio ?? '';
+        $user->save();
+        qrCode($user->id);
         // --- Update or create company record ---
         if ($request->hasAny(['company_name', 'email'])) {
             $companyData = [
-                'name'    => $request->company_name,
-                'email'   => $request->email,
-                'phone'   => $request->phone,
-                'website' => $request->company_website,
+                'name'    => $request->company_name ?? '',
+                'email'   => $request->email ?? '',
+                'phone'   => $request->phone ?? '',
+                'website' => $request->company_website ?? '',
             ];
 
             \App\Models\Company::updateOrCreate(
@@ -398,7 +398,7 @@ public function updateUser(Request $request)
     } catch (JWTException $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Unauthorized',
+            'message' => 'Fail to update profile!',
             'data'    => null,
         ], 401);
     }
@@ -417,53 +417,32 @@ public function updateUserImage(Request $request)
 
        
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpg,jpeg,png',
+         'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', 
         ]);
         
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed.',
+                'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors(),
             ], 422);
         }
         
 
-        $uploadPath = 'users/profile/' . $user->id;
-
-        
-        $file = $request->file('image');
-        $filename = uniqid('profile_') . '.' . $file->getClientOriginalExtension();
-        $file->storeAs('public/' . $uploadPath, $filename);
-
-        $imageUrl = asset('storage/' . $uploadPath . '/' . $filename);
-
-      
-        
-        auth()->user()->photo()->updateOrCreate(
-    ['table_type' => 'users'], // match existing photo record for this user
-    [
-        'table_id' => auth()->id(), // link to current user
-        'file_name' => $filename,
-        'file_type' => 'photo',
-    ]
-);
-
-       
-        $user->load('photo');
+       if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        }
 
         return response()->json([
-            // 'success'   => true,
+            'success'   => true,
             'message'   => 'Profile image updated successfully.',
-            // 'image_url' => $user->photo->url,
-            // 'data'      => $user,
         ]);
 
     } catch (JWTException $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Unauthorized',
+            'message' => 'Fail to upload profile image!',
         ], 401);
     }
 }

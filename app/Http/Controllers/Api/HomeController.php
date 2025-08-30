@@ -233,7 +233,7 @@ public function getConnections(Request $request)
         }
 
         
-        $connections = User::with(['photo', 'company']) // eager load relations
+        $connections = User::with(['photo', 'usercompany']) // eager load relations
             ->limit(50)
             ->get()
             ->map(function ($connection) {
@@ -241,7 +241,7 @@ public function getConnections(Request $request)
                     "id" => (string) $connection->id,
                     "name" => $connection->full_name ?? $connection->name,
                     "connection_role" => $connection->getRoleNames(),
-                    "company_name" =>$connection->company ? $connection->company->name : null,
+                    "company_name" =>$connection->usercompany ? $connection->usercompany->name : null,
                     "connection_image" => $connection->photo ? $connection->photo->file_path : null,
                        
                 ];

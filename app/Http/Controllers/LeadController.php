@@ -11,128 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class LeadController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // public function index(Request $request)
-    // {
-    //     //
-    //       $query = Lead::with(['assignedAgent', 'matchedEvent']);
 
-    //     if ($request->filled('search')) {
-    //         $search = $request->search;
-    //         $query->where(function ($q) use ($search) {
-    //             $q->where('first_name', 'like', "%{$search}%")
-    //               ->orWhere('last_name', 'like', "%{$search}%")
-    //               ->orWhere('email', 'like', "%{$search}%")
-    //               ->orWhere('phone', 'like', "%{$search}%");
-    //         });
-    //     }
-
-    //     if ($request->filled('status')) {
-    //         $query->where('status', $request->status);
-    //     }
-
-    //     if ($request->filled('source')) {
-    //         $query->where('source', $request->source);
-    //     }
-
-    //     if ($request->filled('priority')) {
-    //         $query->where('priority', $request->priority);
-    //     }
-
-    //     $leads = $query->orderBy('created_at', 'desc')->paginate(20);
-
-    //     return view('leads.index', compact('leads'));
-    // }
-//     public function index(Request $request)
-// {
-//     $query = Lead::with(['assignedAgent', 'matchedEvent', 'user', 'company']);
-
-//     if ($request->filled('search')) {
-//         $search = $request->search;
-//         $query->where(function ($q) use ($search) {
-//             $q->where('first_name', 'like', "%{$search}%")
-//               ->orWhere('last_name', 'like', "%{$search}%")
-//               ->orWhere('email', 'like', "%{$search}%")
-//               ->orWhere('phone', 'like', "%{$search}%")
-//               ->orWhereHas('user', function($sub) use ($search) {
-//                   $sub->where('name', 'like', "%{$search}%")
-//                       ->orWhere('lastname', 'like', "%{$search}%")
-//                       ->orWhere('email', 'like', "%{$search}%");
-//               })
-//               ->orWhereHas('company', function($sub) use ($search) {
-//                   $sub->where('name', 'like', "%{$search}%")
-//                       ->orWhere('email', 'like', "%{$search}%")
-//                       ->orWhere('phone', 'like', "%{$search}%");
-//               });
-//         });
-//     }
-
-//     if ($request->filled('status')) {
-//         $query->where('status', $request->status);
-//     }
-
-//     if ($request->filled('source')) {
-//         $query->where('source', $request->source);
-//     }
-
-//     if ($request->filled('priority')) {
-//         $query->where('priority', $request->priority);
-//     }
-
-//     $leads = $query->orderBy('created_at', 'desc')->paginate(20);
-
-//     return view('leads.index', compact('leads'));
-// }
-//  public function index(Request $request)
-// {
-//     $query = Lead::with(['user', 'company']);
-
-//     // Simple search
-//     if ($request->filled('search')) {
-//         $search = $request->search;
-//         $query->where(function($q) use ($search) {
-//             $q->where('first_name', 'like', "%{$search}%")
-//               ->orWhere('last_name', 'like', "%{$search}%");
-//         });
-//     }
-
-//     // Advanced search: Company name
-//     if ($request->filled('company')) {
-//         $company = $request->company;
-//         $query->whereHas('company', function($q) use ($company) {
-//             $q->where('name', 'like', "%{$company}%");
-//         });
-//     }
-
-//     // Advanced search: Industry
-//     if ($request->filled('industry')) {
-//         $industry = $request->industry;
-//         $query->whereHas('company', function($q) use ($industry) {
-//             $q->where('industry', 'like', "%{$industry}%");
-//         });
-//     }
-
-//     // Advanced search: Interest level (desired_bedrooms)
-//     if ($request->filled('interest_level')) {
-//         $query->where('desired_bedrooms', $request->interest_level);
-//     }
-
-//     // Status filter
-//     if ($request->filled('status')) {
-//         $query->where('status', $request->status);
-//     }
-
-//     // Source filter
-//     if ($request->filled('source')) {
-//         $query->where('source', $request->source);
-//     }
-
-//     $leads = $query->latest()->paginate(20)->withQueryString();
-
-//     return view('leads.index', compact('leads'));
-// }
 public function index(Request $request)
 {
     $query = Lead::with(['user', 'company']);
@@ -176,11 +55,6 @@ public function index(Request $request)
      */
     public function create()
     {
-        //
-        //  $events = Event::where('published', 'draft')->get();
-        // //$agents = \App\Models\User::where('role', 'agent')->get();
-        // $agents = User::get();
-        // $events = Event::where('published', 'draft')->get();
           return view('leads.create');
         
     }
@@ -294,31 +168,7 @@ public function index(Request $request)
         return redirect()->route('leads.index')
             ->with('success', 'Lead deleted successfully!');
     }
-//     public function export(Request $request, $format = 'xlsx')
-// {
-//     $fileName = 'leads_export_' . now()->format('Y_m_d_H_i_s');
 
-//     switch($format) {
-//         case 'csv':
-//             $fileName .= '.csv';
-//             break;
-//         case 'xls':
-//             $fileName .= '.xls';
-//             break;
-//         case 'crm': // CRM-Compatible format
-//             $fileName .= '_crm.csv'; 
-//             break;
-//         case 'xlsx':
-//         default:
-//             $fileName .= '.xlsx';
-//             break;
-//     }
-//        if ($format === 'crm') {
-//         return Excel::download(new LeadsCrmExport, $fileName, \Maatwebsite\Excel\Excel::CSV);
-//     }
-
-//     return Excel::download(new LeadsExport, $fileName);
-// }
 public function export(Request $request, $format = 'xlsx')
 {
     $fileName = 'leads_export_' . now()->format('Y_m_d_H_i_s');

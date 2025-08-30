@@ -129,7 +129,7 @@ public function store(Request $request)
     }
 
     // Fetch the authenticated user with their company
-    $user = Auth::user()->load('company');
+    $user = Auth::user()->load('usercompany');
 
     if (!$user->company) {
         return redirect()->back()
