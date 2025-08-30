@@ -280,16 +280,9 @@ class JWTAuthController extends Controller
             ], 404);
         }
 
-      
         $user->load('photo'); 
-
-   
         $token = request()->bearerToken() ?? JWTAuth::refresh();
-
-      
         $roles = $user->getRoleNames();
-
-       
         $address = [
             'street'   => $user->address ?? null,
             'city'     => $user->city ?? null,
@@ -299,34 +292,26 @@ class JWTAuthController extends Controller
         ];
         $user->load(['photo', 'company']);
 
-return response()->json([
-    'success' => true,
-    'message' => 'successful',
-    'data' => [
-        'user' => [
+        return response()->json([
+            'success' => true,
+            'message' => 'successful',
             'id'        => $user->id,
-            'name'      => $user->name,
+            'first_name'      => $user->name,
             'lastname'  => $user->lastname,
-            'full_name' => $user->full_name,
+            'name' => $user->full_name,
             'email'     => $user->email,
-            'mobile'    => $user->mobile,
+            'phone'    => $user->mobile,
+            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : '',
             'designation'=> $user->designation,
             'bio'       => $user->about,
-            'tags'      => $user->tags,
-            'qr_code' => $user-> qr_code,
-            'address'   => [
-                'street'  => $user->street,
-                'city'    => $user->city,
-                'state'   => $user->state,
-                'country' => $user->country,
-                'zipcode' => $user->zipcode,
-            ],
-            'company'   => $user->company, // full company object
-        ],
-        'image_url' => $user->photo,
-        'roles'     => $user->getRoleNames(),
-    ],
-]);
+            'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
+            'my_qr_code' => asset($user->qr_code),
+            'company_name'   => !empty($user->company) ? $user->company->name : '', 
+            'company_email'   => !empty($user->company) ? $user->company->email : '', 
+            'company_phone'   => !empty($user->company) ? $user->company->phone : '', 
+            'image_url' => $user->photo,
+            'roles'     => $user->getRoleNames(),
+        ]);
 
 
     

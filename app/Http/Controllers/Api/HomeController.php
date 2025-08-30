@@ -37,7 +37,7 @@ class HomeController extends Controller
     ];
 
     // ================= Upcoming Session =================
-    $upcomingSession = Session::where('start_time', '>=', now())
+    $upcomingSession = Session::with('attendees','sponsors')->where('start_time', '>=', now())
         ->orderBy('start_time', 'ASC')
         ->first();
 
@@ -59,7 +59,7 @@ class HomeController extends Controller
             ->get()
             ->map(function ($session) {
                 return [
-                    "id" => "sub-session-" . $session->id,
+                    "id" => $session->id,
                     "title" => $session->title,
                     "description" => $session->description,
                     "keynote" => $session->keynote ?? '',
@@ -96,45 +96,31 @@ class HomeController extends Controller
 
     // ================= Notifications =================
     $user = auth()->user();
-
-    $notificationsQuery = GeneralNotification::query()
-        ->where(function ($q) use ($user) {
-            $q->whereNull('user_id'); // broadcast
-            if ($user) {
-                $q->orWhere('user_id', $user->id);
-            }
-        })
-        ->latest();
-
-    $notificationsList = $notificationsQuery->take(20)->get()->map(function ($n) {
+    
+   
+    $notificationsQuery = GeneralNotification::where('is_read', false)
+    ->where(function ($q) use ($user) {
+        $q->where('user_id', $user->id);
+    })->latest();
+    $notificationsList = $notificationsQuery->get()->map(function ($n) {
         return [
             "id" => $n->id,
             "title" => $n->title,
             "message" => $n->body,
-            "is_read" => $n->read_at ? true : false,
-            "created_at" => $n->created_at->toDateTimeString(),
-            "related" => [
-                "type" => $n->related_type,
-                "id" => $n->related_id,
-                "name" => $n->related_name,
-            ],
-            "meta" => $n->meta,
+            "is_read" => $n->read_at ? true : false
         ];
     });
-
     $notifications = [
-        "count" => $notificationsQuery->count(),
+        "count" => $notificationsList->count(),
         "hasNew" => $notificationsQuery->whereNull('read_at')->exists(),
         "data" => $notificationsList,
     ];
 
-    // ================= My Stats =================
+    //================= My Stats =================
     $myStats = [
-        "totalAgents" => User::count(),
+        "totalAgents" => !empty($upcomingSession->sponsors) ? $upcomingSession->sponsors->count() : 0,
         "totalConnections" => User::count(),
-        "totalSessionAttendee" => User::whereHas("roles", function ($q) {
-            $q->where("name", "Attendee");
-        })->count(),
+        "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
     ];
 
     return response()->json([
@@ -160,16 +146,10 @@ public function getNotifications(Request $request)
 
     
     $isSpeaker = $user->hasRole('Speaker');
-
-    
     $photo = $user->photo;
-   
-    $userPhoto = $user->photo
-        ? Storage::url('users/' . $user->photo->file_name)
-        : url('images/default.jpg');
-
+    $userPhoto = !empty($user->photo) ? $user->photo->file_path : url('images/default.jpg');
     
-    $notifications = GeneralNotification::query()
+    $notifications = notification::query()
         ->where(function ($q) use ($user) {
             $q->whereNull('user_id');          
             $q->orWhere('user_id', $user->id); 
@@ -192,6 +172,7 @@ public function getNotifications(Request $request)
         'data'    => $notifications,
     ], 200);
 }
+
 public function getSession($sessionId)
 {
     try {
