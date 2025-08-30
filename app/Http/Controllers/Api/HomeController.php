@@ -19,17 +19,14 @@ class HomeController extends Controller
     public function index(Request $request)
 {
     // ================= Banner =================
-    $featuredEvent = Event::where('start_date', '>=', now())
-    
-        ->inRandomOrder()
-        ->first();
+    $featuredEvent = Event::with('photo')->first();
 
     $banner = $featuredEvent ? [
         "id" => $featuredEvent->id,
         "title" => $featuredEvent->title,
         "description" => $featuredEvent->description,
         "location" => $featuredEvent->location,
-        "imageUrl" => $featuredEvent->image_url ?? url('images/default_event.jpg'),
+        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : url('images/default_event.jpg'),
         "videoUrl" => $featuredEvent->youtube_link ?? '',
         "startTime" => $featuredEvent->start_date?->toIso8601String(),
         "endTime" => $featuredEvent->end_date?->toIso8601String(),
@@ -40,8 +37,7 @@ class HomeController extends Controller
     ];
 
     // ================= Upcoming Session =================
-    $upcomingSession = Session::with(['event', 'speakers', 'booth'])
-        ->where('start_time', '>=', now())
+    $upcomingSession = Session::with('attendees','sponsors')->where('start_time', '>=', now())
         ->orderBy('start_time', 'ASC')
         ->first();
 
@@ -49,14 +45,7 @@ class HomeController extends Controller
         "id" => $upcomingSession->id,
         "title" => $upcomingSession->title,
         "description" => $upcomingSession->description,
-        "start_time" => $upcomingSession->start_time?->toIso8601String(),
-        "end_time" => $upcomingSession->end_time?->toIso8601String(),
-        "location" => $upcomingSession->booth->title ?? 'No Booth',
-        "event" => $upcomingSession->event ? [
-        "id" => $upcomingSession->event->id,
-        "title" => $upcomingSession->event->title,
-        ] : null,
-        "speakers" => $upcomingSession->speakers->map(fn ($sp) => ["name" => $sp->name]),
+        "startDateTime" => $upcomingSession->start_time?->toIso8601String(),
         "status" => "upcoming",
     ] : null;
 
@@ -70,7 +59,7 @@ class HomeController extends Controller
             ->get()
             ->map(function ($session) {
                 return [
-                    "id" => "sub-session-" . $session->id,
+                    "id" => $session->id,
                     "title" => $session->title,
                     "description" => $session->description,
                     "keynote" => $session->keynote ?? '',
@@ -79,7 +68,7 @@ class HomeController extends Controller
                     "start_time" => $session->start_time?->toIso8601String(),
                     "end_time" => $session->end_time?->toIso8601String(),
                     "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
-                    "location" => !empty($session->booth) ? $session->booth->title : 'No Booth',
+                    "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
                     "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
                     "isFavorite" => true
@@ -90,66 +79,53 @@ class HomeController extends Controller
    
     // ================= Home Connections (from session_sponsors) =================
  $homeConnections = User::with('photo')
+    ->whereHas("roles", function ($q) {
+        $q->whereIn("name", ['Attendee','Speaker']);
+    })
     ->whereHas('sponsoredSessions') // only users who are sponsors
-    ->limit(20)
+    ->limit(3)
     ->get()
     ->map(function ($user) {
         return [
-            "id" => "sponsor-" . $user->id,
+            "id" => $user->id,
             "name" => $user->full_name ?? $user->name,
-            "avatarUrl" => $user->photo
-                ? asset('storage/' . $user->photo->file_path . '/' . $user->photo->file_name)
-                : url('images/default_avatar.png'),
+            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :url('images/default_avatar.png')
         ];
     });
 
 
     // ================= Notifications =================
     $user = auth()->user();
-
-    $notificationsQuery = GeneralNotification::query()
-        ->where(function ($q) use ($user) {
-            $q->whereNull('user_id'); // broadcast
-            if ($user) {
-                $q->orWhere('user_id', $user->id);
-            }
-        })
-        ->latest();
-
-    $notificationsList = $notificationsQuery->take(20)->get()->map(function ($n) {
+    
+   
+    $notificationsQuery = GeneralNotification::where('is_read', false)
+    ->where(function ($q) use ($user) {
+        $q->where('user_id', $user->id);
+    })->latest();
+    $notificationsList = $notificationsQuery->get()->map(function ($n) {
         return [
             "id" => $n->id,
             "title" => $n->title,
             "message" => $n->body,
-            "is_read" => $n->read_at ? true : false,
-            "created_at" => $n->created_at->toDateTimeString(),
-            "related" => [
-                "type" => $n->related_type,
-                "id" => $n->related_id,
-                "name" => $n->related_name,
-            ],
-            "meta" => $n->meta,
+            "is_read" => $n->read_at ? true : false
         ];
     });
-
     $notifications = [
-        "count" => $notificationsQuery->count(),
+        "count" => $notificationsList->count(),
         "hasNew" => $notificationsQuery->whereNull('read_at')->exists(),
         "data" => $notificationsList,
     ];
 
-    // ================= My Stats =================
+    //================= My Stats =================
     $myStats = [
-        "totalAgents" => User::count(),
+        "totalAgents" => !empty($upcomingSession->sponsors) ? $upcomingSession->sponsors->count() : 0,
         "totalConnections" => User::count(),
-        "totalSessionAttendee" => User::whereHas("roles", function ($q) {
-            $q->where("name", "Attendee");
-        })->count(),
+        "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
     ];
 
     return response()->json([
         "banner" => $banner,
-        "upcomingSession" => $upcomingSessionData,
+        "upcomingEvent" => $upcomingSessionData,
         "home_sessions" => $homeSessions,
         "home_connections" => $homeConnections,
         "myStats" => $myStats,
@@ -170,14 +146,8 @@ public function getNotifications(Request $request)
 
     
     $isSpeaker = $user->hasRole('Speaker');
-
-    
     $photo = $user->photo;
-   
-    $userPhoto = $user->photo
-        ? Storage::url('users/' . $user->photo->file_name)
-        : url('images/default.jpg');
-
+    $userPhoto = !empty($user->photo) ? $user->photo->file_path : '';
     
     $notifications = GeneralNotification::query()
         ->where(function ($q) use ($user) {
@@ -190,18 +160,17 @@ public function getNotifications(Request $request)
         ->map(function ($n) use ($isSpeaker, $userPhoto) {
             return [
                 'imageUrl'   => $userPhoto, 
-                'heading'    => $n->title ?? $n->body ?? '',
+                'heading'    => $n->title  ?? '',
+                'message'    => $n->body  ?? '',
                 'created_at' => $n->created_at?->toIso8601String(),
                 'isRead'     => $n->read_at ? true : false,
                 'isSpeaker'  => $isSpeaker,
             ];
         });
 
-    return response()->json([
-        'success' => true,
-        'data'    => $notifications,
-    ], 200);
+    return response()->json($notifications, 200);
 }
+
 public function getSession($sessionId)
 {
     try {
@@ -262,7 +231,7 @@ public function getConnections(Request $request)
         }
 
         
-        $connections = User::with(['photo', 'company']) // eager load relations
+        $connections = User::with(['photo', 'usercompany']) // eager load relations
             ->limit(50)
             ->get()
             ->map(function ($connection) {
@@ -270,7 +239,7 @@ public function getConnections(Request $request)
                     "id" => (string) $connection->id,
                     "name" => $connection->full_name ?? $connection->name,
                     "connection_role" => $connection->getRoleNames(),
-                    "company_name" =>$connection->company ? $connection->company->name : null,
+                    "company_name" =>$connection->usercompany ? $connection->usercompany->name : null,
                     "connection_image" => $connection->photo ? $connection->photo->file_path : null,
                        
                 ];

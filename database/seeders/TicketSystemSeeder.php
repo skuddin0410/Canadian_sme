@@ -270,6 +270,7 @@ class TicketSystemSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                notification($userId,'Speaker_Reminder',$sessionId);
             }
         }
 
@@ -283,6 +284,7 @@ class TicketSystemSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                notification($userId,'Exhibitor_Reminder',$sessionId);
             }
         }
 

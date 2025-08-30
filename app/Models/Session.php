@@ -47,6 +47,11 @@ class Session extends Model
         return $this->belongsToMany(User::class, 'session_sponsors', 'session_id', 'user_id')->withTimestamps();
     }
 
+    public function attendees(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'session_attendees', 'session_id', 'user_id')->withTimestamps();
+    }
+
     public function tickets()
     {
          return $this->hasMany(EventTicket::class, 'session_id');
@@ -70,4 +75,13 @@ class Session extends Model
             ->where('file_type', 'photo')
             ->whereNotNull('file_name');
     }
+
+    public function getStartsInAttribute()
+    {
+        return now()->diffForHumans($this->start_time, [
+            'parts' => 2,
+        ]);
+    }
+
+    protected $appends = ['starts_in'];
 }

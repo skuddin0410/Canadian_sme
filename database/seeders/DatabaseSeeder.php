@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             //ServiceCategoriesSeeder::class,
            // ServicesSeeder::class,
             SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
+
+            SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
         ]);
     }
 }

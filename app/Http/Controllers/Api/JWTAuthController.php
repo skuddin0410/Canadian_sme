@@ -280,16 +280,9 @@ class JWTAuthController extends Controller
             ], 404);
         }
 
-      
-        $user->load('photo'); 
-
-   
+    
         $token = request()->bearerToken() ?? JWTAuth::refresh();
-
-      
         $roles = $user->getRoleNames();
-
-       
         $address = [
             'street'   => $user->address ?? null,
             'city'     => $user->city ?? null,
@@ -297,36 +290,31 @@ class JWTAuthController extends Controller
             'country'  => $user->country ?? null,
             'zipcode'  => $user->zipcode ?? null,
         ];
-        $user->load(['photo', 'company']);
-
-return response()->json([
-    'success' => true,
-    'message' => 'successful',
-    'data' => [
-        'user' => [
+        $user->load(['photo', 'usercompany']);
+        return response()->json([
+            'success' => true,
+            'message' => 'successful',
             'id'        => $user->id,
-            'name'      => $user->name,
-            'lastname'  => $user->lastname,
-            'full_name' => $user->full_name,
-            'email'     => $user->email,
-            'mobile'    => $user->mobile,
+            'first_name'      => $user->name ?? '',
+            'lastname'  => $user->lastname ?? '',
+            'name' => $user->full_name,
+            'email'     => $user->email ?? '',
+            'phone'    => $user->mobile ?? '',
+            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : '',
             'designation'=> $user->designation,
             'bio'       => $user->about,
-            'tags'      => $user->tags,
-            'qr_code' => $user-> qr_code,
-            'address'   => [
-                'street'  => $user->street,
-                'city'    => $user->city,
-                'state'   => $user->state,
-                'country' => $user->country,
-                'zipcode' => $user->zipcode,
-            ],
-            'company'   => $user->company, // full company object
-        ],
-        'image_url' => $user->photo,
-        'roles'     => $user->getRoleNames(),
-    ],
-]);
+            'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
+            'my_qr_code' => asset($user->qr_code),
+            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
+            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 
+            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
+            'image_url' => !empty($user->photo) ? $user->photo->file_path : '' ,
+            'roles'     => $user->getRoleNames(),
+            'company_about_page'  => config('app.url').'/about_page',
+            'company_location_page'    => config('app.url').'/location_page',
+            'company_privacy_policy_page' => config('app.url').'/policy_page',
+            'company_terms_of_service_page' => config('app.url').'/service_page',
+        ]);
 
 
     
@@ -353,51 +341,47 @@ public function updateUser(Request $request)
                 'data' => collect(),
             ], 404);
         }
-
+        
         // Custom validation with error handling
         $validator = Validator::make($request->all(), [
-            'name'        => 'nullable|string|max:255',
-            'lastname'    => 'nullable|string|max:255',
-            'designation' => 'nullable|string|max:255',
-            'email'       => 'nullable|email|unique:users,email,' . $user->id,
-            'mobile'      => 'nullable|string|max:20',
-            'gender'      => 'nullable|in:male,female,other',
-            'dob'         => 'nullable|date',
+            'first_name'        => 'required|string|max:255',
+            'last_name'    => 'required|string|max:255',
+            'designation' => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email,' . $user->id,
+            'phone'      => 'required|string|max:20',
+            'bio'    => 'nullable|max:300',
+            'tags'   => 'nullable|string',
             // company fields
-            'company_name'     => 'nullable|string|max:255',
-            'company_email'    => 'nullable|email|max:255',
-            'company_phone'    => 'nullable|string|max:20',
-            'company_website'  => 'nullable|string|max:200',
-            'about'            => 'nullable|string',
-            'tags'             => 'nullable|string',
-            // address
-            'street'      => 'nullable|string|max:255',
-            'city'        => 'nullable|string|max:255',
-            'state'       => 'nullable|string|max:255',
-            'country'     => 'nullable|string|max:255',
-            'zipcode'     => 'nullable|string|max:20',
+            'company_name'     => 'required|string|max:255',
+            'company_website'     => 'nullable|string|max:255'
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update profile.',
-                'errors'  => $validator->errors(),
+                'errors'  => $validator->errors()->first(),
             ], 422);
         }
+        
 
-        $validated = $validator->validated();
-
-        // --- Update user basic info ---
-        $user->update($validated);
-
+        $user->name = $request->first_name ?? '';
+        $user->lastname = $request->last_name ?? '';
+        $user->email = $request->email ?? '';
+        $user->company = $request->company_name?? '';
+        $user->designation = $request->designation ?? '';
+        $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
+        $user->mobile = $request->phone ?? '';
+        $user->bio = $request->bio ?? '';
+        $user->save();
+        qrCode($user->id);
         // --- Update or create company record ---
-        if ($request->hasAny(['company_name', 'company_email', 'company_phone', 'company_website'])) {
+        if ($request->hasAny(['company_name', 'email'])) {
             $companyData = [
-                'name'    => $request->company_name,
-                'email'   => $request->company_email,
-                'phone'   => $request->company_phone,
-                'website' => $request->company_website,
+                'name'    => $request->company_name ?? '',
+                'email'   => $request->email ?? '',
+                'phone'   => $request->phone ?? '',
+                'website' => $request->company_website ?? '',
             ];
 
             \App\Models\Company::updateOrCreate(
@@ -406,19 +390,15 @@ public function updateUser(Request $request)
             );
         }
 
-        // Reload relations
-        $user->load(['photo', 'company']);
-
         return response()->json([
             'success' => true,
             'message' => 'Profile updated successfully.',
-            'data'    => $user,
         ]);
 
     } catch (JWTException $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Unauthorized',
+            'message' => 'Fail to update profile!',
             'data'    => null,
         ], 401);
     }
@@ -437,53 +417,32 @@ public function updateUserImage(Request $request)
 
        
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:' . config('app.user_image_size'),
+         'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', 
         ]);
         
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed.',
+                'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors(),
             ], 422);
         }
         
 
-        $uploadPath = 'users/profile/' . $user->id;
-
-        
-        $file = $request->file('image');
-        $filename = uniqid('profile_') . '.' . $file->getClientOriginalExtension();
-        $file->storeAs('public/' . $uploadPath, $filename);
-
-        $imageUrl = asset('storage/' . $uploadPath . '/' . $filename);
-
-      
-        
-        auth()->user()->photo()->updateOrCreate(
-    ['table_type' => 'users'], // match existing photo record for this user
-    [
-        'table_id' => auth()->id(), // link to current user
-        'file_name' => $filename,
-        'file_type' => 'photo',
-    ]
-);
-
-       
-        $user->load('photo');
+       if ($request->hasFile('image')) {
+          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        }
 
         return response()->json([
-            // 'success'   => true,
+            'success'   => true,
             'message'   => 'Profile image updated successfully.',
-            // 'image_url' => $user->photo->url,
-            // 'data'      => $user,
         ]);
 
     } catch (JWTException $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Unauthorized',
+            'message' => 'Fail to upload profile image!',
         ], 401);
     }
 }
@@ -673,12 +632,11 @@ public function getExhibitor($exhibitorId)
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
-                // 'data'    => collect(),
             ], 401);
         }
 
      
-        $exhibitor = User::find($exhibitorId);
+        $exhibitor = User::with('photo','usercompany','usercompany.booths','usercompany.files')->find($exhibitorId);
 
         if (! $exhibitor) {
             return response()->json([
@@ -687,16 +645,14 @@ public function getExhibitor($exhibitorId)
                 'data'    => collect(),
             ], 404);
         }
-
-     
         $response = [
-            'name'     => trim(($exhibitor->name ?? '') . ' ' . ($exhibitor->lastname ?? '')),
-            'word_no'  => $exhibitor->designation ?? '',
-            'location' => trim(($exhibitor->city ?? '') . ', ' . ($exhibitor->country ?? '')),
+            'name'     => $exhibitor->full_name ?? '',
+            'word_no'  => $exhibitor?->usercompany?->booths[0]?->booth_number ?? '',
+            'avatar'=> !empty($exhibitor->photo) ? $exhibitor->photo->file_path : '',
+            'location' => $exhibitor?->usercompany?->booths[0]?->location_preferences ?? '',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->mobile ?? '',
             'website'  => $exhibitor->website_url ?? '',
-
             'social_links' => [
                 ['name' => 'linkedin', 'url' => $exhibitor->linkedin_url ?? ''],
                 ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
@@ -705,13 +661,20 @@ public function getExhibitor($exhibitorId)
                 ['name' => 'github', 'url' => $speaker->github_url ?? ''],
 
             ],
-
             'bio' => $exhibitor->bio ?? '',
-        ];
+            'my_qr_code' => asset($exhibitor->qr_code) ?? '',
+            'uploaded_files' => $exhibitor->usercompany->files->map(function ($file) {
+                    return [
+                        'name' => $file->file_name, 
+                        'url'  => $file->file_path,
+                    ];
+             })->toArray() ?? [],
 
+        ];
+        
+        
         return response()->json([
             'success' => true,
-            // 'message' => 'Exhibitor details fetched successfully',
             'data'    => $response,
         ], 200);
 
@@ -735,7 +698,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             ], 404);
         }
 
-        $exhibitor = User::find($exhibitorId);
+        $exhibitor = User::with('usercompany','usercompany.files')->find($exhibitorId);
       
         if (! $exhibitor) {
             return response()->json([
@@ -746,38 +709,37 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
         }
 
         $validator = Validator::make($request->all(), [
-            'file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:' . config('app.user_image_size'),
+            'file' => 'required|image|mimes:jpg,jpeg,png',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed.',
-                'errors'  => $validator->errors(),
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors()->first(),
             ], 422);
         }
 
         if ($request->file("file")) {
-            
             $fileRecord = $this->imageUpload(
                 $request->file("file"),
-                'users',
-                $exhibitor->id,
-                'users',
-                'photo',
-                $idForUpdate = $exhibitor->id
+                'companies',
+                $exhibitor->usercompany->id,
+                'companies',
+                'files'
             );
          
         }
-
-       
-        $exhibitor = User::where('id', $exhibitor->id)->with('photo')->first();
-
+    
+        $exhibitor = User::where('id', $exhibitor->id)->with(['files' => function ($query) {
+            $query->latest()->take(1); 
+         }])->first();
+ 
         return response()->json([
           
             'message'   => 'File uploaded successfully.',
-            'file_id'   =>  $exhibitor->photo ? $exhibitor->photo->id : null,
-            'image_url' => $exhibitor->photo ? $exhibitor->photo->file_path : null,
+            'file_id'   =>  !empty($exhibitor->files) ? $exhibitor->files[0]->id : null,
+            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : null,
         ]);
 
     } catch (\Exception $e) {
@@ -787,59 +749,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
         ], 500);
     }
 }
-// public function deleteExhibitorFiles(Request $request, $exhibitorId, $fileId)
-// {
-//     try {
-//         if (! $user = JWTAuth::parseToken()->authenticate()) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'User not found.',
-//             ], 404);
-//         }
 
-//         // Check exhibitor exists
-//         $exhibitor = User::with('photo')->find($exhibitorId);
-//         if (! $exhibitor) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'Exhibitor not found.',
-//             ], 404);
-//         }
-
-       
-//         $file = File::where('id', $fileId)
-//             ->where('fileable_id', $exhibitor->id)
-//             ->where('fileable_type', User::class)
-//             ->first();
-
-//         if (! $file) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'File not found for this exhibitor.',
-//             ], 404);
-//         }
-
-//         // Delete from storage
-//         if (Storage::disk('public')->exists($file->file_path)) {
-//             Storage::disk('public')->delete($file->file_path);
-//         }
-
-//         // Delete DB record
-//         $file->delete();
-
-//         return response()->json([
-//             'success' => true,
-//             'message' => 'Exhibitor file deleted successfully.',
-//             'deleted_file_id' => $fileId,
-//         ]);
-
-//     } catch (\Exception $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => $e->getMessage(),
-//         ], 500);
-//     }
-// }
 public function deleteExhibitorFiles($exhibitorId, $fileId)
 {
     try {
@@ -914,8 +824,8 @@ public function getSpeaker()
         }
 
      
-        $speakers = User::whereHas("roles", function ($q) {
-            $q->where("name", "Speaker");
+        $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Speaker');
         })->get();
 
         if ($speakers->isEmpty()) {
@@ -929,13 +839,16 @@ public function getSpeaker()
         
         $response = $speakers->map(function ($speaker) {
             return [
-                'name'     => trim(($speaker->name ?? '') . ' ' . ($speaker->lastname ?? '')),
-                'word_no'  => $speaker->designation ?? '',
-                'location' => trim(($speaker->place ?? '') . ', ' . ($speaker->street ?? '') . ', ' . ($speaker->city ?? '') . '- ' . ($speaker->zipcode ?? '') . ', ' . ($speaker->state ?? '') . ', ' . ($speaker->country ?? '')),
+                'name'     => $speaker->full_name,
+                'company'  => $speaker->company ?? '',
+                'designation'  => $speaker->company ?? '',
+                'location' => '',
                 'email'    => $speaker->email ?? '',
                 'phone'    => $speaker->mobile ?? '',
                 'website'  => $speaker->website_url ?? '',
-                // 'avatar'   => $speaker->avatar ?? '',
+                'avatar'   => !empty($speaker->photo) ? $speaker->photo->file_path  : '',
+                'tags' => !empty($speaker->tags) ? explode(',',$speaker->tags) : '',
+                'groups' => groups($speaker),
 
                 'social_links' => [
                     ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
@@ -945,15 +858,7 @@ public function getSpeaker()
                     ['name' => 'github', 'url' => $speaker->github_url ?? ''],
                 ],
 
-                'bio'            => $speaker->bio ?? '',
-                // 'uploaded_files' => method_exists($speaker, 'files')
-                //     ? $speaker->files->map(function ($file) {
-                //         return [
-                //             'name' => $file->name,
-                //             'url'  => $file->url,
-                //         ];
-                //     })
-                //     : [], 
+                'bio'   => $speaker->bio ?? '',
             ];
         });
 
@@ -970,46 +875,13 @@ public function getSpeaker()
         ], 500);
     }
 }
-// public function getTags()
-// {
-//     try {
-     
-//         $tags = Category::where('type','tags')->pluck('name')
-        
-//             ->filter() 
-//             ->flatMap(function ($tagString) {
-//                 // handle JSON or comma-separated tags
-//                 if (is_array($tagString)) {
-//                     return $tagString;
-//                 }
-//                 return explode(',', $tagString);
-//             })
-//             ->map(fn($tag) => trim($tag)) // clean spaces
-//             ->filter() // remove empty after trim
-//             ->unique()
-//             ->values();
 
-//         return response()->json([
-//             'success' => true,
-//             'data'    => $tags,
-//         ], 200);
-
-//     } catch (\Exception $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Something went wrong: ' . $e->getMessage(),
-//             'data'    => [],
-//         ], 500);
-//     }
-// }
 public function getTags()
 {
     try {
-        $tags = Category::where('type', 'tags')
-            ->pluck('name') // get only names
-            ->filter() // remove null/empty
+        $tags = Category::pluck('name') 
+            ->filter() 
             ->flatMap(function ($tagString) {
-                // handle JSON or comma-separated tags
                 if (is_array($tagString)) {
                     return $tagString;
                 }
@@ -1028,10 +900,7 @@ public function getTags()
             ->unique()
             ->values();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $tags,
-        ], 200);
+        return response()->json($tags,200);
 
     } catch (\Exception $e) {
         return response()->json([

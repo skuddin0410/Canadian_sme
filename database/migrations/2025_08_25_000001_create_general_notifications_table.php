@@ -25,8 +25,7 @@ use Illuminate\Support\Facades\Schema;
 			$table->timestamp('scheduled_at')->nullable(); // when to send (optional)
 			$table->timestamp('delivered_at')->nullable();
 			$table->timestamp('read_at')->nullable();
-
-
+            $table->boolean('is_read')->default(true);
 			$table->json('meta')->nullable(); // arbitrary JSON for clients
 			$table->timestamps();
 

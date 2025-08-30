@@ -92,30 +92,29 @@ class Company extends Model
    {
     return $this->belongsTo(Product::class,'company_id');
    }
-    // public function booths()
-    // {
-    //     return $this->hasMany(Booth::class, 'company_id');
-    // }
-//     public function booth()
-// {
-//     return $this->belongsTo(Booth::class);
-// }
-public function boothUsers()
-{
-    return $this->hasMany(BoothUser::class);
-}
-public function booths()
-{
-    return $this->hasManyThrough(
-        Booth::class,   // Target
-        BoothUser::class, // Pivot
-        'company_id',    // Foreign key on BoothUser
-        'id',            // Foreign key on Booth
-        'id',            // Local key on Company
-        'booth_id'       // Local key on BoothUser
-    );
-}
 
+    public function boothUsers()
+    {
+        return $this->hasMany(BoothUser::class);
+    }
+    public function booths()
+    {
+        return $this->hasManyThrough(
+            Booth::class,   // Target
+            BoothUser::class, // Pivot
+            'company_id',    // Foreign key on BoothUser
+            'id',            // Foreign key on Booth
+            'id',            // Local key on Company
+            'booth_id'       // Local key on BoothUser
+        );
+    }
 
+    public function files()
+    {
+        return $this->hasMany(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'files')
+            ->whereNotNull('file_name');
+    }
 
 }

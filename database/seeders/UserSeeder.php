@@ -25,9 +25,10 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $groups = config('roles.groups');
-
+ 
         $eventAdmin->assignRole('Admin');
-         ////qrCode($eventAdmin->id);
+        notification($eventAdmin->id,'welcome');
+        qrCode($eventAdmin->id);
 
         $exhibitorsNames = [
             ['first_name' => 'Liam',     'last_name' => 'Smith'],
@@ -104,8 +105,8 @@ class UserSeeder extends Seeder
             ]);
 
             $exhibitorAdmin->assignRole('Exhibitor');
-             ////qrCode($exhibitorAdmin->id);
-
+            qrCode($exhibitorAdmin->id);
+            notification($exhibitorAdmin->id,'welcome');
             $companies = [
                 'user_id'             => $exhibitorAdmin->id, // or assign dynamically
                 'name'                => $name,
@@ -144,8 +145,8 @@ class UserSeeder extends Seeder
                 'password'   => Hash::make('password')
             ]);
              $sponsors->assignRole('Sponsors');
-             //qrCode($sponsors->id);
-
+             qrCode($sponsors->id);
+             notification($sponsors->id,'welcome');
              $companies = [
                 'user_id'             => $sponsors->id, // or assign dynamically
                 'name'                => $name,
@@ -195,7 +196,8 @@ class UserSeeder extends Seeder
 
             ]);
             $speaker->assignRole('Speaker');
-            //qrCode($speaker->id);
+            qrCode($speaker->id);
+            notification($speaker->id,'welcome');
 
             $companies = [
                 'user_id'             => $speaker->id, // or assign dynamically
@@ -242,7 +244,8 @@ class UserSeeder extends Seeder
         ]);
         $exhibitorRepresentative->assignRole('Representative');
 
-        //qrCode($exhibitorRepresentative->id);
+        qrCode($exhibitorRepresentative->id);
+        notification($exhibitorRepresentative->id,'welcome');
 
            $companies = [
                 'user_id'             => $exhibitorRepresentative->id, // or assign dynamically
@@ -289,7 +292,8 @@ class UserSeeder extends Seeder
                 'secondary_group'=> implode(',', $randomThree)
         ]);
         $attendee->assignRole('Attendee');
-        //qrCode($attendee->id);
+        qrCode($attendee->id);
+        notification($attendee->id,'welcome');
 
            $companies = [
                 'user_id'             => $attendee->id, // or assign dynamically
@@ -327,8 +331,9 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $SupportStaff->assignRole('Support Staff Or Helpdesk');
-        //qrCode($SupportStaff->id); 
- 
+        qrCode($SupportStaff->id); 
+        notification($SupportStaff->id,'welcome');
+
         $registrationDesk = User::create([
             'name' => 'Registration',
             'lastname'=>'Desk',
@@ -337,7 +342,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
         $registrationDesk->assignRole('Registration Desk');
-        //qrCode($registrationDesk->id);
+        qrCode($registrationDesk->id);
+        notification($registrationDesk->id,'welcome');
 
     }
 }

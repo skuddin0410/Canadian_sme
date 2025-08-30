@@ -124,6 +124,16 @@ class User extends Authenticatable implements JWTSubject
             ->where('file_type', 'photo')
             ->whereNotNull('file_name');
     }
+
+    public function files()
+    {
+        return $this->hasMany(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'users')
+            ->where('file_type', 'files')
+            ->whereNotNull('file_name');
+    }
+
+    
     public function coverphoto()
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
@@ -159,7 +169,7 @@ class User extends Authenticatable implements JWTSubject
     }
     
 
-    public function company()
+    public function usercompany()
     {
         return $this->hasOne(Company::class,'user_id','id');
     }
