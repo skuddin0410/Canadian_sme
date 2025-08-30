@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use App\Models\GeneralNotification;
+use App\Models\Session;
 
 
 if (!function_exists('getCategory')) {
@@ -97,45 +99,6 @@ if (!function_exists('getKeyValue')) {
 }
 
 
-if (!function_exists('qrCode')) {
-    function qrCode($userId, $folder = "user")
-    {
-        $user = User::findOrFail($userId);
-
-        $data = json_encode([
-            'id' => $user->id,
-            'name' => $user->full_name ?? '',
-            'email' => $user->email ?? '',
-        ]);
-
-        // Ensure the directory exists
-        $dirPath = public_path('qrcodes');
-        if (!file_exists($dirPath)) {
-            mkdir($dirPath, 0755, true);
-        }
-
-        $fileName = $folder . '_' . $user->id . '.png';
-        $filePath = $dirPath . '/' . $fileName;
-
-        // Remove old QR if exists
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
-
-        // Setup the QR renderer
-        $renderer = new ImageRenderer(
-            new RendererStyle(300),
-            new ImagickImageBackEnd() // more reliable than GDLibRenderer
-        );
-
-        $writer = new Writer($renderer);
-        $writer->writeFile($data, $filePath);
-
-        // Save relative path in DB
-        $user->qr_code = 'qrcodes/' . $fileName;
-        $user->save();
-    }
-}
 
 if (!function_exists('downloadQrCode')) {
     function downloadQrCode($userId)
@@ -161,61 +124,94 @@ if (!function_exists('downloadQrCode')) {
 
 
 
-// if (!function_exists('qrCode')) {
-//   function qrCode($userId,$folder="user")
-//   { 
-//        $user = User::findOrFail($userId);
+if (!function_exists('qrCode')) {
+  function qrCode($userId,$folder="user")
+  { 
+       $user = User::findOrFail($userId);
 
-//         $data = json_encode([
-//             'id' => $user->id,
-//             'name' => $user->full_name ?? '',
-//             'email' => $user->email ?? '',
-//         ]);
+        $data = json_encode([
+            'id' => $user->id,
+            'name' => $user->full_name ?? '',
+            'email' => $user->email ?? '',
+        ]);
 
-//         if (!file_exists(public_path('qrcodes'))) {
-//             mkdir(public_path('qrcodes'), 0755, true);
-//         }
+        if (!file_exists(public_path('qrcodes'))) {
+            mkdir(public_path('qrcodes'), 0755, true);
+        }
 
-//         $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
-//         $filePath = public_path($fileName);
+        $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
+        $filePath = public_path($fileName);
 
-//         if (file_exists($filePath)) {
-//             unlink($filePath);
-//         }
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
 
-//         // Use GDLibRenderer
-//         $renderer = new GDLibRenderer(300); // 300 is the size of the QR code
-//         $writer = new Writer($renderer);
-//         $writer->writeFile($data, $filePath);
+        // Use GDLibRenderer
+        $renderer = new GDLibRenderer(300); // 300 is the size of the QR code
+        $writer = new Writer($renderer);
+        $writer->writeFile($data, $filePath);
 
-//         // $user->qr_code = asset($fileName);
-//         // $user->qr_code = $fileName; // e.g. "qrcodes/user_1.png"
-//         $user->qr_code = 'qrcodes/' . $folder . '_' . $user->id . '.png';
+        // $user->qr_code = asset($fileName);
+        // $user->qr_code = $fileName; // e.g. "qrcodes/user_1.png"
+        $user->qr_code = 'qrcodes/' . $folder . '_' . $user->id . '.png';
 
 
-//         $user->save();
-//   }
+        $user->save();
+  }
+}
 
-//   if (!function_exists('downloadQrCode')) {
-//     function downloadQrCode($userId)
-// {
-//     $user = User::findOrFail($userId);
+if (!function_exists('notification')) {
+  function notification($user_id,$type='welcome', $session_id=null)
+  {  
+    $user = User::find($user_id);
+    $session=null;
+    if($session_id){
+       $session = Session::find($session_id); 
+    }
+    
+    if($type == 'welcome'){
+      $title = 'Hi, welcome to '.config('app.name', 'SME').'!'; //welcome,Attendee,Exhibitors,Speaker 
+      $body = 'Hi '.$user->full_name.', welcome to '.config('app.name', 'SME').'! We’re glad to have you here.';  
+    }
 
-//     if (!$user->qr_code || !file_exists(public_path($user->qr_code))) {
-//         qrCode($userId, "user"); // regenerate
-//     }
+    if($type == 'Attendee'){
+        $title = 'Hi, '.$user->full_name; //welcome,Attendee,Exhibitors,Speaker 
+        $body = 'Don’t miss it, '.$user->full_name.'! '.$session->title.' starts soon.';
+    }
+    
+    if($type == 'Attendee_Reminder'){
+        $title = 'Hi, '.$user->full_name; //welcome,Attendee,Exhibitors,Speaker 
+        $body = '📅 Don’t miss it, '.$user->full_name.'! '.$session->title.' starts soon. Check the agenda';
+    }
 
-//     $filePath = public_path($user->qr_code);
 
-//     if (file_exists($filePath)) {
-//         return response()->download($filePath, 'qr_code_' . $user->id . '.png', [
-//             'Content-Type' => 'image/png',
-//         ]);
-//     }
+    if($type == 'Speaker_Reminder'){
+        $title = 'Hi, '.$user->full_name; //welcome,Attendee,Exhibitors,Speaker 
+        $body = '⏰ Reminder, '.$user->full_name.': Your talk ‘'.$session->title.'’ at '.$session->event->title.' starts in '.$session->starts_in.' minutes.';
+    }
 
-//     abort(404, 'QR code not found.');
-// }
+    if($type == 'Speaker_Thankyou'){
+        $title = 'Hi, '.$user->full_name; //welcome,Attendee,Exhibitors,Speaker 
+        $body = 'Thank you, '.$user->full_name.'! Your session at ‘'.$session->title.'’ inspired many attendees.';
+    }
 
-// }
+    if($type == 'Exhibitor_Reminder'){
+        $title = 'Hi, '.$user->full_name; //welcome,Attendee,Exhibitors,Speaker 
+        $body = '📅 Don’t miss it, '.$user->full_name.'! '.$session->title.' starts soon. Check the agenda';
+    }
 
-// }
+    $arr =[
+        'user'=> $user,
+        'session' => $session
+    ];
+
+     GeneralNotification::create([
+        'user_id'=>$user->id,
+        'title'=>$title,
+        'related_type'=> $type,
+        'body'=>$body,
+        'meta'=> json_encode($arr)
+    ]);
+  }
+}
+
