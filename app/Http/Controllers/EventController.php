@@ -130,7 +130,7 @@ class EventController extends Controller
             'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
         ]);
 
-        $validated['tags'] = $request->has('tags') ? implode(',', $request->tags) : '';
+        $validated['tags'] = $request->has('tags') && !empty($request->tags) ? implode(',', $request->tags) : '';
         $event->title        = $validated['title'];
         $event->slug         = $validated['slug'] ?? $event->slug;
         $event->description  = $validated['description'] ?? null;

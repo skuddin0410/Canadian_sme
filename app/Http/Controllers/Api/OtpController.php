@@ -21,7 +21,7 @@ class OtpController extends Controller
 {
     public function generate(Request $request) {
         $validator = Validator::make($request->all(), [
-            'email' => 'sometimes|nullable|string|max:255|email',
+            'email' => 'required|nullable|string|max:255|email',
             // 'mobile' => 'sometimes|nullable|string',
         ]);
         if ($validator->fails()) {

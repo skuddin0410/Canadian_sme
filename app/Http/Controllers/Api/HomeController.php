@@ -19,17 +19,14 @@ class HomeController extends Controller
     public function index(Request $request)
 {
     // ================= Banner =================
-    $featuredEvent = Event::where('start_date', '>=', now())
-    
-        ->inRandomOrder()
-        ->first();
+    $featuredEvent = Event::with('photo')->first();
 
     $banner = $featuredEvent ? [
         "id" => $featuredEvent->id,
         "title" => $featuredEvent->title,
         "description" => $featuredEvent->description,
         "location" => $featuredEvent->location,
-        "imageUrl" => $featuredEvent->image_url ?? url('images/default_event.jpg'),
+        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : url('images/default_event.jpg'),
         "videoUrl" => $featuredEvent->youtube_link ?? '',
         "startTime" => $featuredEvent->start_date?->toIso8601String(),
         "endTime" => $featuredEvent->end_date?->toIso8601String(),
@@ -40,8 +37,7 @@ class HomeController extends Controller
     ];
 
     // ================= Upcoming Session =================
-    $upcomingSession = Session::with(['event', 'speakers', 'booth'])
-        ->where('start_time', '>=', now())
+    $upcomingSession = Session::where('start_time', '>=', now())
         ->orderBy('start_time', 'ASC')
         ->first();
 
@@ -49,14 +45,7 @@ class HomeController extends Controller
         "id" => $upcomingSession->id,
         "title" => $upcomingSession->title,
         "description" => $upcomingSession->description,
-        "start_time" => $upcomingSession->start_time?->toIso8601String(),
-        "end_time" => $upcomingSession->end_time?->toIso8601String(),
-        "location" => $upcomingSession->booth->title ?? 'No Booth',
-        "event" => $upcomingSession->event ? [
-        "id" => $upcomingSession->event->id,
-        "title" => $upcomingSession->event->title,
-        ] : null,
-        "speakers" => $upcomingSession->speakers->map(fn ($sp) => ["name" => $sp->name]),
+        "startDateTime" => $upcomingSession->start_time?->toIso8601String(),
         "status" => "upcoming",
     ] : null;
 
@@ -79,7 +68,7 @@ class HomeController extends Controller
                     "start_time" => $session->start_time?->toIso8601String(),
                     "end_time" => $session->end_time?->toIso8601String(),
                     "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
-                    "location" => !empty($session->booth) ? $session->booth->title : 'No Booth',
+                    "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
                     "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
                     "isFavorite" => true
@@ -90,16 +79,17 @@ class HomeController extends Controller
    
     // ================= Home Connections (from session_sponsors) =================
  $homeConnections = User::with('photo')
+    ->whereHas("roles", function ($q) {
+        $q->whereIn("name", ['Attendee','Speaker']);
+    })
     ->whereHas('sponsoredSessions') // only users who are sponsors
-    ->limit(20)
+    ->limit(3)
     ->get()
     ->map(function ($user) {
         return [
-            "id" => "sponsor-" . $user->id,
+            "id" => $user->id,
             "name" => $user->full_name ?? $user->name,
-            "avatarUrl" => $user->photo
-                ? asset('storage/' . $user->photo->file_path . '/' . $user->photo->file_name)
-                : url('images/default_avatar.png'),
+            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :url('images/default_avatar.png')
         ];
     });
 
@@ -149,7 +139,7 @@ class HomeController extends Controller
 
     return response()->json([
         "banner" => $banner,
-        "upcomingSession" => $upcomingSessionData,
+        "upcomingEvent" => $upcomingSessionData,
         "home_sessions" => $homeSessions,
         "home_connections" => $homeConnections,
         "myStats" => $myStats,
