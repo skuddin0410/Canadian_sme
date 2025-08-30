@@ -342,29 +342,19 @@ public function updateUser(Request $request)
                 'data' => collect(),
             ], 404);
         }
-
+        
         // Custom validation with error handling
         $validator = Validator::make($request->all(), [
-            'name'        => 'nullable|string|max:255',
-            'lastname'    => 'nullable|string|max:255',
-            'designation' => 'nullable|string|max:255',
-            'email'       => 'nullable|email|unique:users,email,' . $user->id,
-            'mobile'      => 'nullable|string|max:20',
-            'gender'      => 'nullable|in:male,female,other',
-            'dob'         => 'nullable|date',
+            'first_name'        => 'required|string|max:255',
+            'last_name'    => 'required|string|max:255',
+            'designation' => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email,' . $user->id,
+            'phone'      => 'required|string|max:20',
+            'bio'    => 'nullable|max:300',
+            'tags'   => 'nullable|string',
             // company fields
-            'company_name'     => 'nullable|string|max:255',
-            'company_email'    => 'nullable|email|max:255',
-            'company_phone'    => 'nullable|string|max:20',
-            'company_website'  => 'nullable|string|max:200',
-            'about'            => 'nullable|string',
-            'tags'             => 'nullable|string',
-            // address
-            'street'      => 'nullable|string|max:255',
-            'city'        => 'nullable|string|max:255',
-            'state'       => 'nullable|string|max:255',
-            'country'     => 'nullable|string|max:255',
-            'zipcode'     => 'nullable|string|max:20',
+            'company_name'     => 'required|string|max:255',
+            'company_website'     => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -374,18 +364,23 @@ public function updateUser(Request $request)
                 'errors'  => $validator->errors(),
             ], 422);
         }
+        
 
-        $validated = $validator->validated();
-
-        // --- Update user basic info ---
-        $user->update($validated);
+        $user->name = $request->first_name;
+        $user->lastname = $request->last_name;
+        $user->email = $request->email;
+        $user->company = $request->company_name;
+        $user->designation = $request->designation;
+        $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
+        $user->mobile = $request->phone;
+        $user->bio = $request->bio;
 
         // --- Update or create company record ---
-        if ($request->hasAny(['company_name', 'company_email', 'company_phone', 'company_website'])) {
+        if ($request->hasAny(['company_name', 'email'])) {
             $companyData = [
                 'name'    => $request->company_name,
-                'email'   => $request->company_email,
-                'phone'   => $request->company_phone,
+                'email'   => $request->email,
+                'phone'   => $request->phone,
                 'website' => $request->company_website,
             ];
 
@@ -395,13 +390,9 @@ public function updateUser(Request $request)
             );
         }
 
-        // Reload relations
-        $user->load(['photo', 'company']);
-
         return response()->json([
             'success' => true,
             'message' => 'Profile updated successfully.',
-            'data'    => $user,
         ]);
 
     } catch (JWTException $e) {
@@ -426,7 +417,7 @@ public function updateUserImage(Request $request)
 
        
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:' . config('app.user_image_size'),
+            'image' => 'required|image|mimes:jpg,jpeg,png',
         ]);
         
 
