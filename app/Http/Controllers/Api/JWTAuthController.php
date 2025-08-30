@@ -900,10 +900,7 @@ public function getTags()
             ->unique()
             ->values();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $tags,
-        ], 200);
+        return response()->json($tags,200);
 
     } catch (\Exception $e) {
         return response()->json([
