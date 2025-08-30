@@ -632,12 +632,11 @@ public function getExhibitor($exhibitorId)
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
-                // 'data'    => collect(),
             ], 401);
         }
 
      
-        $exhibitor = User::find($exhibitorId);
+        $exhibitor = User::with('photo','usercompany.booths','files')->find($exhibitorId);
 
         if (! $exhibitor) {
             return response()->json([
@@ -647,15 +646,14 @@ public function getExhibitor($exhibitorId)
             ], 404);
         }
 
-     
         $response = [
-            'name'     => trim(($exhibitor->name ?? '') . ' ' . ($exhibitor->lastname ?? '')),
-            'word_no'  => $exhibitor->designation ?? '',
-            'location' => trim(($exhibitor->city ?? '') . ', ' . ($exhibitor->country ?? '')),
+            'name'     => $exhibitor->full_name ?? '',
+            'word_no'  => $exhibitor?->usercompany?->booths[0]?->booth_number ?? '',
+            'avatar'=> !empty($exhibitor->photo) ? $exhibitor->photo->file_path : '',
+            'location' => $exhibitor?->usercompany?->booths[0]?->location_preferences ?? '',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->mobile ?? '',
             'website'  => $exhibitor->website_url ?? '',
-
             'social_links' => [
                 ['name' => 'linkedin', 'url' => $exhibitor->linkedin_url ?? ''],
                 ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
@@ -664,13 +662,20 @@ public function getExhibitor($exhibitorId)
                 ['name' => 'github', 'url' => $speaker->github_url ?? ''],
 
             ],
-
             'bio' => $exhibitor->bio ?? '',
-        ];
+            'my_qr_code' => asset($exhibitor->qr_code) ?? '',
+            'uploaded_files' => $exhibitor->files->map(function ($file) {
+                    return [
+                        'name' => $file->file_name, // adjust based on your column
+                        'url'  =>  $file->file_path, // adjust path
+                    ];
+                })->toArray()
 
+        ];
+        
+        
         return response()->json([
             'success' => true,
-            // 'message' => 'Exhibitor details fetched successfully',
             'data'    => $response,
         ], 200);
 
@@ -705,38 +710,37 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
         }
 
         $validator = Validator::make($request->all(), [
-            'file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:' . config('app.user_image_size'),
+            'file' => 'required|image|mimes:jpg,jpeg,png',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed.',
-                'errors'  => $validator->errors(),
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors()->first(),
             ], 422);
         }
 
         if ($request->file("file")) {
-            
             $fileRecord = $this->imageUpload(
                 $request->file("file"),
                 'users',
                 $exhibitor->id,
                 'users',
-                'photo',
-                $idForUpdate = $exhibitor->id
+                'files'
             );
          
         }
-
-       
-        $exhibitor = User::where('id', $exhibitor->id)->with('photo')->first();
-
+    
+        $exhibitor = User::where('id', $exhibitor->id)->with(['files' => function ($query) {
+            $query->latest()->take(1); 
+         }])->first();
+ 
         return response()->json([
           
             'message'   => 'File uploaded successfully.',
-            'file_id'   =>  $exhibitor->photo ? $exhibitor->photo->id : null,
-            'image_url' => $exhibitor->photo ? $exhibitor->photo->file_path : null,
+            'file_id'   =>  !empty($exhibitor->files) ? $exhibitor->files[0]->id : null,
+            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : null,
         ]);
 
     } catch (\Exception $e) {
@@ -746,59 +750,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
         ], 500);
     }
 }
-// public function deleteExhibitorFiles(Request $request, $exhibitorId, $fileId)
-// {
-//     try {
-//         if (! $user = JWTAuth::parseToken()->authenticate()) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'User not found.',
-//             ], 404);
-//         }
 
-//         // Check exhibitor exists
-//         $exhibitor = User::with('photo')->find($exhibitorId);
-//         if (! $exhibitor) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'Exhibitor not found.',
-//             ], 404);
-//         }
-
-       
-//         $file = File::where('id', $fileId)
-//             ->where('fileable_id', $exhibitor->id)
-//             ->where('fileable_type', User::class)
-//             ->first();
-
-//         if (! $file) {
-//             return response()->json([
-//                 'success' => false,
-//                 'message' => 'File not found for this exhibitor.',
-//             ], 404);
-//         }
-
-//         // Delete from storage
-//         if (Storage::disk('public')->exists($file->file_path)) {
-//             Storage::disk('public')->delete($file->file_path);
-//         }
-
-//         // Delete DB record
-//         $file->delete();
-
-//         return response()->json([
-//             'success' => true,
-//             'message' => 'Exhibitor file deleted successfully.',
-//             'deleted_file_id' => $fileId,
-//         ]);
-
-//     } catch (\Exception $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => $e->getMessage(),
-//         ], 500);
-//     }
-// }
 public function deleteExhibitorFiles($exhibitorId, $fileId)
 {
     try {
