@@ -31,11 +31,11 @@
       <label class="form-label">Content Icon</label>
 
       @php
-        $contentIconFile = !empty($user->company?->contentIconFile) && !empty($user->company->contentIconFile->file_path);
+        $contentIconFile = !empty($user->contentIconFile) && !empty($user->contentIconFile->file_path);
         $contentIconSrc = $contentIconFile 
-            ? (Str::startsWith($user->company->contentIconFile->file_path, ['http://','https://'])
-                ? $user->company->contentIconFile->file_path
-                : Storage::url($user->company->contentIconFile->file_path))
+            ? (Str::startsWith($user->contentIconFile->file_path, ['http://','https://'])
+                ? $user->contentIconFile->file_path
+                : Storage::url($user->contentIconFile->file_path))
             : '';
       @endphp
 
@@ -84,11 +84,11 @@
       <label class="form-label">Quick Link Icon</label>
 
       @php
-        $quickLinkFile = !empty($user->company?->quickLinkIconFile) && !empty($user->company->quickLinkIconFile->file_path);
+        $quickLinkFile = !empty($user->quickLinkIconFile) && !empty($user->quickLinkIconFile->file_path);
         $quickLinkSrc = $quickLinkFile 
-            ? (Str::startsWith($user->company->quickLinkIconFile->file_path, ['http://','https://'])
-                ? $user->company->quickLinkIconFile->file_path
-                : Storage::url($user->company->quickLinkIconFile->file_path))
+            ? (Str::startsWith($user->quickLinkIconFile->file_path, ['http://','https://'])
+                ? $user->quickLinkIconFile->file_path
+                : Storage::url($user->quickLinkIconFile->file_path))
             : '';
       @endphp
 
@@ -139,7 +139,7 @@
                   <input type="text" 
                          class="form-control" 
                          name="company_name" 
-                         value="{{ old('company_name', optional($user->company)->name) }}" 
+                         value="{{ old('company_name', $user->name) }}" 
                          placeholder="Company Name" required>
                   @error('company_name') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -152,7 +152,7 @@
                   <input type="email" 
                          class="form-control" 
                          name="company_email" 
-                         value="{{ old('company_email', optional($user->company)->email) }}" 
+                         value="{{ old('company_email', $user->email) }}" 
                          placeholder="Company Email" required>
                   @error('company_email') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -165,30 +165,19 @@
                   <input type="text" 
                          class="form-control" 
                          name="company_phone" 
-                         value="{{ old('company_phone', optional($user->company)->phone) }}" 
+                         value="{{ old('company_phone', $user->phone) }}" 
                          placeholder="Company Phone" required>
                   @error('company_phone') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>
 
-              {{-- Description --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Description</label>
-                  <textarea name="company_description" 
-                            class="form-control" 
-                            rows="4"
-                            placeholder="Company Description">{{ old('company_description', optional($user->company)->description) }}</textarea>
-                  @error('company_description') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
-
+      
               {{-- Website --}}
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Website</label>
                   <input type="url" class="form-control" name="website" 
-                         value="{{ old('website', optional($user->company)->website) }}" 
+                         value="{{ old('website', $user->website) }}" 
                          placeholder="https://example.com">
                   @error('website') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -199,7 +188,7 @@
                 <div class="mb-3">
                   <label class="form-label">LinkedIn</label>
                   <input type="url" class="form-control" name="linkedin" 
-                         value="{{ old('linkedin', optional($user->company)->linkedin) }}" 
+                         value="{{ old('linkedin', $user->linkedin) }}" 
                          placeholder="LinkedIn Profile URL">
                   @error('linkedin') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -210,7 +199,7 @@
                 <div class="mb-3">
                   <label class="form-label">Twitter</label>
                   <input type="url" class="form-control" name="twitter" 
-                         value="{{ old('twitter', optional($user->company)->twitter) }}" 
+                         value="{{ old('twitter', $user->twitter) }}" 
                          placeholder="Twitter Profile URL">
                   @error('twitter') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -221,17 +210,40 @@
                 <div class="mb-3">
                   <label class="form-label">Facebook</label>
                   <input type="url" class="form-control" name="facebook" 
-                         value="{{ old('facebook', optional($user->company)->facebook) }}" 
+                         value="{{ old('facebook', $user->facebook) }}" 
                          placeholder="Facebook Page URL">
                   @error('facebook') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>
 
-             
+             <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Instagram</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
+                    <input type="url" name="instagram" class="form-control"
+                           value="{{ old('instagram', $user->instagram) }}" placeholder="https://instagram.com/...">
+                  </div>
+                </div>
+              </div>
+
+                  {{-- Description --}}
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="form-label">Description</label>
+                  <textarea name="company_description" 
+                            class="form-control" 
+                            rows="4"
+                            placeholder="Company Description">{{ old('company_description', $user->description) }}</textarea>
+                  @error('company_description') <span class="text-danger">{{ $message }}</span> @enderror
+                </div>
+              </div>
+
 
             </div>
 
             {{-- Buttons --}}
+            <input type="hidden" name="company_id" value="{{$user->id}}">
             <div class="d-flex justify-content-end pt-3 gap-2">
               <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary px-4 py-2">
                 Cancel

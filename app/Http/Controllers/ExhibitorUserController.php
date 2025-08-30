@@ -40,33 +40,20 @@ public function index(Request $request)
     $pageNo = (int) $request->input('page', 1);
 
     
-    $query = User::with("roles" , "company")
-        ->whereHas("roles", function ($q) {
-            $q->where("name", "Exhibitor");
-        })
-        ->orderBy("created_at", "DESC");
+    $query = Company::with(['contentIconFile','quickLinkIconFile','boothUsers.booth'])->where('is_sponsor',0)->orderBy("created_at", "DESC");
 
-   
     if ($request->filled("search")) {
         $search = "%" . $request->search . "%";
         $query->where(function ($q) use ($search) {
-            $q->where("users.name", "LIKE", $search)
-              ->orWhere("users.mobile", "LIKE", $search)
-              ->orWhere("users.email", "LIKE", $search);
+            $q->where("companies.name", "LIKE", $search)
+              ->orWhere("companies.phone", "LIKE", $search)
+              ->orWhere("companies.email", "LIKE", $search);
         });
     }
-
-
    
     $users = $query->paginate($perPage, ["*"], "page", $pageNo);
-
-   
     $users->appends($request->all());
-
-   
     $offset = ($users->currentPage() - 1) * $perPage;
-
-    
     if ($request->ajax() && $request->ajax_request == true) {
         $html = view("users.exhibitor_users.table", compact("users", "perPage"))
             ->with("i", $offset)
@@ -105,7 +92,7 @@ public function index(Request $request)
      */
     public function store(Request $request)
     {
-        
+
          $validator = Validator::make($request->all(), [
           
             'company_name'          => 'required|string|max:255',
@@ -116,8 +103,8 @@ public function index(Request $request)
             'linkedin'      => 'nullable|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
-            'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-            'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'content_icon'    => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
+            'quick_link_icon' => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
 
 
         ]);
@@ -126,60 +113,57 @@ public function index(Request $request)
                 ->withErrors($validator);
         }
 
-       DB::beginTransaction();
        try {
   
-    $user = User::create([
-        'name'       => $request->company_name,
-        'email'      => $request->company_email,
-        'password'   => Hash::make('password'),
-    ]);
-    $user->assignRole('Exhibitor');
+            $user = User::create([
+                'name'       => $request->company_name,
+                'email'      => $request->company_email
+            ]);
+            $user->assignRole('Exhibitor');
+            qrCode($user->id);
+            $company = Company::create([
+                'user_id'     => $user->id,
+                'name'        => $request->company_name,
+                'email'       => $request->company_email,
+                'phone'       => $request->company_phone,
+                'description' => $request->company_description,
+                'website'     => $request->website,
+                'linkedin'    => $request->linkedin,
+                'twitter'     => $request->twitter,
+                'facebook'    => $request->facebook,
+                'instagram'    => $request->instagram,
+                
+            ]);
+            $user->company_id = $company->id;
+            $user->save();
 
-    
-    $company = Company::create([
-        'user_id'     => $user->id,
-        'name'        => $request->company_name,
-        'email'       => $request->company_email,
-        'phone'       => $request->company_phone,
-        'description' => $request->company_description,
-        'website'     => $request->website,
-        'linkedin'    => $request->linkedin,
-        'twitter'     => $request->twitter,
-        'facebook'    => $request->facebook,
-    ]);
+        if ($request->file("content_icon")) {
+            $this->imageUpload(
+            $request->file("content_icon"),
+            'content_icon',
+            $company->id,
+            'companies',
+            'content_icon',
+            $company->id,
+            );
+        } 
 
-   
-    $user->company_id = $company->id;
-    $user->save();
-       if ($request->file("content_icon")) {
-        $this->imageUpload(
-        $request->file("content_icon"),
-        'content_icon',
-        $company->id,
-        'companies',
-        'content_icon'
-        );
-    } 
-
-    if ($request->file("quick_link_icon")) {
-    $this->imageUpload(
-        $request->file("quick_link_icon"),
-        'quick_link_icon',
-        $company->id,
-        'companies',
-        'quick_link_icon'
-    );
-    }
+        if ($request->file("quick_link_icon")) {
+            $this->imageUpload(
+                $request->file("quick_link_icon"),
+                'quick_link_icon',
+                $company->id,
+                'companies',
+                'quick_link_icon',
+                $company->id,
+            );
+        }
 
 
-    DB::commit();
-
-    return redirect(route('exhibitor-users.index'))
-        ->withSuccess('Exhibitor Created');
+        return redirect(route('exhibitor-users.index'))
+            ->withSuccess('Exhibitor Created');
     }   catch (\Exception $e) {
-    DB::rollBack();
-    return redirect(route('exhibitor-users.create'))
+        return redirect(route('exhibitor-users.create'))
         ->withInput()
         ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
      }
@@ -188,10 +172,10 @@ public function index(Request $request)
 
 
 
-public function show(User $exhibitor_user, Request $request)
-{   
-    $company = Company::with(['boothUsers.booth', 'certificationFile', 'logoFile', 'mediaGallery', 'videos'])
-        ->where('user_id', $exhibitor_user->id)
+public function show(User $exhibitor_user, Request $request){ 
+
+    $company = Company::with(['boothUsers.booth','contentIconFile','quickLinkIconFile','user'])
+        ->where('id', $exhibitor_user->id)
         ->firstOrFail();
 
     $booths = Booth::all(); 
@@ -208,17 +192,20 @@ public function show(User $exhibitor_user, Request $request)
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $exhibitor_user)
-    {    
-        $user = User::with('company')->findOrFail($exhibitor_user->id);
+    public function edit(User $exhibitor_user){    
+
+       $user = Company::with(['contentIconFile','quickLinkIconFile'])->where('id', $exhibitor_user->id)->firstOrFail();
         return view('users.exhibitor_users.edit', ['user' => $user]);
     }
 
-    public function update(Request $request, User $exhibitor_user)
-    {
-        $validator = Validator::make($request->all(), [
+    public function update(Request $request, User $exhibitor_user){
+        try {
+            
+           $company = Company::find($request->company_id);
+            
+            $validator = Validator::make($request->all(), [
             'company_name'        => 'required|string|max:255',
-            'company_email'       => 'required|email|max:255|unique:companies,email,' . optional($exhibitor_user->company)->id,
+            'company_email'       => 'required|email|max:255|unique:companies,email,'.$company->id,
             'company_phone'       => 'required|string|max:20',
             'company_description' => 'nullable|string',
             'website'             => 'nullable|url',
@@ -227,18 +214,16 @@ public function show(User $exhibitor_user, Request $request)
             'facebook'            => 'nullable|url',
             'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
             'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'company_id'       => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
 
-        DB::beginTransaction();
-        try {
-         
-            $company = Company::updateOrCreate(
-                ['user_id' => $exhibitor_user->id], 
-                [
+
+            if ($company) {
+                $company->update([
                     'name'        => $request->company_name,
                     'email'       => $request->company_email,
                     'phone'       => $request->company_phone,
@@ -247,9 +232,19 @@ public function show(User $exhibitor_user, Request $request)
                     'linkedin'    => $request->linkedin,
                     'twitter'     => $request->twitter,
                     'facebook'    => $request->facebook,
-                ]
-            );
+                    'instagram'    => $request->instagram,
+                ]);
 
+                $user = User::where('id',$company->user_id)->first(); 
+
+                if ($user) {
+                    $user->update([
+                        'name'  => $request->company_name,
+                        'email' => $request->company_email,
+                    ]);
+                    qrCode($user->id);
+                }
+            }
          
             if ($request->hasFile('content_icon')) {
                 $this->imageUpload(
@@ -257,7 +252,8 @@ public function show(User $exhibitor_user, Request $request)
                     'content_icon',
                     $company->id,
                     'companies',
-                    'content_icon'
+                    'content_icon',
+                    $company->id,
                 );
             }
 
@@ -268,16 +264,16 @@ public function show(User $exhibitor_user, Request $request)
                     'quick_link_icon',
                     $company->id,
                     'companies',
-                    'quick_link_icon'
+                    'quick_link_icon',
+                    $company->id,
                 );
             }
 
-            DB::commit();
 
             return redirect(route('exhibitor-users.index'))
                 ->withSuccess('Exhibitor updated successfully.');
+
         } catch (\Exception $e) {
-            DB::rollBack();
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
@@ -286,8 +282,7 @@ public function show(User $exhibitor_user, Request $request)
 
 
 
-    public function approve($id)
-    {
+    public function approve($id){
         $user = User::findOrFail($id);
         $user->is_approve = true;
         $user->save();
@@ -296,55 +291,43 @@ public function show(User $exhibitor_user, Request $request)
     }
 
 
-    public function assignBoothForm($companyId)
-{
-    $company = Company::findOrFail($companyId);
-    $booths = Booth::all(); // Fetch all booths
+    public function assignBoothForm($companyId){
+        $company = Company::findOrFail($companyId);
+        $booths = Booth::all(); // Fetch all booths
 
-    return view('users.exhibitor_users.show', compact('company', 'booths'));
-}
-
-
-
-public function assignBooth(Request $request, $companyId)
-{
-    $company = Company::findOrFail($companyId);
-
-    $request->validate([
-        'booth_id' => 'required|exists:booths,id',
-    ]);
-
-    $boothId = $request->input('booth_id');
-
-   
-    if (BoothUser::where('booth_id', $boothId)->exists()) {
-        return redirect()->back()->withErrors('This booth is already assigned to another company.');
+        return view('users.exhibitor_users.show', compact('company', 'booths'));
     }
 
-    BoothUser::create([
-        'company_id' => $company->id,
-        'booth_id' => $boothId,
-    ]);
-        // dd($company->id);
 
 
-    return redirect()->route('exhibitor-users.index')
-                     ->with('success', 'Booth assigned successfully.');
-}
+    public function assignBooth(Request $request, $companyId){
+        $company = Company::findOrFail($companyId);
+        $request->validate([
+            'booth_id' => 'required|exists:booths,id',
+        ]);
+        $boothId = $request->input('booth_id');
+        if (BoothUser::where('booth_id', $boothId)->exists()) {
+            return redirect()->back()->withErrors('This booth is already assigned to another company.');
+        }
+
+        BoothUser::create([
+            'company_id' => $company->id,
+            'booth_id' => $boothId,
+        ]);
+
+        return redirect()->route('exhibitor-users.edit', ['exhibitor_user' => $company->id])->with('success', 'Booth assigned successfully.');
+    }
 
 
 
-    public function toggleBlock(User $user)
-    {
+    public function toggleBlock(User $user){
         $currentUser = auth()->user();
-
         if ($currentUser->hasRole(['Admin'])) {
                 $user->is_block = true;
                 $user->save();
                 return back()->withSuccess('User has been blocked successfully.');
 
         }
-
         return back()->withErrors('You do not have permission to perform this action.');
     }
 

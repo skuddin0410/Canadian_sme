@@ -9,25 +9,6 @@
   <h4 class="py-3 mb-4">
       <span class="text-muted fw-light"> Exhibitor /</span> Create
   </h4>
-
-  {{-- Validation Errors --}}
-  @if($errors->any())
-      <div class="alert alert-danger">
-          <ul class="mb-0">
-              @foreach($errors->all() as $error)
-                  <li>{{ $error }}</li>
-              @endforeach
-          </ul>
-      </div>
-  @endif
-
-  {{-- Success Message --}}
-  @if(session('success'))
-      <div class="alert alert-success">
-          {{ session('success') }}
-      </div>
-  @endif
-
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
@@ -36,7 +17,7 @@
         </div>
 
         <div class="card-body">
-          <form action="{{ route('exhibitor-users.store') }}" method="POST" autocomplete="off">
+          <form action="{{ route('exhibitor-users.store') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
             @csrf
             {{-- Row for Content Icon & Quick Link Icon --}}
             <div class="row">
@@ -248,6 +229,25 @@
                     <input type="url" name="facebook" class="form-control"
                            value="{{ old('facebook') }}" placeholder="https://facebook.com/...">
                   </div>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Instagram</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
+                    <input type="url" name="instagram" class="form-control"
+                           value="{{ old('instagram') }}" placeholder="https://instagram.com/...">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="form-label">Company Description</label>
+                  <textarea name="company_description" class="form-control" rows="4"
+                            placeholder="Brief description about the company">{{ old('company_description') }}</textarea>
                 </div>
               </div>
 

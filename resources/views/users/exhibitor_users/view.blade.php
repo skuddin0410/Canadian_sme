@@ -38,9 +38,7 @@
             <div class="col-md-4">
                 <h6>Content Icon</h6>
                 @if(!empty($company->contentIconFile) && !empty($company->contentIconFile->file_path))
-                    <img src="{{ Str::startsWith($company->contentIconFile->file_path, ['http://','https://']) 
-                                ? $company->contentIconFile->file_path 
-                                : Storage::url($company->contentIconFile->file_path) }}"
+                    <img src="{{$company->contentIconFile->file_path }}"
                          alt="Content Icon"
                          class="img-fluid rounded shadow-sm"
                          style="max-height: 150px; object-fit: contain;">
@@ -51,11 +49,10 @@
 
             <!-- Quick Link Icon -->
             <div class="col-md-4">
+
                 <h6>Quick Link Icon</h6>
                 @if(!empty($company->quickLinkIconFile) && !empty($company->quickLinkIconFile->file_path))
-                    <img src="{{ Str::startsWith($company->quickLinkIconFile->file_path, ['http://','https://']) 
-                                ? $company->quickLinkIconFile->file_path 
-                                : Storage::url($company->quickLinkIconFile->file_path) }}"
+                    <img src="{{$company->quickLinkIconFile->file_path}}"
                          alt="Quick Link Icon"
                          class="img-fluid rounded shadow-sm"
                          style="max-height: 150px; object-fit: contain;">
@@ -67,8 +64,14 @@
             <!-- QR Code -->
             <div class="col-md-4">
                 <h6>QR Code</h6>
-                {{-- {!! QrCode::size(150)->generate(route('companies.show', $company->id)) !!} --}}
-                <p class="mt-2"><small>Scan to view profile</small></p>
+                    @if($user->qr_code)
+                        <img src="{{ asset($user->qr_code) }}"
+                             alt="User QR Code"
+                             class="rounded border"
+                             style="max-height: 150px; object-fit:contain;">
+                    @else
+                        <p>No QR code generated.</p>
+                    @endif
             </div>
         </div>
     </div>
