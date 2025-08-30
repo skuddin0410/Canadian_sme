@@ -824,8 +824,8 @@ public function getSpeaker()
         }
 
      
-        $speakers = User::whereHas("roles", function ($q) {
-            $q->where("name", "Speaker");
+        $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Speaker');
         })->get();
 
         if ($speakers->isEmpty()) {
@@ -839,13 +839,16 @@ public function getSpeaker()
         
         $response = $speakers->map(function ($speaker) {
             return [
-                'name'     => trim(($speaker->name ?? '') . ' ' . ($speaker->lastname ?? '')),
-                'word_no'  => $speaker->designation ?? '',
-                'location' => trim(($speaker->place ?? '') . ', ' . ($speaker->street ?? '') . ', ' . ($speaker->city ?? '') . '- ' . ($speaker->zipcode ?? '') . ', ' . ($speaker->state ?? '') . ', ' . ($speaker->country ?? '')),
+                'name'     => $speaker->full_name,
+                'company'  => $speaker->company ?? '',
+                'designation'  => $speaker->company ?? '',
+                'location' => '',
                 'email'    => $speaker->email ?? '',
                 'phone'    => $speaker->mobile ?? '',
                 'website'  => $speaker->website_url ?? '',
-                // 'avatar'   => $speaker->avatar ?? '',
+                'avatar'   => !empty($speaker->photo) ? $speaker->photo->file_path  : '',
+                'tags' => !empty($speaker->tags) ? explode(',',$speaker->tags) : '',
+                'groups' => groups($speaker),
 
                 'social_links' => [
                     ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
@@ -856,14 +859,6 @@ public function getSpeaker()
                 ],
 
                 'bio'   => $speaker->bio ?? '',
-                // 'uploaded_files' => method_exists($speaker, 'files')
-                //     ? $speaker->files->map(function ($file) {
-                //         return [
-                //             'name' => $file->name,
-                //             'url'  => $file->url,
-                //         ];
-                //     })
-                //     : [], 
             ];
         });
 
@@ -880,38 +875,7 @@ public function getSpeaker()
         ], 500);
     }
 }
-// public function getTags()
-// {
-//     try {
-     
-//         $tags = Category::where('type','tags')->pluck('name')
-        
-//             ->filter() 
-//             ->flatMap(function ($tagString) {
-//                 // handle JSON or comma-separated tags
-//                 if (is_array($tagString)) {
-//                     return $tagString;
-//                 }
-//                 return explode(',', $tagString);
-//             })
-//             ->map(fn($tag) => trim($tag)) // clean spaces
-//             ->filter() // remove empty after trim
-//             ->unique()
-//             ->values();
 
-//         return response()->json([
-//             'success' => true,
-//             'data'    => $tags,
-//         ], 200);
-
-//     } catch (\Exception $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Something went wrong: ' . $e->getMessage(),
-//             'data'    => [],
-//         ], 500);
-//     }
-// }
 public function getTags()
 {
     try {
@@ -919,7 +883,6 @@ public function getTags()
             ->pluck('name') // get only names
             ->filter() // remove null/empty
             ->flatMap(function ($tagString) {
-                // handle JSON or comma-separated tags
                 if (is_array($tagString)) {
                     return $tagString;
                 }
