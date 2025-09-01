@@ -54,6 +54,11 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::post('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBooth'])->name('exhibitor-users.assign-booth');
      Route::get('/exhibitors/export', [ExhibitorUserController::class, 'exportExhibitors'])
     ->name('exhibitors.export');
+      Route::get('/sponsors/export', [SponsorsController::class, 'exportSponsors'])
+    ->name('sponsors.export');
+     Route::get('/speaker/export', [SpeakerController::class, 'exportSpeakers'])
+    ->name('speaker.export');
+
 
 
     
@@ -104,11 +109,10 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('attendee-users.export');
 
      Route::resource('sponsors', SponsorsController::class);
+     
      Route::resource('speaker', SpeakerController::class);
      Route::get('/speaker/{user}/qr/download', [SpeakerController::class,'downloadQr'])->name('speaker.qr.download');
-     Route::get('/speaker/export', [SpeakerController::class, 'exportSpeakers'])
-    ->name('speaker.export');
-
+    
 
 
 

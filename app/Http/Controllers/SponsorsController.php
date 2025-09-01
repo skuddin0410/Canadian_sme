@@ -17,6 +17,7 @@ use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
+use App\Exports\SponsorExport;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Hash;
@@ -304,6 +305,10 @@ public function index(Request $request)
     public function downloadQr($userid){
         return downloadQrCode($userid);
     }
+     public function exportSponsors()
+{
+    return Excel::download(new SponsorExport, 'sponsors.xlsx');
+}
    
     
 }
