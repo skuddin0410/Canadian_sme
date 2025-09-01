@@ -366,7 +366,20 @@ class SpeakerController extends Controller
     {
         return Excel::download(new SpeakersExport, 'speakers.xlsx');
     }
-   public function allowAccess(string $id)
+//    public function allowAccess(string $id)
+// {
+//     $user = User::with('roles')
+//         ->whereHas('roles', function ($q) {
+//             $q->where('name', 'Speaker');
+//         })
+//         ->findOrFail($id);
+
+//     $user->is_approve = true; 
+//     $user->save();
+
+//     return back()->withSuccess('App access allowed successfully for Speaker.');
+// }
+public function allowAccess(string $id)
 {
     $user = User::with('roles')
         ->whereHas('roles', function ($q) {
@@ -374,10 +387,25 @@ class SpeakerController extends Controller
         })
         ->findOrFail($id);
 
-    $user->is_approve = true; 
+  
+    $user->is_approve = true;
+
+ 
+    $existingAccess = !empty($user->access_speaker_ids) 
+        ? explode(',', $user->access_speaker_ids) 
+        : [];
+
+    if (!in_array($user->id, $existingAccess)) {
+        $existingAccess[] = $user->id; 
+    }
+
+   
+    $user->access_speaker_ids = implode(',', $existingAccess);
+
     $user->save();
 
-    return back()->withSuccess('App access allowed successfully for Speaker.');
+    return back()->withSuccess('App access allowed successfully for Speaker and stored in access_speaker_ids.');
 }
+
 
 }
