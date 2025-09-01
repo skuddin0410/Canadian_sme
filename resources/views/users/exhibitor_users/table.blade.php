@@ -80,10 +80,15 @@
 	{{-- Download QR --}}
 	<td>
 		
-			<a href="" 
-			   class="btn btn-sm btn-primary" title="Download QR">
-				Download QR
-			</a>
+		@if($user->user && $user->user->qr_code)
+        <a href="{{ route('sponsors.qr.download', $user->user->id) }}" 
+           class="btn btn-sm btn-primary" 
+           title="Download QR">
+             Download QR
+        </a>
+        @else
+          <span class="text-muted">No QRCode Generated Yet</span>
+        @endif
 		
 	</td>
 

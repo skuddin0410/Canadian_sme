@@ -299,6 +299,11 @@ public function index(Request $request)
             ->withSuccess('Sponsor user deleted successfully.');
 
     }
+
+
+    public function downloadQr($userid){
+        return downloadQrCode($userid);
+    }
    
     
 }

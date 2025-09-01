@@ -40,7 +40,7 @@ public function index(Request $request)
     $pageNo = (int) $request->input('page', 1);
 
     
-    $query = Company::with(['contentIconFile','quickLinkIconFile','boothUsers.booth'])->where('is_sponsor',0)->orderBy("created_at", "DESC");
+    $query = Company::with(['contentIconFile','quickLinkIconFile','boothUsers.booth','user'])->where('is_sponsor',0)->orderBy("created_at", "DESC");
 
     if ($request->filled("search")) {
         $search = "%" . $request->search . "%";
