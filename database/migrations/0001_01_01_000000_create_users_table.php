@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('company_id')->nullable()->index();
             $table->string('name')->nullable()->index();
             $table->string('lastname')->nullable()->index();
             $table->string('email')->nullable()->unique();
@@ -49,7 +49,6 @@ return new class extends Migration
             $table->string('state')->nullable()->index();
             $table->string('country')->nullable()->index();
             $table->string('qr_code')->nullable()->index();
-            $table->string('company_id')->nullable()->index();
             $table->string('access_speaker_ids')->nullable()->index();
             $table->string('access_exhibitor_ids')->nullable()->index();
             $table->string('access_sponsor_ids')->nullable()->index();

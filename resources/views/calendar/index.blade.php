@@ -34,6 +34,18 @@
   
   .dz img:not(.d-none) ~ #dz-remove{ display:block !important; }
   .dz img:not(.d-none) ~ .dz-placeholder{ display:none; }
+
+  .event-tooltip .tooltip-inner {
+    text-align: left;
+    font-size: 1rem;       /* Increase text size */
+    line-height: 1.6;      /* More spacing between lines */
+    padding: 12px 16px;    /* Bigger padding inside tooltip */
+    max-width: 300px;      /* Wider tooltip */
+}
+
+.event-tooltip .tooltip {
+    font-weight: 500;
+}
 </style>
 <div class="container">
      <h4 class="py-3 mb-4"><span class="text-muted fw-light">Event/</span>Calendar</h4>
@@ -224,7 +236,7 @@
                                     <select class="form-select" id="exhibitorSelect">
                                         <option value="">Select a exhibitor...</option>
                                          @foreach($exhibitors as $exhibitor)
-                                          <option value="{{ $exhibitor->id }}">{{ $exhibitor->full_name }}</option>
+                                          <option value="{{ $exhibitor->id }}">{{ $exhibitor->name }}</option>
                                          @endforeach 
                                        
                                     </select>
@@ -241,7 +253,7 @@
                                     <select class="form-select" id="sponsorSelect">
                                         <option value="">Select a sponsors...</option>
                                          @foreach($sponsors as $sponsor)
-                                          <option value="{{ $sponsor->id }}">{{ $sponsor->full_name }}</option>
+                                          <option value="{{ $sponsor->id }}">{{ $sponsor->name }}</option>
                                          @endforeach 
                                        
                                     </select>

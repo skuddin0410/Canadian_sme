@@ -89,11 +89,11 @@ Admin | Edit Speaker
                   Basic Information
                 </button>
               </li>
-              <li class="nav-item" role="presentation">
+         <!--      <li class="nav-item" role="presentation">
                 <button class="nav-link" id="access-tab" data-bs-toggle="tab" data-bs-target="#access" type="button" role="tab">
                   Access Permissions
                 </button>
-              </li>
+              </li> -->
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="docs-tab" data-bs-toggle="tab" data-bs-target="#docs" type="button" role="tab">
                   Private Docs
@@ -142,7 +142,7 @@ Admin | Edit Speaker
                       </div>
 
                       <div class="col-md-6">
-                        <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                        <label class="form-label">Mobile</label>
                         <div class="input-group input-group-merge mb-3">
                           <span class="input-group-text"><i class="bx bx-phone"></i></span>
                           <input type="text" class="form-control" name="mobile" id="mobile"
@@ -178,11 +178,11 @@ Admin | Edit Speaker
                         <select class="form-select mb-3" name="primary_group">
                          
                           @foreach(($groups ?? []) as $g)
-                           @if($g =='Speaker')
+                         
                             <option value="{{ $g }}" {{ (old('primary_group', $user->primary_group ?? null) == $g) ? 'selected' : '' }}>
                               {{ $g }}
                             </option>
-                            @endif
+                           
                           @endforeach
                         </select>
                         @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror

@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
 
             SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
+            AddExhibitorUsers::class
         ]);
     }
 }

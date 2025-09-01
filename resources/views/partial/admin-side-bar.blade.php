@@ -143,11 +143,11 @@
                             <div data-i18n="Coupons">Webview</div>
                         </a>
                     </li>
-                    <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
+                    <!-- <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
                     <a href="{{route('booths.index')}}" class="menu-link">
                        <div data-i18n="Booth Management">Booths</div>
                     </a>
-                    </li>
+                    </li> -->
 
                 </ul>
 

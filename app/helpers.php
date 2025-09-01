@@ -13,6 +13,7 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use App\Models\GeneralNotification;
 use App\Models\Session;
+use App\Models\Company;
 
 
 if (!function_exists('getCategory')) {
@@ -127,21 +128,36 @@ if (!function_exists('downloadQrCode')) {
 
 
 if (!function_exists('qrCode')) {
-  function qrCode($userId,$folder="user")
-  { 
-       $user = User::findOrFail($userId);
-
-        $data = json_encode([
-            'id' => $user->id,
-            'name' => $user->full_name ?? '',
-            'email' => $user->email ?? '',
-        ]);
-
+  function qrCode($id,$folder="user")
+  {     
         if (!file_exists(public_path('qrcodes'))) {
             mkdir(public_path('qrcodes'), 0755, true);
         }
 
-        $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
+        if($folder == 'user'){
+            $user = User::findOrFail($id);
+            $data = json_encode([
+                'id' => $user->id,
+                'name' => $user->full_name ?? '',
+                'email' => $user->email ?? '',
+            ]);
+            $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
+            $id = $user->id;
+        }
+
+        if($folder == 'company'){
+           $company = Company::where('id',$id)->findOrFail();
+           $data = json_encode([
+                'id' => $company->id,
+                'name' => $company->name ?? '',
+                'email' => $company->email ?? '',
+            ]);
+            $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
+            $id = $user->id;
+        }
+
+        
+        
         $filePath = public_path($fileName);
 
         if (file_exists($filePath)) {
@@ -152,10 +168,7 @@ if (!function_exists('qrCode')) {
         $renderer = new GDLibRenderer(300); // 300 is the size of the QR code
         $writer = new Writer($renderer);
         $writer->writeFile($data, $filePath);
-
-        // $user->qr_code = asset($fileName);
-        // $user->qr_code = $fileName; // e.g. "qrcodes/user_1.png"
-        $user->qr_code = 'qrcodes/' . $folder . '_' . $user->id . '.png';
+        $user->qr_code = 'qrcodes/' . $folder . '_' . $id. '.png';
 
 
         $user->save();

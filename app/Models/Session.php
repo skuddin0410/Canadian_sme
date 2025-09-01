@@ -38,13 +38,12 @@ class Session extends Model
 
     public function exhibitors(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'session_exhibitors', 'session_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(Company::class, 'session_exhibitors', 'session_id', 'company_id')->withTimestamps();
     }
-
 
     public function sponsors(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'session_sponsors', 'session_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(Company::class, 'session_sponsors', 'session_id', 'company_id')->withTimestamps();
     }
 
     public function attendees(): BelongsToMany
