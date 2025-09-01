@@ -164,11 +164,11 @@ Admin | Speaker Add
                         <select class="form-select mb-3" name="primary_group">
                          
                           @foreach(($groups ?? []) as $g)
-                          @if($g =='Speaker')
+                     
                             <option value="{{ $g }}" {{ (old('primary_group', $user->primary_group ?? null) == $g) ? 'selected' : '' }}>
                               {{ $g }}
                             </option>
-                           @endif 
+                         
                           @endforeach
                         </select>
                         @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror
