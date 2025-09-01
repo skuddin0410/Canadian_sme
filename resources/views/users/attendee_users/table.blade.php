@@ -37,11 +37,12 @@
 <thead>
 	<tr>
 		<th>Name</th>
-		<th>Email</th>
-		<th>Mobile</th>
+		{{-- <th>Email</th>
+		<th>Mobile</th> --}}
+    <th>Added on</th>
     <th>QR</th>
 		{{-- <th>Referral coupon</th> --}}
-		{{-- <th>Created At</th> --}}
+		
 		<th width="8%">Action</th>
 	</tr>
 </thead>
@@ -49,8 +50,9 @@
     @foreach($users as $user)
     <tr>
     <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th style="text-transform:none">{{$user->email ?? ''}}</th>
-		<th>{{$user->mobile ?? ''}}</th>
+		{{-- <th style="text-transform:none">{{$user->email ?? ''}}</th>
+		<th>{{$user->mobile ?? ''}}</th> --}}
+    <th>{{dateFormat($user->created_at) ?? '' }}</th>
     <th>
 		
 		@if($user->qr_code)
@@ -64,7 +66,7 @@
         @endif
 		
 	</th>
-		{{-- <th>{{dateFormat($user->created_at) ?? '' }}</th> --}}
+		
 		
          <th>
   <div class="d-flex gap-2">

@@ -14,6 +14,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Attendee List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                         <a href="{{route('attendee-users.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
                         @if(Auth::user()->hasRole('Admin')  || Auth::user()->hasRole('Support Staff Or Helpdesk'))
                             <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
                         @endif

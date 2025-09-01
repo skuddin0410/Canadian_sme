@@ -96,6 +96,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::get('/sponsors/{user}/qr/download', [SponsorsController::class,'downloadQr'])->name('sponsors.qr.download');
      Route::resource('representative-users', RepresentativeUserController::class);
      Route::resource('attendee-users', AttendeeUserController::class);
+     Route::get('/attendees/export', [AttendeeUserController::class, 'exportAttendees'])
+    ->name('attendee-users.export');
+
      Route::resource('sponsors', SponsorsController::class);
      Route::resource('speaker', SpeakerController::class);
      Route::get('/speaker/{user}/qr/download', [SpeakerController::class,'downloadQr'])->name('speaker.qr.download');
