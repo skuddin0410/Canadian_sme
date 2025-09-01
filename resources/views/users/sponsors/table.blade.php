@@ -50,17 +50,16 @@
       <td>{{ $company->name ?? '-' }}</td>
       <td>
 		
-  @if($company->user && $company->user->qr_code)
-    <a href="{{ route('sponsors.qr.download', $company->user->id) }}" 
-       class="btn btn-sm btn-primary" 
-       title="Download QR">
-      Download QR
-	 
-    </a>
-  @else
-    <span class="text-muted">No QR</span>
-  @endif
-</td>
+      @if($company->user && $company->user->qr_code)
+        <a href="{{ route('sponsors.qr.download', $company->user->id) }}" 
+           class="btn btn-sm btn-primary" 
+           title="Download QR">
+             Download QR
+        </a>
+        @else
+          <span class="text-muted">No QRCode Generated Yet</span>
+        @endif
+     </td>
 
       <td>
         <div class="d-flex gap-2">

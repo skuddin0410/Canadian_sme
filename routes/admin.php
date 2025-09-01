@@ -83,22 +83,21 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
         Route::get('/speakers', [CalendarController::class, 'speakers'])->name('speakers.list');
         Route::get('/exhibitors', [CalendarController::class, 'exhibitors'])->name('exhibitors.list');
         Route::get('/sponsors', [CalendarController::class, 'sponsors'])->name('sponsors.list');
-        Route::get('/sponsors/{user}/qr/download', function ($userId) {
-        return downloadQrCode($userId);
-          })->name('sponsors.qr.download');
+        
     });
 
      Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
 });
 
-    Route::group(['middleware' => ['webauth', 'role:Admin|Admin|Admin|Support Staff Or Helpdesk']], function () {
+    Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
         'exhibitor-users' => 'exhibitor_user',
     ]);
+    Route::get('/sponsors/{user}/qr/download', [SponsorsController::class,'downloadQr'])->name('sponsors.qr.download');
      Route::resource('representative-users', RepresentativeUserController::class);
      Route::resource('attendee-users', AttendeeUserController::class);
      Route::resource('sponsors', SponsorsController::class);
-    Route::resource('speaker', SpeakerController::class);
+     Route::resource('speaker', SpeakerController::class);
 
     Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');

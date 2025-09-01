@@ -104,18 +104,16 @@ if (!function_exists('downloadQrCode')) {
     function downloadQrCode($userId)
     {
         $user = User::findOrFail($userId);
-
         // Regenerate if missing
         if (!$user->qr_code || !file_exists(public_path($user->qr_code))) {
             qrCode($userId, "user");
         }
 
         $filePath = public_path($user->qr_code);
-
+       
         if (!file_exists($filePath)) {
             abort(404, 'QR code not found.');
         }
-
         return response()->download($filePath, 'qrcodes' . $user->id . '.png', [
             'Content-Type' => 'image/png',
         ])->deleteFileAfterSend(false); // keep file in public/qrcodes
