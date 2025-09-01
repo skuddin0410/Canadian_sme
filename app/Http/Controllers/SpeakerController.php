@@ -41,7 +41,7 @@ class SpeakerController extends Controller
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Speaker']);
-                })->orderBy('created_at', 'DESC');
+                })->where('primary_group','Speaker')->orderBy('created_at', 'DESC');
 
             if ($request->search) {
                 $users = $users->where(function ($query) use ($request) {
