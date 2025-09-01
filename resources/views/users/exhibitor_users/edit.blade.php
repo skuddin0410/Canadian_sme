@@ -226,7 +226,7 @@
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-book"></i></span>
                     <input type="text" name="booth" class="form-control"
-                           value="{{ old('booth') }}">
+                           value="{{ old('booth', $user->booth) }}">
                   </div>
                 </div>
               </div>

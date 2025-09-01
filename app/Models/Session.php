@@ -41,7 +41,6 @@ class Session extends Model
         return $this->belongsToMany(Company::class, 'session_exhibitors', 'session_id', 'company_id')->withTimestamps();
     }
 
-
     public function sponsors(): BelongsToMany
     {
         return $this->belongsToMany(Company::class, 'session_sponsors', 'session_id', 'company_id')->withTimestamps();

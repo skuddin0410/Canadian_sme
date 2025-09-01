@@ -187,7 +187,7 @@
               <select id="type" name="type" class="form-select mb-3">
                   <option value="">Select Category</option>
                     @foreach(config('membership.types') as $key => $label)
-                        <option value="{{ $key }}" {{ old('membership_type', $user->membership_type ?? '') == $key ? 'selected' : '' }}>
+                        <option value="{{ $key }}" {{ old('type', $company->type ?? '') == $key ? 'selected' : '' }}>
                             {{ $label }}
                         </option>
                     @endforeach

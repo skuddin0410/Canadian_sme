@@ -47,7 +47,7 @@ class LaravelEventCalendar {
             },
             height: 'auto',
             slotMinTime: '06:00:00',
-            slotMaxTime: '23:00:00',
+            slotMaxTime: '23:59:00',
             slotDuration: '00:15:00',
             snapDuration: '00:15:00',
             editable: true,
@@ -57,8 +57,8 @@ class LaravelEventCalendar {
             nowIndicator: true,
             businessHours: {
                 daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-                startTime: '08:00',
-                endTime: '18:00'
+                startTime: '06:00',
+                endTime: '23:59'
             },
             
             eventClick: (info) => {
@@ -86,12 +86,36 @@ class LaravelEventCalendar {
             },
             
             eventDidMount: (info) => {
+                console.log(info.event.extendedProps)
                 // Add custom styling based on session type
                 const sessionType = info.event.extendedProps.type;
+                const track = info.event.extendedProps.track
                 info.el.classList.add(`session-type-${sessionType}`);
                 
                 // Add tooltip
-                info.el.title = info.event.extendedProps.description || info.event.title;
+                info.el.title = info.event.extendedProps.description || info.event.title+`(${track})`;
+
+                    // Build stacked list
+                    const tooltipContent = `
+                        <div>
+                            <div><strong>${info.event.title}</strong></div>
+                            ${info.event.extendedProps.track ? `<div>Track: ${info.event.extendedProps.track}</div>` : ''}
+                            ${info.event.extendedProps.location ? `<div>Location: ${info.event.extendedProps.location}(${info.event.extendedProps.booth})</div>` : ''}
+                            ${info.event.extendedProps.keynote ? `<div>Key Note: ${info.event.extendedProps.keynote}</div>` : ''}
+                        </div>
+                    `;
+
+                    // Initialize Bootstrap tooltip (HTML enabled)
+                    if(info.event.title){
+                    new bootstrap.Tooltip(info.el, {
+                        title: tooltipContent,
+                        placement: 'top',
+                        html: true,
+                        trigger: 'hover',
+                        customClass: 'event-tooltip'
+                    });
+                    }
+
                 const color = info.event.backgroundColor || info.event.extendedProps.color || info.event.extendedProps.backgroundColor;
                   if (color) {
                     // Works with FC v5/v6 CSS variables
@@ -249,6 +273,7 @@ class LaravelEventCalendar {
                 backgroundColor: session.backgroundColor,
                 borderColor: session.borderColor,
                 textColor: session.textColor, // better contrast
+                booth: session.booth, // better contrast
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
@@ -271,6 +296,7 @@ class LaravelEventCalendar {
                     panels: session.panels,
                     img: session.img,
                     img_id: session.img_id,
+                    booth: session.booth,
                 }
             };
         });
@@ -341,8 +367,10 @@ class LaravelEventCalendar {
             `;
 
             sessions.forEach(session => {
+                console.log(session)
                 const statusBadge = this.getStatusBadge(session.status);
-                const typeBadge = this.getTypeBadge(session.type);
+                const typeBadge = this.getTypeBadge(session.track);
+                const keyBadge = this.getTypeBadge(session.keynote);
 
                 gridHTML += `
                 <div class="col-md-6 col-lg-4">
@@ -352,14 +380,29 @@ class LaravelEventCalendar {
                                 <h6 class="card-title mb-0" style="color: ${session.textColor};">${session.title}</h6>
                                 ${statusBadge}
                             </div>
+                          
                             <div class="mb-2" style="color: ${session.textColor};">
                                 ${typeBadge} 
                             </div>
                             <div class="text-muted small mb-2">
                                 <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
-                                ${session.venue ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} (${session.venue})</div>` : ''}
+                                ${session.location ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} (${session.booth})</div>` : ''}
                                 ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
+
+                            <div class="mb-2" style="color: ${session.textColor};">
+                              <i class="fas fa-sticky-note me-1" title="Key Note"></i>Key Note:  ${session.keynote} 
+                            </div>
+                             <div class="mb-2" style="color: ${session.textColor};">
+                              <i class="fas fa-clipboard me-1" title="Panels"></i>Panels:  ${session.panels} 
+                            </div>
+                             <div class="mb-2" style="color: ${session.textColor};">
+                              <i class="fas fa-book me-1" title="Demoes"></i>Demoes:  ${session.demoes} 
+                            </div>
+
+                              <div class="mb-2" style="color: ${session.textColor};">
+                              <i class="fas fa-pen-square me-1" title="Description"></i>Demoes:  ${session.description} 
+                            </div>   
                             <div class="mt-auto">
                                 ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
                                     <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
@@ -408,7 +451,7 @@ class LaravelEventCalendar {
 
             sortedSessions.forEach(session => {
             const statusBadge = this.getStatusBadge(session.status);
-            const typeBadge = this.getTypeBadge(session.type);
+            const typeBadge = this.getTypeBadge(session.track);
 
 
            
@@ -417,7 +460,7 @@ class LaravelEventCalendar {
             : '';
 
             listHTML += `
-            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" style="background-color: ${session.backgroundColor}; color: ${session.textColor};" onclick="eventCalendar.showSessionDetailsById('${session.id}')">
+            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start mt-2" style="background-color: ${session.backgroundColor}; color: ${session.textColor};" onclick="eventCalendar.showSessionDetailsById('${session.id}')">
             <div class="flex-grow-1">
                 <h6 class="mb-1" style="color: ${session.textColor};">${session.title}</h6>
                 <div class="mb-2" style="color: ${session.textColor};">
@@ -426,13 +469,46 @@ class LaravelEventCalendar {
                 <div class="small text-muted mb-1">
                     <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
                     <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
-                    ${session.venue ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''} (${session.venue})</span>` : ''}
+                    ${session.location ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''} (${session.booth})</span>` : ''}
                 </div>
-                ${description}
+                 
+               <div class="mb-2" style="color: ${session.textColor};">
+                  <i class="fas fa-sticky-note me-1" title="Key Note"></i>Key Note:  ${session.keynote} 
+                </div>
+                 <div class="mb-2" style="color: ${session.textColor};">
+                  <i class="fas fa-clipboard me-1" title="Panels"></i>Panels:  ${session.panels} 
+                </div>
+                 <div class="mb-2" style="color: ${session.textColor};">
+                  <i class="fas fa-book me-1" title="Demoes"></i>Demoes:  ${session.demoes} 
+                </div>
+
+                  <div class="mb-2" style="color: ${session.textColor};">
+                  <i class="fas fa-pen-square me-1" title="Description"></i>Demoes:  ${session.description} 
+                </div>
+                
+                    <div class="mt-2">
+                        ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
+                            <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
+                        `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No speakers assigned</span>'}
+                    </div>
+
+                    <div class="mt-2">
+                        ${session.extendedProps.exhibitors && session.extendedProps.exhibitors.length ? session.extendedProps.exhibitors.map(s => `
+                            <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Exhibitor'})</span>
+                        `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No exhibitors assigned</span>'}
+                    </div> 
+
+                    <div class="mt-2">
+                        ${session.extendedProps.sponsors && session.extendedProps.sponsors.length ? session.extendedProps.sponsors.map(s => `
+                            <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Sponsor'})</span>
+                        `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No sponsors assigned</span>'}
+                    </div>    
             </div>
+
+
             <div class="text-end ms-3">
                 <div class="small text-muted" style="color: ${session.textColor};">${this.calculateDuration(session.start_time, session.end_time)} min</div>
-            </div>
+            </div>       
             </button>
             `;
             });
@@ -545,8 +621,8 @@ class LaravelEventCalendar {
             <div>${event.extendedProps?.duration || 0} minutes</div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="fw-bold">Type</div>
-            <div>${this.getTypeBadge(event.extendedProps?.type)}</div>
+            <div class="fw-bold">Track</div>
+            <div>${this.getTypeBadge(event.extendedProps?.track)}</div>
         </div>
         <div class="col-12 col-md-6">
             <div class="fw-bold">Venue</div>
@@ -562,7 +638,7 @@ class LaravelEventCalendar {
     ${event.extendedProps?.img ? `
         <div class="mt-3" style="width:100%;">
             <div class="fw-bold">Description</div>
-            <div class="mt-2"><img src="${event.extendedProps.img}" /></div>
+            <div class="mt-2"><img src="${event.extendedProps.img}" width="100%"/></div>
         </div>
     ` : ''}        
 
@@ -626,6 +702,7 @@ class LaravelEventCalendar {
                 backgroundColor: session.color,
                 borderColor: session.color,
                 textColor: session.textColor, // better contrast
+                booth: session.booth,
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
@@ -648,6 +725,7 @@ class LaravelEventCalendar {
                     panels: session.panels,
                     img: session.img,
                     img_id: session.img_id,
+                    booth: session.booth,
                 }
             };
             this.showSessionDetails(eventData);
@@ -666,6 +744,7 @@ class LaravelEventCalendar {
                 borderColor: session.color,
                 textColor: session.textColor, // better contrast
                 description: session.description,
+                 booth: session.booth,
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
@@ -688,6 +767,7 @@ class LaravelEventCalendar {
                     panels: session.panels,
                     img: session.img,
                     img_id: session.img_id,
+                     booth: session.booth,
                 }
             };
             this.openSessionModal(eventData);
@@ -855,6 +935,7 @@ class LaravelEventCalendar {
                 borderColor: session.color,
                 textColor: session.textColor, // better contrast
                 color: session.color,
+                 booth: session.booth,
                 extendedProps: {
                     description: session.extendedProps.description,
                     status: session.extendedProps.status,
@@ -877,6 +958,7 @@ class LaravelEventCalendar {
                     panels: session.panels,
                     img: session.img,
                     img_id: session.img_id,
+                     booth: session.booth,
                 }
             })));
         }

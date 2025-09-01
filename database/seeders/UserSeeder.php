@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use App\Models\User;
 Use App\Models\Company;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -139,7 +140,7 @@ class UserSeeder extends Seeder
                 'created_at'          => now(),
                 'updated_at'          => now(),
                 'is_sponsor' => true,
-                'type' => collect(config('membership.types'))->keys()->random()
+                'type' => Str::lower(collect(config('membership.types'))->random())
             ];
             $company=Company::create($companies); 
 
