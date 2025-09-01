@@ -6,12 +6,12 @@
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Categories</span></h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Categories Or Tags</span></h4>
   <div class="row">
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Category @if(!empty($category)) Update @else Create @endif</h5>
+          <h5 class="mb-0">Category Or Tag @if(!empty($category)) Update @else Create @endif</h5>
         </div>
         <div class="card-body">
           @if(Session::has('success'))

@@ -79,7 +79,7 @@ class CategoryController extends Controller
 
         $category = new Category();
         $category->name = $request->name;
-        $category->slug = $request->slug;
+        $category->slug = Str::slug($request->name, '-');
         $category->type = $request->type;
         $category->save();
         return redirect(route('categories.index'))->withSuccess("Category has been saved successfully");
@@ -143,6 +143,7 @@ class CategoryController extends Controller
        return 'success';
     }
     
+
     public function storeTags(Request $request){
 
         $validator = Validator::make($request->all(), [
@@ -153,7 +154,7 @@ class CategoryController extends Controller
         $category = new Category();
         $category->name = $request->name;
         $category->slug = $request->slug;
-        $category->type = 'tags';
+        $category->type = 'event';
         $category->save();
         
         return response()->json([
