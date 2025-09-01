@@ -114,15 +114,7 @@ public function index(Request $request)
 
        DB::beginTransaction();
        try {
-  
-        $user = User::create([
-            'name'       => $request->company_name,
-            'email'      => $request->company_email,
-            'password'   => Hash::make('password'),
-        ]);
-        $user->assignRole('Sponsors');
         $company = Company::create([
-            'user_id'     => $user->id,
             'name'        => $request->company_name,
             'email'       => $request->company_email,
             'is_sponsor' => true,
@@ -133,11 +125,9 @@ public function index(Request $request)
             'twitter'     => $request->twitter,
             'facebook'    => $request->facebook,
             'instagram'    => $request->instagram,
+            'type'    => $request->type,
 
         ]);
-
-        $user->company_id = $company->id;
-        $user->save();
         if ($request->file("logo")) {
             $this->imageUpload(
                 $request->file("logo"),
@@ -238,16 +228,9 @@ public function index(Request $request)
             'twitter'     => $request->twitter,
             'facebook'    => $request->facebook,
             'instagram'    => $request->instagram,
+            'type'    => $request->type
         ]);
 
-            $user    = User::where('id',$company->user_id)->first();
-            if($user){
-                $user->update([
-                    'name'  => $request->company_name,
-                    'email' => $request->company_email,
-                ]);
-                 qrCode($user->id);
-            }
         }
       
         if ($request->file("logo")) {

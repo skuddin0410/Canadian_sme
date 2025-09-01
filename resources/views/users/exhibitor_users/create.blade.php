@@ -173,17 +173,7 @@
                 </div>
               </div>
 
-             
-
-              {{-- Company Description --}}
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Company Description</label>
-                  <textarea name="company_description" class="form-control" rows="4"
-                            placeholder="Brief description about the company">{{ old('company_description') }}</textarea>
-                </div>
-              </div>
-
+            
                {{-- Website --}}
               <div class="col-6">
                 <div class="mb-3">
@@ -239,6 +229,17 @@
                     <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
                     <input type="url" name="instagram" class="form-control"
                            value="{{ old('instagram') }}" placeholder="https://instagram.com/...">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="form-label">Booth</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-book"></i></span>
+                    <input type="text" name="booth" class="form-control"
+                           value="{{ old('booth') }}" placeholder="https://instagram.com/...">
                   </div>
                 </div>
               </div>

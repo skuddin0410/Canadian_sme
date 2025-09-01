@@ -86,9 +86,9 @@ Admin | Speaker Add
               </li>
 
 
-              <li class="nav-item" role="presentation">
+             <!--  <li class="nav-item" role="presentation">
                 <button class="nav-link" id="access-tab" data-bs-toggle="tab" data-bs-target="#access" type="button" role="tab">Access Permissions</button>
-              </li>
+              </li> -->
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="docs-tab" data-bs-toggle="tab" data-bs-target="#docs" type="button" role="tab">Private Docs</button>
               </li>

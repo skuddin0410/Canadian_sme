@@ -16,6 +16,8 @@ return new class extends Migration
            // $table->foreignId('user_id')->constrained()->onDelete('cascade');
             // Basic Company Details
             $table->string('name')->nullable();
+            $table->string('booth')->nullable();
+            $table->string('type')->nullable();
             $table->foreignId('booth_id')->nullable()->constrained('booths')->onDelete('cascade');
             $table->boolean('is_sponsor')->default(false);
             $table->string('industry')->nullable();
@@ -33,7 +35,6 @@ return new class extends Migration
             $table->string('twitter')->nullable();
             $table->string('facebook')->nullable();
             $table->string('instagram')->nullable();
-
             // Certifications (can be comma-separated or structured later)
             $table->text('certifications')->nullable();
             $table->timestamps();

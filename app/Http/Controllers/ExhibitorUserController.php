@@ -115,12 +115,6 @@ public function index(Request $request)
 
        try {
   
-            $user = User::create([
-                'name'       => $request->company_name,
-                'email'      => $request->company_email
-            ]);
-            $user->assignRole('Exhibitor');
-            qrCode($user->id);
             $company = Company::create([
                 'user_id'     => $user->id,
                 'name'        => $request->company_name,
@@ -132,10 +126,9 @@ public function index(Request $request)
                 'twitter'     => $request->twitter,
                 'facebook'    => $request->facebook,
                 'instagram'    => $request->instagram,
+                'booth'=> $request->booth
                 
             ]);
-            $user->company_id = $company->id;
-            $user->save();
 
         if ($request->file("content_icon")) {
             $this->imageUpload(
@@ -233,17 +226,8 @@ public function show(User $exhibitor_user, Request $request){
                     'twitter'     => $request->twitter,
                     'facebook'    => $request->facebook,
                     'instagram'    => $request->instagram,
-                ]);
-
-                $user = User::where('id',$company->user_id)->first(); 
-
-                if ($user) {
-                    $user->update([
-                        'name'  => $request->company_name,
-                        'email' => $request->company_email,
-                    ]);
-                    qrCode($user->id);
-                }
+                    'booth'=> $request->booth
+                ]); 
             }
          
             if ($request->hasFile('content_icon')) {
