@@ -14,6 +14,7 @@
 				    <h5 class="mb-0"> Speaker List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
 						<div class="dt-buttons"> 
+                            <a href="{{route('speaker.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
 							<a href="{{route('speaker.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
 								<span><i class="bx bx-plus me-sm-1"></i> 
 									<span class="d-none d-sm-inline-block">Add Speaker </span>

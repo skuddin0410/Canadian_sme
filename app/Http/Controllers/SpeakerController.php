@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Wallet;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Drive;
-use Storage;
-use App\Mail\KycMail;
-use Illuminate\Support\Facades\Mail;
-
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use DataTables;
 use DB;
+use Carbon;
+use Storage;
+use DataTables;
+use App\Models\User;
+use App\Mail\KycMail;
+use App\Models\Drive;
 use App\Models\Order;
+use App\Models\Wallet;
+
+use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
+use Illuminate\Http\Request;
+use App\Exports\SpeakersExport;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon;
-use App\Models\Company;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SpeakerController extends Controller
 {
@@ -360,5 +361,9 @@ class SpeakerController extends Controller
 }
   public function downloadQr($userid){
         return downloadQrCode($userid);
+    }
+  public function exportSpeakers()
+    {
+        return Excel::download(new SpeakersExport, 'speakers.xlsx');
     }
 }
