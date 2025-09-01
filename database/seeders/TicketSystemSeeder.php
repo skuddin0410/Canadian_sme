@@ -51,10 +51,10 @@ class TicketSystemSeeder extends Seeder
         [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
         [ 'name' => 'Government & Policy', 'type' => 'event' ],
         [ 'name' => 'Women in Leadership', 'type' => 'event' ],
-        [ 'name' => 'Event', 'type' => 'event' ],
-        [ 'name' => 'CloudTrends', 'type' => 'event' ],
-        [ 'name' => 'DataSecurity', 'type' => 'event' ],
-        [ 'name' => 'TechnoVation', 'type' => 'event' ],
+        [ 'name' => 'Event', 'type' => 'tags' ],
+        [ 'name' => 'CloudTrends', 'type' => 'tags' ],
+        [ 'name' => 'DataSecurity', 'type' => 'tags' ],
+        [ 'name' => 'TechnoVation', 'type' => 'tags' ],
     ];
 
        $tracks = [
