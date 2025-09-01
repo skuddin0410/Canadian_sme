@@ -2,28 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Wallet;
-use App\Models\Booth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Drive;
-use Storage;
-use App\Mail\KycMail;
-use Illuminate\Support\Facades\Mail;
-
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use DataTables;
 use DB;
+use Carbon;
+use Storage;
+use DataTables;
+use App\Models\User;
+use App\Mail\KycMail;
+use App\Models\Booth;
+use App\Models\Drive;
 use App\Models\Order;
+use App\Models\Wallet;
+
+use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
+use Illuminate\Http\Request;
+use App\Mail\CustomSpeakerMail;
+use App\Exports\AttendeesExport;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon;
-use App\Models\Company;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 class AttendeeUserController extends Controller
@@ -159,6 +161,7 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->is_approve = true;
         $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
         $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
         $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
@@ -259,7 +262,7 @@ class AttendeeUserController extends Controller
             'secondary_group.*' => ['string'],  
             'primary_group' => 'required|string', 
 
-            'access_speaker_ids'    => ['nullable','array'],
+           'access_speaker_ids'    => ['nullable','array'],
           'access_speaker_ids.*'  => ['integer','exists:users,id'],
           'access_exhibitor_ids'  => ['nullable','array'],
           'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
@@ -288,6 +291,8 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->is_approve = true;
+
         $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
         $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
         $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
@@ -358,5 +363,40 @@ class AttendeeUserController extends Controller
         }
         return back()->withErrors('You do not have permission to perform this action.');
     }
-    
+    public function exportAttendees()
+    {
+        return Excel::download(new AttendeesExport, 'attendees.xlsx');
+    }
+    public function allowAccess(string $id)
+{
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Attendee');
+        })
+        ->findOrFail($id);
+
+
+    $user->is_approve = true; // allow access
+    $user->save();
+
+    return back()->withSuccess('App access allowed successfully to Attendee.');
+}
+public function sendMail(Request $request, $id)
+{
+    $request->validate([
+        'subject' => 'required|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Attendee');
+        })
+        ->findOrFail($id);
+
+    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
+
+    return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
+}
+
 }

@@ -2,27 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Wallet;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Drive;
-use Storage;
-use App\Mail\KycMail;
-use Illuminate\Support\Facades\Mail;
-
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use DataTables;
 use DB;
+use Carbon;
+use Storage;
+use DataTables;
+use App\Models\User;
+use App\Mail\KycMail;
+use App\Models\Drive;
 use App\Models\Order;
+use App\Models\Wallet;
+
+
+use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
+use Illuminate\Http\Request;
+use App\Exports\SpeakersExport;
+use App\Mail\CustomSpeakerMail;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon;
-use App\Models\Company;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SpeakerController extends Controller
 {
@@ -358,4 +361,70 @@ class SpeakerController extends Controller
 
     return back()->withErrors('You do not have permission to perform this action.');
 }
+  public function downloadQr($userid){
+        return downloadQrCode($userid);
+    }
+  public function exportSpeakers()
+    {
+        return Excel::download(new SpeakersExport, 'speakers.xlsx');
+    }
+//    public function allowAccess(string $id)
+// {
+//     $user = User::with('roles')
+//         ->whereHas('roles', function ($q) {
+//             $q->where('name', 'Speaker');
+//         })
+//         ->findOrFail($id);
+
+//     $user->is_approve = true; 
+//     $user->save();
+
+//     return back()->withSuccess('App access allowed successfully for Speaker.');
+// }
+public function allowAccess(string $id)
+{
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Speaker');
+        })
+        ->findOrFail($id);
+
+  
+    $user->is_approve = true;
+
+ 
+    $existingAccess = !empty($user->access_speaker_ids) 
+        ? explode(',', $user->access_speaker_ids) 
+        : [];
+
+    if (!in_array($user->id, $existingAccess)) {
+        $existingAccess[] = $user->id; 
+    }
+
+   
+    $user->access_speaker_ids = implode(',', $existingAccess);
+
+    $user->save();
+
+    return back()->withSuccess('App access allowed successfully for Speaker and stored in access_speaker_ids.');
+}
+public function sendMail(Request $request, $id)
+{
+    $request->validate([
+        'subject' => 'required|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Speaker');
+        })
+        ->findOrFail($id);
+
+    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
+
+    return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
+}
+
+
 }

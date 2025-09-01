@@ -377,7 +377,7 @@ Admin | Speaker Add
           </div>
 
           <div class="card-footer d-flex justify-content-end">
-            <a href="{{ route('attendee-users.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
+            <a href="{{ route('speaker.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
             <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Save</button>
           </div>
         </div>

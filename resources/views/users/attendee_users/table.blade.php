@@ -37,23 +37,58 @@
 <thead>
 	<tr>
 		<th>Name</th>
-		<th>Email</th>
-		<th>Mobile</th>
+		{{-- <th>Email</th>
+		<th>Mobile</th> --}}
+    <th>Added on</th>
+    <th>QR</th>
 		{{-- <th>Referral coupon</th> --}}
-		<th>Created At</th>
-		<th width="8%">Action</th>
+		
+		<th width="28%">Action</th>
 	</tr>
 </thead>
 <tbody>	
     @foreach($users as $user)
     <tr>
     <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		<th style="text-transform:none">{{$user->email ?? ''}}</th>
-		<th>{{$user->mobile ?? ''}}</th>
-		<th>{{dateFormat($user->created_at) ?? '' }}</th>
+		{{-- <th style="text-transform:none">{{$user->email ?? ''}}</th>
+		<th>{{$user->mobile ?? ''}}</th> --}}
+    <th>{{dateFormat($user->created_at) ?? '' }}</th>
+    <th>
+		
+		@if($user->qr_code)
+        <a href="{{ route('speaker.qr.download', $user->id) }}" 
+           class="btn btn-sm btn-primary" 
+           title="Download QR">
+             Download QR
+        </a>
+        @else
+          <span class="text-muted">No QRCode Generated Yet</span>
+        @endif
+		
+	</th>
+		
 		
          <th>
   <div class="d-flex gap-2">
+        <form action="{{ route('attendee-users.allow-access', $user->id) }}" method="POST" style="display:inline;">
+    @csrf
+    @if($user->is_approve)
+        <button type="submit" class="btn btn-sm btn-success" title="App access approved">
+            ✔ Approved
+        </button>
+    @else
+        <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
+            Allow app access
+        </button>
+    @endif
+</form>
+      <button type="button" 
+        class="btn btn-sm btn-primary" 
+        data-bs-toggle="modal" 
+        data-bs-target="#sendMailModal{{ $user->id }}">
+         Send Mail
+        </button>
+
     {{-- View --}}
     <a href="{{ route('attendee-users.show', $user->id) }}" class="btn btn-sm btn-icon btn-primary" title="View">
       <i class="bx bx-show"></i>
@@ -83,6 +118,38 @@
 	@endif
 </tbody>
 </table>
+@foreach($users as $user)
+<!-- Send Mail Modal -->
+<div class="modal fade" id="sendMailModal{{ $user->id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form action="{{ route('attendee-users.sendMail', $user->id) }}" method="POST">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title">Send Mail to {{ $user->name }} {{ $user->lastname }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Subject -->
+          <div class="mb-3">
+            <label class="form-label">Subject</label>
+            <input type="text" name="subject" class="form-control" required>
+          </div>
+          <!-- Message -->
+          <div class="mb-3">
+            <label class="form-label">Message</label>
+            <textarea name="message" class="form-control" rows="5" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send Mail</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endforeach
 	<div class="text-xs-center">
 	    @if ($users->hasPages())
 	        <div class="custom_pagination">

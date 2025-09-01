@@ -14,14 +14,13 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Attendee List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                        @if(Auth::user()->hasRole('Admin')  || Auth::user()->hasRole('Support Staff Or Helpdesk'))
+                         <a href="{{route('attendee-users.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
+                      
                             <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
-                        @endif
-                        @if(auth()->user()->hasRole('Admin'))
                             <a href="{{ route('attendee-users.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add Attendee
                             </a>
-                        @endif
+                    
                     </div>
                 </div>
 
@@ -58,13 +57,6 @@
 
                 <!-- Card Body -->
                 <div class="card-body pt-0">
-                    @if(Session::has('success'))
-                        <div class="alert alert-success">{{ Session::get('success') }}</div>
-                    @endif
-                    @if(Session::has('error'))
-                        <div class="alert alert-danger">{{ Session::get('error') }}</div>
-                    @endif
-
                     <!-- Loading Spinner -->
                     <div class="text-center mb-3">
                         <div class="spinner-border spinner-border-sm" style="display:none;"></div>

@@ -47,11 +47,29 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
 Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('users.attendee');
+    
       Route::resource('usergroup', UserGroupController::class);
     
     Route::patch('exhibitor-users/{id}/approve', [ExhibitorUserController::class, 'approve'])->name('exhibitor-users.approve');
     Route::get('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBoothForm'])->name('exhibitor-users.assign-booth-form');
     Route::post('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBooth'])->name('exhibitor-users.assign-booth');
+     Route::get('/exhibitors/export', [ExhibitorUserController::class, 'exportExhibitors'])
+    ->name('exhibitors.export');
+      Route::get('/sponsors/export', [SponsorsController::class, 'exportSponsors'])
+    ->name('sponsors.export');
+     Route::get('/speaker/export', [SpeakerController::class, 'exportSpeakers'])
+    ->name('speaker.export');
+    Route::post('/attendee-users/{id}/allow-access', [AttendeeUserController::class, 'allowAccess'])
+    ->name('attendee-users.allow-access');
+    Route::post('/speakers/{id}/allow-access', [SpeakerController::class, 'allowAccess'])
+    ->name('speakers.allow-access');
+    Route::post('/speakers/{id}/send-mail', [SpeakerController::class, 'sendMail'])
+    ->name('speakers.sendMail');
+    Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
+    ->name('attendee-users.sendMail');
+
+
+
 
     
     Route::resource('speaker', SpeakerController::class);
@@ -97,8 +115,16 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::get('/sponsors/{user}/qr/download', [SponsorsController::class,'downloadQr'])->name('sponsors.qr.download');
      Route::resource('representative-users', RepresentativeUserController::class);
      Route::resource('attendee-users', AttendeeUserController::class);
+     Route::get('/attendees/export', [AttendeeUserController::class, 'exportAttendees'])
+    ->name('attendee-users.export');
+
      Route::resource('sponsors', SponsorsController::class);
+     
      Route::resource('speaker', SpeakerController::class);
+     Route::get('/speaker/{user}/qr/download', [SpeakerController::class,'downloadQr'])->name('speaker.qr.download');
+    
+
+
 
     Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
