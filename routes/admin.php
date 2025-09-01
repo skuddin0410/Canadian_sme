@@ -98,6 +98,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
      Route::resource('attendee-users', AttendeeUserController::class);
      Route::resource('sponsors', SponsorsController::class);
      Route::resource('speaker', SpeakerController::class);
+     Route::get('/speaker/{user}/qr/download', [SpeakerController::class,'downloadQr'])->name('speaker.qr.download');
+
+
 
     Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');

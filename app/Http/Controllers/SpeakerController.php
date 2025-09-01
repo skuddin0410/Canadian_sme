@@ -358,4 +358,7 @@ class SpeakerController extends Controller
 
     return back()->withErrors('You do not have permission to perform this action.');
 }
+  public function downloadQr($userid){
+        return downloadQrCode($userid);
+    }
 }
