@@ -142,7 +142,7 @@ Admin | Edit Attendee Data
                       </div>
 
                       <div class="col-md-6">
-                        <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                        <label class="form-label">Mobile</label>
                         <div class="input-group input-group-merge mb-3">
                           <span class="input-group-text"><i class="bx bx-phone"></i></span>
                           <input type="text" class="form-control" name="mobile" id="mobile"
@@ -178,11 +178,11 @@ Admin | Edit Attendee Data
                         <select class="form-select mb-3" name="primary_group">
                          
                           @foreach(($groups ?? []) as $g)
-                          @if($g == 'Attendee')
+                       
                             <option value="{{ $g }}" {{ (old('primary_group', $user->primary_group ?? null) == $g) ? 'selected' : '' }}>
                               {{ $g }}
                             </option>
-                          @endif  
+                        
                           @endforeach
                         </select>
                         @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror

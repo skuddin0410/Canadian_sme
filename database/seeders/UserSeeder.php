@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use App\Models\User;
 Use App\Models\Company;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -112,6 +113,7 @@ class UserSeeder extends Seeder
                 'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
                 'created_at'          => now(),
                 'updated_at'          => now(),
+                'booth' => rand(1, 100),
             ];
 
             $company=Company::create($companies); 
@@ -137,7 +139,8 @@ class UserSeeder extends Seeder
                 'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
                 'created_at'          => now(),
                 'updated_at'          => now(),
-                'is_sponsor' => true
+                'is_sponsor' => true,
+                'type' => Str::lower(collect(config('membership.types'))->random())
             ];
             $company=Company::create($companies); 
 

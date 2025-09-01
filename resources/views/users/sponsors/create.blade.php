@@ -156,7 +156,7 @@ Admin | Add Sponsors
               {{-- Company Phone --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Company Phone <span class="text-danger">*</span></label>
+                  <label class="form-label">Company Phone </label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-phone"></i></span>
                     <input type="text" name="company_phone" class="form-control"
@@ -223,7 +223,17 @@ Admin | Add Sponsors
                   </div>
                 </div>
               </div>
-
+              <div class="col-12"> 
+              <label for="type"  class="form-label">Select Category</label>             
+              <select id="type" name="type" class="form-select mb-3">
+                  <option value="">Select  Category</option>
+                 @foreach(config('membership.types') as $key => $label)
+                  <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
+                      {{ $label }}
+                  </option>
+                @endforeach
+              </select>
+              </div>
               <input type="hidden" name="is_sponsor" value="true"/>
               {{-- Company Description --}}
               <div class="col-12">

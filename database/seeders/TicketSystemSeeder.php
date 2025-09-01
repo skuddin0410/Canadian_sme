@@ -100,7 +100,7 @@ class TicketSystemSeeder extends Seeder
             Category::create([
                 'name' => $category['name'],
                 'slug' => Str::slug($category['name']),
-                'type' => 'event'
+                'type' => $category['type']
             ]);
         }
 
@@ -241,7 +241,7 @@ class TicketSystemSeeder extends Seeder
                         'demoes' => $faker->paragraph(1),
                         'panels' => $faker->paragraph(1),
                         'track'=>implode(',', $faker->randomElements(
-                        ['Test1', 'Test2', 'Test3', 'Keynote', 'Workshop', 'Panel', 'Demo'],
+                        ['Keynotes & Vision', 'Leadership & Strategy', 'Product Management', 'Engineering & Architecture', 'Generative AI & LLMs', 'Data & Analytics', 'MLOps & Model Ops','Cloud & Infrastructure'],
                         rand(1, 3)
                         )),
                         'color'=>$calendarColors[array_rand($calendarColors)],

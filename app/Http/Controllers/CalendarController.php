@@ -77,11 +77,10 @@ class CalendarController extends Controller
         }
 
         $sessions = $query->orderBy('start_time')->get();
-
+      
 
         
         $events = $sessions->map(function ($session) {
-            
             return [
                 'id' => $session->id,
                 'title' => $session->title,
@@ -95,7 +94,7 @@ class CalendarController extends Controller
                 'location' => $session->location,
                 'track' => $session->track,
                 'type' => $session->type,
-                'venue' => '' ,
+                'venue' =>'' ,
                 'venue_id' => '' ,
                 'capacity' => '',
                 'duration' => $session->getDurationInMinutes(),
@@ -104,6 +103,7 @@ class CalendarController extends Controller
                 'panels' => $session->panels,
                 'img'=> !empty($session->photo) ? $session->photo->file_path : '',
                 'img_id'=> !empty($session->photo) ? $session->photo->id : '',
+                'booth'=> optional($session->exhibitors->first())->booth ?? '',
 
                 'extendedProps' => [
                     'description' => $session->description,
@@ -139,6 +139,7 @@ class CalendarController extends Controller
                     'panels' => $session->panels,
                     'img'=> !empty($session->photo) ? $session->photo->file_path : '',
                     'img_id'=> !empty($session->photo) ? $session->photo->id : '',
+                    'booth'=> optional($session->exhibitors->first())->booth ?? '',
                 ]
             ];
         });

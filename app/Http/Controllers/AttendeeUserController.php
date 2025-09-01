@@ -41,8 +41,8 @@ class AttendeeUserController extends Controller
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
         $users = User::with("roles")->whereHas("roles", function ($q) {
-            $q->whereIn("name", ['Attendee']);
-            })->orderBy('created_at', 'DESC');
+             $q->whereIn("name", ['Attendee', 'Exhibitor', 'Speaker','Sponsors','Admin']);
+        })->orderBy('created_at', 'DESC');
 
  
             if ($request->filled('search')) {
@@ -73,7 +73,7 @@ class AttendeeUserController extends Controller
             ]);
             $data['offset'] = $offset;
             $data['pageNo'] = $pageNo;
-            $users->setPath(route('users.index'));
+            $users->setPath(route('attendee-users.index'));
             $data['html'] = view('users.attendee_users.table', compact('users', 'perPage'))
                 ->with('i', $pageNo * $perPage)
                 ->render();
@@ -117,7 +117,7 @@ class AttendeeUserController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|unique:users,mobile',
+            'mobile' => 'nullable|string|unique:users,mobile',
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -248,7 +248,7 @@ class AttendeeUserController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|unique:users,mobile,' . $user->id,
+            'mobile' => 'nullable|string|unique:users,mobile,' . $user->id,
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 

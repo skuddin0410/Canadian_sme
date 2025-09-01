@@ -41,7 +41,7 @@ class SpeakerController extends Controller
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Speaker']);
-                })->orderBy('created_at', 'DESC');
+                })->where('primary_group','Speaker')->orderBy('created_at', 'DESC');
 
             if ($request->search) {
                 $users = $users->where(function ($query) use ($request) {
@@ -113,7 +113,7 @@ class SpeakerController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|unique:users,mobile',
+            'mobile' => 'nullable|string|unique:users,mobile',
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -246,7 +246,7 @@ class SpeakerController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'required|string|unique:users,mobile,' . $user->id,
+            'mobile' => 'nullable|string|unique:users,mobile,' . $user->id,
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
