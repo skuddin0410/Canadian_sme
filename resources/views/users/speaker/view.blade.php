@@ -66,7 +66,7 @@ Admin | Speaker Details
                             <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
                              </ul>
                         </div>  
-                        <div class="col-6">
+                        <div class="col-4">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Name:</span> <span>{{ $user->name }}
                                             {{ $user->lastname }}</span></li>
@@ -89,7 +89,7 @@ Admin | Speaker Details
                                     </li>
                                 </ul>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Website:</span> <span>{{ $user->website_url }}</span></li>
                                    
@@ -99,6 +99,12 @@ Admin | Speaker Details
                                    <li class="mb-3"><span class="fw-medium me-2">Instagram:</span> <span>{{ $user->instagram_url }}</span></li>
                                    <li class="mb-3"><span class="fw-medium me-2">Twitter:</span> <span>{{ $user->twitter_url }}</span></li> 
                                 </ul>
+                            </div>
+
+                            <div class="col-4">
+                                 <img id="profileImagePreview" 
+                                   src="{{asset($user->qr_code)}}" style="width: 250px; height: 250px; object-fit: cover; cursor: pointer;">
+                                 
                             </div>
 
                         </div>

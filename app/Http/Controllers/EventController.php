@@ -105,7 +105,8 @@ class EventController extends Controller
     }
 
     public function edit(Event $event)
-    {   $availableTags = Category::where('type','tags')->pluck('name');
+    {   
+        $availableTags = Category::where('type','event')->pluck('name');
         return view('events.edit', compact('event','availableTags'));
     }
 

@@ -102,7 +102,7 @@ Admin | Attendee Details
                             </div>
                             <div class="col-4">
                                  <img id="profileImagePreview" 
-                                   src="{{$user->qr_code}}" style="width: 250px; height: 250px; object-fit: cover; cursor: pointer;">
+                                   src="{{asset($user->qr_code)}}" style="width: 250px; height: 250px; object-fit: cover; cursor: pointer;">
                                  
                             </div>
 

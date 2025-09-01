@@ -353,7 +353,7 @@
 
 <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form id="addTagForm" action="{{route('categories.store')}}" method="POST" class="modal-content">
+    <form id="addTagForm" action="{{route('categories.store-tags')}}" method="POST" class="modal-content">
       @csrf
       <div class="modal-header">
         <h5 class="modal-title" id="addTagModalLabel">Add New Tag</h5>

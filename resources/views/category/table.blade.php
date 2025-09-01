@@ -37,7 +37,7 @@
 <thead>
 	<tr>
 		<th>name</th>
-		<th>order</th>
+		<th>Type</th>
 		<th width="6%">action</th>
 	</tr>
 </thead>
@@ -45,7 +45,7 @@
     @foreach($categories as $category)
     <tr> 
     	<th>{{$category->name}}</th>
-    	<th contenteditable='true' data-id="{{$category->id ?? ''}}" class="editOrder" id="{{$category->id ?? ''}}">{{$category->order ?? ''}}</th>
+    	<th>{{$category->type ?? ''}}</th>
 		<th>
 		@if(Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Content Manager'))	
 		<div class="row">
