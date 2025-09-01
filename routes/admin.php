@@ -52,6 +52,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::patch('exhibitor-users/{id}/approve', [ExhibitorUserController::class, 'approve'])->name('exhibitor-users.approve');
     Route::get('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBoothForm'])->name('exhibitor-users.assign-booth-form');
     Route::post('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBooth'])->name('exhibitor-users.assign-booth');
+     Route::get('/exhibitors/export', [ExhibitorUserController::class, 'exportExhibitors'])
+    ->name('exhibitors.export');
+
 
     
     Route::resource('speaker', SpeakerController::class);
