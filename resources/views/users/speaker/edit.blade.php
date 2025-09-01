@@ -142,7 +142,7 @@ Admin | Edit Speaker
                       </div>
 
                       <div class="col-md-6">
-                        <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                        <label class="form-label">Mobile</label>
                         <div class="input-group input-group-merge mb-3">
                           <span class="input-group-text"><i class="bx bx-phone"></i></span>
                           <input type="text" class="form-control" name="mobile" id="mobile"

@@ -136,7 +136,7 @@
 
               {{-- Phone --}}
               <div class="col-md-6 mb-3">
-                <label class="form-label">Phone <span class="text-danger">*</span></label>
+                <label class="form-label">Phone </label>
                 <input type="text" class="form-control" name="company_phone"
                        value="{{ old('company_phone', $company->phone) }}" placeholder="Phone Number">
                 @error('company_phone') <span class="text-danger">{{ $message }}</span> @enderror

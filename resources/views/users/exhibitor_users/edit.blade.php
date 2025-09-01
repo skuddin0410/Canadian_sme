@@ -154,7 +154,7 @@
               {{-- Company Phone --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Company Phone <span class="text-danger">*</span></label>
+                  <label class="form-label">Company Phone</label>
                   <input type="text" 
                          class="form-control" 
                          name="company_phone" 

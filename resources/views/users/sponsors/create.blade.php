@@ -156,7 +156,7 @@ Admin | Add Sponsors
               {{-- Company Phone --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Company Phone <span class="text-danger">*</span></label>
+                  <label class="form-label">Company Phone </label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-phone"></i></span>
                     <input type="text" name="company_phone" class="form-control"

@@ -97,7 +97,7 @@ public function index(Request $request)
           
             'company_name'          => 'required|string|max:255',
             'company_email'         => 'required|email|max:255',
-            'company_phone'         => 'required|string|max:20',
+            'company_phone'         => 'nullable|string|max:20',
             'company_description'   => 'nullable|string',
             'website'       => 'required|url',
             'linkedin'      => 'nullable|url',
@@ -199,7 +199,7 @@ public function show(User $exhibitor_user, Request $request){
             $validator = Validator::make($request->all(), [
             'company_name'        => 'required|string|max:255',
             'company_email'       => 'required|email|max:255|unique:companies,email,'.$company->id,
-            'company_phone'       => 'required|string|max:20',
+            'company_phone'       => 'nullable|string|max:20',
             'company_description' => 'nullable|string',
             'website'             => 'nullable|url',
             'linkedin'            => 'nullable|url',
