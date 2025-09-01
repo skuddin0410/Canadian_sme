@@ -100,7 +100,7 @@ class TicketSystemSeeder extends Seeder
             Category::create([
                 'name' => $category['name'],
                 'slug' => Str::slug($category['name']),
-                'type' => 'event'
+                'type' => $category['type']
             ]);
         }
 
