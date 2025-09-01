@@ -59,7 +59,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
 
 
     Route::any('categories/{id}/order/{order}', '\App\Http\Controllers\CategoryController@order');
-    Route::any('categories/tags/store', '\App\Http\Controllers\CategoryController@storeTags')->name('categories.store');
+   
+    Route::any('categories/tags/store', '\App\Http\Controllers\CategoryController@storeTags')->name('categories.store-tags');
     
     
     Route::any('home/settings/', '\App\Http\Controllers\SettingController@indexHome')->name('indexHome');

@@ -16,9 +16,13 @@ use App\Models\Session;
 
 
 if (!function_exists('getCategory')) {
-    function getCategory()
+    function getCategory($type=null)
     {
-       $category = Category::orderBy("created_at","DESC")->get();
+       $category = Category::orderBy("created_at","DESC");
+       if($type){
+            $category = $category->where('type',$type);
+       } 
+       $category = $category->get();
        return $category;
     }
 }

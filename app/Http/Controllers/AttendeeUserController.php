@@ -152,7 +152,7 @@ class AttendeeUserController extends Controller
         $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags =  implode(',',$request->tags) ?? '';
+        $user->tags =  !empty($request->tags)? implode(',',$request->tags) : '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->linkedin_url;
@@ -281,7 +281,7 @@ class AttendeeUserController extends Controller
         $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags =  implode(',',$request->tags) ?? '';
+        $user->tags =  !empty($request->tags)? implode(',',$request->tags) : '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->linkedin_url;

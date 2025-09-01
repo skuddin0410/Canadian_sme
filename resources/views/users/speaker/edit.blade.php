@@ -176,11 +176,13 @@ Admin | Edit Speaker
 
                         <label class="form-label">User Primary Group {{$user->primary_group}}</label>
                         <select class="form-select mb-3" name="primary_group">
-                          <option value="">Select primary group</option>
+                         
                           @foreach(($groups ?? []) as $g)
+                           @if($g =='Speaker')
                             <option value="{{ $g }}" {{ (old('primary_group', $user->primary_group ?? null) == $g) ? 'selected' : '' }}>
                               {{ $g }}
                             </option>
+                            @endif
                           @endforeach
                         </select>
                         @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror
@@ -213,22 +215,15 @@ Admin | Edit Speaker
                             @php
                               $selectedTags = old('tags', is_array($user->tags ?? null) ? $user->tags : (empty($user->tags) ? [] : (is_string($user->tags) ? explode(',', $user->tags) : [])));
                             @endphp
+                            @if(!empty(getCategory('tags')))
+                            @foreach(getCategory('tags') as $tag)
+                            <input type="checkbox" class="btn-check" id="{{$tag->slug}}{{$tag->id}}" name="tags[]" value="{{$tag->name}}"
+                              {{ in_array($tag->name, $selectedTags ?? [], true) ? 'checked' : '' }}>
+                            <label class="btn btn-outline-primary" for="{{$tag->slug}}{{$tag->id}}">{{$tag->name}}</label>
 
-                            <input type="checkbox" class="btn-check" id="tagEvent" name="tags[]" value="Event"
-                              {{ in_array('Event', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-primary" for="tagEvent">Event</label>
+                             @endforeach 
+                            @endif
 
-                            <input type="checkbox" class="btn-check" id="tagCloudTrends" name="tags[]" value="CloudTrends"
-                              {{ in_array('CloudTrends', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-success" for="tagCloudTrends">CloudTrends</label>
-
-                            <input type="checkbox" class="btn-check" id="tagDataseecurity" name="tags[]" value="Dataseecurity"
-                              {{ in_array('Dataseecurity', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-info" for="tagDataseecurity">Dataseecurity</label>
-
-                            <input type="checkbox" class="btn-check" id="tagTechnoVation" name="tags[]" value="TechnoVation"
-                              {{ in_array('TechnoVation', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-warning" for="tagTechnoVation">TechnoVation</label>
                           </div>
                           @error('tags') <div class="text-danger">{{ $message }}</div> @enderror
                         </div>
