@@ -366,4 +366,18 @@ class SpeakerController extends Controller
     {
         return Excel::download(new SpeakersExport, 'speakers.xlsx');
     }
+   public function allowAccess(string $id)
+{
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Speaker');
+        })
+        ->findOrFail($id);
+
+    $user->is_approve = true; 
+    $user->save();
+
+    return back()->withSuccess('App access allowed successfully for Speaker.');
+}
+
 }

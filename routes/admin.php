@@ -61,6 +61,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('speaker.export');
     Route::post('/attendee-users/{id}/allow-access', [AttendeeUserController::class, 'allowAccess'])
     ->name('attendee-users.allow-access');
+    Route::post('/speakers/{id}/allow-access', [SpeakerController::class, 'allowAccess'])
+    ->name('speakers.allow-access');
 
 
 

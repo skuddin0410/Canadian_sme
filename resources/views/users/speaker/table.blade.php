@@ -41,7 +41,7 @@
 		<th>Mobile</th>
 		<th>QR</th>
 		{{-- <th>Created At</th> --}}
-		<th width="8%">Action</th>
+		<th width="18%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -65,14 +65,34 @@
 	</th>
 		{{-- <th>{{dateFormat($user->created_at) ?? '' }}</th> --}}
 		<th>
-			<div class="row">
-			<div class="col-4 p-1">	
-				<a href="{{ route('speaker.show', $user->id) }}" class="btn btn-sm btn-icon item-show"><i class="bx bxs-show"></i></a>
-            </div>
-		    <div class="col-4 p-1">	
-			<a href="{{ route('speaker.edit', $user->id) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
-            </div>
-       </th>
+    <div class="d-flex gap-1">
+		 <form action="{{ route('speakers.allow-access', $user->id) }}" method="POST" style="display:inline;">
+            @csrf
+            @if($user->is_approve)
+                <button type="submit" class="btn btn-sm btn-success" title="App access approved">
+                    ✔ Approved
+                </button>
+            @else
+                <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
+                    Allow app access
+                </button>
+            @endif
+        </form>
+        
+        <a href="{{ route('speaker.show', $user->id) }}" class="btn btn-sm btn-icon item-show" >
+            <i class="bx bxs-show"></i>
+        </a>
+
+       
+        <a href="{{ route('speaker.edit', $user->id) }}" class="bbtn btn-sm btn-icon item-edit" >
+            <i class="bx bxs-edit"></i>
+        </a>
+
+       
+       
+    </div>
+</th>
+
 	</tr>
 	@endforeach
 	@if(count($users) <=0)
