@@ -12,11 +12,13 @@ use App\Models\Drive;
 use App\Models\Order;
 use App\Models\Wallet;
 
+
 use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
 use App\Exports\SpeakersExport;
+use App\Mail\CustomSpeakerMail;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Hash;
@@ -405,6 +407,23 @@ public function allowAccess(string $id)
     $user->save();
 
     return back()->withSuccess('App access allowed successfully for Speaker and stored in access_speaker_ids.');
+}
+public function sendMail(Request $request, $id)
+{
+    $request->validate([
+        'subject' => 'required|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Speaker');
+        })
+        ->findOrFail($id);
+
+    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
+
+    return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
 }
 
 
