@@ -73,7 +73,7 @@ class AttendeeUserController extends Controller
             ]);
             $data['offset'] = $offset;
             $data['pageNo'] = $pageNo;
-            $users->setPath(route('users.index'));
+            $users->setPath(route('attendee-users.index'));
             $data['html'] = view('users.attendee_users.table', compact('users', 'perPage'))
                 ->with('i', $pageNo * $perPage)
                 ->render();
