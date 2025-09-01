@@ -17,6 +17,7 @@ use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
+use App\Mail\CustomSpeakerMail;
 use App\Exports\AttendeesExport;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
@@ -379,6 +380,23 @@ class AttendeeUserController extends Controller
     $user->save();
 
     return back()->withSuccess('App access allowed successfully to Attendee.');
+}
+public function sendMail(Request $request, $id)
+{
+    $request->validate([
+        'subject' => 'required|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    $user = User::with('roles')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Attendee');
+        })
+        ->findOrFail($id);
+
+    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
+
+    return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
 }
 
 }

@@ -63,6 +63,11 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('attendee-users.allow-access');
     Route::post('/speakers/{id}/allow-access', [SpeakerController::class, 'allowAccess'])
     ->name('speakers.allow-access');
+    Route::post('/speakers/{id}/send-mail', [SpeakerController::class, 'sendMail'])
+    ->name('speakers.sendMail');
+    Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
+    ->name('attendee-users.sendMail');
+
 
 
 
