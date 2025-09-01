@@ -47,6 +47,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
 Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('users.attendee');
+    
       Route::resource('usergroup', UserGroupController::class);
     
     Route::patch('exhibitor-users/{id}/approve', [ExhibitorUserController::class, 'approve'])->name('exhibitor-users.approve');
@@ -58,6 +59,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('sponsors.export');
      Route::get('/speaker/export', [SpeakerController::class, 'exportSpeakers'])
     ->name('speaker.export');
+    Route::post('/attendee-users/{id}/allow-access', [AttendeeUserController::class, 'allowAccess'])
+    ->name('attendee-users.allow-access');
 
 
 

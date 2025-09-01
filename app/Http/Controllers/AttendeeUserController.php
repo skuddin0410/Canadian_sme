@@ -160,6 +160,7 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->is_approve = true;
         $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
         $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
         $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
@@ -260,7 +261,7 @@ class AttendeeUserController extends Controller
             'secondary_group.*' => ['string'],  
             'primary_group' => 'required|string', 
 
-            'access_speaker_ids'    => ['nullable','array'],
+           'access_speaker_ids'    => ['nullable','array'],
           'access_speaker_ids.*'  => ['integer','exists:users,id'],
           'access_exhibitor_ids'  => ['nullable','array'],
           'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
@@ -289,6 +290,8 @@ class AttendeeUserController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->is_approve = true;
+
         $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
         $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
         $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
@@ -363,5 +366,14 @@ class AttendeeUserController extends Controller
     {
         return Excel::download(new AttendeesExport, 'attendees.xlsx');
     }
-    
+    public function allowAccess(string $id)
+{
+    $user = User::findOrFail($id);
+
+    $user->is_approve = true; // allow access
+    $user->save();
+
+    return back()->withSuccess('App access allowed successfully.');
+}
+
 }

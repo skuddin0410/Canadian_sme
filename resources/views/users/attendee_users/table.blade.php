@@ -43,7 +43,7 @@
     <th>QR</th>
 		{{-- <th>Referral coupon</th> --}}
 		
-		<th width="8%">Action</th>
+		<th width="28%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -70,6 +70,19 @@
 		
          <th>
   <div class="d-flex gap-2">
+        <form action="{{ route('attendee-users.allow-access', $user->id) }}" method="POST" style="display:inline;">
+    @csrf
+    @if($user->is_approve)
+        <button type="submit" class="btn btn-sm btn-success" title="App access approved">
+            ✔ Approved
+        </button>
+    @else
+        <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
+            Allow app access
+        </button>
+    @endif
+</form>
+
     {{-- View --}}
     <a href="{{ route('attendee-users.show', $user->id) }}" class="btn btn-sm btn-icon btn-primary" title="View">
       <i class="bx bx-show"></i>
