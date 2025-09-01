@@ -18,6 +18,7 @@ use App\Models\BoothUser;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
+use App\Exports\ExhibitorsExport;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
@@ -330,5 +331,9 @@ public function show(User $exhibitor_user, Request $request){
         }
         return back()->withErrors('You do not have permission to perform this action.');
     }
+    public function exportExhibitors()
+{
+    return Excel::download(new ExhibitorsExport, 'exhibitors.xlsx');
+}
 
 }

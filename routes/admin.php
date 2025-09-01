@@ -102,6 +102,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
      Route::resource('sponsors', SponsorsController::class);
      Route::resource('speaker', SpeakerController::class);
      Route::get('/speaker/{user}/qr/download', [SpeakerController::class,'downloadQr'])->name('speaker.qr.download');
+     Route::get('/speaker/export', [SpeakerController::class, 'exportSpeakers'])
+    ->name('speaker.export');
+
 
 
 
