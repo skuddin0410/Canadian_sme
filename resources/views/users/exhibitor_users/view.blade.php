@@ -35,7 +35,7 @@
     <div class="card-body text-center">
         <div class="row">
             <!-- Content Icon -->
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h6>Content Icon</h6>
                 @if(!empty($company->contentIconFile) && !empty($company->contentIconFile->file_path))
                     <img src="{{$company->contentIconFile->file_path }}"
@@ -48,7 +48,7 @@
             </div>
 
             <!-- Quick Link Icon -->
-            <div class="col-md-4">
+            <div class="col-md-6">
 
                 <h6>Quick Link Icon</h6>
                 @if(!empty($company->quickLinkIconFile) && !empty($company->quickLinkIconFile->file_path))
@@ -60,19 +60,6 @@
                     <p class="text-muted">No Quick Link Icon</p>
                 @endif
             </div>
-
-            <!-- QR Code -->
-            <div class="col-md-4">
-                <h6>QR Code</h6>
-                    @if($user->qr_code)
-                        <img src="{{ asset($user->qr_code) }}"
-                             alt="User QR Code"
-                             class="rounded border"
-                             style="max-height: 150px; object-fit:contain;">
-                    @else
-                        <p>No QR code generated.</p>
-                    @endif
-            </div>
         </div>
     </div>
 </div>
@@ -83,59 +70,28 @@
         <div class="col-md-4">
             <!-- Assign Booth Form -->
              <div class="card">
-    <div class="d-flex pt-3 justify-content-end">
-    <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary me-2">Back</a>
-    </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>Assign Booth</h4>
+                <div class="d-flex pt-3 justify-content-end">
+                <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary me-2">Back</a>
                 </div>
-                <div class="card-body">
-                    <form action="{{route('exhibitor-users.assign-booth-form',$company->id)}}" method="POST">
-                        @csrf
-                         {{-- <div class="mb-3">
-                          <label for="booth_title" class="form-label">Booth Title</label>
-                          <input type="text" name="booth_title" id="booth_title" class="form-control" required>
-                         </div> --}}
-                          <div class="mb-3">
-                <label for="booth_id" class="form-label">Booth Number</label>
-                <select name="booth_id" id="booth_id" class="form-control" required>
-                    <option value="">Select Booth Number</option>
-                    @foreach($booths as $booth)
-                        <option value="{{ $booth->id }}">{{ $booth->booth_number }}</option>
-                    @endforeach
-                </select>
-            </div>
-                        <button type="submit" class="btn btn-primary w-100">Assign Booth</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+            <h4 class="ms-2">
+                Booth No :
+                <span class="badge bg-primary rounded-pill">
+                    {{ $company->booth ?? 'N/A' }}
+                </span>
+            </h4>
 
-            <!-- Booth Details -->
-          @if($company->boothUsers && $company->boothUsers->count())
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Booth Number</th>
-                <th>Booth Title</th>
-                <th>Size</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($company->boothUsers as $bu)
-                <tr>
-                    <td>{{ $bu->booth->booth_number ?? '-' }}</td>
-                    <td>{{ $bu->booth->title ?? '-' }}</td>
-                    <td>{{ $bu->booth->size ?? '-' }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-@else
-    <p>No booths assigned yet.</p>
-@endif
-
+                        <!-- QR Code -->
+            <div class="col-md-12 ms-2">
+                    @if($company->qr_code)
+                        <img src="{{ asset($company->qr_code) }}"
+                             alt="User QR Code"
+                             class="rounded border"
+                             style="max-height: 150px; object-fit:contain;">
+                    @else
+                        <p>No QR code generated.</p>
+                    @endif
+            </div>
+         </div>
 
         </div>
     </div>

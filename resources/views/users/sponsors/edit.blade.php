@@ -183,15 +183,14 @@
               </div>
               
               <div class="col-12"> 
-              <label for="type"  class="form-label">Select Membership Type</label>             
+              <label for="type"  class="form-label">Select Category</label>             
               <select id="type" name="type" class="form-select mb-3">
-                  <option value="">Select Membership Type</option>
-                    <option value="gold" {{ old('type', $user->type ?? '') == 'gold' ? 'selected' : '' }}>GOLD</option>
-                    <option value="majlislounge" {{ old('type', $user->type ?? '') == 'majlislounge' ? 'selected' : '' }}>MAJLISLOUNGE</option>
-                    <option value="platinum" {{ old('type', $user->type ?? '') == 'platinum' ? 'selected' : '' }}>PLATINUM</option>
-                    <option value="silver" {{ old('type', $user->type ?? '') == 'silver' ? 'selected' : '' }}>SILVER</option>
-                    <option value="innovationpartner" {{ old('type', $user->type ?? '') == 'innovationpartner' ? 'selected' : '' }}>INNOVATIONPARTNER</option>
-                    <option value="bronze" {{ old('type', $user->type ?? '') == 'bronze' ? 'selected' : '' }}>BRONZE</option>
+                  <option value="">Select Category</option>
+                    @foreach(config('membership.types') as $key => $label)
+                        <option value="{{ $key }}" {{ old('membership_type', $user->membership_type ?? '') == $key ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
                 </select>
              
               </div>
