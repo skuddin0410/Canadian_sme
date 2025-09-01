@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
 use App\Models\Track;
 use Illuminate\Support\Facades\DB;
+use App\Models\Company;
 
 class CalendarController extends Controller
 {
@@ -28,13 +29,9 @@ class CalendarController extends Controller
                     $q->where("name", 'Speaker');
                 })->orderBy('created_at', 'DESC')->get();
 
-        $exhibitors = User::whereHas("roles", function ($q) {
-                    $q->where("name", 'Exhibitor');
-                })->orderBy('created_at', 'DESC')->get();
+        $exhibitors = Company::select('id','name','email')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
 
-        $sponsors = User::whereHas("roles", function ($q) {
-                    $q->where("name", 'Sponsors');
-                })->orderBy('created_at', 'DESC')->get();
+        $sponsors = Company::select('id','name','email')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
         $tracks = Track::orderBy('created_at', 'DESC')->get();
         return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths','tracks'));
     }
@@ -52,21 +49,15 @@ class CalendarController extends Controller
     public function exhibitors(Request $request)
     {
 
-        $exhibitors = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Exhibitor']);
-                })->orderBy('created_at', 'DESC')->get();
+        $exhibitors = Company::select('id','name','email')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
         return response()->json($exhibitors);
         
     }
 
     public function sponsors(Request $request)
     {
-
-        $sponsors = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Sponsors']);
-                })->orderBy('created_at', 'DESC')->get();
+        $sponsors = Company::select('id','name','email')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
         return response()->json($sponsors);
-        
     }
 
     public function getSessions(Request $request): JsonResponse
@@ -86,8 +77,11 @@ class CalendarController extends Controller
         }
 
         $sessions = $query->orderBy('start_time')->get();
+
+
         
         $events = $sessions->map(function ($session) {
+            
             return [
                 'id' => $session->id,
                 'title' => $session->title,
@@ -123,18 +117,18 @@ class CalendarController extends Controller
                             'role' => $speaker->pivot->role
                         ];
                     }),
-                    'sponsors' => $session->sponsors->map(function ($speaker) {
+                    'sponsors' => $session->sponsors->map(function ($sponsor) {
                         return [
-                            'id' => $speaker->id,
-                            'name' => $speaker->name.' '.$speaker->lastname,
-                            'role' => $speaker->pivot->role
+                            'id' => $sponsor->id,
+                            'name' => $sponsor->name,
+                            'role' => $sponsor->pivot->role
                         ];
                     }),
-                    'exhibitors' => $session->exhibitors->map(function ($speaker) {
+                    'exhibitors' => $session->exhibitors->map(function ($exhibitor) {
                         return [
-                            'id' => $speaker->id,
-                            'name' => $speaker->name.' '.$speaker->lastname,
-                            'role' => $speaker->pivot->role
+                            'id' => $exhibitor->id,
+                            'name' => $exhibitor->name,
+                            'role' => $exhibitor->pivot->role
                         ];
                     }),
                     'capacity' => '',

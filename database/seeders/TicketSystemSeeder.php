@@ -273,14 +273,16 @@ class TicketSystemSeeder extends Seeder
                 notification($userId,'Speaker_Reminder',$sessionId);
             }
         }
-
+        
+        
+        $exhbitors = DB::table('companies')->where('is_sponsor',0)->pluck('id')->toArray();
         foreach ($sessions as $sessionId) {
-            $speakers = collect($users)->random(2);
+            $speakers = collect($exhbitors)->random(2);
 
             foreach ($speakers as $userId) {
                 DB::table('session_exhibitors')->insert([
                     'session_id' => $sessionId,
-                    'user_id' => $userId,
+                    'company_id' => $userId,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -288,13 +290,15 @@ class TicketSystemSeeder extends Seeder
             }
         }
 
+        $sponsors = DB::table('companies')->where('is_sponsor',1)->pluck('id')->toArray();
+
         foreach ($sessions as $sessionId) {
-            $speakers = collect($users)->random(2);
+            $speakers = collect($sponsors)->random(2);
 
             foreach ($speakers as $userId) {
                 DB::table('session_sponsors')->insert([
                     'session_id' => $sessionId,
-                    'user_id' => $userId,
+                    'company_id' => $userId,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

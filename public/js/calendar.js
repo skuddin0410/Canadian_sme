@@ -913,7 +913,7 @@ class LaravelEventCalendar {
         this.exhibitors.forEach(exibitor => {
             const option = document.createElement('option');
             option.value = exibitor.id;
-            option.textContent = `${exibitor.full_name} - ${exibitor.email || 'Exibitor'}`;
+            option.textContent = `${exibitor.name}`;
             select.appendChild(option);
         });
     }
@@ -926,7 +926,7 @@ class LaravelEventCalendar {
         this.sponsors.forEach(sponsor => {
             const option = document.createElement('option');
             option.value = sponsor.id;
-            option.textContent = `${sponsor.full_name} - ${sponsor.email || 'Exibitor'}`;
+            option.textContent = `${sponsor.name}`;
             select.appendChild(option);
         });
     }

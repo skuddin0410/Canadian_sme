@@ -224,7 +224,7 @@
                                     <select class="form-select" id="exhibitorSelect">
                                         <option value="">Select a exhibitor...</option>
                                          @foreach($exhibitors as $exhibitor)
-                                          <option value="{{ $exhibitor->id }}">{{ $exhibitor->full_name }}</option>
+                                          <option value="{{ $exhibitor->id }}">{{ $exhibitor->name }}</option>
                                          @endforeach 
                                        
                                     </select>
@@ -241,7 +241,7 @@
                                     <select class="form-select" id="sponsorSelect">
                                         <option value="">Select a sponsors...</option>
                                          @foreach($sponsors as $sponsor)
-                                          <option value="{{ $sponsor->id }}">{{ $sponsor->full_name }}</option>
+                                          <option value="{{ $sponsor->id }}">{{ $sponsor->name }}</option>
                                          @endforeach 
                                        
                                     </select>

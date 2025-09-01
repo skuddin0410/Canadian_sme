@@ -14,21 +14,21 @@ return new class extends Migration
         Schema::create('session_exhibitors', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('session_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('company_id');
             $table->timestamps();
 
             $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
 
         Schema::create('session_sponsors', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('session_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('company_id');
             $table->timestamps();
 
             $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 
