@@ -20,7 +20,7 @@
                                     @if(!empty($attendee->photo) &&  $attendee->photo->file_path)
                                     <img src="{{$attendee->photo->file_path}}" alt="">
                                     @else
-                                    <span class="small-heading-blue mb-0">{{$attendee->full_name}}</span>
+                                    <span class="small-heading-blue mb-0">{{shortenName($attendee->name, $attendee->lastname)}}</span>
                                     @endif
                                 </div>
                                 <div class="abc">
@@ -30,11 +30,11 @@
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Company</span>
-                                <span class="small-heading-black fw-semibold">{{$attendee->company ?? ''}}</span>
+                                <span class="small-heading-black fw-semibold">{{$attendee->company ?? 'NA'}}</span>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Job Title</span>
-                                <span class="small-heading-black fw-semibold">Procurement Manager</span>
+                                <span class="small-heading-black fw-semibold">{{$attendee->designation ?? 'NA'}}</span>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Email ID</span>

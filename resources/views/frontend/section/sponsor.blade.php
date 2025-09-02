@@ -23,60 +23,24 @@
                 <div class="mt-2 mt-sm-4 mt-lg-5">
                     <div class="swiper sponsors-swiper">
                         <div class="swiper-wrapper">
+                            @if(!empty($sponsors))
+                             @foreach($sponsors as $sponsor)
+
                             <div class="swiper-slide">
                                 <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/sponsor-1.png')}}" alt="">
+                                     @if($sponsor->logo)
+                                      <img src="{{$sponsor->logo->file_path}}" alt="">
+                                     @else
+                                       <img src="{{asset('frontend/images/sponsor-1.png')}}" alt="">
+                                     @endif
                                 </div>
                                 <div class="swiper-img-text">
-                                    <span class="sponsors-name">Innovatech Solutions</span>
-                                    <span class="sponsors-title">Speaker</span>
+                                    <span class="sponsors-name">{{$sponsor->name ?? ''}}</span>
+                                    <span class="sponsors-title">Sponsor</span>
                                 </div>
                             </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/sponsor-2.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="sponsors-name">Innovatech Solutions</span>
-                                    <span class="sponsors-title">Speaker</span>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/sponsor-3.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="sponsors-name">Innovatech Solutions</span>
-                                    <span class="sponsors-title">Speaker</span>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/sponsor-4.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="sponsors-name">Innovatech Solutions</span>
-                                    <span class="sponsors-title">Speaker</span>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/sponsor-1.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="sponsors-name">Innovatech Solutions</span>
-                                    <span class="sponsors-title">Speaker</span>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/sponsor-2.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="sponsors-name">Innovatech Solutions</span>
-                                    <span class="sponsors-title">Speaker</span>
-                                </div>
-                            </div>
+                             @endforeach
+                            @endif
                         </div>
                     </div>
                 </div>
