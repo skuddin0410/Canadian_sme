@@ -117,7 +117,6 @@ public function index(Request $request)
        try {
   
             $company = Company::create([
-                'user_id'     => $user->id,
                 'name'        => $request->company_name,
                 'email'       => $request->company_email,
                 'phone'       => $request->company_phone,

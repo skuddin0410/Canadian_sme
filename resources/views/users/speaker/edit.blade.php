@@ -17,7 +17,7 @@ Admin | Edit Speaker
 }
 </style>
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Attendee /</span> Edit</h4>
+  <h4 class="py-3 mb-4"><span class="text-muted fw-light">Speaker/</span> Edit</h4>
 
 
   <div class="card mb-4">
@@ -426,7 +426,7 @@ Admin | Edit Speaker
           </div>
 
           <div class="card-footer d-flex justify-content-end">
-            <a href="{{ route('attendee-users.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
+            <a href="{{ route('speaker.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
             <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Save</button>
           </div>
         </div>

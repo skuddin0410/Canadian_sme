@@ -25,9 +25,16 @@ class ExhibitorsExport implements FromCollection , WithHeadings, WithMapping
             $company->name,
             $company->email,
             $company->phone,
+            $company->description,
             $company->website,
-            optional($company->user)->email,
-            $company->boothUsers->pluck('booth.name')->implode(', '),
+            $company->linkedin,
+            $company->twitter,
+            $company->facebook,
+            $company->instagram,
+            $company->booth,
+            // optional($company->user)->email,
+
+            // $company->boothUsers->pluck('booth.name')->implode(', '),
             $company->created_at->format('Y-m-d H:i'),
         ];
     }
@@ -39,9 +46,16 @@ class ExhibitorsExport implements FromCollection , WithHeadings, WithMapping
             'Company Name',
             'Email',
             'Phone',
+            'description',
             'Website',
-            'User Email',
-            'Assigned Booths',
+            'linkedin',
+            'twitter',
+            'facebook',
+            'instagram',
+            'booth',
+ 
+            // 'User Email',
+            // 'Assigned Booths',
             'Created At',
         ];
     }

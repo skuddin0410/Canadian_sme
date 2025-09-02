@@ -6,11 +6,12 @@ use App\Http\Controllers\SpeakerController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\SponsorsController;
 use App\Http\Controllers\UserGroupController;
+use App\Http\Controllers\EventGuideController;
+use App\Http\Controllers\EventTrackController;
 use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
-use App\Http\Controllers\EventTrackController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::resource('pages',   App\Http\Controllers\PageController::class);
@@ -31,6 +32,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/event-tracks/create', [EventTrackController::class, 'create'])->name('event-tracks.create');
     // Store new event track
     Route::post('/event-tracks', [EventTrackController::class, 'store'])->name('event-tracks.store');
+
+    Route::resource('event-guides', EventGuideController::class);
 
     Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
     Route::post('/assign-permission', [App\Http\Controllers\RoleController::class, 'assignPermission'])->name('roles.assign.permission');

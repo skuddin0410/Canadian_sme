@@ -136,7 +136,7 @@ class SpeakerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect(route('attendee-users.create'))->withInput()
+            return redirect(route('speaker.create'))->withInput()
                 ->withErrors($validator);
         }
 
@@ -198,7 +198,7 @@ class SpeakerController extends Controller
         qrCode($user->id);
     
 
-      return redirect(route('speaker.edit', $user->id))
+      return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');
     }
 
@@ -327,7 +327,7 @@ class SpeakerController extends Controller
         }
         qrCode($user->id);
 
-     return redirect(route('speaker.edit', $user->id))
+     return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');
     }
 

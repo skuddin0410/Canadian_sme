@@ -25,8 +25,14 @@ class SponsorExport implements FromCollection , WithHeadings, WithMapping
             $company->name,
             $company->email,
             $company->phone,
+            $company->description,
             $company->website,
-            optional($company->user)->email,
+            $company->linkedin,
+            $company->twitter,
+            $company->facebook,
+            $company->instagram,
+           
+            // optional($company->user)->email,
             // $company->boothUsers->pluck('booth.name')->implode(', '),
             $company->created_at->format('Y-m-d H:i'),
         ];
@@ -39,8 +45,13 @@ class SponsorExport implements FromCollection , WithHeadings, WithMapping
             'Company Name',
             'Email',
             'Phone',
+          
+             'description',
             'Website',
-            'User Email',
+            'linkedin',
+            'twitter',
+            'facebook',
+            'instagram',
             // 'Assigned Booths',
             'Created At',
         ];
