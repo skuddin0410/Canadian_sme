@@ -23,7 +23,7 @@
 
       <p><strong>Document:</strong> 
         @if($eventGuide->doc)
-          <a href="{{ asset('storage/'.$eventGuide->doc) }}" target="_blank" class="btn btn-sm btn-primary">
+          <a href="{{ asset('storage/event_guides/'.$eventGuide->doc) }}" target="_blank" class="btn btn-sm btn-primary">
             View Document
           </a>
         @else

@@ -78,14 +78,14 @@
      <div class="col-md-6 mb-3">
         <div class="card p-3 h-100">
             <h6 class="mb-2">User QR Code</h6>
-            @if($user->qr_code)
+            {{-- @if($user->qr_code)
                 <img src="{{ asset($user->qr_code) }}"
                      alt="User QR Code"
                      class="rounded border"
                      style="width:200px; height:200px; object-fit:contain;">
             @else
                 <p>No QR code generated.</p>
-            @endif
+            @endif --}}
         </div>
     </div>
                             <div class="col-md-6 mb-3">
