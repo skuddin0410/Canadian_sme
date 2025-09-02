@@ -229,17 +229,19 @@ if (!function_exists('notification')) {
     ]);
   }
 
-  if (!function_exists('groups')) {
-    function groups($user)
-        {  
-            $arr =[];
-            if(!empty($user->secondary_group)){
-             $arr = explode(',', $user->secondary_group);
-            }
-            array_push($arr, $user->primary_group);
-
-            return array_unique($arr);
-        }
-   }
 }
+
+if (!function_exists('groups')) {
+function groups($user)
+    {  
+        $arr =[];
+        if(!empty($user->secondary_group)){
+         $arr = explode(',', $user->secondary_group);
+        }
+        array_push($arr, $user->primary_group);
+
+        return array_unique($arr);
+    }
+}
+
 
