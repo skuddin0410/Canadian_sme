@@ -277,7 +277,7 @@ class TicketSystemSeeder extends Seeder
         
         $exhbitors = DB::table('companies')->where('is_sponsor',0)->pluck('id')->toArray();
         foreach ($sessions as $sessionId) {
-            $speakers = collect($exhbitors)->random(2);
+            $speakers = collect($exhbitors)->random(5);
 
             foreach ($speakers as $userId) {
                 DB::table('session_exhibitors')->insert([
@@ -293,7 +293,7 @@ class TicketSystemSeeder extends Seeder
         $sponsors = DB::table('companies')->where('is_sponsor',1)->pluck('id')->toArray();
 
         foreach ($sessions as $sessionId) {
-            $speakers = collect($sponsors)->random(2);
+            $speakers = collect($sponsors)->random(5);
 
             foreach ($speakers as $userId) {
                 DB::table('session_sponsors')->insert([
