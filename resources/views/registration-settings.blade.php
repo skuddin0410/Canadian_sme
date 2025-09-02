@@ -77,22 +77,22 @@
      
 
       <label for="privacy_policy" class="form-label">Privacy Policy Content</label>
-      <p><a href="{{ config('app.url')}}privacy_policy"/>{{ config('app.url')}}privacy_policy </p>
+      <p><a href="{{ config('app.url')}}privacy_policy"/>{{ config('app.url')}}privacy_policy</a> </p>
       <textarea class="form-control" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write your Privacy Policy here...">{{getKeyValue('privacy_policy')->value}}</textarea>
     </div>
 
     <!-- Terms & Conditions -->
     <div class="tab-pane fade" id="terms" role="tabpanel" aria-labelledby="terms-tab" tabindex="0">
       <label for="terms_conditions" class="form-label">Terms &amp; Conditions Content</label>
-      <p><a href="{{ config('app.url')}}terms_conditions"/>{{ config('app.url')}}terms_conditions </p>
+      <p><a href="{{ config('app.url')}}terms_conditions"/>{{ config('app.url')}}terms_conditions </a></p>
       <textarea class="form-control" id="terms_conditions" name="terms_conditions" rows="12" placeholder="Paste or write your Terms & Conditions here...">{{getKeyValue('terms_conditions')->value}}</textarea>
     </div>
 
     <!-- Thank You Page -->
     <div class="tab-pane fade" id="thankyou" role="tabpanel" aria-labelledby="thankyou-tab" tabindex="0">
       <label for="thank_you_page" class="form-label">Thank You Page Message / HTML</label>
-      <p><a href="{{ config('app.url')}}thank_you_page"/>{{ config('app.url')}}thank_you_page </p>
-      <textarea class="form-control" id="thank_you_page" name="thank_you_page" rows="8" placeholder="Thank you for your purchase! Your order number is.">{{getKeyValue('thank_you_page')->value}}</textarea>
+      <p><a href="{{ config('app.url')}}thank_you_page"/>{{ config('app.url')}}thank_you_page </a></p>
+      <textarea class="form-control" id="thank_you_page" name="thank_you_page" rows="8" placeholder="">{{getKeyValue('thank_you_page')->value}}</textarea>
       <div class="form-text"></div>
     </div>
   </div>

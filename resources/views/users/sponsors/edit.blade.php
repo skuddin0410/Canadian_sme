@@ -136,7 +136,7 @@
 
               {{-- Phone --}}
               <div class="col-md-6 mb-3">
-                <label class="form-label">Phone <span class="text-danger">*</span></label>
+                <label class="form-label">Phone </label>
                 <input type="text" class="form-control" name="company_phone"
                        value="{{ old('company_phone', $company->phone) }}" placeholder="Phone Number">
                 @error('company_phone') <span class="text-danger">{{ $message }}</span> @enderror
@@ -180,6 +180,19 @@
                 <input type="url" class="form-control" name="instagram"
                        value="{{ old('instagram', $company->instagram) }}" placeholder="https://instagram.com/sponsor">
                 @error('instagram') <span class="text-danger">{{ $message }}</span> @enderror
+              </div>
+              
+              <div class="col-12"> 
+              <label for="type"  class="form-label">Select Category</label>             
+              <select id="type" name="type" class="form-select mb-3">
+                  <option value="">Select Category</option>
+                    @foreach(config('membership.types') as $key => $label)
+                        <option value="{{ $key }}" {{ old('type', $company->type ?? '') == $key ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+             
               </div>
 
               {{-- Description --}}

@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use App\Models\User;
 Use App\Models\Company;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -96,19 +97,7 @@ class UserSeeder extends Seeder
             $name = $faker->company;
             $email = $faker->companyEmail; 
             $phone= $faker->e164PhoneNumber;
-            
-            $exhibitorAdmin = User::create([
-                'name' => $name,
-                'email' => $email,
-                'mobile' => $phone,
-                'password'   => Hash::make('password')
-            ]);
-
-            $exhibitorAdmin->assignRole('Exhibitor');
-            qrCode($exhibitorAdmin->id);
-            notification($exhibitorAdmin->id,'welcome');
             $companies = [
-                'user_id'             => $exhibitorAdmin->id, // or assign dynamically
                 'name'                => $name,
                 'industry'            => $faker->randomElement($industries),
                 'size'                => $faker->randomElement($sizes),
@@ -124,31 +113,17 @@ class UserSeeder extends Seeder
                 'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
                 'created_at'          => now(),
                 'updated_at'          => now(),
+                'booth' => rand(1, 100),
             ];
 
             $company=Company::create($companies); 
-
-            $exhibitorAdmin->company_id = $company->id;
-            $exhibitorAdmin->save();
-
         }
 
         foreach ($sponsorsNames as $sponsor) {
             $name = $faker->company;
             $email = $faker->companyEmail; 
             $phone= $faker->e164PhoneNumber;
-
-            $sponsors = User::create([
-                'name' => $name,
-                'email' => $email,
-                'mobile' => $phone,
-                'password'   => Hash::make('password')
-            ]);
-             $sponsors->assignRole('Sponsors');
-             qrCode($sponsors->id);
-             notification($sponsors->id,'welcome');
              $companies = [
-                'user_id'             => $sponsors->id, // or assign dynamically
                 'name'                => $name,
                 'industry'            => $faker->randomElement($industries),
                 'size'                => $faker->randomElement($sizes),
@@ -164,13 +139,10 @@ class UserSeeder extends Seeder
                 'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
                 'created_at'          => now(),
                 'updated_at'          => now(),
-                'is_sponsor' => true
+                'is_sponsor' => true,
+                'type' => Str::lower(collect(config('membership.types'))->random())
             ];
-
             $company=Company::create($companies); 
-
-            $sponsors->company_id = $company->id;
-            $sponsors->save();
 
         }
 
@@ -180,6 +152,7 @@ class UserSeeder extends Seeder
             $speaker = User::create([
                 'name' => $speakerVal['first_name'],
                 'lastname'=>$speakerVal['last_name'],
+                'company' =>$faker->company,
                 'email' => strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
                 'tags'=>implode(',', $faker->randomElements($roles, rand(1, 3))),
@@ -198,30 +171,6 @@ class UserSeeder extends Seeder
             $speaker->assignRole('Speaker');
             qrCode($speaker->id);
             notification($speaker->id,'welcome');
-
-            $companies = [
-                'user_id'             => $speaker->id, // or assign dynamically
-                'name'                => $faker->company,
-                'industry'            => $faker->randomElement($industries),
-                'size'                => $faker->randomElement($sizes),
-                'location'            => $faker->city . ', ' . $faker->country,
-                'email'               => $faker->companyEmail,
-                'phone'               => $faker->e164PhoneNumber, // +14155552671 format
-                'description'         => $faker->paragraph(3),
-                'website'             => $faker->url,
-                'linkedin'            => "https://www.linkedin.com/company/" . $faker->slug,
-                'twitter'             => "https://twitter.com/" . $faker->slug,
-                'facebook'            => "https://facebook.com/" . $faker->slug,
-                'instagram'           => "https://instagram.com/" . $faker->slug,
-                'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
-                'created_at'          => now(),
-                'updated_at'          => now()
-            ];
-
-            $company=Company::create($companies); 
-            $speaker->company_id = $company->id;
-            $speaker->save();
-
         }
            
 
@@ -247,34 +196,12 @@ class UserSeeder extends Seeder
         qrCode($exhibitorRepresentative->id);
         notification($exhibitorRepresentative->id,'welcome');
 
-           $companies = [
-                'user_id'             => $exhibitorRepresentative->id, // or assign dynamically
-                'name'                => $faker->company,
-                'industry'            => $faker->randomElement($industries),
-                'size'                => $faker->randomElement($sizes),
-                'location'            => $faker->city . ', ' . $faker->country,
-                'email'               => $faker->companyEmail,
-                'phone'               => $faker->e164PhoneNumber, // +14155552671 format
-                'description'         => $faker->paragraph(3),
-                'website'             => $faker->url,
-                'linkedin'            => "https://www.linkedin.com/company/" . $faker->slug,
-                'twitter'             => "https://twitter.com/" . $faker->slug,
-                'facebook'            => "https://facebook.com/" . $faker->slug,
-                'instagram'           => "https://instagram.com/" . $faker->slug,
-                'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
-                'created_at'          => now(),
-                'updated_at'          => now(),
-            ];
-
-            $company=Company::create($companies); 
-            $exhibitorRepresentative->company_id = $company->id;
-            $exhibitorRepresentative->save();
 
         }
 
         foreach ($attendees as $attendeeVal) {
             $randomThree = collect($groups)->random(3)->toArray();
-        $attendee = User::create([
+            $attendee = User::create([
                 'name' => $attendeeVal['first_name'],
                 'lastname'=>$attendeeVal['last_name'],
                 'email' => strtolower($attendeeVal['first_name'] . '.' . $attendeeVal['last_name']) . '@example.com',
@@ -289,34 +216,12 @@ class UserSeeder extends Seeder
                 'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
                 'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
                 'primary_group'=> 'Attendee',
-                'secondary_group'=> implode(',', $randomThree)
+                'secondary_group'=> implode(',', $randomThree),
+                'company' =>$faker->company,
         ]);
-        $attendee->assignRole('Attendee');
-        qrCode($attendee->id);
-        notification($attendee->id,'welcome');
-
-           $companies = [
-                'user_id'             => $attendee->id, // or assign dynamically
-                'name'                => $faker->company,
-                'industry'            => $faker->randomElement($industries),
-                'size'                => $faker->randomElement($sizes),
-                'location'            => $faker->city . ', ' . $faker->country,
-                'email'               => $faker->companyEmail,
-                'phone'               => $faker->e164PhoneNumber, // +14155552671 format
-                'description'         => $faker->paragraph(3),
-                'website'             => $faker->url,
-                'linkedin'            => "https://www.linkedin.com/company/" . $faker->slug,
-                'twitter'             => "https://twitter.com/" . $faker->slug,
-                'facebook'            => "https://facebook.com/" . $faker->slug,
-                'instagram'           => "https://instagram.com/" . $faker->slug,
-                'certifications'      => "ISO " . $faker->numberBetween(9001, 9999) . ", ISO " . $faker->numberBetween(14001, 14999),
-                'created_at'          => now(),
-                'updated_at'          => now(),
-            ];
-
-            $company=Company::create($companies); 
-            $attendee->company_id = $company->id;
-            $attendee->save();
+            $attendee->assignRole('Attendee');
+            qrCode($attendee->id);
+            notification($attendee->id,'welcome');
 
         }
 

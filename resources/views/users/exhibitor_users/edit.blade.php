@@ -154,7 +154,7 @@
               {{-- Company Phone --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Company Phone <span class="text-danger">*</span></label>
+                  <label class="form-label">Company Phone</label>
                   <input type="text" 
                          class="form-control" 
                          name="company_phone" 
@@ -216,6 +216,17 @@
                     <span class="input-group-text"><i class="bx bxl-instagram"></i></span>
                     <input type="url" name="instagram" class="form-control"
                            value="{{ old('instagram', $user->instagram) }}" placeholder="https://instagram.com/...">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="form-label">Booth</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-book"></i></span>
+                    <input type="text" name="booth" class="form-control"
+                           value="{{ old('booth', $user->booth) }}">
                   </div>
                 </div>
               </div>
