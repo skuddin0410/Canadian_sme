@@ -1,7 +1,7 @@
 <header>
     <nav class="navbar navbar-expand-md bg-transparent p-0">
         <div class="container">
-            <a class="navbar-brand" href="javascript:void()">
+            <a class="navbar-brand" href="{{url('/')}}">
                 <img class="logo" src="{{asset('frontend/images/logo.png')}}" alt="logo">
             </a>
             <div class="d-flex align-items-center">

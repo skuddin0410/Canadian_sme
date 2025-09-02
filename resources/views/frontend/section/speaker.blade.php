@@ -15,14 +15,15 @@
                 <div class="col-xl-8 p-0">
                     <div class="swiper speakers-swiper">
                         <div class="swiper-wrapper">
-                            {{dd($speakers)}}
                             @if(!empty($speakers))
                             @foreach($speakers as $speaker)
-                            {{dd($speaker->photo)}}
+                            
                             <div class="swiper-slide">
                                 <div class="swiper-img-box">
                                     @if(!empty($speaker->photo))
                                      <img src="{{$speaker->photo->file_path}}" alt="">
+                                    @else
+                                     <img src="{{asset('frontend/images/speaker-1.png')}}" alt="">
                                     @endif
                                 </div>
                                 <div class="swiper-img-text">
