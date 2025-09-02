@@ -244,4 +244,11 @@ function groups($user)
     }
 }
 
-
+if (! function_exists('shortenName')) {
+    function shortenName($firstName, $lastName)
+    {
+        $firstInitial = strtoupper($firstName[0]);
+        $lastName = strtoupper($lastName[0]);
+        return $firstInitial . $lastName;
+    }
+}

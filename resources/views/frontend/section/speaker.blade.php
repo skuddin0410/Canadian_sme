@@ -15,42 +15,23 @@
                 <div class="col-xl-8 p-0">
                     <div class="swiper speakers-swiper">
                         <div class="swiper-wrapper">
+                            {{dd($speakers)}}
+                            @if(!empty($speakers))
+                            @foreach($speakers as $speaker)
+                            {{dd($speaker->photo)}}
                             <div class="swiper-slide">
                                 <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/speaker-1.png')}}" alt="">
+                                    @if(!empty($speaker->photo))
+                                     <img src="{{$speaker->photo->file_path}}" alt="">
+                                    @endif
                                 </div>
                                 <div class="swiper-img-text">
-                                    <span class="speakers-name">Jenyfe loe</span>
+                                    <span class="speakers-name">{{$speaker->full_name}}</span>
                                     <span class="speakers-title">Speaker</span>
                                 </div>
                             </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/speaker-2.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="speakers-name">Jenyfe loe</span>
-                                    <span class="speakers-title">Speaker</span>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/speaker-1.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="speakers-name">Jenyfe loe</span>
-                                    <span class="speakers-title">Speaker</span>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="swiper-img-box">
-                                    <img src="{{asset('frontend/images/speaker-2.png')}}" alt="">
-                                </div>
-                                <div class="swiper-img-text">
-                                    <span class="speakers-name">Jenyfe loe</span>
-                                    <span class="speakers-title">Speaker</span>
-                                </div>
-                            </div>
+                            @endforeach
+                            @endif
                         </div>
                     </div>
 

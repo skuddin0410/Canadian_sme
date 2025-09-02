@@ -19,10 +19,10 @@ class LandingController extends Controller
         ->orderBy('start_time', 'ASC')
         ->first();
 
-        $speakers = $session->speakers; 
-        $exhibitors = $session->exhibitors; 
-        $sponsors = $session->sponsors; 
-        $attendees = $session->attendees; 
+        $speakers = $session->speakers->take(3); 
+        $exhibitors = $session->exhibitors->take(3);
+        $sponsors = $session->sponsors->take(3);
+        $attendees = $session->attendees->take(3);
         return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees'));
     }
 }
