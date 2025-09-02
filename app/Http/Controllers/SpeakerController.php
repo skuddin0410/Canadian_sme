@@ -136,7 +136,7 @@ class SpeakerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect(route('attendee-users.create'))->withInput()
+            return redirect(route('speaker.create'))->withInput()
                 ->withErrors($validator);
         }
 
