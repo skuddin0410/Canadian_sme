@@ -82,5 +82,30 @@ class Session extends Model
         ]);
     }
 
-    protected $appends = ['starts_in'];
+    public function getStartsTimeInAttribute()
+    {
+        if (!$this->start_time) {
+            return null;
+        }
+        $now = now();
+        $target = $this->start_time; 
+        $diff = $now->diff($target);
+        $dd = sprintf('%02d', $diff->d);
+        $hh = sprintf('%02d', $diff->h);
+        $mm = sprintf('%02d', $diff->i);
+        $ss = sprintf('%02d', $diff->s); 
+        return [
+            'direction' => $diff->invert ? 'since' : 'in',
+            'days'      => $dd,
+            'hours'     => $hh,
+            'minutes'   => $mm,
+            'seconds'   => $ss,
+            'year'   => $target->year,
+            'month'   => $target->month,
+            'formatted' => sprintf('%dd %02dh %02dm %02ds', $diff->d, $diff->h, $diff->i, $diff->s),
+        ];
+    }
+    
+
+    protected $appends = ['starts_in','starts_time_in'];
 }
