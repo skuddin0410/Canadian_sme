@@ -58,6 +58,10 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::post('exhibitor-users/{id}/assign-booth', [ExhibitorUserController::class, 'assignBooth'])->name('exhibitor-users.assign-booth');
      Route::get('/exhibitors/export', [ExhibitorUserController::class, 'exportExhibitors'])
     ->name('exhibitors.export');
+     Route::post('/exhibitor/{companyId}/upload-docs', [ExhibitorUserController::class, 'uploadDocs'])->name('exhibitor.uploadDocs');
+     Route::delete('/exhibitors/docs/{id}', [ExhibitorUserController::class, 'deleteDoc'])
+    ->name('exhibitor.deleteDoc');
+
       Route::get('/sponsors/export', [SponsorsController::class, 'exportSponsors'])
     ->name('sponsors.export');
      Route::get('/speaker/export', [SpeakerController::class, 'exportSpeakers'])

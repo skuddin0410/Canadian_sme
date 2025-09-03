@@ -167,11 +167,12 @@ public function index(Request $request)
 
 public function show(User $exhibitor_user, Request $request){ 
 
-    $company = Company::with(['boothUsers.booth','contentIconFile','quickLinkIconFile','user'])
+    $company = Company::with(['boothUsers.booth','contentIconFile','quickLinkIconFile','user','Docs'])
         ->where('id', $exhibitor_user->id)
         ->firstOrFail();
 
     $booths = Booth::all(); 
+    
 
     return view('users.exhibitor_users.view', [
         'user' => $exhibitor_user,
@@ -301,6 +302,87 @@ public function show(User $exhibitor_user, Request $request){
 
         return redirect()->route('exhibitor-users.show', ['exhibitor_user' => $company->id])->with('success', 'Booth assigned successfully.');
     }
+//     public function uploadDocs(Request $request, $companyId)
+// {
+//     $request->validate([
+//         'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
+//     ]);
+
+//     $company = Company::findOrFail($companyId);
+
+//     if ($request->hasFile('private_docs')) {
+//         foreach ($request->file('private_docs') as $file) {
+//             $path = $file->store("companies/{$company->id}/Docs", 'public');
+
+           
+//             $company->docs()->create([
+//                 'file_path' => "storage/{$path}"
+//             ]);
+//         }
+//     }
+
+//     return redirect()->back()->with('success', 'Documents uploaded successfully.');
+// }
+    
+
+// public function uploadDocs(Request $request, $companyId)
+// {
+//     $request->validate([
+//         'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
+//     ]);
+
+//     $company = Company::findOrFail($companyId);
+
+//     if ($request->hasFile('private_docs')) {
+//         foreach ($request->file('private_docs') as $file) {
+//             $path = $file->store("companies/{$company->id}/docs", 'public');
+
+         
+//             $company->Docs()->create([
+//                 'file_name'  => $file->getClientOriginalName(),
+//                 'file_path'  => Storage::url($path), 
+//             ]);
+//         }
+//     }
+
+//     return redirect()->back()->with('success', 'Documents uploaded successfully.');
+// }
+  public function uploadDocs(Request $request, $companyId)
+{
+    $request->validate([
+        'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
+    ]);
+
+    $company = Company::findOrFail($companyId);
+
+    if ($request->hasFile('private_docs')) {
+        foreach ($request->file('private_docs') as $file) {
+           
+            $this->imageUpload($file,"companies",$company->id,'companies','private_docs');
+
+           
+        }
+    }
+
+    return redirect()->back()->with('success', 'Documents uploaded successfully.');
+}
+  
+
+public function deleteDoc($id)
+{
+    $doc =Drive::findOrFail($id);
+
+    // delete file from storage
+    if ($doc->file_path && \Storage::disk('public')->exists(str_replace('/storage/', '', $doc->file_path))) {
+        \Storage::disk('public')->delete(str_replace('/storage/', '', $doc->file_path));
+    }
+
+    $doc->delete();
+
+    return redirect()->back()->with('success', 'Document deleted successfully.');
+}
+
+
 
 
 
