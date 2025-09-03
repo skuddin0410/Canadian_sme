@@ -1,4 +1,371 @@
-// public/js/form-builder.js
+renderConditionalRules(targetFieldId) {
+        const rules = this.conditionalLogic.filter(rule => rule.target_field === targetFieldId);
+        
+        return rules.map((rule, index) => `
+            <div class="conditional-rule">
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <select onchange="formBuilder.updateConditionalRule(${index}, 'condition', this.value)"
+                                class="form-select form-select-sm">
+                            <option value="show" ${rule.condition === 'show' ? 'selected' : ''}>Show</option>
+                            <option value="hide" ${rule.condition === 'hide' ? 'selected' : ''}>Hide</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-6">
+                        <select onchange="formBuilder.updateConditionalRule(${index}, 'source_field', this.value)"
+                                class="form-select form-select-sm">
+                            <option value="">Select Field</option>
+                            ${this.formData.map(field => `
+                                <option value="${field.id}" ${rule.source_field === field.id ? 'selected' : ''}>
+                                    ${field.label}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-4">
+                        <select onchange="formBuilder.updateConditionalRule(${index}, 'operator', this.value)"
+                                class="form-select form-select-sm">
+                            <option value="==" ${rule.operator === '==' ? 'selected' : ''}>Equals</option>
+                            <option value="!=" ${rule.operator === '!=' ? 'selected' : ''}>Not Equals</option>
+                            <option value="contains" ${rule.operator === 'contains' ? 'selected' : ''}>Contains</option>
+                            <option value="not_contains" ${rule.operator === 'not_contains' ? 'selected' : ''}>Not Contains</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-6">
+                        <input type="text" value="${rule.value || ''}" 
+                               placeholder="Value"
+                               class="form-control form-control-sm"
+                               onchange="formBuilder.updateConditionalRule(${index}, 'value', this.value)">
+                    </div>
+                    
+                    <div class="col-2">
+                        <button type="button" onclick="formBuilder.removeConditionalRule(${index})" 
+                                class="btn btn-sm btn-outline-danger w-100">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    addConditionalRule(targetFieldId) {
+        const rule = {
+            target_field: targetFieldId,
+            source_field: '',
+            condition: 'show',
+            operator: '==',
+            value: ''
+        };
+        
+        this.conditionalLogic.push(rule);
+        this.showFieldProperties(this.selectedField);
+    }
+
+    updateConditionalRule(index, property, value) {
+        if (this.conditionalLogic[index]) {
+            this.conditionalLogic[index][property] = value;
+        }
+    }
+
+    removeConditionalRule(index) {
+        this.conditionalLogic.splice(index, 1);
+        this.showFieldProperties(this.selectedField);
+    }
+
+    deleteField(fieldId) {
+        // Remove from form data
+        this.formData = this.formData.filter(field => field.id !== fieldId);
+        
+        // Remove from DOM
+        const fieldElement = document.querySelector(`[data-field-id="${fieldId}"]`);
+        if (fieldElement) {
+            fieldElement.remove();
+        }
+        
+        // Remove related conditional logic
+        this.conditionalLogic = this.conditionalLogic.filter(rule => 
+            rule.target_field !== fieldId && rule.source_field !== fieldId
+        );
+        
+        // Clear properties panel if this field was selected
+        if (this.selectedField && this.selectedField.id === fieldId) {
+            this.selectedField = null;
+            document.getElementById('properties-content').innerHTML = `
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-cog display-6 mb-3"></i>
+                    <p>Select a field to edit properties</p>
+                </div>
+            `;
+        }
+        
+        // Show empty state if no fields
+        if (this.formData.length === 0) {
+            this.showEmptyState();
+        }
+    }
+
+    updateFieldOrder() {
+        const fieldElements = document.querySelectorAll('#form-canvas .form-field');
+        const newOrder = [];
+        
+        fieldElements.forEach(element => {
+            const fieldId = element.getAttribute('data-field-id');
+            const fieldData = this.formData.find(field => field.id === fieldId);
+            if (fieldData) {
+                newOrder.push(fieldData);
+            }
+        });
+        
+        this.formData = newOrder;
+    }
+
+    updateValidationRules() {
+        this.validationRules = {};
+        
+        this.formData.forEach(field => {
+            const rules = [];
+            
+            if (field.required) {
+                rules.push('required');
+            }
+            
+            if (field.type === 'email') {
+                rules.push('email');
+            }
+            
+            if (field.type === 'number') {
+                rules.push('numeric');
+            }
+            
+            if (field.maxLength) {
+                rules.push(`max:${field.maxLength}`);
+            }
+            
+            if (rules.length > 0) {
+                this.validationRules[field.name] = rules.join('|');
+            }
+        });
+    }
+
+    hideEmptyState() {
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.style.display = 'none';
+        }
+    }
+
+    showEmptyState() {
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.style.display = 'block';
+        }
+    }
+
+    previewForm() {
+        const modal = new bootstrap.Modal(document.getElementById('preview-modal'));
+        const content = document.getElementById('preview-content');
+        
+        const formTitle = document.getElementById('form-title').value || 'Form Preview';
+        const formDescription = document.getElementById('form-description').value;
+        
+        let previewHTML = `
+            <div class="mb-4">
+                <h4 class="fw-bold text-dark">${formTitle}</h4>
+                ${formDescription ? `<p class="text-muted">${formDescription}</p>` : ''}
+            </div>
+            <form id="preview-form-element">
+        `;
+        
+        this.formData.forEach(field => {
+            previewHTML += `<div class="mb-3">${this.generatePreviewFieldHTML(field)}</div>`;
+        });
+        
+        previewHTML += `
+                <div class="mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Form
+                    </button>
+                </div>
+            </form>
+        `;
+        
+        content.innerHTML = previewHTML;
+        modal.show();
+    }
+
+    generatePreviewFieldHTML(fieldData) {
+        let html = `
+            <label class="form-label fw-medium">
+                ${fieldData.label}${fieldData.required ? ' <span class="text-danger">*</span>' : ''}
+            </label>
+        `;
+
+        switch(fieldData.type) {
+            case 'text':
+            case 'email':
+            case 'number':
+            case 'date':
+                html += `<input type="${fieldData.type}" name="${fieldData.name}"
+                               class="form-control" 
+                               placeholder="${fieldData.placeholder || ''}" 
+                               ${fieldData.required ? 'required' : ''}
+                               ${fieldData.maxLength ? `maxlength="${fieldData.maxLength}"` : ''}>`;
+                break;
+                
+            case 'textarea':
+                html += `<textarea name="${fieldData.name}" rows="4"
+                                  class="form-control" 
+                                  placeholder="${fieldData.placeholder || ''}" 
+                                  ${fieldData.required ? 'required' : ''}
+                                  ${fieldData.maxLength ? `maxlength="${fieldData.maxLength}"` : ''}></textarea>`;
+                break;
+                
+            case 'select':
+                html += `<select name="${fieldData.name}" 
+                                class="form-select"
+                                ${fieldData.required ? 'required' : ''}>`;
+                html += '<option value="">Choose an option</option>';
+                if (fieldData.options) {
+                    fieldData.options.forEach(option => {
+                        html += `<option value="${option.value}">${option.label}</option>`;
+                    });
+                }
+                html += `</select>`;
+                break;
+                
+            case 'radio':
+                if (fieldData.options) {
+                    html += '<div>';
+                    fieldData.options.forEach((option, index) => {
+                        html += `
+                            <div class="form-check">
+                                <input type="radio" name="${fieldData.name}" value="${option.value}" 
+                                       id="preview_${fieldData.name}_${index}" class="form-check-input" 
+                                       ${fieldData.required ? 'required' : ''}>
+                                <label class="form-check-label" for="preview_${fieldData.name}_${index}">
+                                    ${option.label}
+                                </label>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                break;
+                
+            case 'checkbox':
+                if (fieldData.options) {
+                    html += '<div>';
+                    fieldData.options.forEach((option, index) => {
+                        html += `
+                            <div class="form-check">
+                                <input type="checkbox" name="${fieldData.name}[]" value="${option.value}" 
+                                       id="preview_${fieldData.name}_${index}" class="form-check-input">
+                                <label class="form-check-label" for="preview_${fieldData.name}_${index}">
+                                    ${option.label}
+                                </label>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                break;
+        }
+
+        return html;
+    }
+
+    saveForm() {
+        const formTitle = document.getElementById('form-title').value;
+        const formDescription = document.getElementById('form-description').value;
+        
+        if (!formTitle) {
+            // Bootstrap toast or alert
+            this.showAlert('Please enter a form title', 'warning');
+            return;
+        }
+        
+        if (this.formData.length === 0) {
+            this.showAlert('Please add at least one field to the form', 'warning');
+            return;
+        }
+        
+        this.updateValidationRules();
+        
+        const formData = {
+            title: formTitle,
+            description: formDescription,
+            form_data: this.formData,
+            validation_rules: this.validationRules,
+            conditional_logic: this.conditionalLogic
+        };
+        
+        // Show loading state
+        const saveBtn = document.getElementById('save-form');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving...';
+        saveBtn.disabled = true;
+        
+        fetch('/form-builder/forms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.form) {
+                this.showAlert('Form saved successfully!', 'success');
+                console.log('Form ID:', data.form.id);
+            } else if (data.errors) {
+                console.error('Validation errors:', data.errors);
+                this.showAlert('Please fix the validation errors and try again.', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            this.showAlert('Error saving form. Please try again.', 'danger');
+        })
+        .finally(() => {
+            // Reset button state
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        });
+    }
+
+    showAlert(message, type) {
+        // Create Bootstrap alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+}
+
+// Initialize the form builder when the page loads
+let formBuilder;
+document.addEventListener('DOMContentLoaded', function() {
+    formBuilder = new FormBuilder();
+});// public/js/form-builder.js
 
 class FormBuilder {
     constructor() {

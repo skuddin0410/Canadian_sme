@@ -3,26 +3,34 @@
 @section('title', $form->title)
 
 @section('content')
-<div class="container mx-auto py-8 px-4">
-    <div class="bg-white rounded-lg shadow-sm border p-6">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">{{ $form->title }}</h1>
-            @if($form->description)
-                <p class="text-gray-600 mt-2">{{ $form->description }}</p>
-            @endif
-        </div>
-        
-        <form id="dynamic-form" data-form-id="{{ $form->id }}">
-            @csrf
-            <div id="form-fields"></div>
-            
-            <div class="mt-6">
-                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-paper-plane me-2"></i>Submit Form
-                </button>
+<div class="container-xxl flex-grow-1 container-p-y pt-0">
+    <div class="row">
+    <div class="col-xl">
+    <div class="card mb-4">
+        <div class="card-body"> 
+        <div class="">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">{{ $form->title }}</h1>
+                @if($form->description)
+                    <p class="text-gray-600 mt-2">{{ $form->description }}</p>
+                @endif
             </div>
-        </form>
+            
+            <form id="dynamic-form" data-form-id="{{ $form->id }}">
+                @csrf
+                <div id="form-fields"></div>
+                
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Form
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+    </div>
+    </div>
+    </div> 
 </div>
 
 <script>
@@ -56,7 +64,6 @@ function createFieldHtml(field) {
             ${field.label}${field.required ? ' <span class="text-red-500">*</span>' : ''}
         </label>
     `;
-
     switch(field.type) {
         case 'text':
         case 'email':
@@ -84,7 +91,7 @@ function createFieldHtml(field) {
             fieldHtml += '<option value="">Choose an option</option>';
             if (field.options) {
                 field.options.forEach(option => {
-                    fieldHtml += `<option value="${option.value}">${option.label}</option>`;
+                    fieldHtml += `<option value="${option}">${option}</option>`;
                 });
             }
             fieldHtml += `</select>`;
@@ -94,11 +101,12 @@ function createFieldHtml(field) {
             if (field.options) {
                 fieldHtml += '<div class="space-y-2">';
                 field.options.forEach((option, index) => {
+                    console.log(option)
                     fieldHtml += `
                         <label class="flex items-center">
                             <input type="radio" name="${field.name}" value="${option.value}" 
                                    class="mr-2" ${field.required ? 'required' : ''}>
-                            ${option.label}
+                            ${option}
                         </label>
                     `;
                 });
@@ -114,7 +122,7 @@ function createFieldHtml(field) {
                         <label class="flex items-center">
                             <input type="checkbox" name="${field.name}[]" value="${option.value}" 
                                    class="mr-2">
-                            ${option.label}
+                            ${option}
                         </label>
                     `;
                 });
