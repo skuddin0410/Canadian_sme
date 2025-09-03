@@ -16,6 +16,7 @@ use App\Models\Session;
 use App\Models\Company;
 
 
+
 if (!function_exists('getCategory')) {
     function getCategory($type=null)
     {
@@ -142,7 +143,7 @@ if (!function_exists('qrCode')) {
                 'email' => $user->email ?? '',
             ]);
             $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
-            $id = $user->id;
+            $timestamp= Carbon\Carbon::now()->timestamp;
         }
 
         if($folder == 'company'){
@@ -153,7 +154,7 @@ if (!function_exists('qrCode')) {
                 'email' => $company->email ?? '',
             ]);
             $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
-            $id = $user->id;
+            $timestamp= Carbon\Carbon::now()->timestamp;
         }
 
         
@@ -168,7 +169,7 @@ if (!function_exists('qrCode')) {
         $renderer = new GDLibRenderer(300); // 300 is the size of the QR code
         $writer = new Writer($renderer);
         $writer->writeFile($data, $filePath);
-        $user->qr_code = 'qrcodes/' . $folder . '_' . $id. '.png';
+        $user->qr_code = 'qrcodes/' . $folder . '_' . $timestamp. '.png';
 
 
         $user->save();
