@@ -11,7 +11,6 @@ Route::prefix('form-builder')->group(function () {
     Route::get('/forms/{id}', [FormBuilderController::class, 'show'])->name('forms.show');
     Route::put('/forms/{id}', [FormBuilderController::class, 'update'])->name('forms.update');
     Route::delete('/forms/{id}', [FormBuilderController::class, 'destroy'])->name('forms.destroy');
-    Route::get('/form/{id}', [FormBuilderController::class, 'showFrontendForm'])->name('form.show');
-    Route::post('/forms/{id}/submit', [FormBuilderController::class, 'submitForm'])->name('forms.submit');
+    
 
 });

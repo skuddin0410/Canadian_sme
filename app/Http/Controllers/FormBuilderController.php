@@ -204,9 +204,9 @@ class FormBuilderController extends Controller
         }
         
     }
-    public function showFrontendForm($id)
+    public function showFrontendForm()
     {
-        $form = Form::where('is_active', true)->findOrFail($id);
+        $form = Form::where('is_active', true)->findOrFail(1);
         return view('formbuilder.showform', compact('form'));
     }
 
