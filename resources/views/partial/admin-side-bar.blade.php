@@ -94,7 +94,7 @@
         </li>
 
 
-         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }} {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('pages*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }}  {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('pages*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
