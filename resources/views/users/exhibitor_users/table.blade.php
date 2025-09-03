@@ -40,8 +40,8 @@
 	<tr>
 		<th>Content Icon</th>
 		<th>Name</th>
+		<th>email</th>
 		<th>Booth ID</th>
-		<th>QR</th> {{-- New QR Download column --}}
 		<th width="20%">Actions</th>
 	</tr>
 </thead>
@@ -63,34 +63,13 @@
 
 	{{-- Company Name --}}
 	<td>{{ $user->name ?? '-' }}</td>
-
+    <td>{{ $user->email ?? '-' }}</td>
 	{{-- Booth ID --}}
 	<td>
-@if($user && $user->boothUsers->count())
-    @foreach($user->boothUsers as $bu)
-        {{ $bu->booth->id ?? '-' }}<br>
-    @endforeach
-@else
-    
-@endif
-
-</td>
+     {{$user->booth?? ''}}
+    </td>
 
 
-	{{-- Download QR --}}
-	<td>
-		
-		@if($user->user && $user->user->qr_code)
-        <a href="{{ route('sponsors.qr.download', $user->user->id) }}" 
-           class="btn btn-sm btn-primary" 
-           title="Download QR">
-             Download QR
-        </a>
-        @else
-          <span class="text-muted">No QRCode Generated Yet</span>
-        @endif
-		
-	</td>
 
 	{{-- Actions --}}
 	<td>

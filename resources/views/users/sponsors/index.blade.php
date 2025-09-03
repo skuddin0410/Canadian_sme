@@ -39,10 +39,6 @@
 
             <!-- Filter -->
             <div class="col-auto">
-                <input type="text" class="form-control form-control-md" name="kyc" id="kyc" 
-                    placeholder="Filter KYC Status">
-            </div>
-            <div class="col-auto">
                 <button type="button" class="btn btn-md btn-primary" id="filter-btn">Filter</button>
             </div>
 
@@ -56,13 +52,6 @@
 
                 <!-- Card Body -->
                 <div class="card-body pt-0">
-                    @if(Session::has('success'))
-                        <div class="alert alert-success">{{ Session::get('success') }}</div>
-                    @endif
-                    @if(Session::has('error'))
-                        <div class="alert alert-danger">{{ Session::get('error') }}</div>
-                    @endif
-
                     <!-- Loading Spinner -->
                     <div class="text-center mb-3">
                         <div class="spinner-border spinner-border-sm" style="display:none;"></div>
