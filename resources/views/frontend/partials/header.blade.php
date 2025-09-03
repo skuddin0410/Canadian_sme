@@ -1,7 +1,7 @@
 <header>
     <nav class="navbar navbar-expand-md bg-transparent p-0">
         <div class="container">
-            <a class="navbar-brand" href="javascript:void()">
+            <a class="navbar-brand" href="{{url('/')}}">
                 <img class="logo" src="{{asset('frontend/images/logo.png')}}" alt="logo">
             </a>
             <div class="d-flex align-items-center">
@@ -18,10 +18,10 @@
                         </li>
                     </ul>
                 </div>
-                <button class="heroBtn ms-md-5" type="submit">
+                <a class="heroBtn ms-md-5" href="{{route('registration')}}">
                     <img class="d-md-none" src="{{asset('frontend/images/login.png')}}" alt="">
                     <span class="d-none d-md-block">Registration</span>
-                </button>
+                </a>
                 <button class="navbar-toggler heroBtn bg-transparent custom-toggler-open ms-3 ms-md-5">
                     <span class="navbar-toggler-icon"></span>
                 </button>

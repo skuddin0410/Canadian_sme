@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class, // php artisan db:seed --class=SettingSeeder
             AccountManagerPermissionSeeder::class,
             TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
-            PagesSeeder::class,
+            PagesSeeder::class, // php artisan db:seed --class=PagesSeeder
             //ProductsCategoriesSeeder::class,
             //ProductsSeeder::class,
             //ProductTechnicalSpecsSeeder::class,

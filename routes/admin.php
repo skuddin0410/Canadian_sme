@@ -14,6 +14,7 @@ use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+    Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
     Route::resource('coupons', App\Http\Controllers\CouponController::class);

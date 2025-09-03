@@ -14,10 +14,10 @@ class SessionAttendee extends Seeder
     public function run(): void
     {
         $sessions = DB::table('event_sessions')->pluck('id')->toArray();
-        $users = DB::table('users')->pluck('id')->toArray();
+        $users = DB::table('users')->where('primary_group','Attendee')->pluck('id')->toArray();
 
         foreach ($sessions as $sessionId) {
-            $attendees = collect($users)->random(15);
+            $attendees = collect($users)->random(6);
             foreach ($attendees as $userId) {
                 DB::table('session_attendees')->insert([
                     'session_id' => $sessionId,

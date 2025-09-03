@@ -50,8 +50,6 @@ class AttendeeUserController extends Controller
             if ($request->filled('search')) {
                 $users = $users->where(function ($query) use ($request) {
                     $query->where('name', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('username', 'LIKE', '%' . $request->search . '%')
-                        //   ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
                           ->orWhere('email', 'LIKE', '%' . $request->search . '%');
                 });
             }
@@ -149,7 +147,7 @@ class AttendeeUserController extends Controller
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
-        $user->secondary_group = implode(',',$request->secondary_group) ?? '';
+        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
         $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
@@ -279,7 +277,7 @@ class AttendeeUserController extends Controller
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
-        $user->secondary_group = implode(',',$request->secondary_group) ?? '';
+        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
         $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;

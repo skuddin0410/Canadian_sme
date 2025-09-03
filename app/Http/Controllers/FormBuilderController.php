@@ -15,8 +15,8 @@ class FormBuilderController extends Controller
      */
     public function index()
     {
-        //
-          return view('formbuilder.index');
+        $form = Form::find(1);;
+        return view('formbuilder.index',compact('form'));
     }
 
     /**
@@ -31,7 +31,8 @@ class FormBuilderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request) : JsonResponse
-    {
+    {   
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -57,7 +58,7 @@ class FormBuilderController extends Controller
     public function show($id)
     {
         $form = Form::findOrFail($id);
-        return view('form-builder.show', compact('form'));
+        return view('formbuilder.show', compact('form'));
 
     }
 
@@ -203,10 +204,10 @@ class FormBuilderController extends Controller
         }
         
     }
-    public function showFrontendForm($id)
-{
-    $form = Form::where('is_active', true)->findOrFail($id);
-    return view('formbuilder.showform', compact('form'));
-}
+    public function showFrontendForm()
+    {
+        $form = Form::where('is_active', true)->findOrFail(1);
+        return view('formbuilder.showform', compact('form'));
+    }
 
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Event;
+use App\Models\Session;
 use App\Models\Setting;
 
 use Validator;
@@ -13,6 +13,8 @@ use Auth;
 use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
+use App\Models\Order;
+use App\Models\Page;
 
 class HomeController extends Controller
 {
@@ -41,12 +43,27 @@ class HomeController extends Controller
             || Auth::user()->hasRole('Support Staff Or Helpdesk')
             || Auth::user()->hasRole('Registration Desk')) {
             
-            $evntCount = Event::count();
-            $userCount = User::with("roles")
+            $evntCount = Session::count();
+            $attendeeCount = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ["Admin"]);
+                    $q->whereNotIn("name", ["Attendee"]);
                 })->count();
+
+            $speakerCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Speaker"]);
+                })->count();  
+
+            $sponsorCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Sponsors"]);
+                })->count();         
             
+            $exhibitorCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Exhibitor"]);
+                })->count();
+            $revenue = Order::sum('amount') ?? 0;
             if(Auth::user()->hasRole('Admin') ){
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
@@ -55,8 +72,7 @@ class HomeController extends Controller
                 $loginlogs = UserLogin::with('user')->where('user_logins.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
             } 
 
-
-            return view('home',compact('evntCount','userCount','logs','loginlogs'));
+            return view('home',compact('evntCount','attendeeCount','speakerCount','sponsorCount','exhibitorCount','revenue','logs','loginlogs'));
         }
 
     }
@@ -247,7 +263,7 @@ class HomeController extends Controller
     }
 
     public function registrationSettings(Request $request){
-        
+
         if($request->mode == 'save'){
                $data = $request->validate([
                 'company_name'     => ['required','string','max:255'],
@@ -257,12 +273,25 @@ class HomeController extends Controller
                 'tax_percentage'   => ['required','numeric','between:0,100'],
                 'company_number'   => ['required','string','max:100'],
                 'privacy_policy'   => ['nullable','string'],
+                'about'   => ['nullable','string'],
                 'terms_conditions' => ['nullable','string'],
                 'thank_you_page'   => ['nullable','string'],
                ]);
 
             foreach ($data as $key => $value) {
                 \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+
+                if($key == 'about'){
+                   Page::where('slug','about')->update(['description' => $value]);
+                }
+
+                if($key == 'privacy_policy'){
+                   Page::where('slug','privacy')->update(['description' => $value]);
+                }
+
+                if($key == 'terms_conditions'){
+                   Page::where('slug','terms')->update(['description' => $value]);
+                }
             } 
             session()->flash('success', 'Saved successfully.');
 
