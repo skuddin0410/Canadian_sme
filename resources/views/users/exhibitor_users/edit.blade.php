@@ -159,7 +159,7 @@
                          class="form-control" 
                          name="company_phone" 
                          value="{{ old('company_phone', $user->phone) }}" 
-                         placeholder="Company Phone" required>
+                         placeholder="Company Phone">
                   @error('company_phone') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>
