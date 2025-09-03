@@ -116,5 +116,13 @@ class Company extends Model
             ->where('file_type', 'files')
             ->whereNotNull('file_name');
     }
+    
+      public function Docs()
+    {
+        return $this->hasMany(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'companies')
+            ->where('file_type', 'private_docs')
+            ->whereNotNull('file_name');
+    }
 
 }
