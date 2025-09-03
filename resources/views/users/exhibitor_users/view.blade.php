@@ -120,31 +120,46 @@
     <div class="card-body">
         @if($company->Docs && $company->Docs->count() > 0)
             <div class="row g-3">
-                @foreach($company->Docs as $doc)
-                    <div class="col-md-4 text-center">
-                        <div class="card p-2 shadow-sm">
-                            @if(Str::endsWith($doc->file_path, ['.png', '.jpg', '.jpeg']))
-                                <img src="{{ $doc->file_path }}"
-                                     alt="Document"
-                                     class="img-fluid rounded mb-2"
-                                     style="max-height: 200px; object-fit: contain;">
-                            @elseif(Str::endsWith($doc->file_path, '.pdf'))
-                                <a href="{{$doc->file_path }}" target="_blank">
-                                    <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 4rem;"></i>
-                                </a>
-                            @elseif(Str::endsWith($doc->file_path, ['.doc', '.docx']))
-                                <a href="{{$doc->file_path }}" target="_blank">
-                                    <i class="bi bi-file-earmark-word text-primary" style="font-size: 4rem;"></i>
-                                </a>
-                            @else
-                                <a href="{{ $doc->file_path }}" target="_blank">
-                                    <i class="bi bi-file-earmark-text" style="font-size: 4rem;"></i>
-                                </a>
-                            @endif
-                            <p class="mt-2 text-truncate">{{ $doc->file_name }}</p>
-                        </div>
-                    </div>
-                @endforeach
+               @foreach($company->Docs as $doc)
+    <div class="col-md-4 text-center">
+        <div class="card p-2 shadow-sm position-relative doc-card">
+
+            {{-- Delete Button (hidden by default, visible on hover) --}}
+            <form action="{{ route('exhibitor.deleteDoc', $doc->id) }}" method="POST" 
+                  class="position-absolute top-0 end-0 m-1 delete-form"
+                  onsubmit="return confirm('Are you sure you want to delete this document?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger rounded-circle delete-btn">
+                    &times;
+                </button>
+            </form>
+
+            {{-- File Preview --}}
+            @if(Str::endsWith($doc->file_path, ['.png', '.jpg', '.jpeg']))
+                <img src="{{ asset($doc->file_path) }}"
+                     alt="Document"
+                     class="img-fluid rounded mb-2"
+                     style="max-height: 200px; object-fit: contain;">
+            @elseif(Str::endsWith($doc->file_path, '.pdf'))
+                <a href="{{ asset($doc->file_path) }}" target="_blank">
+                    <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 4rem;"></i>
+                </a>
+            @elseif(Str::endsWith($doc->file_path, ['.doc', '.docx']))
+                <a href="{{ asset($doc->file_path) }}" target="_blank">
+                    <i class="bi bi-file-earmark-word text-primary" style="font-size: 4rem;"></i>
+                </a>
+            @else
+                <a href="{{ asset($doc->file_path) }}" target="_blank">
+                    <i class="bi bi-file-earmark-text" style="font-size: 4rem;"></i>
+                </a>
+            @endif
+
+            <p class="mt-2 text-truncate">{{ $doc->file_name }}</p>
+        </div>
+    </div>
+@endforeach
+
             </div>
         @else
             <p class="text-muted">No documents uploaded yet.</p>
@@ -157,6 +172,23 @@
  
     </div>
 </div>
+<style>
+    .delete-btn {
+        display: none;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        line-height: 1;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    /* Fix: target .doc-card instead of .gallery-card */
+    .doc-card:hover .delete-btn {
+        display: inline-block;
+    }
+</style>
+
 @endsection
 
 
@@ -221,4 +253,5 @@
         });
     }
 </script>
+
 @endsection

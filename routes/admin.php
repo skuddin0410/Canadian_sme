@@ -32,8 +32,18 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/event-tracks/create', [EventTrackController::class, 'create'])->name('event-tracks.create');
     // Store new event track
     Route::post('/event-tracks', [EventTrackController::class, 'store'])->name('event-tracks.store');
+ 
+     Route::get('/event-guides/gallery', [EventGuideController::class, 'showGallery'])
+    ->name('event-guides.showGallery');
+    Route::post('/event-guides/gallery/upload', [EventGuideController::class, 'uploadGallery'])->name('event-guides.uploadGallery');
+
+  Route::delete('event-guides/delete-gallery-image', [EventGuideController::class, 'deleteGalleryImage'])->name('event-guides.deleteGalleryImage');
+
+
+
 
     Route::resource('event-guides', EventGuideController::class);
+   
 
     Route::get('/role-permission-matrix', [App\Http\Controllers\RoleController::class, 'matrix'])->name('roles.matrix');
     Route::post('/assign-permission', [App\Http\Controllers\RoleController::class, 'assignPermission'])->name('roles.assign.permission');
@@ -61,6 +71,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
      Route::post('/exhibitor/{companyId}/upload-docs', [ExhibitorUserController::class, 'uploadDocs'])->name('exhibitor.uploadDocs');
      Route::delete('/exhibitors/docs/{id}', [ExhibitorUserController::class, 'deleteDoc'])
     ->name('exhibitor.deleteDoc');
+    
 
       Route::get('/sponsors/export', [SponsorsController::class, 'exportSponsors'])
     ->name('sponsors.export');

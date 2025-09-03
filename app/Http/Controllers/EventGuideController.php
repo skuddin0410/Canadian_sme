@@ -215,4 +215,78 @@ public function store(Request $request)
         return back()->with('success', 'EventGuide deleted successfully.');
         
     }
+
+public function showGallery()
+{
+    $filePath = storage_path("app/public/event_guides/gallery.json");
+
+    $images = file_exists($filePath)
+        ? json_decode(file_get_contents($filePath), true)
+        : [];
+
+    return view('event_guide.gallery', compact('images'));
+}
+
+public function uploadGallery(Request $request)
+{
+    $request->validate([
+        'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    $paths = [];
+
+    foreach ($request->file('images') as $image) {
+        // Store file in storage/app/public/event_guides
+        $path = $image->store('event_guides', 'public');
+        $paths[] = $path; // e.g. "event_guides/abc.jpg"
+    }
+
+    $filePath = storage_path("app/public/event_guides/gallery.json");
+
+    $existing = file_exists($filePath)
+        ? json_decode(file_get_contents($filePath), true)
+        : [];
+
+    $merged = array_merge($existing, $paths);
+
+    file_put_contents($filePath, json_encode($merged));
+
+    return redirect()->route('event-guides.showGallery')->with('success', 'Images uploaded successfully.');
+}
+
+  
+public function deleteGalleryImage(Request $request)
+{
+    $request->validate([
+        'image' => 'required|string',
+    ]);
+
+    $image = $request->image;
+
+    $filePath = storage_path("app/public/event_guides/gallery.json");
+
+    // Load existing images
+    $images = file_exists($filePath)
+        ? json_decode(file_get_contents($filePath), true)
+        : [];
+
+    // Remove from array
+    $updated = array_filter($images, fn($img) => $img !== $image);
+
+    // Save updated JSON
+    file_put_contents($filePath, json_encode(array_values($updated)));
+
+    // Delete file from storage
+    if (Storage::disk('public')->exists($image)) {
+        Storage::disk('public')->delete($image);
+    }
+
+    return redirect()->route('event-guides.showGallery')->with('success', 'Image deleted successfully.');
+}
+
+
+
+
+
+
 }

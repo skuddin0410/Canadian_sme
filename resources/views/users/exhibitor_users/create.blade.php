@@ -26,7 +26,7 @@
   {{-- Content Icon --}}
   <div class="col-md-6">
     <div class="mb-3">
-      <label class="form-label">Content Icon</label>
+      <label class="form-label">Logo</label>
 
       @php
         $contentIconFile = !empty($company?->contentIconFile) && !empty($company->contentIconFile->file_path);
@@ -79,7 +79,7 @@
   {{-- Quick Link Icon --}}
   <div class="col-md-6">
     <div class="mb-3">
-      <label class="form-label">Quick Link Icon</label>
+      <label class="form-label">Banner</label>
 
       @php
         $quickLinkFile = !empty($company?->quickLinkIconFile) && !empty($company->quickLinkIconFile->file_path);

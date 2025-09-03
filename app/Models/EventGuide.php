@@ -23,4 +23,12 @@ class EventGuide extends Model
             ->where('table_type', 'event_guides')
             ->where('file_type', 'doc');
     }
+    public function galleryImages()
+{
+    return $this->hasMany(Drive::class, 'table_id', 'id')
+        ->where('table_type', 'event_guides')
+        ->where('file_type', 'gallery')
+        ->whereNotNull('file_name');
+}
+
 }

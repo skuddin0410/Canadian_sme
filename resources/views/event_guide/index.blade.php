@@ -14,6 +14,11 @@
 				    <h5 class="mb-0">Event Guide Lists</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
 						<div class="dt-buttons"> 
+                            <a href="{{route('event-guides.showGallery')}}" class="dt-button create-new btn btn-primary">
+								<span><i class="bx bx-plus me-sm-1"></i> 
+									<span class="d-none d-sm-inline-block">Add Gallery</span>
+								</span>
+							</a>
 							<a href="{{ route('event-guides.create') }}" class="dt-button create-new btn btn-primary">
 								<span><i class="bx bx-plus me-sm-1"></i> 
 									<span class="d-none d-sm-inline-block">Add Event Guide</span>

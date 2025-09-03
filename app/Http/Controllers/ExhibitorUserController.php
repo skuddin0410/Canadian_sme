@@ -302,51 +302,6 @@ public function show(User $exhibitor_user, Request $request){
 
         return redirect()->route('exhibitor-users.show', ['exhibitor_user' => $company->id])->with('success', 'Booth assigned successfully.');
     }
-//     public function uploadDocs(Request $request, $companyId)
-// {
-//     $request->validate([
-//         'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
-//     ]);
-
-//     $company = Company::findOrFail($companyId);
-
-//     if ($request->hasFile('private_docs')) {
-//         foreach ($request->file('private_docs') as $file) {
-//             $path = $file->store("companies/{$company->id}/Docs", 'public');
-
-           
-//             $company->docs()->create([
-//                 'file_path' => "storage/{$path}"
-//             ]);
-//         }
-//     }
-
-//     return redirect()->back()->with('success', 'Documents uploaded successfully.');
-// }
-    
-
-// public function uploadDocs(Request $request, $companyId)
-// {
-//     $request->validate([
-//         'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
-//     ]);
-
-//     $company = Company::findOrFail($companyId);
-
-//     if ($request->hasFile('private_docs')) {
-//         foreach ($request->file('private_docs') as $file) {
-//             $path = $file->store("companies/{$company->id}/docs", 'public');
-
-         
-//             $company->Docs()->create([
-//                 'file_name'  => $file->getClientOriginalName(),
-//                 'file_path'  => Storage::url($path), 
-//             ]);
-//         }
-//     }
-
-//     return redirect()->back()->with('success', 'Documents uploaded successfully.');
-// }
   public function uploadDocs(Request $request, $companyId)
 {
     $request->validate([
