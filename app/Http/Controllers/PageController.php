@@ -120,7 +120,7 @@ class PageController extends Controller
      */
     public function show(Page $page)
     {   
-        $page = Page::with(['category','photo'])->find($page->id);
+        $page = Page::find($page->id);
         return view('pages.view',['page'=>$page]);
     }
 
@@ -187,5 +187,20 @@ class PageController extends Controller
         $page->delete();
         return redirect(route('pages.index'))
                             ->withSuccess('Page deleted successfully');
+    }
+
+
+    public function webview(Request $request){
+        if($request->webview == 'landing'){
+            $view = Page::where('slug','landing')->first();
+        } 
+        return view('webview');
+    }
+
+    public function publicPage(Request $request, $slug){
+        $page = Page::where('slug', $slug)->firstOrFail();
+        $property = [];
+        $view = 'frontend.cms'; 
+        return view($view,compact('page'));
     }
 }

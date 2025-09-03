@@ -28,6 +28,13 @@
         T&amp;C
       </button>
     </li>
+
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="false">
+       About
+      </button>
+    </li>
+
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="thankyou-tab" data-bs-toggle="tab" data-bs-target="#thankyou" type="button" role="tab" aria-controls="thankyou" aria-selected="false">
         Thank You Page
@@ -86,6 +93,13 @@
       <label for="terms_conditions" class="form-label">Terms &amp; Conditions Content</label>
       <p><a href="{{ config('app.url')}}terms_conditions"/>{{ config('app.url')}}terms_conditions </a></p>
       <textarea class="form-control" id="terms_conditions" name="terms_conditions" rows="12" placeholder="Paste or write your Terms & Conditions here...">{{getKeyValue('terms_conditions')->value}}</textarea>
+    </div>
+
+    <!-- about -->
+    <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab" tabindex="0">
+      <label for="about" class="form-label">About</label>
+      <p><a href="{{ config('app.url')}}about"/>{{ config('app.url')}}about </a></p>
+      <textarea class="form-control" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{getKeyValue('about')->value}}</textarea>
     </div>
 
     <!-- Thank You Page -->
