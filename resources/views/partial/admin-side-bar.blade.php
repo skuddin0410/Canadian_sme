@@ -209,11 +209,11 @@
                
 
             
-                <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
                     <a href="{{ route('roles.matrix') }}" class="menu-link">
                         <div data-i18n="audit">Roles</div>
                     </a>
-                </li>
+                </li> --}}
                 
             </ul>
         </li>
