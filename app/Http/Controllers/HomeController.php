@@ -14,6 +14,7 @@ use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
 use App\Models\Order;
+use App\Models\Page;
 
 class HomeController extends Controller
 {
@@ -262,7 +263,7 @@ class HomeController extends Controller
     }
 
     public function registrationSettings(Request $request){
-        
+
         if($request->mode == 'save'){
                $data = $request->validate([
                 'company_name'     => ['required','string','max:255'],
@@ -272,12 +273,25 @@ class HomeController extends Controller
                 'tax_percentage'   => ['required','numeric','between:0,100'],
                 'company_number'   => ['required','string','max:100'],
                 'privacy_policy'   => ['nullable','string'],
+                'about'   => ['nullable','string'],
                 'terms_conditions' => ['nullable','string'],
                 'thank_you_page'   => ['nullable','string'],
                ]);
 
             foreach ($data as $key => $value) {
                 \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+
+                if($key == 'about'){
+                   Page::where('slug','about')->update(['description' => $value]);
+                }
+
+                if($key == 'privacy_policy'){
+                   Page::where('slug','privacy')->update(['description' => $value]);
+                }
+
+                if($key == 'terms_conditions'){
+                   Page::where('slug','terms')->update(['description' => $value]);
+                }
             } 
             session()->flash('success', 'Saved successfully.');
 
