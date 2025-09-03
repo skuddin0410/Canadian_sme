@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Event;
+use App\Models\Session;
 use App\Models\Setting;
 
 use Validator;
@@ -13,6 +13,7 @@ use Auth;
 use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
+use App\Models\Order;
 
 class HomeController extends Controller
 {
@@ -41,12 +42,27 @@ class HomeController extends Controller
             || Auth::user()->hasRole('Support Staff Or Helpdesk')
             || Auth::user()->hasRole('Registration Desk')) {
             
-            $evntCount = Event::count();
-            $userCount = User::with("roles")
+            $evntCount = Session::count();
+            $attendeeCount = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ["Admin"]);
+                    $q->whereNotIn("name", ["Attendee"]);
                 })->count();
+
+            $speakerCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Speaker"]);
+                })->count();  
+
+            $sponsorCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Sponsors"]);
+                })->count();         
             
+            $exhibitorCount = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereNotIn("name", ["Exhibitor"]);
+                })->count();
+            $revenue = Order::sum('amount') ?? 0;
             if(Auth::user()->hasRole('Admin') ){
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
@@ -55,8 +71,7 @@ class HomeController extends Controller
                 $loginlogs = UserLogin::with('user')->where('user_logins.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
             } 
 
-
-            return view('home',compact('evntCount','userCount','logs','loginlogs'));
+            return view('home',compact('evntCount','attendeeCount','speakerCount','sponsorCount','exhibitorCount','revenue','logs','loginlogs'));
         }
 
     }
