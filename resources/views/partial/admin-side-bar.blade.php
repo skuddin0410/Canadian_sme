@@ -94,7 +94,7 @@
         </li>
 
 
-         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }}  {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('pages*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }}  {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('webview*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('event-guides*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
@@ -138,12 +138,12 @@
                         </a>
                     </li>
 
-                    <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
-                        <a href="{{ route('pages.index') }}" class="menu-link">
+                    <li class="menu-item {{ request()->is('webview*') ? 'active open' : '' }}">
+                        <a href="{{ route('webview') }}" class="menu-link">
                             <div data-i18n="Coupons">Webview</div>
                         </a>
                     </li>
-                     <li class="menu-item {{ request()->is('pages*') ? 'active open' : '' }}">
+                     <li class="menu-item {{ request()->is('event-guides*') ? 'active open' : '' }}">
                         <a href="{{ url('event-guides') }}" class="menu-link">
                             <div data-i18n="Coupons">Event Guide</div>
                         </a>

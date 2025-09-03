@@ -188,4 +188,14 @@ class PageController extends Controller
         return redirect(route('pages.index'))
                             ->withSuccess('Page deleted successfully');
     }
+
+
+    public function webview(Request $request){
+        if($request->webview == 'landing'){
+            $view = Page::where('slug','landing')->first();
+
+            //dd($view,$request->all());
+        } 
+        return view('webview');
+    }
 }
