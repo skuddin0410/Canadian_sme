@@ -189,12 +189,19 @@
 
 @section('scripts')
 <script>
+    // Add this debugging version to your script section to identify the issue
+
 (function(){
     const form = document.getElementById('dynamic-form');
     const alertBox = document.getElementById('form-alert');
     const submitBtn = document.getElementById('submit-btn');
     const btnText = submitBtn.querySelector('.btn-text');
     const btnSpin = submitBtn.querySelector('.spinner-border');
+
+    // Debug: Check if elements exist
+    console.log('Form element:', form);
+    console.log('Alert box:', alertBox);
+    console.log('Submit button:', submitBtn);
 
     const showAlert = (msg, type='success') => {
         alertBox.className = `alert alert-${type}`;
@@ -305,13 +312,18 @@
 
     form.addEventListener('submit', async function(e){
         e.preventDefault();
+        console.log('Form submit event triggered');
+        
         clearAlert();
 
         if (!form.checkValidity()) {
+            console.log('Form validation failed');
             form.classList.add('was-validated');
             showAlert('Please correct the highlighted fields and try again.', 'warning');
             return;
         }
+
+        console.log('Form validation passed');
 
         const fd = new FormData(form);
         const payload = {};
@@ -324,8 +336,15 @@
             }
         });
 
+        console.log('Payload to send:', payload);
+        console.log('Route URL:', "{{ route('forms.submit', $form->id) }}");
+        console.log('CSRF Token:', '{{ csrf_token() }}');
+
         setSubmitting(true);
+        
         try {
+            console.log('Making fetch request...');
+            
             const res = await fetch("{{ route('forms.submit', $form->id) }}", {
                 method: 'POST',
                 headers: {
@@ -336,7 +355,16 @@
                 body: JSON.stringify(payload)
             });
 
-            const result = await res.json().catch(() => ({}));
+            console.log('Response received:', res);
+            console.log('Response status:', res.status);
+            console.log('Response ok:', res.ok);
+
+            const result = await res.json().catch((err) => {
+                console.error('JSON parse error:', err);
+                return {};
+            });
+
+            console.log('Parsed result:', result);
 
             if (res.ok) {
                 showAlert('Form submitted successfully!', 'success');
@@ -348,15 +376,186 @@
                 showAlert(msg, 'danger');
             }
         } catch (err) {
+            console.error('Fetch error:', err);
             showAlert('Something went wrong. Please try again.', 'danger');
-            console.error(err);
         } finally {
             setSubmitting(false);
         }
     });
 
+    // Debug: Check if event listener is attached
+    console.log('Form submit event listener attached');
+
     initConditionalLogic();
 })();
+// (function(){
+//     const form = document.getElementById('dynamic-form');
+//     const alertBox = document.getElementById('form-alert');
+//     const submitBtn = document.getElementById('submit-btn');
+//     const btnText = submitBtn.querySelector('.btn-text');
+//     const btnSpin = submitBtn.querySelector('.spinner-border');
+
+//     const showAlert = (msg, type='success') => {
+//         alertBox.className = `alert alert-${type}`;
+//         alertBox.textContent = msg;
+//         alertBox.classList.remove('d-none');
+//         alertBox.scrollIntoView({behavior: 'smooth', block: 'center'});
+//     };
+
+//     const clearAlert = () => {
+//         alertBox.className = 'alert d-none';
+//         alertBox.textContent = '';
+//     };
+
+//     const setSubmitting = (is) => {
+//         submitBtn.disabled = is;
+//         btnText.classList.toggle('d-none', is);
+//         btnSpin.classList.toggle('d-none', !is);
+//     };
+
+//     const slug = (s='') => (s || '')
+//         .toString()
+//         .normalize('NFKD').replace(/[\u0300-\u036F]/g, '')
+//         .toLowerCase()
+//         .replace(/[^a-z0-9]+/g,'_')
+//         .replace(/^_+|_+$/g,'')
+//         .replace(/_+/g,'_');
+
+//     const toggleWrapper = (wrap, show) => {
+//         wrap.classList.toggle('d-none', !show);
+//         wrap.querySelectorAll('input, select, textarea').forEach(el => {
+//             el.disabled = !show;
+//             if (!show) {
+//                 if (el.type === 'radio' || el.type === 'checkbox') el.checked = false;
+//                 else el.value = '';
+//             }
+//         });
+//     };
+
+//     const initConditionalLogic = () => {
+//         const wrappers = [...document.querySelectorAll('.field-wrapper[data-logic]')];
+//         const sourcesMap = {};
+
+//         wrappers.forEach(wrap => {
+//             try {
+//                 const logic = JSON.parse(wrap.dataset.logic || 'null');
+//                 if (!logic || !logic.condition || logic.condition === 'none') return;
+
+//                 const sf = logic.source_field || '';
+//                 const dash = sf.indexOf('-');
+//                 const srcLabel = dash >= 0 ? sf.slice(dash + 1) : sf;
+//                 const srcName = slug(srcLabel);
+
+//                 if (!sourcesMap[srcName]) sourcesMap[srcName] = [];
+//                 sourcesMap[srcName].push({wrap, logic, srcName});
+//             } catch(e){ console.error(e); }
+//         });
+
+//         Object.keys(sourcesMap).forEach(srcName => {
+//             const targets = sourcesMap[srcName];
+
+//             const listener = () => {
+//                 const curVal = getFieldValue(srcName);
+//                 targets.forEach(({wrap, logic}) => {
+//                     const ok = evalOp(curVal, logic.operator, logic.value);
+//                     const shouldShow = logic.condition === 'show' ? ok : !ok;
+//                     toggleWrapper(wrap, shouldShow);
+//                 });
+//             };
+
+//             const elems = document.querySelectorAll(`[name="${srcName}"], [name="${srcName}[]"]`);
+//             elems.forEach(el => {
+//                 el.addEventListener('change', listener);
+//                 if (['text','email','number','date','textarea'].includes((el.type||el.tagName).toLowerCase())) {
+//                     el.addEventListener('input', listener);
+//                 }
+//             });
+
+//             listener(); // run once
+//         });
+//     };
+
+//     const getFieldValue = (name) => {
+//         const el = document.querySelector(`[name="${name}"], [name="${name}[]"]`);
+//         if (!el) return null;
+//         if (el.type === 'checkbox') {
+//             return [...document.querySelectorAll(`[name="${name}[]"]:checked`)].map(e => e.value);
+//         } else if (el.type === 'radio') {
+//             const checked = document.querySelector(`[name="${name}"]:checked`);
+//             return checked ? checked.value : null;
+//         } else {
+//             return el.value;
+//         }
+//     };
+
+//     const evalOp = (val, operator, compare) => {
+//         switch(operator){
+//             case '==': return val == compare;
+//             case '!=': return val != compare;
+//             case '>': return val > compare;
+//             case '<': return val < compare;
+//             case '>=': return val >= compare;
+//             case '<=': return val <= compare;
+//             case 'in': return (Array.isArray(compare) ? compare : [compare]).includes(val);
+//             case 'not_in': return !(Array.isArray(compare) ? compare : [compare]).includes(val);
+//             default: return false;
+//         }
+//     };
+
+//     form.addEventListener('submit', async function(e){
+//         e.preventDefault();
+//         clearAlert();
+
+//         if (!form.checkValidity()) {
+//             form.classList.add('was-validated');
+//             showAlert('Please correct the highlighted fields and try again.', 'warning');
+//             return;
+//         }
+
+//         const fd = new FormData(form);
+//         const payload = {};
+//         fd.forEach((value, key) => {
+//             if (payload[key] !== undefined) {
+//                 if (Array.isArray(payload[key])) payload[key].push(value);
+//                 else payload[key] = [payload[key], value];
+//             } else {
+//                 payload[key] = value;
+//             }
+//         });
+
+//         setSubmitting(true);
+//         try {
+//             const res = await fetch("{{ route('forms.submit', $form->id) }}", {
+//                 method: 'POST',
+//                 headers: {
+//                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+//                     'Accept': 'application/json',
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: JSON.stringify(payload)
+//             });
+
+//             const result = await res.json().catch(() => ({}));
+
+//             if (res.ok) {
+//                 showAlert('Form submitted successfully!', 'success');
+//                 form.reset();
+//                 form.classList.remove('was-validated');
+//                 initConditionalLogic();
+//             } else {
+//                 const msg = result?.errors ? JSON.stringify(result.errors) : (result?.message || 'Submission failed.');
+//                 showAlert(msg, 'danger');
+//             }
+//         } catch (err) {
+//             showAlert('Something went wrong. Please try again.', 'danger');
+//             console.error(err);
+//         } finally {
+//             setSubmitting(false);
+//         }
+//     });
+
+//     initConditionalLogic();
+// })();
 </script>
 
 {{-- Additional CSS for better fieldset styling --}}

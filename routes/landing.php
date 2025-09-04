@@ -10,10 +10,11 @@ Route::get('/', [LandingController::class, 'index'])->name('front.landing');
 Route::get('/page/{slug}', [PageController::class, 'publicPage'])->name('public.page');
 Route::get('/registration', [FormBuilderController::class, 'showFrontendForm'])->name('registration');
 
-Route::prefix('form-builder')->group(function () {
+// Route::prefix('form-builder')->group(function () {
   Route::post('/forms/{id}/submit', [FormBuilderController::class, 'submitForm'])->name('forms.submit');
-});
+// });
 
-Route::get('/profile', [LandingController::class, 'profile'])->name('profile');
+Route::get('/profile/{id}', [LandingController::class, 'profile'])->name('profile');
+Route::get('/attendees', [LandingController::class, 'attendees'])->name('attendees');
 
 Route::get('/session', [LandingController::class, 'session'])->name('session');

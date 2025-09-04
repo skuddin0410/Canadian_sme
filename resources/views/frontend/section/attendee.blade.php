@@ -42,7 +42,7 @@
                             </div>
                             <div>
                                 <a class="view-more position-relative d-flex
-                                align-items-center gap-2" href="{{route('profile')}}">
+                                align-items-center gap-2" href="{{route('profile', $attendee->id)}}">
                                     View More
                                 </a>
                             </div>
