@@ -310,10 +310,10 @@ class JWTAuthController extends Controller
             'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
             'image_url' => !empty($user->photo) ? $user->photo->file_path : '' ,
             'roles'     => $user->getRoleNames(),
-            'company_about_page'  => config('app.url').'page/about',
-            'company_location_page'    => config('app.url').'page/location',
-            'company_privacy_policy_page' => config('app.url').'page/privacy',
-            'company_terms_of_service_page' => config('app.url').'page/terms',
+            'company_about_page'  => config('app.url').'app/page/about',
+            'company_location_page'    => config('app.url').'app/page/location',
+            'company_privacy_policy_page' => config('app.url').'app/page/privacy',
+            'company_terms_of_service_page' => config('app.url').'app/page/terms',
         ]);
 
 
