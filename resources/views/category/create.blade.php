@@ -14,17 +14,6 @@
           <h5 class="mb-0">Category Or Tag @if(!empty($category)) Update @else Create @endif</h5>
         </div>
         <div class="card-body">
-          @if(Session::has('success'))
-              <div class="alert alert-success">
-              {{ Session::get('success') }}
-              </div>
-          @endif
-          @if(Session::has('error'))
-              <div class="alert alert-danger">
-              {{ Session::get('error') }}
-              </div>
-          @endif
-       
           @if(!empty($category))
              <form  action="{{route('categories.update',["category"=>$category->id])}}" method="POST" enctype="multipart/form-data">
           @else
@@ -73,13 +62,21 @@
             <select name="type" id="type" 
                     class="form-select @error('type') is-invalid @enderror" required>
                 <option value="">-- Select Type --</option>
-                <option value="events" {{ old('type') == 'events' ? 'selected' : '' }}>Events</option>
-                <option value="tags" {{ old('type') == 'tags' ? 'selected' : '' }}>Tags</option>
+                <option value="events" {{ old('type', $category->type ?? '') == 'events' ? 'selected' : '' }}>Events</option>
+                <option value="tags" {{ old('type', $category->type ?? '') == 'tags' ? 'selected' : '' }}>Tags</option>
+
+                <option value="sponsor" {{ old('type', $category->type ?? '') == 'sponsor' ? 'selected' : '' }}>Sponsor</option>
             </select>
             @error('type')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
+
+          <div class="mb-3" id="extraSection" style="display:none; margin-top:10px; padding:10px; border:1px solid #ccc;">
+            <label for="color" class="form-label">Theme Color</label>
+            <input type="color" class="form-control form-control-color" 
+                   id="color" name="color" value="{{$category->color ?? '#0d6efd'}}" title="Choose your color">
+          </div>
 
 
             @if(!empty($category))
@@ -119,5 +116,21 @@ function slugify(str) {
            .replace(/-+/g, '-'); // remove consecutive hyphens
   return str.replace(/^-+|-+$/g, '');
 }
-</script
+</script>
+
+<script>
+  let section = document.getElementById('extraSection');
+  @if(!empty($category) && $category->type == 'sponsor')
+    section.style.display = 'block';
+  @endif
+
+  document.getElementById('type').addEventListener('change', function() {
+    
+      if (this.value === 'sponsor') {
+        section.style.display = 'block';
+      } else {
+        section.style.display = 'none';
+      }
+  });
+</script>
 @endsection
