@@ -92,28 +92,28 @@
 
       <label for="privacy_policy" class="form-label">Privacy Policy Content</label>
       <p><a href="{{ config('app.url')}}privacy_policy"/>{{ config('app.url')}}privacy_policy</a> </p>
-      <textarea class="form-control" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write your Privacy Policy here...">{{getKeyValue('privacy_policy')->value}}</textarea>
+      <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write your Privacy Policy here...">{{getKeyValue('privacy_policy')->value}}</textarea>
     </div>
 
     <!-- Terms & Conditions -->
     <div class="tab-pane fade" id="terms" role="tabpanel" aria-labelledby="terms-tab" tabindex="0">
       <label for="terms_conditions" class="form-label">Terms &amp; Conditions Content</label>
       <p><a href="{{ config('app.url')}}terms_conditions"/>{{ config('app.url')}}terms_conditions </a></p>
-      <textarea class="form-control" id="terms_conditions" name="terms_conditions" rows="12" placeholder="Paste or write your Terms & Conditions here...">{{getKeyValue('terms_conditions')->value}}</textarea>
+      <textarea class="form-control description-cls" id="terms_conditions" name="terms_conditions" rows="12" placeholder="Paste or write your Terms & Conditions here...">{{getKeyValue('terms_conditions')->value}}</textarea>
     </div>
 
     <!-- about -->
     <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab" tabindex="0">
       <label for="about" class="form-label">About</label>
       <p><a href="{{ config('app.url')}}about"/>{{ config('app.url')}}about </a></p>
-      <textarea class="form-control" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{getKeyValue('about')->value}}</textarea>
+      <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{getKeyValue('about')->value}}</textarea>
     </div>
 
      <!-- about -->
     <div class="tab-pane fade" id="location" role="tabpanel" aria-labelledby="location-tab" tabindex="0">
       <label for="location" class="form-label">Location</label>
       <p><a href="{{ config('app.url')}}location"/>{{ config('app.url')}}location </a></p>
-      <textarea class="form-control" id="location" name="location" rows="12" placeholder="Paste or write location us here...">{{getKeyValue('location')->value}}</textarea>
+      <textarea class="form-control description-cls" id="location" name="location" rows="12" placeholder="Paste or write location us here...">{{getKeyValue('location')->value}}</textarea>
     </div>
 
 
