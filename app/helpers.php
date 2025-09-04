@@ -134,7 +134,7 @@ if (!function_exists('qrCode')) {
         if (!file_exists(public_path('qrcodes'))) {
             mkdir(public_path('qrcodes'), 0755, true);
         }
-
+        $timestamp= Carbon\Carbon::now()->timestamp;
         if($folder == 'user'){
             $user = User::findOrFail($id);
             $data = json_encode([
@@ -142,8 +142,7 @@ if (!function_exists('qrCode')) {
                 'name' => $user->full_name ?? '',
                 'email' => $user->email ?? '',
             ]);
-            $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
-            $timestamp= Carbon\Carbon::now()->timestamp;
+            $fileName = 'qrcodes/'.$folder.'_'. $timestamp . '.png';
         }
 
         if($folder == 'company'){
@@ -153,8 +152,8 @@ if (!function_exists('qrCode')) {
                 'name' => $company->name ?? '',
                 'email' => $company->email ?? '',
             ]);
-            $fileName = 'qrcodes/'.$folder.'_'. $user->id . '.png';
-            $timestamp= Carbon\Carbon::now()->timestamp;
+            $fileName = 'qrcodes/'.$folder.'_'. $timestamp . '.png';
+            
         }
 
         

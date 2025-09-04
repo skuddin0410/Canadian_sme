@@ -171,7 +171,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function usercompany()
     {
-        return $this->hasOne(Company::class,'user_id','id');
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     protected function approvalStatusLabel(): Attribute
