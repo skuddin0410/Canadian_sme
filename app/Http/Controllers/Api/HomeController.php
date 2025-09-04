@@ -26,14 +26,14 @@ class HomeController extends Controller
         "title" => $featuredEvent->title,
         "description" => $featuredEvent->description,
         "location" => $featuredEvent->location,
-        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : url('images/default_event.jpg'),
+        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : asset('images/default.png'),
         "videoUrl" => $featuredEvent->youtube_link ?? '',
         "startTime" => $featuredEvent->start_date?->toIso8601String(),
         "endTime" => $featuredEvent->end_date?->toIso8601String(),
         "status" => $featuredEvent->status,
     ] : [
         "title" => "No Featured Event Available",
-        "imageUrl" => url('images/default_event.jpg'),
+        "imageUrl" => asset('images/default.png'),
     ];
 
     // ================= Upcoming Session =================
@@ -88,7 +88,7 @@ class HomeController extends Controller
         return [
             "id" => $user->id,
             "name" => $user->full_name ?? $user->name,
-            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :url('images/default_avatar.png')
+            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :asset('images/default.png')
         ];
     });
 
@@ -146,7 +146,7 @@ public function getNotifications(Request $request)
     
     $isSpeaker = $user->hasRole('Speaker');
     $photo = $user->photo;
-    $userPhoto = !empty($user->photo) ? $user->photo->file_path : '';
+    $userPhoto = !empty($user->photo) ? $user->photo->file_path : asset('images/default.png');
     
     $notifications = GeneralNotification::query()
         ->where(function ($q) use ($user) {
@@ -239,7 +239,7 @@ public function getConnections(Request $request)
                     "name" => $connection->full_name ?? $connection->name,
                     "connection_role" => $connection->getRoleNames(),
                     "company_name" =>$connection->usercompany ? $connection->usercompany->name : null,
-                    "connection_image" => $connection->photo ? $connection->photo->file_path : null,
+                    "connection_image" => $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
                        
                 ];
             });

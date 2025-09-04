@@ -300,7 +300,7 @@ class JWTAuthController extends Controller
             'name' => $user->full_name,
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
-            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : '',
+            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
             'designation'=> $user->designation,
             'bio'       => $user->about,
             'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
@@ -308,7 +308,7 @@ class JWTAuthController extends Controller
             'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
             'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 
             'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
-            'image_url' => !empty($user->photo) ? $user->photo->file_path : '' ,
+            'image_url' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png') ,
             'roles'     => $user->getRoleNames(),
             'company_about_page'  => config('app.url').'app/page/about',
             'company_location_page'    => config('app.url').'app/page/location',
@@ -739,7 +739,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
           
             'message'   => 'File uploaded successfully.',
             'file_id'   =>  !empty($exhibitor->files) ? $exhibitor->files[0]->id : null,
-            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : null,
+            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : asset('images/default.png'),
         ]);
 
     } catch (\Exception $e) {
