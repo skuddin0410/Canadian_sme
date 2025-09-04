@@ -34,15 +34,13 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::post('/home', [HomeController::class, 'index']);
     Route::get('/get-notifications', [HomeController::class, 'getNotifications']);
     Route::get('/sessions/{sessionId}', [HomeController::class, 'getSession']);
-     Route::get('/connections', [HomeController::class, 'getConnections']);
+    Route::get('/connections', [HomeController::class, 'getConnections']);
     Route::prefix('password')->group(function () {
         Route::post('/change', [App\Http\Controllers\Api\JWTAuthController::class, 'changePassword']);
     });
 
     Route::get('/refresh-token', [App\Http\Controllers\Api\JWTAuthController::class, 'refreshToken']);
-   
     Route::get('/logout', [App\Http\Controllers\Api\JWTAuthController::class, 'logout']);
-    //Route::resource('events', EventController::class);
    
 });
 

@@ -302,7 +302,7 @@ class JWTAuthController extends Controller
             'phone'    => $user->mobile ?? '',
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
             'designation'=> $user->designation,
-            'bio'       => $user->about,
+            'bio'       => $user->bio,
             'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
             'my_qr_code' => asset($user->qr_code),
             'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
@@ -375,20 +375,7 @@ public function updateUser(Request $request)
         $user->bio = $request->bio ?? '';
         $user->save();
         qrCode($user->id);
-        // --- Update or create company record ---
-        if ($request->hasAny(['company_name', 'email'])) {
-            $companyData = [
-                'name'    => $request->company_name ?? '',
-                'email'   => $request->email ?? '',
-                'phone'   => $request->phone ?? '',
-                'website' => $request->company_website ?? '',
-            ];
-
-            \App\Models\Company::updateOrCreate(
-                ['user_id' => $user->id], // condition
-                $companyData              // values
-            );
-        }
+        
 
         return response()->json([
             'success' => true,

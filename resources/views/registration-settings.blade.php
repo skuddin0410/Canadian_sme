@@ -36,6 +36,13 @@
     </li>
 
     <li class="nav-item" role="presentation">
+      <button class="nav-link" id="location-tab" data-bs-toggle="tab" data-bs-target="#location" type="button" role="tab" aria-controls="location" aria-selected="false">
+       Location
+      </button>
+    </li>
+
+
+    <li class="nav-item" role="presentation">
       <button class="nav-link" id="thankyou-tab" data-bs-toggle="tab" data-bs-target="#thankyou" type="button" role="tab" aria-controls="thankyou" aria-selected="false">
         Thank You Page
       </button>
@@ -101,6 +108,14 @@
       <p><a href="{{ config('app.url')}}about"/>{{ config('app.url')}}about </a></p>
       <textarea class="form-control" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{getKeyValue('about')->value}}</textarea>
     </div>
+
+     <!-- about -->
+    <div class="tab-pane fade" id="location" role="tabpanel" aria-labelledby="location-tab" tabindex="0">
+      <label for="location" class="form-label">Location</label>
+      <p><a href="{{ config('app.url')}}location"/>{{ config('app.url')}}location </a></p>
+      <textarea class="form-control" id="location" name="location" rows="12" placeholder="Paste or write location us here...">{{getKeyValue('location')->value}}</textarea>
+    </div>
+
 
     <!-- Thank You Page -->
     <div class="tab-pane fade" id="thankyou" role="tabpanel" aria-labelledby="thankyou-tab" tabindex="0">
