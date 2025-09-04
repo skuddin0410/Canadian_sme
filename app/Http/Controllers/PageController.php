@@ -226,8 +226,8 @@ class PageController extends Controller
                'message'=> 'Fail to load data!'
         ]   );
         }
-        return response()->json([
-            'data'=> $page->description ?? ''
-        ]);
+
+        $view = 'frontend.app-cms'; 
+        return view($view,compact('page'));
     }
 }

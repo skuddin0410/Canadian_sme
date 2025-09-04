@@ -41,7 +41,6 @@ class TicketSystemSeeder extends Seeder
         }
 
     $categories = [
-
         // 🔹 Summit / Conference related
         [ 'name' => 'Leadership Summit', 'type' => 'event' ],
         [ 'name' => 'Startup & Investment', 'type' => 'event' ],
@@ -55,7 +54,14 @@ class TicketSystemSeeder extends Seeder
         [ 'name' => 'CloudTrends', 'type' => 'tags' ],
         [ 'name' => 'DataSecurity', 'type' => 'tags' ],
         [ 'name' => 'TechnoVation', 'type' => 'tags' ],
+        [ 'name' => 'Gold','type' => 'sponsor', 'color' => '#FFD700' ], 
+        [ 'name' => 'Majlislounge','type' => 'sponsor', 'color' => '#8B0000' ],
+        [ 'name' => 'Platinum','type' => 'sponsor', 'color' => '#E5E4E2' ], 
+        [ 'name' => 'Silver','type' => 'sponsor', 'color' => '#C0C0C0' ], 
+        [ 'name' => 'Innovationpartner', 'type' => 'sponsor', 'color' => '#1E90FF' ],
+        [ 'name' => 'Bronze','type' => 'sponsor', 'color' => '#CD7F32' ], 
     ];
+
 
        $tracks = [
                 [ 'name' => 'Keynotes & Vision',            'slug' => 'keynotes-vision',            'type' => 'track' ],
