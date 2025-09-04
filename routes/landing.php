@@ -13,3 +13,7 @@ Route::get('/registration', [FormBuilderController::class, 'showFrontendForm'])-
 Route::prefix('form-builder')->group(function () {
   Route::post('/forms/{id}/submit', [FormBuilderController::class, 'submitForm'])->name('forms.submit');
 });
+
+Route::get('/profile', [LandingController::class, 'profile'])->name('profile');
+
+Route::get('/session', [LandingController::class, 'session'])->name('session');
