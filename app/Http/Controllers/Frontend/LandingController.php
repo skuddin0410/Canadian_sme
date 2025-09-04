@@ -80,5 +80,11 @@ class LandingController extends Controller
         return $schedules;    
     }
 
+    public function profile(Request $request){
+       return view('frontend.profile');
+    }
 
+     public function session(Request $request){
+       return view('frontend.session');
+    }
 }

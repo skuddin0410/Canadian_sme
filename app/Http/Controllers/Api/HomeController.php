@@ -82,7 +82,6 @@ class HomeController extends Controller
     ->whereHas("roles", function ($q) {
         $q->whereIn("name", ['Attendee','Speaker']);
     })
-    ->whereHas('sponsoredSessions') // only users who are sponsors
     ->limit(3)
     ->get()
     ->map(function ($user) {
