@@ -45,8 +45,16 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::get('/get-notifications', [HomeController::class, 'getNotifications']);
 
     
+    Route::prefix('connections')->group(function () {
+        Route::get('/', [HomeController::class, 'getConnections']);
+        Route::get('/{connectionId}', [HomeController::class, 'getConnectionsDetails']);
+    });
 
-    Route::get('/connections', [HomeController::class, 'getConnections']);
+    Route::prefix('agenda')->group(function () {
+         Route::get('/', [HomeController::class, 'getAgenda']);
+    });
+  
+    
 
     Route::prefix('password')->group(function () {
         Route::post('/change', [App\Http\Controllers\Api\JWTAuthController::class, 'changePassword']);

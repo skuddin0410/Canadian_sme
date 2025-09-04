@@ -16,6 +16,7 @@ use App\Models\Session;
 use App\Models\Company;
 use App\Models\UserAgenda;
 use App\Models\FavoriteSession;
+use App\Models\UserConnection;
 
 
 if (!function_exists('getCategory')) {
@@ -306,3 +307,22 @@ if (! function_exists('isFavorite')) {
         return true; // newly created
     }
 }
+
+if (! function_exists('userConnection')) {
+    function userConnection($senderId,$receiverId)
+    {   
+        if (UserConnection::alreadyConnected($senderId, $receiverId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Already connected or request pending'
+            ], 400);
+        }
+
+        UserConnection::create([
+            'user_id' => $senderId,
+            'connection_id' => $receiverId,
+            'status' => 'accepted'
+        ]);
+    }
+}
+
