@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FormSubmission extends Model
 {
-    //
+    protected $table = 'form_submissions';
      protected $fillable = [
         'form_id',
         'submission_data',
