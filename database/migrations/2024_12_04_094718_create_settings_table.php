@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
-            $table->string('value')->nullable()->index();
+            $table->text('value')->nullable()->index();
             $table->timestamps();
         });
     }

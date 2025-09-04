@@ -65,8 +65,8 @@ class HomeController extends Controller
                     "keynote" => $session->keynote ?? '',
                     "demoes" => $session->demoes ?? '',
                     "panels" => $session->panels ?? '',
-                    "start_time" => $session->start_time?->toIso8601String(),
-                    "end_time" => $session->end_time?->toIso8601String(),
+                    "start_time" => $session->start_time ?? '',
+                    "end_time" => $session->end_time ?? '',
                     "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
                     "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
@@ -97,21 +97,22 @@ class HomeController extends Controller
     $user = auth()->user();
     
    
-    $notificationsQuery = GeneralNotification::where('is_read', false)
+    $notificationsQuery = GeneralNotification::where('is_read', 0)
     ->where(function ($q) use ($user) {
         $q->where('user_id', $user->id);
     })->latest();
+
     $notificationsList = $notificationsQuery->get()->map(function ($n) {
         return [
             "id" => $n->id,
             "title" => $n->title,
             "message" => $n->body,
-            "is_read" => $n->read_at ? true : false
+            "is_read" => $n->is_read==1 ? true : false
         ];
     });
     $notifications = [
         "count" => $notificationsList->count(),
-        "hasNew" => $notificationsQuery->whereNull('read_at')->exists(),
+        "hasNew" => $notificationsQuery->where('is_read',0)->exists(),
         "data" => $notificationsList,
     ];
 

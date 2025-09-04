@@ -111,6 +111,7 @@ public function verify(Request $request)
             ['expires_at' => now()->addMonths(2)] 
         );
         qrCode($user->id);
+        notification($user->id);
         return response()->json([
             'success'    => true,
             'message'    => 'Login successful',
