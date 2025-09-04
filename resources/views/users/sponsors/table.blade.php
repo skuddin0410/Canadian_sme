@@ -32,7 +32,9 @@
     <tr>
       <th>Logo</th>
       <th>Name</th>
-      <th>QR</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Type</th>
       <th width="20%">Actions</th>
     </tr>
   </thead>
@@ -49,16 +51,13 @@
       </td>
       <td>{{ $company->name ?? '-' }}</td>
       <td>
-		
-      @if($company->user && $company->user->qr_code)
-        <a href="{{ route('sponsors.qr.download', $company->user->id) }}" 
-           class="btn btn-sm btn-primary" 
-           title="Download QR">
-             Download QR
-        </a>
-        @else
-          <span class="text-muted">No QRCode Generated Yet</span>
-        @endif
+		    {{$company->email}}
+     </td>
+      <td>
+        {{$company->phone}}
+     </td>
+      <td>
+        {{$company->type}}
      </td>
 
       <td>

@@ -161,9 +161,9 @@ if (!function_exists('qrCode')) {
         
         $filePath = public_path($fileName);
 
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
+        // if (file_exists($filePath)) {
+        //     unlink($filePath);
+        // }
 
         // Use GDLibRenderer
         $renderer = new GDLibRenderer(300); // 300 is the size of the QR code

@@ -51,7 +51,7 @@
         <div class="col-md-6">
             <div class="card mb-4 h-100">
                 <div class="card-header">
-                    <h5 class="mb-0">Media & QR Code</h5>
+                    <h5 class="mb-0">Media</h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
@@ -60,7 +60,7 @@
 <div class="row">
     {{-- Row 2: Logo --}}
     
-    <div class="col-md-12 mb-3">
+    <div class="col-md-6 mb-3">
         <div class="card p-3 h-100">
             <h6 class="mb-2">Banner</h6>
             @if($company->banner)
@@ -73,22 +73,7 @@
             @endif
         </div>
     </div>
-</div>
- <div class="row">
      <div class="col-md-6 mb-3">
-        <div class="card p-3 h-100">
-            <h6 class="mb-2">User QR Code</h6>
-            {{-- @if($user->qr_code)
-                <img src="{{ asset($user->qr_code) }}"
-                     alt="User QR Code"
-                     class="rounded border"
-                     style="width:200px; height:200px; object-fit:contain;">
-            @else
-                <p>No QR code generated.</p>
-            @endif --}}
-        </div>
-    </div>
-                            <div class="col-md-6 mb-3">
         <div class="card p-3">
             <h6 class="mb-2">Logo</h6>
             @if($company->logo)
@@ -101,11 +86,8 @@
             @endif
         </div>
     </div>
-    
-   
-
-    
 </div>
+
 
                     </div>
                 </div>

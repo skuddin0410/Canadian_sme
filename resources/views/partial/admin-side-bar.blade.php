@@ -94,7 +94,7 @@
         </li>
 
 
-         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }}  {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('webview*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('event-guides*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }}  {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('webview*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('event-guides*') ? 'active open' : '' }}  {{ request()->is('event-guides.showGallery*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
@@ -146,6 +146,13 @@
                      <li class="menu-item {{ request()->is('event-guides*') ? 'active open' : '' }}">
                         <a href="{{ url('event-guides') }}" class="menu-link">
                             <div data-i18n="Coupons">Event Guide</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ request()->is('event-guides.showGallery*') ? 'active open' : '' }}">
+                        <a href="{{route('event-guides.showGallery')}}" class="menu-link">
+                            <div data-i18n="Gallery">Gallery</div>
+                           
                         </a>
                     </li>
                     <!-- <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
@@ -209,11 +216,11 @@
                
 
             
-                <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
                     <a href="{{ route('roles.matrix') }}" class="menu-link">
                         <div data-i18n="audit">Roles</div>
                     </a>
-                </li>
+                </li> --}}
                 
             </ul>
         </li>

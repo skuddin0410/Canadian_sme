@@ -169,7 +169,7 @@
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-phone"></i></span>
                     <input type="text" name="company_phone" class="form-control"
-                           value="{{ old('company_phone') }}" placeholder="Company Phone" required>
+                           value="{{ old('company_phone') }}" placeholder="Company Phone">
                   </div>
                 </div>
               </div>
@@ -240,7 +240,7 @@
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-book"></i></span>
                     <input type="text" name="booth" class="form-control"
-                           value="{{ old('booth') }}" placeholder="https://instagram.com/...">
+                           value="{{ old('booth') }}">
                   </div>
                 </div>
               </div>

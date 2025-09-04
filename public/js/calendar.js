@@ -405,11 +405,11 @@ class LaravelEventCalendar {
                             </div>   
                             <div class="mt-auto">
                                 ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
-                                    <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
+                                    <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: #fff;">${s.name} (${s.pivot?.role || 'Speaker'})</span>
                                 `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No speakers assigned</span>'}
                             </div>
 
-                            <div class="mt-auto">
+                            <!--<div class="mt-auto">
                                 ${session.extendedProps.exhibitors && session.extendedProps.exhibitors.length ? session.extendedProps.exhibitors.map(s => `
                                     <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Exhibitor'})</span>
                                 `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No exhibitors assigned</span>'}
@@ -419,7 +419,7 @@ class LaravelEventCalendar {
                                 ${session.extendedProps.sponsors && session.extendedProps.sponsors.length ? session.extendedProps.sponsors.map(s => `
                                     <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Sponsor'})</span>
                                 `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No sponsors assigned</span>'}
-                            </div>     
+                            </div>  -->   
 
                         </div>
                     </div>
@@ -488,11 +488,11 @@ class LaravelEventCalendar {
                 
                     <div class="mt-2">
                         ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
-                            <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Speaker'})</span>
+                            <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: #fff;">${s.name} (${s.pivot?.role || 'Speaker'})</span>
                         `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No speakers assigned</span>'}
                     </div>
 
-                    <div class="mt-2">
+                    <!--<div class="mt-2">
                         ${session.extendedProps.exhibitors && session.extendedProps.exhibitors.length ? session.extendedProps.exhibitors.map(s => `
                             <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Exhibitor'})</span>
                         `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No exhibitors assigned</span>'}
@@ -502,7 +502,7 @@ class LaravelEventCalendar {
                         ${session.extendedProps.sponsors && session.extendedProps.sponsors.length ? session.extendedProps.sponsors.map(s => `
                             <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Sponsor'})</span>
                         `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No sponsors assigned</span>'}
-                    </div>    
+                    </div>  -->  
             </div>
 
 
@@ -1187,7 +1187,7 @@ class LaravelEventCalendar {
             'networking': { class: 'success', icon: 'fa-handshake' }
         };
         const typeConfig = typeMap[type] || { class: 'secondary', icon: 'fa-calendar' };
-        return `<span class="badge bg-${typeConfig.class}"><i class="fas ${typeConfig.icon} me-1"></i>${type || 'Event'}</span>`;
+        return `<span class="badge bg-${typeConfig.class}" ><i class="fas ${typeConfig.icon} me-1"></i> ${ (type || 'Event').replace(/,/g, '<br>') }</span>`;
     }
 
     clearForm() {
