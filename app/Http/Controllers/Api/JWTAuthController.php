@@ -297,7 +297,8 @@ class JWTAuthController extends Controller
             'id'        => $user->id,
             'first_name'      => $user->name ?? '',
             'lastname'  => $user->lastname ?? '',
-            'name' => $user->full_name,
+            'name' => $user->full_name ?? '',
+            'company' => $user->company ?? '',
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
@@ -373,6 +374,7 @@ public function updateUser(Request $request)
         $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
         $user->mobile = $request->phone ?? '';
         $user->bio = $request->bio ?? '';
+        $user->website_url = $request->company_website ?? '';
         $user->save();
         qrCode($user->id);
         

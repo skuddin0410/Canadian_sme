@@ -28,8 +28,8 @@ class HomeController extends Controller
         "location" => $featuredEvent->location,
         "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : asset('images/default.png'),
         "videoUrl" => $featuredEvent->youtube_link ?? '',
-        "startTime" => $featuredEvent->start_date?->toIso8601String(),
-        "endTime" => $featuredEvent->end_date?->toIso8601String(),
+        "startTime" => $featuredEvent->start_date ?? '',
+        "endTime" => $featuredEvent->end_date ?? '',
         "status" => $featuredEvent->status,
     ] : [
         "title" => "No Featured Event Available",
@@ -45,7 +45,7 @@ class HomeController extends Controller
         "id" => $upcomingSession->id,
         "title" => $upcomingSession->title,
         "description" => $upcomingSession->description,
-        "startDateTime" => $upcomingSession->start_time?->toIso8601String(),
+        "startDateTime" => $upcomingSession->start_time ?? '',
         "status" => "upcoming",
     ] : null;
 
@@ -171,15 +171,81 @@ public function getNotifications(Request $request)
     return response()->json($notifications, 200);
 }
 
+public function getAllSession()
+{
+    try {
+
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }   
+        $now = now();
+        $sessions = Session::with(['speakers','booth'])
+            ->where('is_featured', true)
+            ->where('event_id', 1)
+            ->orderBy('start_time', 'ASC')
+            ->get()
+            ->map(function ($session) use ($now) {
+                // Determine session status
+                if ($session->start_time > $now) {
+                    $status = 'Upcoming';
+                } elseif ($session->start_time <= $now && $session->end_time >= $now) {
+                    $status = 'Ongoing';
+                } else {
+                    $status = 'Completed';
+                }
+
+                return [
+                    'id'=>$session->id,
+                    'date'=> userDateFormat($session->date),
+                      'session_list'=>[  
+                        "id" => $session->id,
+                        "title"       => $session->title,
+                        "description" => $session->description,
+                        "keynote"     => $session->keynote ?? '',
+                        "demoes"      => $session->demoes ?? '',
+                        "panels"      => $session->panels ?? '',
+                        "start_time"  => $session->start_time ?? '',
+                        "end_time"    => $session->end_time ?? '',
+                        "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
+                        "location"    => !empty($session->location) ? $session->location : '',
+                        "status"      => $status,
+                        "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
+                        "isFavorite"  => true,
+                       ]
+                ];
+            });
+
+            if (! $sessions) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Session not found!",
+                ], 404);
+            }
+        return response()->json($sessions);
+    
+
+    } catch (\Exception $e) {
+        return response()->json([
+            "success" => false,
+            "message" => $e->getMessage(),
+        ], 500);
+    }
+}
+
 public function getSession($sessionId)
 {
     try {
+
           if (!$user = JWTAuth::parseToken()->authenticate()) {
         return response()->json([
             'success' => false,
             'message' => 'Unauthorized'
         ], 401);
-    }
+    }   
+
         $session = Session::with(['event', 'speakers', 'booth'])
             ->find($sessionId);
 
@@ -203,7 +269,7 @@ public function getSession($sessionId)
            
 
             ]),
-             "isFavorite" =>  $session->is_featured == 1,
+            "isFavorite" =>  $session->is_featured == 1,
             "isInAgenda" => true, 
         ];
         
@@ -220,6 +286,7 @@ public function getSession($sessionId)
         ], 500);
     }
 }
+
 public function getConnections(Request $request)
 {
     try {
