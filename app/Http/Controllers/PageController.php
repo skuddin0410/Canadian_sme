@@ -203,4 +203,11 @@ class PageController extends Controller
         $view = 'frontend.cms'; 
         return view($view,compact('page'));
     }
+
+    public function appPage(Request $request, $slug){
+        $page = Page::where('slug', $slug)->firstOrFail();
+        $property = [];
+        $view = 'frontend.app-cms'; 
+        return view($view,compact('page'));
+    }
 }

@@ -23,7 +23,7 @@ class Drive extends Model
             return asset('storage/' . $this->file_type . '/' . $this->file_name . '?v=' . time());
         }
 
-        return asset('images/no-image.jpg');
+        return asset('images/default.png');
     }
 
     protected $appends = ['file_path'];
