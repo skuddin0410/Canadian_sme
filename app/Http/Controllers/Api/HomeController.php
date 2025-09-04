@@ -71,7 +71,7 @@ class HomeController extends Controller
                     "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
                     "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
-                    "isFavorite" => true
+                    "isFavorite" => isFavorite($session->id)
                 ];
             });
     }
@@ -213,7 +213,7 @@ public function getAllSession()
                         "location"    => !empty($session->location) ? $session->location : '',
                         "status"      => $status,
                         "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
-                        "isFavorite"  => true,
+                        "isFavorite"  => isFavorite($session->id),
                        ]
                 ];
             });
@@ -269,8 +269,8 @@ public function getSession($sessionId)
            
 
             ]),
-            "isFavorite" =>  $session->is_featured == 1,
-            "isInAgenda" => true, 
+            "isFavorite" =>  isFavorite($session->id),
+            "isInAgenda" => isAgenda($session->id), 
         ];
         
 

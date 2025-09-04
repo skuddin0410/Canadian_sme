@@ -14,7 +14,8 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use App\Models\GeneralNotification;
 use App\Models\Session;
 use App\Models\Company;
-
+use App\Models\UserAgenda;
+use App\Models\FavoriteSession;
 
 
 if (!function_exists('getCategory')) {
@@ -252,5 +253,56 @@ if (! function_exists('shortenName')) {
             $lastName = strtoupper($lastName[0]);
         }
         return $firstInitial . $lastName;
+    }
+}
+
+
+if (! function_exists('addAgenda')) {
+    function addAgenda($sessionId,$agenda_type,$userId=null)
+    {
+        UserAgenda::create([
+            'user_id' => !empty($userId) ? $userId : auth()->id(),
+            'session_id' => $sessionId,
+            'agenda_type' => $agenda_type
+        ]);
+    }
+}
+
+if (! function_exists('addFavorite')) {
+    function addFavorite($sessionId,$userId=null)
+    {
+        FavoriteSession::firstOrCreate([
+            'user_id' => !empty($userId) ? $userId : auth()->id(),
+            'session_id' => $sessionId
+        ]);
+    }
+}
+
+if (! function_exists('isAgenda')) {
+    function isAgenda($sessionId)
+    {
+        $exists = UserAgenda::where('user_id', auth()->id())
+        ->where('session_id', $sessionId)
+        ->exists();
+
+        if ($exists) {
+            return false; // already exists
+        }
+
+        return true;
+    }
+}
+
+if (! function_exists('isFavorite')) {
+    function isFavorite($sessionId)
+    {
+        $exists = FavoriteSession::where('user_id', auth()->id())
+        ->where('session_id', $sessionId)
+        ->exists();
+
+        if ($exists) {
+            return false; // already exists
+        }
+        return true; // newly created
     }
 }

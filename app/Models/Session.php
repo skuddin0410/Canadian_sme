@@ -106,6 +106,16 @@ class Session extends Model
         ];
     }
     
+    public function agendas()
+    {
+        return $this->hasMany(UserAgenda::class);
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(FavoriteSession::class);
+    }
+ 
 
     protected $appends = ['starts_in','starts_time_in'];
 }

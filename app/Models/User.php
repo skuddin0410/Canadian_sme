@@ -189,6 +189,16 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Session::class, 'session_speakers', 'user_id', 'session_id')->withTimestamps();
     }
 
+    public function agendas()
+    {
+        return $this->hasMany(UserAgenda::class);
+    }
+
+    public function favoriteSessions()
+    {
+        return $this->hasMany(FavoriteSession::class);
+    }
+
 
     protected $appends = ['full_name'];
 }
