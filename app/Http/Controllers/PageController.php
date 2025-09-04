@@ -205,10 +205,20 @@ class PageController extends Controller
     }
 
     public function appPage(Request $request, $slug){
-        $page = Page::where('slug', $slug)->firstOrFail();
-        $property = [];
-        $view = 'frontend.app-cms'; 
-        return view($view,compact('page'));
+       if($slug=='privacy-policy'){
+            $slug = 'privacy';
+        }
+        if($slug=='terms-condition'){
+            $slug = 'terms';
+        }
+        
+        $page = Page::where('slug', $slug)->first();
+        if(!$page){
+            return response()->json([
+               'message'=> 'Fail to load data!'
+        ]   );
+        }
+        return response(['data'=>$page->description ?? '']);
     }
 
     public function appContent(Request $request, $slug){
