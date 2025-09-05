@@ -251,8 +251,8 @@ public function getSession($sessionId)
             'message' => 'Unauthorized'
         ], 401);
     }   
-
-        $session = Session::with(['event', 'speakers', 'booth'])
+        
+        $session = Session::with(['speakers'])
             ->find($sessionId);
 
         if (! $session) {
@@ -262,21 +262,35 @@ public function getSession($sessionId)
             ], 404);
         }
 
-        $sessionData = [
-            "id" => $session->id,
-            "title" => $session->title,
-            "description" => $session->description,
-          
-            "status" => $session->status ?? 'Upcoming',
-            
-            "speakers" => $session->speakers->map(fn ($sp) => [
-                "id" => $sp->id,
-                "name" => $sp->name,
-           
+        $now = now();
 
+        // Calculate status
+        if ($session->start_time > $now) {
+            $status = 'Upcoming';
+        } elseif ($session->start_time <= $now && $session->end_time >= $now) {
+            $status = 'Ongoing';
+        } else {
+            $status = 'Completed';
+        }
+
+        $sessionData = [
+            "id"          => $session->id,
+            "title"       => $session->title,
+            "description" => $session->description,
+            "keynote"     => $session->keynote,
+            "demoes"      => $session->demoes,
+            "panels"      => $session->panels,
+            "start_time"  => $session->start_time,
+            "end_time"    => $session->end_time,
+            "workshop_no" => "Workshop NO :" . $session->id,
+            "location"    => $session->location,
+            "status"      => $status,
+            "speakers"    => $session->speakers->map(fn ($sp) => [
+                "id"   => $sp->id,
+                "name" => $sp->name,
             ]),
-            "isFavorite" =>  isFavorite($session->id),
-            "isInAgenda" => isAgenda($session->id), 
+            "isFavorite"  => isFavorite($session->id),
+            "isInAgenda"  => isAgenda($session->id),
         ];
         
 
