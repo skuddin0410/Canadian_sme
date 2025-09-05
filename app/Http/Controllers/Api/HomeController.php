@@ -183,41 +183,49 @@ public function getAllSession()
             ], 401);
         }   
         $now = now();
-        $sessions = Session::with(['speakers','booth'])
-            ->where('is_featured', true)
+
+        $sessions = Session::with(['speakers', 'booth'])
             ->where('event_id', 1)
             ->orderBy('start_time', 'ASC')
             ->get()
-            ->map(function ($session) use ($now) {
-                // Determine session status
-                if ($session->start_time > $now) {
-                    $status = 'Upcoming';
-                } elseif ($session->start_time <= $now && $session->end_time >= $now) {
-                    $status = 'Ongoing';
-                } else {
-                    $status = 'Completed';
-                }
-
+            ->groupBy(function ($session) {
+                // group by formatted date
+                return userDateFormat($session->start_time);
+            })
+            ->map(function ($group, $formattedDate) use ($now) {
                 return [
-                    'id'=>$session->id,
-                    'date'=> userDateFormat($session->date),
-                      'session_list'=>[  
-                        "id" => $session->id,
-                        "title"       => $session->title,
-                        "description" => $session->description,
-                        "keynote"     => $session->keynote ?? '',
-                        "demoes"      => $session->demoes ?? '',
-                        "panels"      => $session->panels ?? '',
-                        "start_time"  => $session->start_time ?? '',
-                        "end_time"    => $session->end_time ?? '',
-                        "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
-                        "location"    => !empty($session->location) ? $session->location : '',
-                        "status"      => $status,
-                        "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
-                        "isFavorite"  => isFavorite($session->id),
-                       ]
+                    'date' => $formattedDate,
+                    'session_list' => $group->map(function ($session) use ($now) {
+                        // Determine status
+                        if ($session->start_time > $now) {
+                            $status = 'Upcoming';
+                        } elseif ($session->start_time <= $now && $session->end_time >= $now) {
+                            $status = 'Ongoing';
+                        } else {
+                            $status = 'Completed';
+                        }
+
+                        return [
+                            "id"          => $session->id,
+                            "title"       => $session->title,
+                            "description" => $session->description,
+                            "keynote"     => $session->keynote ?? '',
+                            "demoes"      => $session->demoes ?? '',
+                            "panels"      => $session->panels ?? '',
+                            "start_time"  => $session->start_time ?? '',
+                            "end_time"    => $session->end_time ?? '',
+                            "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
+                            "location"    => $session->location ?? '',
+                            "status"      => $status,
+                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name])->values(),
+                            "isFavorite"  => isFavorite($session->id),
+                        ];
+                    })->values()
                 ];
-            });
+            })
+            ->values(); // reset keys
+
+
 
             if (! $sessions) {
                 return response()->json([
