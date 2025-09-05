@@ -71,7 +71,7 @@ class HomeController extends Controller
                     "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
                     "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
-                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
+                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name, "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')]),
                     "isFavorite" => isFavorite($session->id)
                 ];
             });
@@ -217,7 +217,7 @@ public function getAllSession()
                             "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
                             "location"    => $session->location ?? '',
                             "status"      => $status,
-                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name])->values(),
+                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
                             "isFavorite"  => isFavorite($session->id),
                         ];
                     })->values()
@@ -288,6 +288,7 @@ public function getSession($sessionId)
             "speakers"    => $session->speakers->map(fn ($sp) => [
                 "id"   => $sp->id,
                 "name" => $sp->name,
+                "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')
             ]),
             "isFavorite"  => isFavorite($session->id),
             "isInAgenda"  => isAgenda($session->id),

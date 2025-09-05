@@ -638,7 +638,7 @@ public function getExhibitor($exhibitorId)
         $response = [
             'name'     => $exhibitor->full_name ?? '',
             'word_no'  => $exhibitor?->usercompany?->booths[0]?->booth_number ?? '',
-            'avatar'=> !empty($exhibitor->photo) ? $exhibitor->photo->file_path : '',
+            'avatar'=> !empty($exhibitor->photo) ? $exhibitor->photo->file_path : asset('images/default.png'),
             'location' => $exhibitor?->usercompany?->booths[0]?->location_preferences ?? '',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->mobile ?? '',
@@ -836,7 +836,7 @@ public function getSpeaker()
                 'email'    => $speaker->email ?? '',
                 'phone'    => $speaker->mobile ?? '',
                 'website'  => $speaker->website_url ?? '',
-                'avatar'   => !empty($speaker->photo) ? $speaker->photo->file_path  : '',
+                'avatar'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
                 'tags' => !empty($speaker->tags) ? explode(',',$speaker->tags) : '',
                 'groups' => groups($speaker),
 
