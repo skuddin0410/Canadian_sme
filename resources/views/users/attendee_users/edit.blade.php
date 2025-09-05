@@ -342,8 +342,9 @@ Admin | Edit Attendee Data
                     @endphp
                     <div class="col-md-12">
                       <label class="form-label">Speaker</label>
-                      <select class="form-select select2" name="access_speaker_ids[]" multiple
+                      <select class="form-select select2" name="access_speaker_ids" 
                               data-placeholder="Select speaker(s)" data-allow-clear="true">
+                              <option value="">Please select</option>
                         @foreach($speakers as $speaker)
                           <option value="{{ $speaker->id }}"
                             {{ in_array((string)$speaker->id, $selectedSpeakerIds, true) ? 'selected' : '' }}>
@@ -360,8 +361,9 @@ Admin | Edit Attendee Data
                     @endphp
                     <div class="col-md-12">
                       <label class="form-label">Exhibitor</label>
-                      <select class="form-select select2" name="access_exhibitor_ids[]" multiple
+                      <select class="form-select select2" name="access_exhibitor_ids"
                               data-placeholder="Select exhibitor(s)" data-allow-clear="true">
+                              <option value="">Please select</option>
                         @foreach($exhibitors as $exhibitor)
                           <option value="{{ $exhibitor->id }}"
                             {{ in_array((string)$exhibitor->id, $selectedExhibitorIds, true) ? 'selected' : '' }}>
@@ -378,8 +380,9 @@ Admin | Edit Attendee Data
                     @endphp
                     <div class="col-md-12">
                       <label class="form-label">Sponsors</label>
-                      <select class="form-select select2" name="access_sponsor_ids[]" multiple
+                      <select class="form-select select2" name="access_sponsor_ids" 
                               data-placeholder="Select sponsor(s)" data-allow-clear="true">
+                              <option value="">Please select</option>
                         @foreach($sponsors as $sponsor)
                           <option value="{{ $sponsor->id }}"
                             {{ in_array((string)$sponsor->id, $selectedSponsorIds, true) ? 'selected' : '' }}>

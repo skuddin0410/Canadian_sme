@@ -274,6 +274,7 @@ class HomeController extends Controller
                 'company_number'   => ['required','string','max:100'],
                 'privacy_policy'   => ['nullable','string'],
                 'about'   => ['nullable','string'],
+                'location'   => ['nullable','string'],
                 'terms_conditions' => ['nullable','string'],
                 'thank_you_page'   => ['nullable','string'],
                ]);
@@ -283,6 +284,10 @@ class HomeController extends Controller
 
                 if($key == 'about'){
                    Page::where('slug','about')->update(['description' => $value]);
+                }
+
+                if($key == 'location'){
+                   Page::where('slug','location')->update(['description' => $value]);
                 }
 
                 if($key == 'privacy_policy'){

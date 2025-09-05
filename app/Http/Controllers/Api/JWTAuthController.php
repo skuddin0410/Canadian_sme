@@ -297,23 +297,25 @@ class JWTAuthController extends Controller
             'id'        => $user->id,
             'first_name'      => $user->name ?? '',
             'lastname'  => $user->lastname ?? '',
-            'name' => $user->full_name,
+            'name' => $user->full_name ?? '',
+            'company' => $user->company ?? '',
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
-            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : '',
+            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
             'designation'=> $user->designation,
-            'bio'       => $user->about,
+            'bio'       => $user->bio,
             'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
             'my_qr_code' => asset($user->qr_code),
             'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
             'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 
             'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
-            'image_url' => !empty($user->photo) ? $user->photo->file_path : '' ,
+            'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : '', 
+            'image_url' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png') ,
             'roles'     => $user->getRoleNames(),
-            'company_about_page'  => config('app.url').'page/about',
-            'company_location_page'    => config('app.url').'page/location',
-            'company_privacy_policy_page' => config('app.url').'page/privacy',
-            'company_terms_of_service_page' => config('app.url').'page/terms',
+            'company_about_page'  => config('app.url').'app/page/about',
+            'company_location_page'    => config('app.url').'app/page/location',
+            'company_privacy_policy_page' => config('app.url').'app/page/privacy',
+            'company_terms_of_service_page' => config('app.url').'app/page/terms',
         ]);
 
 
@@ -373,22 +375,10 @@ public function updateUser(Request $request)
         $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
         $user->mobile = $request->phone ?? '';
         $user->bio = $request->bio ?? '';
+        $user->website_url = $request->company_website ?? '';
         $user->save();
         qrCode($user->id);
-        // --- Update or create company record ---
-        if ($request->hasAny(['company_name', 'email'])) {
-            $companyData = [
-                'name'    => $request->company_name ?? '',
-                'email'   => $request->email ?? '',
-                'phone'   => $request->phone ?? '',
-                'website' => $request->company_website ?? '',
-            ];
-
-            \App\Models\Company::updateOrCreate(
-                ['user_id' => $user->id], // condition
-                $companyData              // values
-            );
-        }
+        
 
         return response()->json([
             'success' => true,
@@ -739,7 +729,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
           
             'message'   => 'File uploaded successfully.',
             'file_id'   =>  !empty($exhibitor->files) ? $exhibitor->files[0]->id : null,
-            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : null,
+            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : asset('images/default.png'),
         ]);
 
     } catch (\Exception $e) {

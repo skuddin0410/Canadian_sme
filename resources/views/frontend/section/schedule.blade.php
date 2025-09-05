@@ -42,7 +42,7 @@
                         </div>
                         <div class="">
                             <a class="view-more position-relative d-flex
-                            align-items-center gap-2" href="javascript:void()">
+                            align-items-center gap-2" href="{{route('session')}}">
                                 View More
                             </a>
                         </div>

@@ -327,8 +327,9 @@ Admin | Add Attendee
                     
                     <div class="col-md-12">
                       <label class="form-label">Speaker</label>
-                      <select class="form-select select2" name="access_speaker_ids[]" multiple
+                      <select class="form-select select2" name="access_speaker_ids"
                               data-placeholder="Select speaker(s)" data-allow-clear="true">
+                              <option value="">Please select</option>
                         @foreach($speakers as $speaker)
                           <option value="{{ $speaker->id }}">
                             {{ $speaker->full_name }}
@@ -342,8 +343,9 @@ Admin | Add Attendee
                    
                     <div class="col-md-12">
                       <label class="form-label">Exhibitor</label>
-                      <select class="form-select select2" name="access_exhibitor_ids[]" multiple
+                      <select class="form-select select2" name="access_exhibitor_ids"
                               data-placeholder="Select exhibitor(s)" data-allow-clear="true">
+                              <option value="">Please select</option>
                         @foreach($exhibitors as $exhibitor)
                           <option value="{{ $exhibitor->id }}">
                             {{ $exhibitor->name }}
@@ -356,8 +358,9 @@ Admin | Add Attendee
       
                     <div class="col-md-12">
                       <label class="form-label">Sponsors</label>
-                      <select class="form-select select2" name="access_sponsor_ids[]" multiple
+                      <select class="form-select select2" name="access_sponsor_ids"
                               data-placeholder="Select sponsor(s)" data-allow-clear="true">
+                               <option value="">Please select</option>
                         @foreach($sponsors as $sponsor)
                           <option value="{{ $sponsor->id }}">
                             {{ $sponsor->name }}

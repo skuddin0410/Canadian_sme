@@ -160,9 +160,10 @@ class AttendeeUserController extends Controller
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
         $user->is_approve = true;
-        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
-        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
-        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
+        $user->access_speaker_ids = $request->access_speaker_ids ?? '';
+        $user->access_exhibitor_ids =$request->access_exhibitor_ids??  '';
+        $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
+        $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
 
         $primaryGroupArray= [];
@@ -239,6 +240,7 @@ class AttendeeUserController extends Controller
      */
     public function update(Request $request, string $id)
     {    
+
         $user = User::findOrFail($id);
         $validator = Validator::make($request->all(), [
             
@@ -258,14 +260,7 @@ class AttendeeUserController extends Controller
 
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'],  
-            'primary_group' => 'required|string', 
-
-           'access_speaker_ids'    => ['nullable','array'],
-          'access_speaker_ids.*'  => ['integer','exists:users,id'],
-          'access_exhibitor_ids'  => ['nullable','array'],
-          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
-          'access_sponsor_ids'    => ['nullable','array'],
-          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],        
+            'primary_group' => 'required|string',         
         ]);
 
         if ($validator->fails()) {
@@ -291,9 +286,10 @@ class AttendeeUserController extends Controller
         $user->bio = $request->bio;
         $user->is_approve = true;
 
-        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
-        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
-        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
+        $user->access_speaker_ids = $request->access_speaker_ids ?? '';
+        $user->access_exhibitor_ids =$request->access_exhibitor_ids??  '';
+        $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
+        $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
 
         $primaryGroupArray= [];

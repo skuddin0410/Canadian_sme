@@ -11,6 +11,7 @@ use App\Models\Notification;
 use App\Models\GeneralNotification;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\UserAgenda;
 
 
 
@@ -26,14 +27,14 @@ class HomeController extends Controller
         "title" => $featuredEvent->title,
         "description" => $featuredEvent->description,
         "location" => $featuredEvent->location,
-        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : url('images/default_event.jpg'),
+        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : asset('images/default.png'),
         "videoUrl" => $featuredEvent->youtube_link ?? '',
-        "startTime" => $featuredEvent->start_date?->toIso8601String(),
-        "endTime" => $featuredEvent->end_date?->toIso8601String(),
+        "startTime" => $featuredEvent->start_date ?? '',
+        "endTime" => $featuredEvent->end_date ?? '',
         "status" => $featuredEvent->status,
     ] : [
         "title" => "No Featured Event Available",
-        "imageUrl" => url('images/default_event.jpg'),
+        "imageUrl" => asset('images/default.png'),
     ];
 
     // ================= Upcoming Session =================
@@ -45,7 +46,7 @@ class HomeController extends Controller
         "id" => $upcomingSession->id,
         "title" => $upcomingSession->title,
         "description" => $upcomingSession->description,
-        "startDateTime" => $upcomingSession->start_time?->toIso8601String(),
+        "startDateTime" => $upcomingSession->start_time ?? '',
         "status" => "upcoming",
     ] : null;
 
@@ -65,13 +66,13 @@ class HomeController extends Controller
                     "keynote" => $session->keynote ?? '',
                     "demoes" => $session->demoes ?? '',
                     "panels" => $session->panels ?? '',
-                    "start_time" => $session->start_time?->toIso8601String(),
-                    "end_time" => $session->end_time?->toIso8601String(),
+                    "start_time" => $session->start_time ?? '',
+                    "end_time" => $session->end_time ?? '',
                     "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
                     "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
                     "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
-                    "isFavorite" => true
+                    "isFavorite" => isFavorite($session->id)
                 ];
             });
     }
@@ -82,14 +83,13 @@ class HomeController extends Controller
     ->whereHas("roles", function ($q) {
         $q->whereIn("name", ['Attendee','Speaker']);
     })
-    ->whereHas('sponsoredSessions') // only users who are sponsors
     ->limit(3)
     ->get()
     ->map(function ($user) {
         return [
             "id" => $user->id,
             "name" => $user->full_name ?? $user->name,
-            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :url('images/default_avatar.png')
+            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :asset('images/default.png')
         ];
     });
 
@@ -98,21 +98,22 @@ class HomeController extends Controller
     $user = auth()->user();
     
    
-    $notificationsQuery = GeneralNotification::where('is_read', false)
+    $notificationsQuery = GeneralNotification::where('is_read', 0)
     ->where(function ($q) use ($user) {
         $q->where('user_id', $user->id);
     })->latest();
+
     $notificationsList = $notificationsQuery->get()->map(function ($n) {
         return [
             "id" => $n->id,
             "title" => $n->title,
             "message" => $n->body,
-            "is_read" => $n->read_at ? true : false
+            "is_read" => $n->is_read==1 ? true : false
         ];
     });
     $notifications = [
         "count" => $notificationsList->count(),
-        "hasNew" => $notificationsQuery->whereNull('read_at')->exists(),
+        "hasNew" => $notificationsQuery->where('is_read',0)->exists(),
         "data" => $notificationsList,
     ];
 
@@ -147,7 +148,7 @@ public function getNotifications(Request $request)
     
     $isSpeaker = $user->hasRole('Speaker');
     $photo = $user->photo;
-    $userPhoto = !empty($user->photo) ? $user->photo->file_path : '';
+    $userPhoto = !empty($user->photo) ? $user->photo->file_path : asset('images/default.png');
     
     $notifications = GeneralNotification::query()
         ->where(function ($q) use ($user) {
@@ -171,15 +172,78 @@ public function getNotifications(Request $request)
     return response()->json($notifications, 200);
 }
 
+public function getAllSession()
+{
+    try {
+
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }   
+        $now = now();
+        $sessions = Session::with(['speakers','booth'])
+            ->where('is_featured', true)
+            ->where('event_id', 1)
+            ->orderBy('start_time', 'ASC')
+            ->get()
+            ->map(function ($session) use ($now) {
+                // Determine session status
+                if ($session->start_time > $now) {
+                    $status = 'Upcoming';
+                } elseif ($session->start_time <= $now && $session->end_time >= $now) {
+                    $status = 'Ongoing';
+                } else {
+                    $status = 'Completed';
+                }
+
+                return [
+                    'id'=>$session->id,
+                    'date'=> userDateFormat($session->date),
+                      'session_list'=>[  
+                        "id" => $session->id,
+                        "title"       => $session->title,
+                        "description" => $session->description,
+                        "keynote"     => $session->keynote ?? '',
+                        "demoes"      => $session->demoes ?? '',
+                        "panels"      => $session->panels ?? '',
+                        "start_time"  => $session->start_time ?? '',
+                        "end_time"    => $session->end_time ?? '',
+                        "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
+                        "location"    => !empty($session->location) ? $session->location : '',
+                        "status"      => $status,
+                        "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name]),
+                        "isFavorite"  => isFavorite($session->id),
+                       ]
+                ];
+            });
+
+            if (! $sessions) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Session not found!",
+                ], 404);
+            }
+        return response()->json($sessions);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
+}
+
 public function getSession($sessionId)
 {
     try {
+
           if (!$user = JWTAuth::parseToken()->authenticate()) {
         return response()->json([
             'success' => false,
             'message' => 'Unauthorized'
         ], 401);
-    }
+    }   
+
         $session = Session::with(['event', 'speakers', 'booth'])
             ->find($sessionId);
 
@@ -203,23 +267,18 @@ public function getSession($sessionId)
            
 
             ]),
-             "isFavorite" =>  $session->is_featured == 1,
-            "isInAgenda" => true, 
+            "isFavorite" =>  isFavorite($session->id),
+            "isInAgenda" => isAgenda($session->id), 
         ];
         
 
-        return response()->json([
-            "success" => true,
-            "data" => $sessionData,
-        ]);
+        return response()->json($sessionData);
 
     } catch (\Exception $e) {
-        return response()->json([
-            "success" => false,
-            "message" => $e->getMessage(),
-        ], 500);
+        return response()->json(["message" => $e->getMessage()]);
     }
 }
+
 public function getConnections(Request $request)
 {
     try {
@@ -231,24 +290,82 @@ public function getConnections(Request $request)
         }
 
         
-        $connections = User::with(['photo', 'usercompany']) // eager load relations
-            ->limit(50)
-            ->get()
-            ->map(function ($connection) {
+        $user = auth()->user();
+        $allConnections = $user->connections
+            ->merge($user->connectedWithMe)
+            ->unique('id')
+            ->take(50);
+
+            $connections = $allConnections->map(function ($connection) {
                 return [
-                    "id" => (string) $connection->id,
-                    "name" => $connection->full_name ?? $connection->name,
-                    "connection_role" => $connection->getRoleNames(),
-                    "company_name" =>$connection->usercompany ? $connection->usercompany->name : null,
-                    "connection_image" => $connection->photo ? $connection->photo->file_path : null,
-                       
+                    "id"              => (string) $connection->id,
+                    "name"            => $connection->full_name ?? $connection->name,
+                    "connection_role" => $connection->getRoleNames()->implode(', '),
+                    "company_name"    => $connection->company ?? null,
+                    "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
+                    "status"          => $connection->pivot->status ?? null, // include status if needed
                 ];
             });
 
+        return response()->json($connections);
+
+    } catch (\Exception $e) {
         return response()->json([
-            "success" => true,
-            "data" => $connections
-        ]);
+            "success" => false,
+            "message" => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+public function getConnectionsDetails(Request $request)
+{
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        
+        $user = auth()->user();
+
+        // merge both sides
+        $allConnections = $user->connections
+            ->merge($user->connectedWithMe)
+            ->unique('id');
+
+        // pick specific connection by ID
+        $connectionId = $request->connectionId ?? null; // or pass directly
+        $connection = $allConnections->firstWhere('id', $connectionId);
+
+        if (!$connection) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Connection not found'
+            ], 404);
+        }
+
+        $connectionDetails = [
+            "id"              => $connection->id,
+            "rep_name"            => $connection->full_name ?? $connection->name,
+            "rep_email"            => $connection->email ?? '',
+            "rep_phone"            => $connection->mobile ?? '',
+            "connection_role" => $connection->getRoleNames()->implode(', '),
+            "companyName"    => $connection->company ?? null,
+            "company_website" => $connection->website ?? null,
+            "tags" => !empty($connection->tags) 
+                                ? array_map('trim', explode(',', $connection->tags)) 
+                                : [],
+            "rating" => "Cold | Normal | Warm" ,
+            "visitingCardUrl"=>  asset('images/default.png'),
+            "note"=> "Follow up in two weeks.",
+            "avatarUrl"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
+            "rep_name"          => $connection->pivot->status ?? null,
+        ];
+
+        return response()->json($connectionDetails);
 
     } catch (\Exception $e) {
         return response()->json([
@@ -260,6 +377,45 @@ public function getConnections(Request $request)
 
 
 
+public function getAgenda()
+{
+    try {
 
+          if (!$user = JWTAuth::parseToken()->authenticate()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized'
+        ], 401);
+    }   
+
+   $agendas = UserAgenda::with('session')
+    ->where('user_id', auth()->id())
+    ->get()
+    ->groupBy(function ($agenda) {
+        return $agenda->session->start_time->format('Y-m-d'); // group by date
+    })
+    ->map(function ($grouped, $date) {
+        return [
+            "date"        => $date,
+            "agenda_list" => $grouped->map(function ($agenda) {
+                return [
+                    "id"          => $agenda->id,
+                    "title"       => $agenda->session->title,
+                    "description" => $agenda->session->description,
+                    "location"    => $agenda->session->location,
+                    "start_time"  => $agenda->session->start_time->format('Y-m-d H:i'),
+                    "end_time"    => $agenda->session->end_time->format('Y-m-d H:i'),
+                ];
+            })->values(), // reset keys
+        ];
+    })->values(); // reset main keys
+
+
+        return response()->json($agendas);
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
+}
 
 }

@@ -203,4 +203,41 @@ class PageController extends Controller
         $view = 'frontend.cms'; 
         return view($view,compact('page'));
     }
+
+    public function appPage(Request $request, $slug){
+       if($slug=='privacy-policy'){
+            $slug = 'privacy';
+        }
+        if($slug=='terms-condition'){
+            $slug = 'terms';
+        }
+        
+        $page = Page::where('slug', $slug)->first();
+        if(!$page){
+            return response()->json([
+               'message'=> 'Fail to load data!'
+        ]   );
+        }
+        return response(['data'=>$page->description ?? '']);
+    }
+
+    public function appContent(Request $request, $slug){
+
+        if($slug=='privacy-policy'){
+            $slug = 'privacy';
+        }
+        if($slug=='terms-condition'){
+            $slug = 'terms';
+        }
+        
+        $page = Page::where('slug', $slug)->first();
+        if(!$page){
+            return response()->json([
+               'message'=> 'Fail to load data!'
+        ]   );
+        }
+
+        $view = 'frontend.app-cms'; 
+        return view($view,compact('page'));
+    }
 }
