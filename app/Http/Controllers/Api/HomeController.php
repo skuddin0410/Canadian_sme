@@ -416,7 +416,7 @@ public function getAgenda()
 {
     try {
 
-          if (!$user = JWTAuth::parseToken()->authenticate()) {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
         return response()->json([
             'success' => false,
             'message' => 'Unauthorized'
@@ -451,6 +451,26 @@ public function getAgenda()
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
     }
+}
+
+public function createAgenda(Request $request){
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+        addAgenda($request->sessionId);
+        return response()->json([
+            "message"=> "Session added to your agenda.",
+            "isInAgenda" => isAgenda($request->sessionId)
+        ]);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }     
 }
 
 }

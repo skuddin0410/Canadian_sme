@@ -259,7 +259,7 @@ if (! function_exists('shortenName')) {
 
 
 if (! function_exists('addAgenda')) {
-    function addAgenda($sessionId,$agenda_type,$userId=null)
+    function addAgenda($sessionId,$agenda_type=null,$userId=null)
     {
         UserAgenda::create([
             'user_id' => !empty($userId) ? $userId : auth()->id(),
@@ -287,10 +287,10 @@ if (! function_exists('isAgenda')) {
         ->exists();
 
         if ($exists) {
-            return false; // already exists
+            return true; // already exists
         }
 
-        return true;
+        return false;
     }
 }
 
@@ -340,3 +340,4 @@ if (! function_exists('removeFavorite')) {
             ->delete();
     }
 }
+

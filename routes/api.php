@@ -37,6 +37,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::get('/', [HomeController::class, 'getAllSession']);
         Route::get('/{sessionId}', [HomeController::class, 'getSession']);
         Route::post('/{sessionId}', [HomeController::class, 'addSessionToFavourite']);
+        Route::post('/{sessionId}/agenda', [HomeController::class, 'createAgenda']);
     }); 
 
     Route::get('/speakers', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeaker']);
@@ -55,8 +56,6 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
          Route::get('/', [HomeController::class, 'getAgenda']);
     });
   
-    
-
     Route::prefix('password')->group(function () {
         Route::post('/change', [App\Http\Controllers\Api\JWTAuthController::class, 'changePassword']);
     });

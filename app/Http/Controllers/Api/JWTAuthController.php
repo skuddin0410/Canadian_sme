@@ -371,7 +371,7 @@ public function updateUser(Request $request)
         $user->email = $request->email ?? '';
         $user->company = $request->company_name?? '';
         $user->designation = $request->designation ?? '';
-        $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
+        $user->tags =  !empty($request->tags) ? $request->tags : '';
         $user->mobile = $request->phone ?? '';
         $user->bio = $request->bio ?? '';
         $user->website_url = $request->company_website ?? '';
@@ -875,7 +875,7 @@ public function getSpeaker()
 public function getTags()
 {
     try {
-        $tags = Category::pluck('name') 
+        $tags = Category::where('type','tags')->pluck('name') 
             ->filter() 
             ->flatMap(function ($tagString) {
                 if (is_array($tagString)) {
@@ -906,6 +906,7 @@ public function getTags()
         ], 500);
     }
 }
+
 public function checkSession(Request $request)
 {
     $user = $request->user(); // or Auth::user()
