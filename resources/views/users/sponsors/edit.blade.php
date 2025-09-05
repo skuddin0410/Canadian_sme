@@ -186,9 +186,9 @@
               <label for="type"  class="form-label">Select Category</label>             
               <select id="type" name="type" class="form-select mb-3">
                   <option value="">Select Category</option>
-                    @foreach(config('membership.types') as $key => $label)
-                        <option value="{{ $key }}" {{ old('type', $company->type ?? '') == $key ? 'selected' : '' }}>
-                            {{ $label }}
+                    @foreach(getCategory('sponsor') as $label)
+                        <option value="{{ $label->slug }}" {{ old('type', $company->type ?? '') == $label->slug ? 'selected' : '' }}>
+                            {{ $label->slug }}
                         </option>
                     @endforeach
                 </select>

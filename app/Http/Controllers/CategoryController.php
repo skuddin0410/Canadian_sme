@@ -81,6 +81,7 @@ class CategoryController extends Controller
         $category->name = $request->name;
         $category->slug = Str::slug($request->name, '-');
         $category->type = $request->type;
+        $category->color = $request->color ?? '';
         $category->save();
         return redirect(route('categories.index'))->withSuccess("Category has been saved successfully");
     }
@@ -119,6 +120,7 @@ class CategoryController extends Controller
         $category->name = $request->name;
         $category->slug = Str::slug($request->name, '-');
         $category->type = $request->type;
+        $category->color = $request->color ?? '';
         $category->save();
         return redirect(route('categories.index'))->withSuccess("Category has been saved successfully");
     }

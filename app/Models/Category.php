@@ -11,6 +11,7 @@ class Category extends Model
         'slug',
         'type',
         'order',
+        'color'
     ];
 
     public function blogs()

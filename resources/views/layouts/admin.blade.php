@@ -124,7 +124,7 @@
 </html>
 <script type="text/javascript">
  tinymce.init({
-    selector: '#description',
+    selector: '#description, .description-cls',
     readonly: false,
     width: '100%',
     height: 300,

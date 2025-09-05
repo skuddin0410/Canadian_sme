@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\MailLog;
 
 class SpeakerController extends Controller
 {
@@ -409,7 +410,7 @@ public function allowAccess(string $id)
     return back()->withSuccess('App access allowed successfully for Speaker and stored in access_speaker_ids.');
 }
 public function sendMail(Request $request, $id)
-{
+{   
     $request->validate([
         'subject' => 'required|string|max:255',
         'message' => 'required|string',
@@ -421,7 +422,16 @@ public function sendMail(Request $request, $id)
         })
         ->findOrFail($id);
 
-    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
+    Mail::to($user->email)->send(new CustomSpeakerMail($user, $request->subject, $request->message));
+
+    MailLog::create([
+        'user_id' => $user->id,
+        'email'   => $user->email,
+        'subject' => $request->subject,
+        'message' => $request->message,
+        'status'  => 'sent',
+        'send_by'  => auth()->id(),
+    ]);
 
     return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
 }
