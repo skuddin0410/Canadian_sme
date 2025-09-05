@@ -422,7 +422,7 @@ public function sendMail(Request $request, $id)
         })
         ->findOrFail($id);
 
-    Mail::to('subhabrata06.dapl@gmail.com')->send(new CustomSpeakerMail($user, $request->subject, $request->message));
+    Mail::to($user->email)->send(new CustomSpeakerMail($user, $request->subject, $request->message));
 
     MailLog::create([
         'user_id' => $user->id,
