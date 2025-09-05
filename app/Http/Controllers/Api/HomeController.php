@@ -12,6 +12,7 @@ use App\Models\GeneralNotification;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserAgenda;
+use App\Models\FavoriteSession;
 
 
 
@@ -398,13 +399,24 @@ public function getConnectionsDetails(Request $request)
     }
 }
 
+public function addSessionToFavourite(Request $request){
+
+    if(!isFavorite($request->sessionId)){
+         addFavorite($request->sessionId);
+        
+          return response()->json(["message"=> "Session added as favourite"]);
+        }else{
+          removeFavorite($request->sessionId);
+          return response()->json(["message"=> "Session moved from favourite"]);
+        }
+}
 
 
 public function getAgenda()
 {
     try {
 
-          if (!$user = JWTAuth::parseToken()->authenticate()) {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
         return response()->json([
             'success' => false,
             'message' => 'Unauthorized'
@@ -439,6 +451,26 @@ public function getAgenda()
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
     }
+}
+
+public function createAgenda(Request $request){
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+        addAgenda($request->sessionId);
+        return response()->json([
+            "message"=> "Session added to your agenda.",
+            "isInAgenda" => isAgenda($request->sessionId)
+        ]);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }     
 }
 
 }

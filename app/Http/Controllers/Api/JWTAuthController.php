@@ -280,7 +280,6 @@ class JWTAuthController extends Controller
             ], 404);
         }
 
-    
         $token = request()->bearerToken() ?? JWTAuth::refresh();
         $roles = $user->getRoleNames();
         $address = [
@@ -372,7 +371,7 @@ public function updateUser(Request $request)
         $user->email = $request->email ?? '';
         $user->company = $request->company_name?? '';
         $user->designation = $request->designation ?? '';
-        $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
+        $user->tags =  !empty($request->tags) ? $request->tags : '';
         $user->mobile = $request->phone ?? '';
         $user->bio = $request->bio ?? '';
         $user->website_url = $request->company_website ?? '';
@@ -626,7 +625,11 @@ public function getExhibitor($exhibitorId)
         }
 
      
-        $exhibitor = User::with('photo','usercompany','usercompany.booths','usercompany.files')->find($exhibitorId);
+        $exhibitor = User::with([
+            'photo',
+            'usercompany',
+            'usercompany.files',
+        ])->find($exhibitorId);
 
         if (! $exhibitor) {
             return response()->json([
@@ -635,31 +638,34 @@ public function getExhibitor($exhibitorId)
                 'data'    => collect(),
             ], 404);
         }
+
+        $company = $exhibitor->usercompany;          // may be null
+        $booth   = $company?->booth;      // first booth (Collection-safe)
+
         $response = [
             'name'     => $exhibitor->full_name ?? '',
-            'word_no'  => $exhibitor?->usercompany?->booths[0]?->booth_number ?? '',
-            'avatar'=> !empty($exhibitor->photo) ? $exhibitor->photo->file_path : asset('images/default.png'),
-            'location' => $exhibitor?->usercompany?->booths[0]?->location_preferences ?? '',
+            'word_no'  => $booth ?? '-',
+            'avatar'   => $exhibitor->photo?->file_path ?? asset('images/default.png'),
+            'location' => $booth ?? '-',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->mobile ?? '',
             'website'  => $exhibitor->website_url ?? '',
             'social_links' => [
-                ['name' => 'linkedin', 'url' => $exhibitor->linkedin_url ?? ''],
-                ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
-                ['name' => 'instagram', 'url' => $speaker->instagram_url ?? ''],
-                ['name' => 'twitter', 'url' => $speaker->twitter_url ?? ''],
-                ['name' => 'github', 'url' => $speaker->github_url ?? ''],
-
+                ['name' => 'linkedin',  'url' => $exhibitor->linkedin_url  ?? ''],
+                ['name' => 'facebook',  'url' => $exhibitor->facebook_url  ?? ''],
+                ['name' => 'instagram', 'url' => $exhibitor->instagram_url ?? ''],
+                ['name' => 'twitter',   'url' => $exhibitor->twitter_url   ?? ''],
+                ['name' => 'github',    'url' => $exhibitor->github_url    ?? ''],
             ],
-            'bio' => $exhibitor->bio ?? '',
-            'my_qr_code' => asset($exhibitor->qr_code) ?? '',
-            'uploaded_files' => $exhibitor->usercompany->files->map(function ($file) {
-                    return [
-                        'name' => $file->file_name, 
-                        'url'  => $file->file_path,
-                    ];
-             })->toArray() ?? [],
-
+            'bio'         => $exhibitor->bio ?? '',
+            'my_qr_code'  => $exhibitor->qr_code ? asset($exhibitor->qr_code) : '',
+            'uploaded_files' => ($company?->files ?? collect())
+                ->map(fn ($file) => [
+                    'name' => $file->file_name,
+                    'url'  => $file->file_path,
+                ])
+                ->values()
+                ->all(),
         ];
         
         
@@ -869,7 +875,7 @@ public function getSpeaker()
 public function getTags()
 {
     try {
-        $tags = Category::pluck('name') 
+        $tags = Category::where('type','tags')->pluck('name') 
             ->filter() 
             ->flatMap(function ($tagString) {
                 if (is_array($tagString)) {
@@ -900,6 +906,7 @@ public function getTags()
         ], 500);
     }
 }
+
 public function checkSession(Request $request)
 {
     $user = $request->user(); // or Auth::user()
