@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use App\Mail\UserWelcome;
 
 class OtpController extends Controller
 {
@@ -91,6 +92,8 @@ public function verify(Request $request)
         'password' => Hash::make($request->otp)
     ]);
 
+    $user->assignRole('Attendee');
+
     try {
        
         $credentials = [
@@ -112,6 +115,8 @@ public function verify(Request $request)
         );
         qrCode($user->id);
         notification($user->id);
+      
+        Mail::to($user->email)->send(new UserWelcome($user));
         return response()->json([
             'success'    => true,
             'message'    => 'Login successful',
