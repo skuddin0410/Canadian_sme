@@ -13,6 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserAgenda;
 use App\Models\FavoriteSession;
+use App\Models\UserConnection;
 
 
 
@@ -471,6 +472,83 @@ public function createAgenda(Request $request){
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
     }     
+}
+
+public function scanDetails(Request $request){
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+         $validator = Validator::make($request->all(), [
+            'qrData' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors(),
+                'data' => $request->all(),
+            ], 422);
+        }
+
+        $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
+
+        dd($data);
+
+        return response()->json([
+            "message"=> "Session added to your agenda.",
+            "isInAgenda" => isAgenda($request->sessionId)
+        ]);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
+}
+
+
+public function scanNote(Request $request){
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+        addAgenda($request->sessionId);
+        return response()->json([
+            "message"=> "Session added to your agenda.",
+            "isInAgenda" => isAgenda($request->sessionId)
+        ]);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
+}
+
+
+public function scanCreate(Request $request){
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+        addAgenda($request->sessionId);
+        return response()->json([
+            "message"=> "Session added to your agenda.",
+            "isInAgenda" => isAgenda($request->sessionId)
+        ]);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
 }
 
 }
