@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Event;
-use App\Models\Session;
 use Carbon\Carbon;
+use App\Models\Booth;
+use App\Models\Event;
 use App\Models\User; 
+use App\Models\Company;
+use App\Models\Session;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class LandingController extends Controller
 {
@@ -30,16 +32,7 @@ class LandingController extends Controller
 
         return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules'));
     }
-//     public function attendees()
-// {
-//     $attendees = User::with(['photo', 'roles'])
-//         ->whereHas('roles', function ($q) {
-//             $q->where('name', 'Attendee');
-//         })
-//         ->get();
 
-//     return view('frontend.profile', compact('attendees'));
-// }
 
 
 
@@ -92,74 +85,25 @@ class LandingController extends Controller
         return $schedules;    
     }
    
-// public function profile($id)
-// {
-//     // Fetch attendee with specific roles and relations
-//     $attendee = User::with(['photo', 'roles'])
-//         ->where('id', $id)
-//         ->whereHas('roles', function ($q) {
-//             $q->whereIn('name', ['Attendee']); // only attendee role
-//         })
-//         ->firstOrFail();
+public function exhibitorIndex()
+{
+    $event = Event::with(['photo'])->first();
+    $exhibitors = Company::with('contentIconFile')->get();
+    //  $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+    //     ->where('start_time', '>=', now())
+    //     ->orderBy('start_time', 'ASC')
+    //     ->first();
+     return view('frontend.section.exhibitor', compact('event', 'exhibitors'));
+   
+}
 
-//     // Fetch upcoming session(s) for context
-//     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-//         ->where('start_time', '>=', now())
-//         ->orderBy('start_time', 'ASC')
-//         ->first();
-
-//     // Fetch event details
-//     $event = Event::with('photo')->first();
-
-//     return view('frontend.profile', compact('attendee', 'session', 'event'));
-// }
-// public function profile($id)
-// {
-//     $attendee = User::with(['photo', 'roles'])
-//         ->where('id', $id)
-//         ->whereHas('roles', function ($q) {
-//             $q->where('name', 'Attendee');
-//         })
-//         ->firstOrFail();
-
-//     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-//         ->where('start_time', '>=', now())
-//         ->orderBy('start_time', 'ASC')
-//         ->first();
-
-//     $event = Event::with('photo')->first();
-
-//     return view('frontend.profile', compact('attendee', 'session', 'event'));
-// }
-//   public function profile($id)
-// {
-//     // Fetch attendee by ID with roles + photo
-//     $attendee = User::with(['photo', 'roles'])
-//         ->where('id', $id)
-//         ->whereHas('roles', function ($q) {
-//             $q->where('name', 'Attendee'); // only attendees
-//         })
-//         ->firstOrFail();
-
-//     // Get upcoming session for context
-//     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-//         ->where('start_time', '>=', now())
-//         ->orderBy('start_time', 'ASC')
-//         ->first();
-
-//     // Event details
-//     $event = Event::with('photo')->first();
-
-//     // Show attendee profile page
-//     return view('frontend.profile', compact('attendee', 'session', 'event'));
-// }
 
 public function profile($id)
 {
-    // Fetch user with photo (ignore role check)
+   
     $attendee = User::with(['photo'])->findOrFail($id);
 
-    // Optional: fetch the session and event for context
+   
     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
         ->where('start_time', '>=', now())
         ->orderBy('start_time', 'ASC')
@@ -170,10 +114,32 @@ public function profile($id)
     return view('frontend.profile', compact('attendee', 'session', 'event'));
 }
 
+public function exhibitor( Request $request,$id){ 
+
+    $company = Company::with(['contentIconFile','quickLinkIconFile','user','Docs' ])
+        ->where('id', $id)
+        ->firstOrFail();
+    $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+        ->where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
 
     
 
-     public function session(Request $request){
-       return view('frontend.session');
+    return view('frontend.company',compact('company' , 'sessions'));
+}
+
+
+    
+
+    public function session(Request $request , $id){
+    $speaker = User::with(['photo'])->findOrFail($id);
+
+   
+    $session = Session::with(['speakers'])->findOrFail($id);
+        
+    $event = Event::with('photo')->first();
+       return view('frontend.session',compact('session','event','speaker'));
     }
 }

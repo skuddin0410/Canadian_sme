@@ -34,7 +34,13 @@
                         </div>
                         <div class="">
                             <span class="black-text-18 mb-2">JSpeaker</span>
-                            <span class="small-heading-black fw-semibold">Ashton Porter</span>
+                            <span class="small-heading-black fw-semibold">  
+                                @if($schedule->speakers->isNotEmpty())
+                                   {{ $schedule->speakers->pluck('name')->join(', ') }}
+                                @else
+                                   No speakers assigned
+                                @endif
+                            </span>
                         </div>
                         <div class="">
                             <span class="black-text-18 mb-2">Venue</span>
@@ -42,7 +48,7 @@
                         </div>
                         <div class="">
                             <a class="view-more position-relative d-flex
-                            align-items-center gap-2" href="{{route('session')}}">
+                            align-items-center gap-2" href="{{route('session',$schedule->id)}}">
                                 View More
                             </a>
                         </div>

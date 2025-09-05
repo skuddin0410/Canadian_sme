@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Booth;
 use App\Models\Drive;
+use App\Models\Session;
 use App\Models\BoothUser;
 use App\Traits\Auditable;
 use App\Models\CompanyContact;
@@ -124,5 +125,10 @@ class Company extends Model
             ->where('file_type', 'private_docs')
             ->whereNotNull('file_name');
     }
+    public function sessions()
+{
+    return $this->hasMany(Session::class);
+}
+
 
 }
