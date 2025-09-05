@@ -409,7 +409,7 @@ public function allowAccess(string $id)
     return back()->withSuccess('App access allowed successfully for Speaker and stored in access_speaker_ids.');
 }
 public function sendMail(Request $request, $id)
-{
+{   
     $request->validate([
         'subject' => 'required|string|max:255',
         'message' => 'required|string',
@@ -421,7 +421,7 @@ public function sendMail(Request $request, $id)
         })
         ->findOrFail($id);
 
-    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
+    Mail::to($user->email)->send(new CustomSpeakerMail($user, $request->subject, $request->message));
 
     return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
 }
