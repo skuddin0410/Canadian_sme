@@ -12,14 +12,16 @@ use Illuminate\Queue\SerializesModels;
 class CustomSpeakerMail extends Mailable
 {
     use Queueable, SerializesModels;
+    public $user;
     public $subjectLine;
     public $messageContent;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subjectLine,$messageContent)
-    {
+    public function __construct($user,$subjectLine,$messageContent)
+    {   
+        $this->user = $user;
         $this->subjectLine = $subjectLine;
         $this->messageContent = $messageContent;
     }
@@ -29,6 +31,7 @@ class CustomSpeakerMail extends Mailable
         return $this->subject($this->subjectLine)
                     ->view('emails.custom_mail')
                     ->with([
+                        'user' => $this->user,
                         'messageContent' => $this->messageContent,
                     ]);
     }

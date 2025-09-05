@@ -1,18 +1,7 @@
-<!DOCTYPE html>
-<html>
 
-<head>
-  <title>Welcome to {{config('name')}}</title>
-</head>
-
-<body>
-  <h2> Hi, {{$user->username ?? ''}}</h2>
-  <h3>Your Email : {{$user->email ?? ''}}</h3>
-  <h3>Your Password : {{$user->user_password ?? ''}}</h3>
-  <h3>Your Referral coupon : {{$user->referral_coupon ?? ''}}</h3>
-  <p>Login here ? <a href="{{route('login')}}">Click</a></p>
- 
-  
-</body>
-
-</html>
+@include('emails.layout.header')
+<h1 style="font-size:20px; color:#004fb8; margin:0 0 15px 0; font-weight:bold;">Hi, {{$name ?? ''}}</h1>
+<p style="margin:0 0 15px 0;">
+   Thank you for registering with {{config('app.name')}}. Your account has been created successfully.
+</p>
+@include('emails.layout.footer')
