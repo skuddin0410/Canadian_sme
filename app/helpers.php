@@ -302,9 +302,9 @@ if (! function_exists('isFavorite')) {
         ->exists();
 
         if ($exists) {
-            return false; // already exists
+            return true; // already exists
         }
-        return true; // newly created
+        return false; // newly created
     }
 }
 
@@ -326,3 +326,17 @@ if (! function_exists('userConnection')) {
     }
 }
 
+
+if (! function_exists('removeFavorite')) {
+    function removeFavorite($sessionId, $userId = null): bool
+    {
+        $uid = $userId ?? auth()->id();
+        if (! $uid) {
+            return false; 
+        }
+
+        return (bool) FavoriteSession::where('user_id', $uid)
+            ->where('session_id', $sessionId)
+            ->delete();
+    }
+}

@@ -12,6 +12,7 @@ use App\Models\GeneralNotification;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserAgenda;
+use App\Models\FavoriteSession;
 
 
 
@@ -398,6 +399,17 @@ public function getConnectionsDetails(Request $request)
     }
 }
 
+public function addSessionToFavourite(Request $request){
+
+    if(!isFavorite($request->sessionId)){
+         addFavorite($request->sessionId);
+        
+          return response()->json(["message"=> "Session added as favourite"]);
+        }else{
+          removeFavorite($request->sessionId);
+          return response()->json(["message"=> "Session moved from favourite"]);
+        }
+}
 
 
 public function getAgenda()

@@ -36,8 +36,9 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::prefix('sessions')->group(function () {
         Route::get('/', [HomeController::class, 'getAllSession']);
         Route::get('/{sessionId}', [HomeController::class, 'getSession']);
+        Route::post('/{sessionId}', [HomeController::class, 'addSessionToFavourite']);
     }); 
- 
+
     Route::get('/speakers', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeaker']);
     Route::get('/tags', [App\Http\Controllers\Api\JWTAuthController::class, 'getTags']);
     Route::post('/home', [HomeController::class, 'index']);
