@@ -526,7 +526,7 @@ public function scanDetails(Request $request){
         } 
         $data->load('connection.photo','connection.visitingcard');
       
-
+     
         return response()->json([
             "message"=> "Connection found!",
             "id"=>  !empty($data->connection) ? $data->connection->id: '',
@@ -539,10 +539,10 @@ public function scanDetails(Request $request){
             "avatar"=> !empty($data->connection) && !empty($data->connection->photo) ? $data->connection->photo->file_path: asset('images/default.png'),
             "visiting_card_image" => !empty($data->connection) && !empty($data->connection->visitingcard) ? $data->connection->visitingcard->file_path: asset('images/default.png'),
             "tags"=> !empty($data->connection) ? $data->connection->tags: '' ,
-            "rating"=> !empty($data->connection) ? $data->connection->rating: '' ,
+            "rating"=> !empty($data->rating) ? $data->rating: '' ,
             "address"=> !empty($data->connection) ? $data->connection->address: '' ,
             "bio"=> !empty($data->connection) ? $data->connection->bio: '' ,
-            "note"=> !empty($data->connection) ? $data->connection->note: '' ,
+            "note"=> !empty($data->note) ? $data->note: '' ,
         ]);
     
 
@@ -551,6 +551,32 @@ public function scanDetails(Request $request){
     }
 }
 
+public function scanDetailsUpdate(Request $request){
+
+     try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+        $connetion = UserConnection::where('connection_id',$request->qrData)->where('user_id',$user->id)->first();
+        if(!$connetion){
+           return response()->json([
+            "message"=> "Fail to add note!",
+           ]);
+        }
+        $connetion->note =$request->note ?? '';
+        $connetion->save(); 
+        return response()->json([
+            "message"=> "Connection note added!",
+        ]);
+    
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => "Fail to add note!"]);
+    }
+}
 
 public function connectionUpdate(Request $request){
     try {
@@ -591,19 +617,60 @@ public function connectionUpdate(Request $request){
     }
 }
 
-
-public function scanCreate(Request $request){
-    try {
+public function createConnection(Request $request){
+     try {
         if (!$user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
             ], 401);
         }
-        addAgenda($request->sessionId);
+        
+        $validator = Validator::make($request->all(), [
+         
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|max:255|email|unique:users,email',
+            'designation' => 'nullable|string|max:255' ,
+            'tags' => 'nullable|string|max:255'  ,
+            'website_url' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|string|max:255',
+            'mobile' => 'nullable|string|unique:users,mobile',
+            'bio' => 'required|string',
+            'tags'   => ['nullable','array'],
+            'tags.*' => ['string'],         
+        ]);
+
+        if ($validator->fails()) {
+            return redirect(route('attendee-users.create'))->withInput()
+                ->withErrors($validator);
+        }
+        $tagsString = is_array($request->tags)? implode(',', array_map('trim', $request->tags)) : trim((string) $request->tags);
+        $connection = new User();
+        $connection->name = $request->first_name;
+        $connection->lastname = $request->last_name;
+        $connection->email = $request->email;
+        $connection->company = $request->company_name;
+        $connection->designation = $request->job_title;
+        $connection->tags =  $tagsString;
+        $connection->mobile = $request->phone;
+        $connection->street = $request->address;
+        $connection->is_approve = true;
+        $connection->save();
+        $connection->assignRole('Attendee');
+
+        userConnection($user->id, $connection->id);
+        $connetionUpdate = UserConnection::where('connection_id',$connection->id)->where('user_id',$user->id)->first();
+        $connetionUpdate->rating = $request->rating ?? '';
+        $connetionUpdate->note =$request->note ?? '';
+        $connetionUpdate->save(); 
+
+        if(!empty($request->visitingCardImage)){
+          $this->imageBase64Upload($request->visitingCardImage,'users',$user->id,'users','visiting_card',$user->id); 
+        }
+
         return response()->json([
-            "message"=> "Session added to your agenda.",
-            "isInAgenda" => isAgenda($request->sessionId)
+            "message"=> "Connected updated.",
         ]);
     
 
@@ -617,8 +684,7 @@ public function sendPushNotification(Request $request){
     OneSignal::sendNotificationToAll(
        "Hello from Subhabrata!",
        $url = "https://sme.nodejsdapldevelopments.com/", $data = null, $buttons =null, $schedule = null
-   );
-
+    );
 }
 
 }
