@@ -363,38 +363,55 @@ public function getConnectionsDetails(Request $request)
         $user = auth()->user();
 
         // merge both sides
-        $allConnections = $user->connections
-            ->merge($user->connectedWithMe)
-            ->unique('id');
+        $connecteduser = UserConnection::with('connection')->where('connection_id', $request->connectionId)
+                     ->where('user_id', $user->id)
+                     ->first();
 
-        // pick specific connection by ID
-        $connectionId = $request->connectionId ?? null; // or pass directly
-        $connection = $allConnections->firstWhere('id', $connectionId);
-
-        if (!$connection) {
+        if (!$connecteduser) {
             return response()->json([
                 'success' => false,
                 'message' => 'Connection not found'
             ], 404);
         }
+        
+       
+        $connecteduser = UserConnection::with('connection', 'connection.photo', 'connection.visitingcard')
+        ->where('connection_id', $request->connectionId)
+        ->where('user_id', $user->id)
+        ->first();
 
         $connectionDetails = [
-            "id"              => $connection->id,
-            "rep_name"            => $connection->full_name ?? $connection->name,
-            "rep_email"            => $connection->email ?? '',
-            "rep_phone"            => $connection->mobile ?? '',
-            "connection_role" => $connection->getRoleNames()->implode(', '),
-            "companyName"    => $connection->company ?? null,
-            "company_website" => $connection->website ?? null,
-            "tags" => !empty($connection->tags) 
-                                ? array_map('trim', explode(',', $connection->tags)) 
-                                : [],
-            "rating" => $connection->rating ,
-            "visitingCardUrl"=> $connection->visitingcard ? $connection->visitingcard->file_path : asset('images/default.png'),
-            "note"=> $connection->note,
-            "avatarUrl"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
-            "rep_name"          => $connection->pivot->status ?? null,
+            "id"              => $connecteduser && $connecteduser->connection ? $connecteduser->connection->id : '',
+            "rep_name"        => $connecteduser && $connecteduser->connection 
+                                    ? ($connecteduser->connection->full_name ?: $connecteduser->connection->name)
+                                    : '',
+            
+            "rep_email"       => $connecteduser && $connecteduser->connection ? $connecteduser->connection->email : '',
+            "rep_phone"       => $connecteduser && $connecteduser->connection ? $connecteduser->connection->mobile : '',
+            
+            "connection_role" => $connecteduser && $connecteduser->connection ? 
+                                    $connecteduser->connection->getRoleNames()->implode(', ') 
+                                    : '',
+
+            "companyName"     => $connecteduser && $connecteduser->connection ? $connecteduser->connection->company : null,
+
+            "company_website" => $connecteduser && $connecteduser->connection ? $connecteduser->connection->website_url : null,
+            "tags"            => $connecteduser && $connecteduser->connection && !empty($connecteduser->connection->tags) 
+                                    ? array_map('trim', explode(',', $connecteduser->connection->tags)) 
+                                    : [],
+            "rating"          => $connecteduser->rating ?? '',
+            "visitingCardUrl" => $connecteduser && $connecteduser->connection && $connecteduser->connection->visitingcard 
+                                    ? $connecteduser->connection->visitingcard->file_path 
+                                    : asset('images/default.png'),
+
+            "note"            => $connecteduser->note ?? '',
+            "avatarUrl"       => $connecteduser && $connecteduser->connection && $connecteduser->connection->photo 
+                                    ? $connecteduser->connection->photo->file_path 
+                                    : asset('images/default.png'),
+            "status"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->status ?? null : null,
         ];
+
+
 
         return response()->json($connectionDetails);
 
@@ -544,18 +561,21 @@ public function connectionUpdate(Request $request){
             ], 401);
         }
         
-        $user = User::where('id',$request->connectionId)->first();
-        if(!$user){
+        $connetion = UserConnection::where('connection_id',$request->connectionId)->where('user_id',$user->id)->first();
+
+        if(!$connetion){
            return response()->json([
             "message"=> "No connection found.",
            ]);
         }
-
         $tagsString = is_array($request->tags)? implode(',', array_map('trim', $request->tags)) : trim((string) $request->tags);
-        $user->rating = $request->rating ?? '';
-        $user->tags =$tagsString ?? '';
-        $user->note =$request->note ?? '';
+        $user = User::where('id',$request->connectionId)->first();
+        $user->tags = $tagsString;
         $user->save(); 
+        
+        $connetion->rating = $request->rating ?? '';
+        $connetion->note =$request->note ?? '';
+        $connetion->save(); 
 
         if(!empty($request->visitingCardImage)){
           $this->imageBase64Upload($request->visitingCardImage,'users',$user->id,'users','visiting_card',$user->id); 

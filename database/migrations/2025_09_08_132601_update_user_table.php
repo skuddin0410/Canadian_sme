@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('user_connections', function (Blueprint $table) {
             $table->enum('rating', ['Cold', 'Normal', 'Warm'])
                   ->default('Normal')
-                  ->after('email');
+                  ->after('connection_id');
             $table->string('note', 500)->nullable()->after('rating');
             $table->index('rating');
         });
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-         Schema::table('users', function (Blueprint $table) {
+         Schema::table('user_connections', function (Blueprint $table) {
             $table->dropIndex(['rating']);
             $table->dropColumn(['rating', 'note']);
         });

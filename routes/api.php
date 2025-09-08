@@ -50,8 +50,9 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::prefix('connections')->group(function () {
         Route::get('/', [HomeController::class, 'getConnections']);
         Route::get('/{connectionId}', [HomeController::class, 'getConnectionsDetails']);
-        Route::post('/scan', [HomeController::class, 'scanDetails']);
         Route::put('/{connectionId}', [HomeController::class, 'connectionUpdate']);
+        
+        Route::post('/scan', [HomeController::class, 'scanDetails']);
         Route::put('/create', [HomeController::class, 'scanNote']);
         
     });
@@ -68,7 +69,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::get('/refresh-token', [App\Http\Controllers\Api\JWTAuthController::class, 'refreshToken']);
     Route::get('/logout', [App\Http\Controllers\Api\JWTAuthController::class, 'logout']);
     
-   
+
 
 });
 
