@@ -66,6 +66,8 @@
                 <option value="tags" {{ old('type', $category->type ?? '') == 'tags' ? 'selected' : '' }}>Tags</option>
 
                 <option value="sponsor" {{ old('type', $category->type ?? '') == 'sponsor' ? 'selected' : '' }}>Sponsor</option>
+
+                <option value="connections" {{ old('type', $category->type ?? '') == 'connections' ? 'selected' : '' }}>Connections</option>
             </select>
             @error('type')
                 <div class="invalid-feedback">{{ $message }}</div>
