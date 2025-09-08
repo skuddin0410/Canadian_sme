@@ -316,11 +316,14 @@ public function getConnections(Request $request)
 
         
         $user = auth()->user();
+        
         $allConnections = $user->connections
-            ->merge($user->connectedWithMe)
+            ->union($user->connectedWithMe)
             ->unique('id')
-            ->take(50);
-
+            ->take(400);
+   
+        $connections = [];    
+        if($allConnections){
             $connections = $allConnections->map(function ($connection) {
                 return [
                     "id"              => (string) $connection->id,
@@ -331,6 +334,7 @@ public function getConnections(Request $request)
                     "status"          => $connection->pivot->status ?? null, // include status if needed
                 ];
             });
+        }
 
         return response()->json($connections);
 

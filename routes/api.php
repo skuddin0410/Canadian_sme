@@ -61,6 +61,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     });
 
 
+  
     Route::prefix('password')->group(function () {
         Route::post('/change', [App\Http\Controllers\Api\JWTAuthController::class, 'changePassword']);
     });
