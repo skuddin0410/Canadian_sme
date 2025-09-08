@@ -10,14 +10,25 @@
       <div class="card shadow-sm rounded-4">
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-4">
-            <div class="text-left mb-2">
-              <label for="profileImageInput">
-                <img id="profileImagePreview" 
-                     src="{{ !empty($attendee->photo) ? $attendee->photo->file_path : '' }}" 
-                     class="border border-2" 
-                     style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
-              </label>
+           <div class="text-left mb-2">
+    <label for="profileImageInput">
+        @if(!empty($attendee->photo) && !empty($attendee->photo->file_path))
+            <img id="profileImagePreview"
+                 src="{{ $attendee->photo->file_path }}"
+                 class="border border-2"
+                 style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+        @else
+            <div style="width: 150px; height: 150px; display: flex; 
+                        align-items: center; justify-content: center; 
+                        border: 2px solid #000; cursor: pointer;">
+                <span class="small-heading-blue mb-0" style="font-size: 48px;">
+                    {{ strtoupper(substr($attendee->name, 0, 1)) }}
+                </span>
             </div>
+        @endif
+    </label>
+</div>
+
             <div>
               <h4 class="mb-1">{{ $attendee->full_name ?? 'N/A' }}</h4>
               <span class="badge bg-success">
