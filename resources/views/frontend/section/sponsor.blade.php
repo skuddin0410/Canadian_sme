@@ -27,6 +27,7 @@
                              @foreach($sponsors as $sponsor)
 
                             <div class="swiper-slide">
+                                 <a href="{{ route('sponsor', $sponsor->id) }}" class="text-decoration-none">
                                 <div class="swiper-img-box">
                                      @if($sponsor->logo)
                                       <img src="{{$sponsor->logo->file_path}}" alt="">
@@ -34,6 +35,7 @@
                                        <img src="{{asset('frontend/images/sponsor-1.png')}}" alt="">
                                      @endif
                                 </div>
+                                </a>
                                 <div class="swiper-img-text">
                                     <span class="sponsors-name">{{$sponsor->name ?? ''}}</span>
                                     <span class="sponsors-title">Sponsor</span>
@@ -45,7 +47,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <a class="heroBtn bg-transparent view-more" href="javascript:void()">View More </a>
+                    <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index')}}">View More </a>
                 </div>
             </div>
     </section>

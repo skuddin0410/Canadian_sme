@@ -1,8 +1,5 @@
  <!-- exhibitor -->
- @extends('frontend.landing.index')
 
-@section('title', config('app.name'))
-@section('content')
 
     <section class="exhibitor">
         <div class="container">
@@ -33,7 +30,7 @@
                             @endif
                         </div>
                         <div class="abc">
-                            <span class="blue-text-18 mb-2">Company</span>
+                            <span class="blue-text-18 mb-2">Exhibitor</span>
                             <span class="small-heading-black fw-semibold">{{$exhibitor->name ?? ''}}</span>
                         </div>
                     </div>
@@ -61,4 +58,4 @@
         </div>
     </section>
     <!-- exhibitor end -->
-    @endsection
+ 

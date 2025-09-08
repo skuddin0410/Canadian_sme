@@ -16,14 +16,17 @@ Route::get('app/page/{slug}', [PageController::class, 'appPage'])->name('public.
 // });
 
 Route::get('/profile/{id}', [LandingController::class, 'profile'])->name('profile');
-Route::get('/attendees', [LandingController::class, 'attendees'])->name('attendees');
+
 Route::get('/exhibitors', [LandingController::class, 'exhibitorIndex'])->name('exhibitor-index');
 Route::get('/session/{id}', [LandingController::class, 'session'])->name('session');
 Route::get('/exhibitor/{id}', [LandingController::class, 'exhibitor'])->name('exhibitor');
 Route::get('/profile', [LandingController::class, 'profile'])->name('profile');
+Route::get('/profile', [LandingController::class, 'attendeeIndex'])->name('profile-index');
+Route::get('/sponsor', [LandingController::class, 'sponsorIndex'])->name('sponsor-index');
+Route::get('/sponsor/{id}', [LandingController::class, 'sponsor'])->name('sponsor');
+Route::get('/speaker/{id}', [LandingController::class, 'speaker'])->name('speaker');
 
-Route::get('/session', [LandingController::class, 'session'])->name('session');
-
+Route::get('/venue', [LandingController::class, 'venue'])->name('venue');
 
 
 Route::prefix('cms')->group(function () {

@@ -7,7 +7,10 @@
                     Meeting Attendee List with Designations Included
                 </h2>
                 <div class="d-none d-xl-block">
-                    <button class="heroBtn btn-long">View More</button>
+                    <a class="view-more position-relative d-flex
+                        align-items-center gap-2" href="{{route('profile-index')}}">
+                         View More
+                    </a>
                 </div>
             </div>
 

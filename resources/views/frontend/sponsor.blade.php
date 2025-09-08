@@ -1,6 +1,10 @@
 @extends('layouts.frontendapp')
 
 @section('title', config('app.name'))
+
+@section('meta')
+    <meta name="description" content="Your landing page description here.">
+@endsection
 @section('content')
 
 <div class="container py-5">
@@ -10,9 +14,9 @@
       <div class="card shadow-sm rounded-4">
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-4">
-             @if(!empty($company->contentIconFile) && !empty($company->contentIconFile->file_path))
+             @if(!empty($company->logo) && !empty($company->logo->file_path))
   <div class="me-3">
-    <img src="{{ $company->contentIconFile->file_path }}" 
+    <img src="{{ $company->logo->file_path }}" 
          alt="{{ $company->name ?? 'Company Logo' }}"
          class="rounded-circle border border-3 shadow-sm"
          style="width: 120px; height: 120px; object-fit: cover; background: #f8f9fa;">
@@ -24,12 +28,29 @@
   
   <!-- Badges -->
   <div class="d-flex flex-wrap gap-2">
-    <span class="badge bg-success">Exhibitor</span>
+    <span class="badge bg-success">Sponsors</span>
     
     @if($company->is_sponsor == 1 && !empty($company->type))
-      <span class="badge bg-warning text-dark">
+      {{-- <span class="badge bg-warning text-dark">
         {{ $company->type }}
-      </span>
+      </span> --}}
+       @php
+        $typeColors = match(strtolower($company->type ?? 'general')) {
+            'gold' => ['bg'=>'#FFD700','border'=>'#E6C200','text'=>'#8B4513'],
+            'silver' => ['bg'=>'#C0C0C0','border'=>'#A8A8A8','text'=>'#495057'],
+            'bronze' => ['bg'=>'#CD7F32','border'=>'#B8722C','text'=>'#FFFFFF'],
+            'platinum' => ['bg'=>'#E5E4E2','border'=>'#D4D4D4','text'=>'#2C3E50'],
+            'majlislounge' => ['bg'=>'#8B4513','border'=>'#6B3410','text'=>'#FFFFFF'],
+            default => ['bg'=>'#f0f0f0','border'=>'#dee2e6','text'=>'#495057']
+        };
+        $displayType = $company->type ? ucfirst(strtolower($company->type)) : 'General';
+        if(strtolower($company->type ?? '') === 'majlislounge') $displayType = 'Majlis Lounge';
+    @endphp
+
+    <span class="company-type-badge fw-bold">
+        {{ $displayType }}
+    </span>
+    
     @endif
   </div>
 </div>
@@ -58,14 +79,14 @@
             </div>
 
             <div class="col-sm-12">
-              <p class="mb-1 text-muted"><i class="fas fa-building me-2 text-primary"></i>Exhibitor</p>
+              <p class="mb-1 text-muted"><i class="fas fa-building me-2 text-primary"></i>Sponsor</p>
                 <p class="fw-semibold">{{ $company->name ?? 'N/A' }}</p>
               </div> 
               <div class="col-sm-6"> <p class="mb-1 text-muted"> <i class="fas fa-globe me-2 text-primary"></i>Website</p> <p class="fw-semibold">
             
               @if(!empty($company->website))
                 <p>
-                  <a href="{{ $company->website }}" target="_blank" class="fw-semibold">
+                  <a href="{{ $company->website }}" target="_blank" class="text-dark">
                      {{ $company->website }}
                   </a>
                 </p>
@@ -158,5 +179,33 @@
     </div>
   </div>
 </div>
+ <style>
+        .company-type-badge {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 6px;
+            border: 2px solid {{ $typeColors['border'] }};
+            background-color: {{ $typeColors['bg'] }};
+            color: {{ $typeColors['text'] }};
+            min-width: 120px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
 
+        .company-type-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 768px) {
+            .company-type-badge { min-width: 100px; font-size: 0.8rem; padding: 0.3rem 0.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            .company-type-badge { min-width: 90px; font-size: 0.75rem; padding: 0.25rem 0.6rem; }
+        }
+    </style>
 @endsection

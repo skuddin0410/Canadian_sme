@@ -23,14 +23,19 @@ class LandingController extends Controller
         ->orderBy('start_time', 'ASC')
         ->first();
 
-        $speakers = $session->speakers->take(3); 
+        $speakers = $session->speakers; 
         $exhibitors = $session->exhibitors->take(3);
         $sponsors = $session->sponsors->take(3);
         $attendees = $session->attendees->take(3);
         
         $schedules = $this->schudled();
-
-        return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules'));
+        $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
+        $location = $locationSetting ? $locationSetting->value : null;
+        // $mapUrl = $location ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed" : null;
+         $mapUrl = $location 
+        ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed"
+        : null;
+        return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location' , 'mapUrl'));
     }
 
 
@@ -89,12 +94,33 @@ public function exhibitorIndex()
 {
     $event = Event::with(['photo'])->first();
     $exhibitors = Company::with('contentIconFile')->get();
-    //  $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
-    //     ->where('start_time', '>=', now())
-    //     ->orderBy('start_time', 'ASC')
-    //     ->first();
-     return view('frontend.section.exhibitor', compact('event', 'exhibitors'));
+    
+     return view('frontend.page.exhibitor', compact('event', 'exhibitors'));
    
+}
+public function sponsorIndex()
+{
+    $event = Event::with('photo')->first();
+
+    $sponsors = Company::with('logo')
+        ->where('is_sponsor', 1)   
+        ->get();
+
+    return view('frontend.page.sponsor', compact('event', 'sponsors'));
+}
+
+public function attendeeIndex()
+{
+    $attendees = User::with('photo')->get(); // all attendees
+    
+    $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
+        ->where('start_time', '>=', now())
+        ->orderBy('start_time', 'ASC')
+        ->first();
+
+    $event = Event::with('photo')->first();
+
+    return view('frontend.page.attendee', compact('attendees', 'session', 'event'));
 }
 
 
@@ -113,6 +139,21 @@ public function profile($id)
 
     return view('frontend.profile', compact('attendee', 'session', 'event'));
 }
+   public function speaker($id)
+  {
+   
+    $speaker = User::with(['photo','coverphoto' ])->findOrFail($id);
+
+   
+    $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
+        ->where('start_time', '>=', now())
+        ->orderBy('start_time', 'ASC')
+        ->first();
+
+    $event = Event::with('photo')->first();
+
+    return view('frontend.speaker', compact('speaker', 'session', 'event'));
+}
 
 public function exhibitor( Request $request,$id){ 
 
@@ -130,10 +171,26 @@ public function exhibitor( Request $request,$id){
     return view('frontend.company',compact('company' , 'sessions'));
 }
 
+public function sponsor( Request $request,$id){ 
+
+    $company = Company::with(['logo','banner' ])
+        ->where('id', $id)
+        ->where('is_sponsor', 1)  
+        ->firstOrFail();
+    $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+        ->where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
 
     
 
-    public function session(Request $request , $id){
+    return view('frontend.sponsor',compact('company' , 'sessions'));
+}
+
+    
+
+public function session(Request $request , $id){
     $speaker = User::with(['photo'])->findOrFail($id);
 
    
@@ -141,5 +198,13 @@ public function exhibitor( Request $request,$id){
         
     $event = Event::with('photo')->first();
        return view('frontend.session',compact('session','event','speaker'));
+    }
+    
+    
+    public function venue(){
+    $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
+    $location = $locationSetting ? $locationSetting->value : null;
+    $mapUrl = $location ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed" : null;
+       return view('frontend.venue',compact('location','mapUrl'));
     }
 }
