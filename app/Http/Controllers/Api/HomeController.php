@@ -388,7 +388,7 @@ public function getConnectionsDetails(Request $request)
                                 ? array_map('trim', explode(',', $connection->tags)) 
                                 : [],
             "rating" => $connection->rating ,
-            "visitingCardUrl"=>  asset('images/default.png'),
+            "visitingCardUrl"=> $connection->visitingcard ? $connection->visitingcard->file_path : asset('images/default.png'),
             "note"=> $connection->note,
             "avatarUrl"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
             "rep_name"          => $connection->pivot->status ?? null,
@@ -533,6 +533,11 @@ public function connectionUpdate(Request $request){
         $user->tags =$tagsString ?? '';
         $user->note =$request->note ?? '';
         $user->save(); 
+
+        if(!empty($request->visitingCardImage)){
+          $this->imageBase64Upload($request->visitingCardImage,'users',$user->id,'users','visiting_card',$user->id); 
+        }
+
         return response()->json([
             "message"=> "Connected updated.",
         ]);

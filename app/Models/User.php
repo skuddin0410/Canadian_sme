@@ -223,5 +223,13 @@ class User extends Authenticatable implements JWTSubject
             ->values();
     }
 
+    public function visitingcard()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'users')
+            ->where('file_type', 'visiting_card')
+            ->whereNotNull('file_name');
+    }
+
     protected $appends = ['full_name'];
 }
