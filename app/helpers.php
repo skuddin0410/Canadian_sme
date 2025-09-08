@@ -21,10 +21,10 @@ use App\Models\UserConnection;
 
 if (!function_exists('getCategory')) {
     function getCategory($type=null)
-    {
+    {  
        $category = Category::orderBy("created_at","DESC");
        if($type){
-            $category = $category->where('type',$type);
+            $category = $category->whereIn('type',explode(',', $type));
        } 
        $category = $category->get();
        return $category;

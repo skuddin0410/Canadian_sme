@@ -387,9 +387,9 @@ public function getConnectionsDetails(Request $request)
             "tags" => !empty($connection->tags) 
                                 ? array_map('trim', explode(',', $connection->tags)) 
                                 : [],
-            "rating" => "Cold | Normal | Warm" ,
+            "rating" => $connection->rating ,
             "visitingCardUrl"=>  asset('images/default.png'),
-            "note"=> "Follow up in two weeks.",
+            "note"=> $connection->note,
             "avatarUrl"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
             "rep_name"          => $connection->pivot->status ?? null,
         ];
@@ -500,8 +500,6 @@ public function scanDetails(Request $request){
 
         $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
 
-        dd($data);
-
         return response()->json([
             "message"=> "Session added to your agenda.",
             "isInAgenda" => isAgenda($request->sessionId)
@@ -514,7 +512,7 @@ public function scanDetails(Request $request){
 }
 
 
-public function scanNote(Request $request){
+public function connectionUpdate(Request $request){
     try {
         if (!$user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
@@ -522,10 +520,21 @@ public function scanNote(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
-        addAgenda($request->sessionId);
+        
+        $user = User::where('id',$request->connectionId)->first();
+        if(!$user){
+           return response()->json([
+            "message"=> "No connection found.",
+           ]);
+        }
+
+        $tagsString = is_array($request->tags)? implode(',', array_map('trim', $request->tags)) : trim((string) $request->tags);      
+        $user->rating = $request->rating ?? '';
+        $user->tags =$tagsString ?? '';
+        $user->note =$request->note ?? '';
+        $user->save(); 
         return response()->json([
-            "message"=> "Session added to your agenda.",
-            "isInAgenda" => isAgenda($request->sessionId)
+            "message"=> "Connected updated.",
         ]);
     
 

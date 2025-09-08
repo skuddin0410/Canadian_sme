@@ -51,7 +51,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::get('/', [HomeController::class, 'getConnections']);
         Route::get('/{connectionId}', [HomeController::class, 'getConnectionsDetails']);
         Route::post('/scan', [HomeController::class, 'scanDetails']);
-        Route::put('/scan', [HomeController::class, 'scanNote']);
+        Route::put('/{connectionId}', [HomeController::class, 'connectionUpdate']);
         Route::put('/create', [HomeController::class, 'scanNote']);
         
     });
@@ -59,7 +59,6 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::prefix('agenda')->group(function () {
          Route::get('/', [HomeController::class, 'getAgenda']);
     });
-
 
   
     Route::prefix('password')->group(function () {

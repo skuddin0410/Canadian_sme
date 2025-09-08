@@ -215,8 +215,8 @@ Admin | Edit Speaker
                             @php
                               $selectedTags = old('tags', is_array($user->tags ?? null) ? $user->tags : (empty($user->tags) ? [] : (is_string($user->tags) ? explode(',', $user->tags) : [])));
                             @endphp
-                            @if(!empty(getCategory('tags')))
-                            @foreach(getCategory('tags') as $tag)
+                            @if(!empty(getCategory('tags,connections')))
+                            @foreach(getCategory('tags,connections') as $tag)
                             <input type="checkbox" class="btn-check" id="{{$tag->slug}}{{$tag->id}}" name="tags[]" value="{{$tag->name}}"
                               {{ in_array($tag->name, $selectedTags ?? [], true) ? 'checked' : '' }}>
                             <label class="btn btn-outline-primary" for="{{$tag->slug}}{{$tag->id}}">{{$tag->name}}</label>

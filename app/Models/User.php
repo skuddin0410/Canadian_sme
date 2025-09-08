@@ -66,7 +66,9 @@ class User extends Authenticatable implements JWTSubject
         'gdpr_consent',
         'access_speaker_ids',
         'access_exhibitor_ids',
-        'access_sponsor_ids'
+        'access_sponsor_ids',
+        'rating',
+        'note'
     ];
 
     /**
