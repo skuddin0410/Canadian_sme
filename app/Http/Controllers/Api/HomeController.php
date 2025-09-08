@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\UserAgenda;
 use App\Models\FavoriteSession;
 use App\Models\UserConnection;
+use OneSignal;
+use Illuminate\Support\Facades\Validator;
 
 
 
@@ -497,17 +499,38 @@ public function scanDetails(Request $request){
                 'data' => $request->all(),
             ], 422);
         }
-
+  
         $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
+       
+        if(!$data){
+           return response()->json([
+             "message"=> "Connection not found"
+           ]);
+        } 
+        $data->load('connection.photo','connection.visitingcard');
+      
 
         return response()->json([
-            "message"=> "Session added to your agenda.",
-            "isInAgenda" => isAgenda($request->sessionId)
+            "message"=> "Connection found!",
+            "id"=>  !empty($data->connection) ? $data->connection->id: '',
+            "name"=> !empty($data->connection) ? $data->connection->full_name: '' ,
+            "company"=> !empty($data->connection) ? $data->connection->company: '',
+            "designation"=> !empty($data->connection) ? $data->connection->designation: '',
+            "company_website"=> !empty($data->connection) ? $data->connection->website_url: '',
+            "email"=> !empty($data->connection) ? $data->connection->email: '',
+            "phone"=> !empty($data->connection) ? $data->connection->mobile: '',
+            "avatar"=> !empty($data->connection) && !empty($data->connection->photo) ? $data->connection->photo->file_path: asset('images/default.png'),
+            "visiting_card_image" => !empty($data->connection) && !empty($data->connection->visitingcard) ? $data->connection->visitingcard->file_path: asset('images/default.png'),
+            "tags"=> !empty($data->connection) ? $data->connection->tags: '' ,
+            "rating"=> !empty($data->connection) ? $data->connection->rating: '' ,
+            "address"=> !empty($data->connection) ? $data->connection->address: '' ,
+            "bio"=> !empty($data->connection) ? $data->connection->bio: '' ,
+            "note"=> !empty($data->connection) ? $data->connection->note: '' ,
         ]);
     
 
     } catch (\Exception $e) {
-        return response()->json(["message" => $e->getMessage()]);
+        return response()->json(["message" => 'Scan failed!']);
     }
 }
 
@@ -528,7 +551,7 @@ public function connectionUpdate(Request $request){
            ]);
         }
 
-        $tagsString = is_array($request->tags)? implode(',', array_map('trim', $request->tags)) : trim((string) $request->tags);      
+        $tagsString = is_array($request->tags)? implode(',', array_map('trim', $request->tags)) : trim((string) $request->tags);
         $user->rating = $request->rating ?? '';
         $user->tags =$tagsString ?? '';
         $user->note =$request->note ?? '';
@@ -567,6 +590,15 @@ public function scanCreate(Request $request){
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
     }
+}
+
+
+public function sendPushNotification(Request $request){
+    OneSignal::sendNotificationToAll(
+       "Hello from Subhabrata!",
+       $url = "https://sme.nodejsdapldevelopments.com/", $data = null, $buttons =null, $schedule = null
+   );
+
 }
 
 }
