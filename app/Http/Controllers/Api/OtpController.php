@@ -32,7 +32,13 @@ class OtpController extends Controller
                 // 'data' => $request->all(),
             ], 422);
         }
-
+        
+        if($request->email != "henry.roy@example.com"){
+           return response()->json([
+                'success' => true,
+                'message' => 'Please use test account',
+            ]);
+        } 
         $code = rand(1000, 9999);
         $currentDateTime = Carbon::now();
 
@@ -53,11 +59,18 @@ class OtpController extends Controller
     }
 
 public function verify(Request $request)
-{
+{  
     $validator = Validator::make($request->all(), [
         'email' => 'required|string|email|max:255',
         'otp'   => 'required|digits:4',
     ]);
+    
+     if($request->email != "henry.roy@example.com"){
+           return response()->json([
+                'success' => true,
+                'message' => 'Please use test account'
+            ]);
+        } 
 
     if ($validator->fails()) {
         return response()->json([
