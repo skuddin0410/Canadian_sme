@@ -10,9 +10,6 @@ use App\Models\User;
 use App\Mail\KycMail;
 use App\Models\Booth;
 use App\Models\Drive;
-use App\Models\Order;
-use App\Models\Wallet;
-
 use App\Models\Company;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
