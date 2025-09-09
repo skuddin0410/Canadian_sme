@@ -15,7 +15,7 @@
 
     <ul class="menu-inner py-1">
         <li class="menu-item {{ request()->is('home') ? 'active open' : '' }}">
-            <a href="{{ url('home') }}" class="menu-link">
+            <a href="{{ route('home') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="Dashboard">Overview</div>
             </a>
@@ -81,12 +81,12 @@
             </a>
             <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
-                <a href="{{url('usergroup')}}" class="menu-link">
+                <a href="{{route('usergroup.index')}}" class="menu-link">
                     <div data-i18n="ticket-categories"> User Groups</div>
                 </a>
             </li>
               <li class="menu-item {{ request()->is('attendee-users*') ? 'active' : '' }}">
-                    <a href="{{ url('attendee-users') }}" class="menu-link">
+                    <a href="{{ route('attendee-users.index') }}" class="menu-link">
                         <div data-i18n="Attendee">Attendee </div>
                     </a>
                 </li>
@@ -115,19 +115,19 @@
                         </a>
                     </li> --}}
                     <li class="menu-item {{ request()->is('speaker*') ? 'active open' : '' }}">
-                       <a href="{{ url('speaker') }}" class="menu-link">
+                       <a href="{{ route('speaker.index') }}" class="menu-link">
                         <div data-i18n="Users">Speaker </div>
                        </a>
                     </li>
 
                     <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active open' : '' }}">
-                       <a href="{{ url('exhibitor-users') }}" class="menu-link">
+                       <a href="{{ route('exhibitor-users.index') }}" class="menu-link">
                         <div data-i18n="Users">Exhibitor </div>
                        </a>
                     </li>
                     
                      <li class="menu-item {{ request()->is('sponsors*') ? 'active open' : '' }}">
-                       <a href="{{ url('sponsors') }}" class="menu-link">
+                       <a href="{{ route('sponsors.index') }}" class="menu-link">
                         <div data-i18n="Users">Sponsors </div>
                        </a>
                      </li>
@@ -144,7 +144,7 @@
                         </a>
                     </li>
                      <li class="menu-item {{ request()->is('event-guides*') ? 'active open' : '' }}">
-                        <a href="{{ url('event-guides') }}" class="menu-link">
+                        <a href="{{ route('event-guides.index') }}" class="menu-link">
                             <div data-i18n="Coupons">Event Guide</div>
                         </a>
                     </li>
@@ -201,7 +201,7 @@
                 </li>
 
                 <li class="menu-item {{ request()->is('email-template-settings*') ? 'active open' : '' }}">
-                    <a href="{{ url('email-template-settings') }}" class="menu-link">
+                    <a href="{{ route('email-template-settings') }}" class="menu-link">
                         <div data-i18n="newsletters">Email Template</div>
                     </a>
                 </li>

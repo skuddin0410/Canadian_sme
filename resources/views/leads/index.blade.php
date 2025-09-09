@@ -11,7 +11,7 @@
 <div class="container flex-grow-1 container-p-y pt-0">
 
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-4 mt-4">
         <div>
             <h1 class="h4 fw-bold text-dark mb-1">Lead Management</h1>
             <p class="text-muted mb-0">Manage and track your event leads</p>

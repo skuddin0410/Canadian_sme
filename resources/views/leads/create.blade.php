@@ -10,7 +10,7 @@
 @endpush
 
 @section('content')
-<div class="container flex-grow-1 container-p-y pt-0">
+<div class="container flex-grow-1 container-p-y p-4 mt-4">
     <div class="mb-4">
         <h1 class="h4 fw-bold text-dark">Create New Lead</h1>
         <p class="text-muted">Fill in the details to add a new lead</p>
@@ -28,7 +28,7 @@
         </div>
     @endif
 
-    <div class="card shadow-sm border-0 rounded-3">
+    <div class="card shadow-sm border-0 rounded-3  p-4">
         <div class="card-body p-4">
             <form action="{{ route('leads.store') }}" method="POST">
                 @csrf
