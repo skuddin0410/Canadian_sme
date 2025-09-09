@@ -249,13 +249,13 @@ Admin | Edit Attendee Data
                       {{-- Email / GDPR --}}
                       <div class="col-12">
                         <div class="row">
-                          <div class="col-md-12">
+                          {{-- <div class="col-md-12">
                             <div class="form-check mb-2">
                               <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1"
                                      {{ old('send_email', $user->send_email ?? false) ? 'checked' : '' }}>
                               <label class="form-check-label" for="send_email">Would you like to send email?</label>
                             </div>
-                          </div>
+                          </div> --}}
                           <div class="col-md-12">
                             <div class="form-check mb-2">
                               <input class="form-check-input" type="checkbox" id="gdpr_consent" name="gdpr_consent" value="1"

@@ -1,3 +1,5 @@
+            @include("emails.layout.qrcode")
+
             </td>
           </tr>
 
