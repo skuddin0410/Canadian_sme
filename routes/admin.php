@@ -17,11 +17,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
-    Route::resource('coupons', App\Http\Controllers\CouponController::class);
-    Route::resource('faqs', App\Http\Controllers\FaqController::class);
     Route::resource('otps', App\Http\Controllers\OtpController::class);
-    Route::resource('orders', App\Http\Controllers\OrderController::class);
-    Route::resource('transactions', App\Http\Controllers\TransactionController::class);
     Route::resource('settings', App\Http\Controllers\SettingController::class);
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
 
