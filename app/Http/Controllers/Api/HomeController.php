@@ -680,9 +680,9 @@ public function createConnection(Request $request){
 
 
 public function sendPushNotification(Request $request){
-    OneSignal::sendNotificationToAll(
-       "Hello from Subhabrata!",
-       $url = "https://sme.nodejsdapldevelopments.com/", $data = null, $buttons =null, $schedule = null
+     OneSignal::sendNotificationToUser(
+        "Hi this is a test push notification",
+        $request->onesignal_userid 
     );
 }
 

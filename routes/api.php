@@ -71,8 +71,8 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::get('/refresh-token', [App\Http\Controllers\Api\JWTAuthController::class, 'refreshToken']);
     Route::get('/logout', [App\Http\Controllers\Api\JWTAuthController::class, 'logout']);
     
-
+    Route::post('/onesignal', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotification']);
 
 });
 
- Route::get('/push', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotification']);
+ 
