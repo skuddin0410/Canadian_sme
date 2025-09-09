@@ -9,7 +9,7 @@ class UserConnection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'connection_id', 'status'];
+    protected $fillable = ['user_id', 'connection_id', 'status','rating','note'];
 
     public function user()
     {

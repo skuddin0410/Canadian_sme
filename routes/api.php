@@ -50,16 +50,18 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::prefix('connections')->group(function () {
         Route::get('/', [HomeController::class, 'getConnections']);
         Route::get('/{connectionId}', [HomeController::class, 'getConnectionsDetails']);
+        Route::put('/{connectionId}', [HomeController::class, 'connectionUpdate']);
+
         Route::post('/scan', [HomeController::class, 'scanDetails']);
-        Route::put('/scan', [HomeController::class, 'scanNote']);
-        Route::put('/create', [HomeController::class, 'scanNote']);
+        Route::put('/update/scan', [HomeController::class, 'scanDetailsUpdate']);
+
+        Route::post('/create', [HomeController::class, 'createConnection']);
         
     });
 
     Route::prefix('agenda')->group(function () {
          Route::get('/', [HomeController::class, 'getAgenda']);
     });
-
 
   
     Route::prefix('password')->group(function () {
@@ -68,6 +70,9 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
 
     Route::get('/refresh-token', [App\Http\Controllers\Api\JWTAuthController::class, 'refreshToken']);
     Route::get('/logout', [App\Http\Controllers\Api\JWTAuthController::class, 'logout']);
-   
+    
+    Route::post('/onesignal', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotification']);
+
 });
 
+ 

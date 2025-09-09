@@ -66,7 +66,8 @@ class User extends Authenticatable implements JWTSubject
         'gdpr_consent',
         'access_speaker_ids',
         'access_exhibitor_ids',
-        'access_sponsor_ids'
+        'access_sponsor_ids',
+        'title'
     ];
 
     /**
@@ -219,6 +220,14 @@ class User extends Authenticatable implements JWTSubject
             ->merge($this->connectedWithMe)
             ->unique('id')
             ->values();
+    }
+
+    public function visitingcard()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'users')
+            ->where('file_type', 'visiting_card')
+            ->whereNotNull('file_name');
     }
 
     protected $appends = ['full_name'];
