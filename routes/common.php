@@ -15,3 +15,5 @@ Route::any('brand', [App\Http\Controllers\HomeController::class, 'brand'])->name
 Route::any('splash', [App\Http\Controllers\HomeController::class, 'splash'])->name('splash');
 
 Route::any('registration-settings', [App\Http\Controllers\HomeController::class, 'registrationSettings'])->name('registration-settings');
+
+Route::any('email-template-settings', [App\Http\Controllers\HomeController::class, 'emailTemplateSettings'])->name('email-template-settings');

@@ -307,4 +307,30 @@ class HomeController extends Controller
         return view('registration-settings');
     }
     
+   public function emailTemplateSettings(Request $request){
+        if($request->mode == 'save'){
+               $data = $request->validate([
+                'subject'     => ['required','string','max:255'],
+                'content'  => ['required','string',"max:500"],
+               ]);
+            
+            if(!empty($request->subject)) {
+                $subject = Setting::where('key','email_subject')->first();
+                $subject->value = $request->subject;
+                $subject->save();   
+            }  
+
+             if(!empty($request->content)) {
+                $content = Setting::where('key','email_content')->first();
+                $content->value = $request->content;
+                $content->save();   
+            }
+            
+            session()->flash('success', 'Saved successfully.');     
+            return redirect()->route('email-template-settings'); 
+        }
+            
+       return view('EmailTemplate');
+   }
+    
 }

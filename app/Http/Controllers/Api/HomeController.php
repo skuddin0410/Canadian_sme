@@ -689,9 +689,9 @@ public function createConnection(Request $request){
 
 
 public function sendPushNotification(Request $request){
-     OneSignal::sendNotificationToUser(
+    OneSignal::sendNotificationToUser(
         "Hi this is a test push notification",
-        $request->onesignal_userid 
+         $request->onesignal_userid 
     );
 }
 
