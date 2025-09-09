@@ -151,12 +151,3 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
 
     });
-
-
-Route::group(['middleware' => ['webauth']], function () {
-
- require __DIR__.'/newsletters.php';
- require __DIR__.'/formbuilder.php';
-  require __DIR__.'/lead.php';
-
-});
