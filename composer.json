@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "bacon/bacon-qr-code": "^3.0",
+        "berkayk/onesignal-laravel": "^2.4",
         "doctrine/dbal": "^4.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",

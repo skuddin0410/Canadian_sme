@@ -202,8 +202,8 @@ Admin | Speaker Add
                         <div class="mb-3">
                           <label class="form-label">User Interest</label>
                           <div class="d-flex flex-wrap gap-2">
-                            @if(!empty(getCategory('tags')))
-                            @foreach(getCategory('tags') as $tag)
+                            @if(!empty(getCategory('tags,connections')))
+                            @foreach(getCategory('tags,connections') as $tag)
                             <input type="checkbox" class="btn-check" id="{{$tag->slug}}{{$tag->id}}" name="tags[]" value="{{$tag->name}}"
                               {{ in_array($tag->name, old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
                             <label class="btn btn-outline-primary" for="{{$tag->slug}}{{$tag->id}}">{{$tag->name}}</label>
