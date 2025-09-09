@@ -363,19 +363,26 @@ class AttendeeUserController extends Controller
         return Excel::download(new AttendeesExport, 'attendees.xlsx');
     }
     public function allowAccess(string $id)
-{
-    $user = User::with('roles')
-        ->whereHas('roles', function ($q) {
-            $q->where('name', 'Attendee');
-        })
-        ->findOrFail($id);
+    {
+        $user = User::with('roles')
+            ->whereHas('roles', function ($q) {
+                $q->where('name', 'Attendee');
+            })
+            ->findOrFail($id);
 
 
-    $user->is_approve = true; // allow access
-    $user->save();
+        if($user->is_approve == 1){
+           $user->is_approve = 0;
+           $message = "App access allowed successfully";
+        }else{
+            $user->is_approve = 1;
+            $message = "App access removed successfully";
+        } 
+        $user->save();
+        return back()->withSuccess($message);
 
-    return back()->withSuccess('App access allowed successfully to Attendee.');
-}
+  }
+
 public function sendMail(Request $request, $id)
 {
     $request->validate([
