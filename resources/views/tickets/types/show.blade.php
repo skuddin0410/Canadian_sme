@@ -3,7 +3,7 @@
 @section('title', $ticketType->name . ' - Ticket Type Details')
 
 @section('content')
-<div class="container">
+<div class="container flex-grow-1 container-p-y pt-0">
     <div class="row">
         <div class="col-12 mt-3">
             <!-- Header -->

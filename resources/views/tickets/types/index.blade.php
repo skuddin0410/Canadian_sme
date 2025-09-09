@@ -3,7 +3,7 @@
 @section('title', 'Ticket Types')
 
 @section('content')
-<div class="container">
+<div class="container flex-grow-1 container-p-y pt-0">
     <div class="row">
         <div class="col-12 mt-3">
             <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
@@ -118,15 +118,15 @@
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('admin.ticket-types.show', $ticketType) }}" class="btn btn-outline-info">
-                                                    <i class="fas fa-eye"></i>
+                                                <a href="{{ route('admin.ticket-types.show', $ticketType) }}" class="btn btn-sm btn-icon btn-primary" title="Show">
+                                                   <i class="bx bxs-show"></i>
                                                 </a>
-                                                <a href="{{ route('admin.ticket-types.edit', $ticketType) }}" class="btn btn-outline-primary">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="{{ route('admin.ticket-types.edit', $ticketType) }}"  class="btn btn-sm btn-icon item-edit" title="Edit">
+                                                    <i class="bx bxs-edit"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-outline-danger" onclick="confirmDelete({{ $ticketType->id }})">
+                                            {{--     <button type="button" class="btn btn-outline-danger" onclick="confirmDelete({{ $ticketType->id }})">
                                                     <i class="fas fa-trash"></i>
-                                                </button>
+                                                </button> --}}
                                             </div>
                                         </td>
                                     </tr>
