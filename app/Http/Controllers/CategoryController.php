@@ -130,9 +130,6 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {   
-        if(Blog::where('category',$category->id)->first()){
-          return redirect(route('categories.index'))->withError("Category can not be delete");   
-        }
         $category->delete();
         return redirect(route('categories.index'))->withSuccess("Category has been deleted successfully");
     }

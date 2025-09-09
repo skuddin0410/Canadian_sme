@@ -40,9 +40,11 @@
 	<tr>
 		<th>Content Icon</th>
 		<th>Name</th>
-		<th>email</th>
+		<th>Industry</th>
+		<th>Email</th>
+		<th>Phone</th>
 		<th>Booth ID</th>
-		<th width="20%">Actions</th>
+		<th width="10%">Actions</th>
 	</tr>
 </thead>
 
@@ -63,7 +65,9 @@
 
 	{{-- Company Name --}}
 	<td>{{ $user->name ?? '-' }}</td>
+	<td>{{ $user->industry ?? '-' }}</td>
     <td>{{ $user->email ?? '-' }}</td>
+    <td>{{ $user->phone ?? '-' }}</td>
 	{{-- Booth ID --}}
 	<td>
      {{$user->booth?? ''}}
@@ -75,7 +79,7 @@
 	<td>
 		<div class="d-flex flex-wrap gap-1">
 			<a href="{{ route('exhibitor-users.show', ['exhibitor_user' => $user->id]) }}" 
-			   class="btn btn-sm btn-icon item-show" title="Show">
+			   class="btn btn-sm btn-icon btn-primary" title="Show">
 				<i class="bx bxs-show"></i>
 			</a>
 			<a href="{{ route('exhibitor-users.edit', ['exhibitor_user' => $user->id]) }}" 
@@ -84,7 +88,7 @@
 			</a>
 
 			{{-- Delete button --}}
-			<form action="{{ route('exhibitor-users.destroy', $user->id) }}" 
+	{{-- 		<form action="{{ route('exhibitor-users.destroy', $user->id) }}" 
 			      method="POST" 
 			      onsubmit="return confirm('Are you sure you want to delete this Exhibitor?');">
 				@csrf
@@ -92,7 +96,7 @@
 				<button type="submit" class="btn btn-sm btn-icon btn-danger" title="Delete">
 					<i class="bx bxs-trash"></i>
 				</button>
-			</form>
+			</form> --}}
 		</div>
 	</td>
 </tr>

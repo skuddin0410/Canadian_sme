@@ -35,7 +35,7 @@
       <th>Email</th>
       <th>Phone</th>
       <th>Type</th>
-      <th width="20%">Actions</th>
+      <th width="10%">Actions</th>
     </tr>
   </thead>
  <tbody>
@@ -68,14 +68,14 @@
           <a href="{{ route('sponsors.edit', $company->id) }}" class="btn btn-sm btn-icon item-edit" title="Edit">
             <i class="bx bx-edit-alt"></i>
           </a>
-          <form action="{{ route('sponsors.destroy', $company->id) }}" method="POST"
+         {{--  <form action="{{ route('sponsors.destroy', $company->id) }}" method="POST"
                 onsubmit="return confirm('Are you sure you want to delete this sponsor?');">
             @csrf
             @method('DELETE')
             <button class="btn btn-sm btn-danger btn-icon" type="submit" title="Delete">
               <i class="bx bx-trash"></i>
             </button>
-          </form>
+          </form> --}}
         </div>
       </td>
     </tr>
