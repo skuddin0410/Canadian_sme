@@ -31,7 +31,7 @@ if (!function_exists('getCategory')) {
     }
 }
 
-if (!function_exists('getExperts')) {
+if (!function_exists('getExpert')) {
     function getExpert($string)
     { 
       if(strlen($string) > 150){

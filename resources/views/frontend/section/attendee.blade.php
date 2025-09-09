@@ -7,7 +7,10 @@
                     Meeting Attendee List with Designations Included
                 </h2>
                 <div class="d-none d-xl-block">
-                    <button class="heroBtn btn-long">View More</button>
+                    <a class="view-more position-relative d-flex
+                        align-items-center gap-2" href="{{route('profile-index')}}">
+                         View More
+                    </a>
                 </div>
             </div>
 
@@ -17,12 +20,23 @@
                         <div class="attendee-card shadow">
                             <div class="attendee-card-box">
                                 <div class="attendee-profile">
-                                    @if(!empty($attendee->photo) &&  $attendee->photo->file_path)
-                                    <img src="{{$attendee->photo->file_path}}" alt="">
-                                    @else
-                                    <span class="small-heading-blue mb-0">{{shortenName($attendee->name, $attendee->lastname)}}</span>
-                                    @endif
-                                </div>
+    @if(!empty($attendee->photo) && !empty($attendee->photo->file_path))
+        <img src="{{ $attendee->photo->file_path }}" alt="">
+    @else
+        <span class="small-heading-blue mb-0">{{ shortenName($attendee->name) }}</span>
+    @endif
+</div>
+
+                                {{-- <div class="text-left mb-2">
+                                   <label for="profileImageInput">
+                                @if(!empty($attendee->photo))
+                                   <img id="profileImagePreview" 
+                                   src="{{!empty($attendee->photo) ? $attendee->photo->file_path : ''}}" 
+                                   class="border border-2" 
+                                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                                   </label>
+                                   
+                                </div> --}}
                                 <div class="abc">
                                     <span class="blue-text-18 mb-2">Full Name</span>
                                     <span class="small-heading-black fw-semibold">{{$attendee->full_name ?? ''}}</span>
@@ -42,7 +56,7 @@
                             </div>
                             <div>
                                 <a class="view-more position-relative d-flex
-                                align-items-center gap-2" href="{{route('profile')}}">
+                                align-items-center gap-2" href="{{route('profile', $attendee->id)}}">
                                     View More
                                 </a>
                             </div>
