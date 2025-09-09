@@ -67,20 +67,6 @@
              
         @endif  
 
-        @if(Auth::user()->hasRole('Exhibitor') )
-           @include('partial.exhibitor-side-bar')
-        @endif  
-        
-        @if(Auth::user()->hasRole('Registration Desk'))
-           @include('partial.registration-desk-sidebar')
-        @endif 
-
-        @if(Auth::user()->hasRole('Support Staff Or Helpdesk'))
-           @include('partial.support-staff-side-bar')
-        @endif 
-
-        <!-- / Menu -->
-        <!-- Layout container -->
         <div class="layout-page">
           <!-- Navbar -->
               @include('partial.nav-bar')
