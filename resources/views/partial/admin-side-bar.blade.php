@@ -187,7 +187,7 @@
             </ul>
         </li>
         
-        <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }} {{ request()->is('newsletters*') ? 'active open' : '' }} {{ request()->is('audit*') ? 'active open' : '' }}  {{ request()->is('audit*') ? 'active open' : '' }} {{ request()->is('role-permission-matrix*') ? 'active open' : '' }} ">
+        <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }} {{ request()->is('email-template-settings*') ? 'active open' : '' }} {{ request()->is('audit*') ? 'active open' : '' }}  {{ request()->is('audit*') ? 'active open' : '' }} {{ request()->is('role-permission-matrix*') ? 'active open' : '' }} ">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="formbuilder">Settings</div>
@@ -200,9 +200,9 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('newsletters*') ? 'active open' : '' }}">
-                    <a href="{{ url('newsletters') }}" class="menu-link">
-                        <div data-i18n="newsletters">Newsletter</div>
+                <li class="menu-item {{ request()->is('email-template-settings*') ? 'active open' : '' }}">
+                    <a href="{{ url('email-template-settings') }}" class="menu-link">
+                        <div data-i18n="newsletters">Email Template</div>
                     </a>
                 </li>
 
@@ -213,14 +213,6 @@
                         <div data-i18n="audit">Audit</div>
                     </a>
                 </li>
-               
-
-            
-                {{-- <li class="menu-item {{ request()->is('role-permission-matrix*') ? 'active open' : '' }}">
-                    <a href="{{ route('roles.matrix') }}" class="menu-link">
-                        <div data-i18n="audit">Roles</div>
-                    </a>
-                </li> --}}
                 
             </ul>
         </li>
