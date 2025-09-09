@@ -132,12 +132,12 @@
           <!-- Subject -->
           <div class="mb-3">
             <label class="form-label">Subject</label>
-            <input type="text" name="subject" class="form-control" required>
+            <input type="text" name="subject" class="form-control" value="{{ getKeyValue('email_subject')->value ?? ''}}" required>
           </div>
           <!-- Message -->
           <div class="mb-3">
             <label class="form-label">Message</label>
-            <textarea name="message" class="form-control" rows="5" required></textarea>
+            <textarea name="message" class="form-control" rows="5" required>{{ getKeyValue('email_content')->value ?? ''}}</textarea>
           </div>
         </div>
         <div class="modal-footer">

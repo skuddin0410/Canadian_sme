@@ -129,16 +129,17 @@
           <h5 class="modal-title">Send Mail to {{ $user->name }} {{ $user->lastname }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
         <div class="modal-body">
           <!-- Subject -->
           <div class="mb-3">
             <label class="form-label">Subject</label>
-            <input type="text" name="subject" class="form-control" required>
+            <input type="text" name="subject" class="form-control" value="{{ getKeyValue('email_subject')->value ?? '' }}" required>
           </div>
           <!-- Message -->
           <div class="mb-3">
             <label class="form-label">Message</label>
-            <textarea name="message" class="form-control" rows="5" required></textarea>
+            <textarea name="message" class="form-control" rows="5" required>{{getKeyValue('email_content')->value ?? ''}}</textarea>
           </div>
         </div>
         <div class="modal-footer">
