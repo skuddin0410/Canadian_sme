@@ -14,26 +14,26 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <li class="menu-item {{ request()->is('home') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/home') ? 'active open' : '' }}">
             <a href="{{ route('home') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="Dashboard">Overview</div>
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }} {{ request()->is('registration-settings*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/form-builder*') ? 'active open' : '' }} {{ request()->is('admin/registration-settings*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Registration</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('registration-settings*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/registration-settings*') ? 'active open' : '' }}">
                     <a href="{{ route("registration-settings") }}" class="menu-link">
                         <div data-i18n="events">Registration Settings</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('form-builder*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/form-builder*') ? 'active open' : '' }}">
                     <a href="{{ route('form-builder.index') }}" class="menu-link">
                         <div data-i18n="events">Registration Forms</div>
                     </a>
@@ -42,30 +42,30 @@
         </li>
 
 
-        <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }} {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/events*') ? 'active open' : '' }} {{ request()->is('admin/brand*') ? 'active open' : '' }} {{ request()->is('admin/splash*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Setup</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('events*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/events*') ? 'active open' : '' }}">
                     <a href="{{ route("events.edit",["event"=> 1 ]) }}" class="menu-link">
                         <div data-i18n="events">Basic Info</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('brand*') ? 'active open' : '' }} {{ request()->is('splash*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/brand*') ? 'active open' : '' }} {{ request()->is('admin/splash*') ? 'active open' : '' }}">
                     <a href="javascript:void(0);"  class="menu-link menu-toggle">
                         <div data-i18n="Booth Management">Branding</div>
                     </a>
                      <ul class="menu-sub">
-                        <a href="{{route('brand')}}" class="menu-link {{ request()->is('brand*') ? 'active open' : '' }}" >
+                        <a href="{{route('brand')}}" class="menu-link {{ request()->is('admin/brand*') ? 'active open' : '' }}" >
                            <div data-i18n="Booth Management">App Branding</div>
                         </a>
                         {{--  <a href="{{route('booths.index')}}" class="menu-link">
                            <div data-i18n="Booth Management">App Menu</div>
                         </a>--}}
-                        <a href="{{route('splash')}}" class="menu-link {{ request()->is('splash*') ? 'active open' : '' }}">
+                        <a href="{{route('splash')}}" class="menu-link {{ request()->is('admin/splash*') ? 'active open' : '' }}">
                            <div data-i18n="Booth Management">Splash Screen</div>
                         </a>
                      </ul>
@@ -74,18 +74,18 @@
         </li>
         
 
-        <li class="menu-item {{ request()->is('attendee-users*') ? 'active open' : '' }} {{ request()->is('usergroup*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active open' : '' }} {{ request()->is('admin/usergroup*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class=" menu-link menu-toggle">
                  <i class="menu-icon  fa fa-list"></i>
                 <div data-i18n="tickets">People</div>
             </a>
             <ul class="menu-sub">
-            <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
+            <li class="menu-item {{ request()->is('admin/admin/ticket-categories*') ? 'active open' : '' }}">
                 <a href="{{route('usergroup.index')}}" class="menu-link">
                     <div data-i18n="ticket-categories"> User Groups</div>
                 </a>
             </li>
-              <li class="menu-item {{ request()->is('attendee-users*') ? 'active' : '' }}">
+              <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active' : '' }}">
                     <a href="{{ route('attendee-users.index') }}" class="menu-link">
                         <div data-i18n="Attendee">Attendee </div>
                     </a>
@@ -94,68 +94,68 @@
         </li>
 
 
-         <li class="menu-item {{ request()->is('admin-users*') ? 'active open' : '' }}  {{ request()->is('exhibitor-users*') ? 'active open' : '' }} {{ request()->is('speaker*') ? 'active open' : '' }} {{ request()->is('sponsors*') ? 'active open' : '' }}  {{ request()->is('categories*') ? 'active open' : '' }} {{ request()->is('webview*') ? 'active open' : '' }} {{ request()->is('calendar*') ? 'active open' : '' }} {{ request()->is('booths*') ? 'active open' : '' }} {{ request()->is('event-guides*') ? 'active open' : '' }}  {{ request()->is('event-guides.showGallery*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active open' : '' }}  {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }}  {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') ? 'active open' : '' }}  {{ request()->is('admin/event-guides.showGallery*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
             </a>
 
            <ul class="menu-sub">
-                    <li class="menu-item {{ request()->is('calendar*') ? 'active open' : '' }}">
+                    <li class="menu-item {{ request()->is('admin/calendar*') ? 'active open' : '' }}">
                         <a href="{{ route('calendar.index') }}" class="menu-link">
                         
                             <div data-i18n="Schedules">Schedules </div>
                         </a>
                     </li>
 
-                   {{--  <li class="menu-item {{ request()->is('admin-users*') ? 'active' : '' }}">
+                   {{--  <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active' : '' }}">
                         <a href="{{ url('admin-users') }}" class="menu-link">
                             <i class="menu-icon tf-icons fa fa-users  me-1"></i>
                             <div data-i18n="events">Team </div>
                         </a>
                     </li> --}}
-                    <li class="menu-item {{ request()->is('speaker*') ? 'active open' : '' }}">
+                    <li class="menu-item {{ request()->is('admin/speaker*') ? 'active open' : '' }}">
                        <a href="{{ route('speaker.index') }}" class="menu-link">
                         <div data-i18n="Users">Speaker </div>
                        </a>
                     </li>
 
-                    <li class="menu-item {{ request()->is('exhibitor-users*') ? 'active open' : '' }}">
+                    <li class="menu-item {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }}">
                        <a href="{{ route('exhibitor-users.index') }}" class="menu-link">
                         <div data-i18n="Users">Exhibitor </div>
                        </a>
                     </li>
                     
-                     <li class="menu-item {{ request()->is('sponsors*') ? 'active open' : '' }}">
+                     <li class="menu-item {{ request()->is('admin/sponsors*') ? 'active open' : '' }}">
                        <a href="{{ route('sponsors.index') }}" class="menu-link">
                         <div data-i18n="Users">Sponsors </div>
                        </a>
                      </li>
 
-                    <li class="menu-item {{ request()->is('categories*') ? 'active open' : '' }}">
+                    <li class="menu-item {{ request()->is('admin/categories*') ? 'active open' : '' }}">
                         <a href="{{ route('categories.index') }}" class="menu-link">
                         <div data-i18n="categories">Categories & Tags</div>
                         </a>
                     </li>
 
-                    <li class="menu-item {{ request()->is('webview*') ? 'active open' : '' }}">
+                    <li class="menu-item {{ request()->is('admin/webview*') ? 'active open' : '' }}">
                         <a href="{{ route('webview') }}" class="menu-link">
                             <div data-i18n="Coupons">Webview</div>
                         </a>
                     </li>
-                     <li class="menu-item {{ request()->is('event-guides*') ? 'active open' : '' }}">
+                     <li class="menu-item {{ request()->is('admin/event-guides*') ? 'active open' : '' }}">
                         <a href="{{ route('event-guides.index') }}" class="menu-link">
                             <div data-i18n="Coupons">Event Guide</div>
                         </a>
                     </li>
 
-                    <li class="menu-item {{ request()->is('event-guides.showGallery*') ? 'active open' : '' }}">
+                    <li class="menu-item {{ request()->is('admin/event-guides.showGallery*') ? 'active open' : '' }}">
                         <a href="{{route('event-guides.showGallery')}}" class="menu-link">
                             <div data-i18n="Gallery">Gallery</div>
                            
                         </a>
                     </li>
-                    <!-- <li class="menu-item {{ request()->is('booths*') ? 'active open' : '' }}">
+                    <!-- <li class="menu-item {{ request()->is('admin/booths*') ? 'active open' : '' }}">
                     <a href="{{route('booths.index')}}" class="menu-link">
                        <div data-i18n="Booth Management">Booths</div>
                     </a>
@@ -167,7 +167,7 @@
 
     
 
-         <li class="menu-item {{ request()->is('tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin/tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class=" menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="tickets">Tickets Managment</div>
@@ -187,28 +187,25 @@
             </ul>
         </li>
         
-        <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }} {{ request()->is('email-template-settings*') ? 'active open' : '' }} {{ request()->is('audit*') ? 'active open' : '' }}  {{ request()->is('audit*') ? 'active open' : '' }} {{ request()->is('role-permission-matrix*') ? 'active open' : '' }} ">
+        <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-template-settings*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} ">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="formbuilder">Settings</div>
             </a>
             <ul class="menu-sub">
 
-                <li class="menu-item {{ request()->is('leads*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }}">
                     <a href="{{route('leads.index')}}" class="menu-link">
                             <div data-i18n="Booth Management">Lead Management</div>
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('email-template-settings*') ? 'active open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/email-template-settings*') ? 'active open' : '' }}">
                     <a href="{{ route('email-template-settings') }}" class="menu-link">
                         <div data-i18n="newsletters">Email Template</div>
                     </a>
-                </li>
-
-
-               
-                <li class="menu-item {{ request()->is('audit*') ? 'active open' : '' }}">
+                </li>       
+                <li class="menu-item {{ request()->is('admin/audit*') ? 'active open' : '' }}">
                     <a href="{{ route('audit.index') }}" class="menu-link">
                         <div data-i18n="audit">Audit</div>
                     </a>
