@@ -627,26 +627,21 @@ public function createConnection(Request $request){
         }
         
         $validator = Validator::make($request->all(), [
-         
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
-            'website_url' => 'nullable|string|max:255',
-            'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'nullable|string|unique:users,mobile',
-            'bio' => 'required|string',
-            'tags'   => ['nullable','array'],
-            'tags.*' => ['string'],         
+            'bio' => 'nullable|string',       
         ]);
 
         if ($validator->fails()) {
-            return redirect(route('attendee-users.create'))->withInput()
-                ->withErrors($validator);
+            return response()->json(["message" => $validator->errors()->first()]);
         }
-        $tagsString = is_array($request->tags)? implode(',', array_map('trim', $request->tags)) : trim((string) $request->tags);
+        $tagsString = is_array($request->tag)? implode(',', array_map('trim', $request->tag)) : trim((string) $request->tag);
         $connection = new User();
+        $connection->title = $request->title;
         $connection->name = $request->first_name;
         $connection->lastname = $request->last_name;
         $connection->email = $request->email;
@@ -658,6 +653,10 @@ public function createConnection(Request $request){
         $connection->is_approve = true;
         $connection->save();
         $connection->assignRole('Attendee');
+        
+        qrCode($connection->id);
+        notification($connection->id);
+        Mail::to($connection->email)->send(new UserWelcome($connection));
 
         userConnection($user->id, $connection->id);
         $connetionUpdate = UserConnection::where('connection_id',$connection->id)->where('user_id',$user->id)->first();
@@ -670,7 +669,7 @@ public function createConnection(Request $request){
         }
 
         return response()->json([
-            "message"=> "Connected updated.",
+            "message"=> "Connection added!",
         ]);
     
 

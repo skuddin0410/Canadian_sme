@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('note', 500)->nullable()->after('rating');
             $table->index('rating');
         });
+
+         Schema::table('users', function (Blueprint $table) {
+            $table->string('title', 6)->nullable()->after('id');
+        });
     }
 
     /**
@@ -25,9 +29,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-         Schema::table('user_connections', function (Blueprint $table) {
+        Schema::table('user_connections', function (Blueprint $table) {
             $table->dropIndex(['rating']);
             $table->dropColumn(['rating', 'note']);
+        });
+
+         Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['title']);
         });
     }
 };
