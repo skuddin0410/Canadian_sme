@@ -211,26 +211,19 @@ Admin | Edit Attendee Data
                       <div class="col-md-6">
                         <div class="mb-3">
                           <label class="form-label">User Interest</label>
-                          <div class="d-flex flex-wrap gap-2">
+                           <div class="d-flex flex-wrap gap-2">
                             @php
-                              $selectedTags = old('tags', is_array($user->tags ?? null) ? $user->tags : (empty($user->tags) ? [] : (is_string($user->tags) ? explode(',', $user->tags) : [])));
+                            $selectedTags = old('tags', is_array($user->tags ?? null) ? $user->tags : (empty($user->tags) ? [] : (is_string($user->tags) ? explode(',', $user->tags) : [])));
                             @endphp
+                            @if(!empty(getCategory('tags,connections')))
+                            @foreach(getCategory('tags,connections') as $tag)
+                            <input type="checkbox" class="btn-check" id="{{$tag->slug}}{{$tag->id}}" name="tags[]" value="{{$tag->name}}"
+                              {{ in_array($tag->name, $selectedTags ?? [], true) ? 'checked' : '' }}>
+                            <label class="btn btn-outline-primary" for="{{$tag->slug}}{{$tag->id}}">{{$tag->name}}</label>
 
-                            <input type="checkbox" class="btn-check" id="tagEvent" name="tags[]" value="Event"
-                              {{ in_array('Event', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-primary" for="tagEvent">Event</label>
+                             @endforeach 
+                            @endif
 
-                            <input type="checkbox" class="btn-check" id="tagCloudTrends" name="tags[]" value="CloudTrends"
-                              {{ in_array('CloudTrends', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-success" for="tagCloudTrends">CloudTrends</label>
-
-                            <input type="checkbox" class="btn-check" id="tagDataseecurity" name="tags[]" value="Dataseecurity"
-                              {{ in_array('Dataseecurity', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-info" for="tagDataseecurity">Dataseecurity</label>
-
-                            <input type="checkbox" class="btn-check" id="tagTechnoVation" name="tags[]" value="TechnoVation"
-                              {{ in_array('TechnoVation', $selectedTags ?? [], true) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-warning" for="tagTechnoVation">TechnoVation</label>
                           </div>
                           @error('tags') <div class="text-danger">{{ $message }}</div> @enderror
                         </div>
