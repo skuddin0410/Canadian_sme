@@ -16,8 +16,8 @@ use App\Models\FavoriteSession;
 use App\Models\UserConnection;
 use OneSignal;
 use Illuminate\Support\Facades\Validator;
-
-
+use App\Mail\UserWelcome;
+use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
 {
