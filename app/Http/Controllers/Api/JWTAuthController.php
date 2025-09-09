@@ -303,7 +303,7 @@ class JWTAuthController extends Controller
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
             'designation'=> $user->designation,
             'bio'       => $user->bio,
-            'tags'      => !empty($user->tags) ? explode(',',$user->tags) : '',
+            'tag'      => !empty($user->tags) ? explode(',',$user->tags) : '',
             'my_qr_code' => asset($user->qr_code),
             'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
             'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 

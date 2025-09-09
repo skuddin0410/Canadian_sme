@@ -485,12 +485,21 @@ public function createAgenda(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
-        addAgenda($request->sessionId);
-        return response()->json([
+
+        if(isAgenda($request->sessionId) == false){
+           addAgenda($request->sessionId);
+           return response()->json([
             "message"=> "Session added to your agenda.",
             "isInAgenda" => isAgenda($request->sessionId)
-        ]);
+           ]);
     
+        }else{
+           return response()->json([
+            "message"=> "You’ve already added this agenda.",
+            "isInAgenda" => isAgenda($request->sessionId)
+           ]);  
+        }
+        
 
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
