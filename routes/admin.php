@@ -83,6 +83,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('speakers.sendMail');
     Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
     ->name('attendee-users.sendMail');
+    Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
+    ->name('attendee-users.bulkAction');
 
 
 

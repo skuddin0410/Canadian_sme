@@ -14,9 +14,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Attendee List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                         <a href="{{route('attendee-users.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
-                      
-                            <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
+                            <a href="{{route('attendee-users.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
                             <a href="{{ route('attendee-users.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add Attendee
                             </a>
@@ -25,35 +23,45 @@
                 </div>
 
                 <!-- Search Section -->
-               <!-- Search + Filter Section -->
-<div class="col-12 text-end p-3">
-    <form action="#" method="GET" id="users-search-filter-form">
-        <div class="row justify-content-end g-2 align-items-center">
-            <!-- Search -->
-            <div class="col-auto">
-                <input type="text" class="form-control form-control-md" name="search" id="search" 
-                    value="{{ request('search') }}" placeholder="Search by Name, Email">
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-md btn-primary" id="search-btn">Search</button>
-            </div>
+                <div class="row p-3 align-items-center">
+                    <!-- Search / Filter -->
+                    <div class="col-md-8 text-end">
+                        <form action="#" method="GET" id="users-search-filter-form">
+                            <div class="row g-2 align-items-center">
+                                <!-- Search -->
+                                <div class="col-auto">
+                                    <input type="text" class="form-control form-control-md" name="search" id="search"
+                                        value="{{ request('search') }}" placeholder="Search by Name, Email">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-md btn-primary" id="search-btn">Search</button>
+                                </div>
+                                <!-- Reset -->
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-md btn-secondary reset-filter">Reset</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
 
-            <!-- Filter -->
-            <div class="col-auto">
-                <input type="text" class="form-control form-control-md" name="kyc" id="kyc" 
-                    placeholder="Filter KYC Status">
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-md btn-primary" id="filter-btn">Filter</button>
-            </div>
+                    <!-- Bulk Actions -->
+                    <div class="col-md-4 text-end">
+                        <form id="bulkActionForm" action="#" method="POST">
+                            @csrf
+                            <input type="hidden" name="user_ids" id="selectedUserIds">
 
-            <!-- Reset Button -->
-            <div class="col-auto">
-                <button type="button" class="btn btn-md btn-primary reset-filter">Reset</button>
-            </div>
-        </div>
-    </form>
-</div>
+                            <div class="d-inline-block">
+                                <button type="button" class="btn btn-primary" onclick="submitBulkAction('email')">
+                                    Send Email (<span id="emailCount">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="submitBulkAction('notification')">
+                                    Send Notification (<span id="notifCount">0</span>)
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
 
                 <!-- Card Body -->
                 <div class="card-body pt-0">
@@ -129,4 +137,6 @@ $(document).ready(function() {
     });
 });
 </script>
+
+
 @endsection

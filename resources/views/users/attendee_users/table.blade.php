@@ -33,9 +33,13 @@
   margin: 10px 0 10px 0;
 }
 </style>
+<div class="col-12 text-end p-3">
+
+</div>
 <table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
 	<tr>
+    <th><input type="checkbox" id="select-all"></th>
 		<th>Name</th>
 		<th>Email</th>
 		<th>Mobile</th>
@@ -48,6 +52,9 @@
 <tbody>	
     @foreach($users as $user)
     <tr>
+      <td>
+            <input type="checkbox" name="selected_users[]" value="{{ $user->id }}" class="user-checkbox">
+        </td>
     <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
 		<th>{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
@@ -178,3 +185,41 @@
 	        </div>
 	    @endif
 	</div>
+
+<script>
+function updateCounts() {
+    let selected = document.querySelectorAll('.user-checkbox:checked').length;
+    document.getElementById('emailCount').innerText = selected;
+    document.getElementById('notifCount').innerText = selected;
+}
+
+// Select All checkbox
+document.getElementById('select-all').addEventListener('change', function() {
+    let checked = this.checked;
+    document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = checked);
+    updateCounts();
+});
+
+// Individual checkboxes
+document.querySelectorAll('.user-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateCounts);
+});
+
+function submitBulkAction(actionType) {
+    let selected = [];
+    document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
+        selected.push(cb.value);
+    });
+
+    if (selected.length === 0) {
+        alert("Please select at least one user.");
+        return;
+    }
+
+    document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+
+    let form = document.getElementById('bulkActionForm');
+    form.action = "{{ route('attendee-users.bulkAction') }}?type=" + actionType;
+    form.submit();
+}
+</script>
