@@ -128,8 +128,13 @@ public function verify(Request $request)
         );
         qrCode($user->id);
         notification($user->id);
-      
-        Mail::to($user->email)->send(new UserWelcome($user));
+
+        if (! $user->wasRecentlyCreated) {
+           Mail::to($user->email)->send(new UserWelcome($user,"Welcome","Welcome! We’re glad to have you with us.")); 
+        }else{
+            Mail::to($user->email)->send(new UserWelcome($user,"Welcome",""));
+        }
+
         return response()->json([
             'success'    => true,
             'message'    => 'Login successful',

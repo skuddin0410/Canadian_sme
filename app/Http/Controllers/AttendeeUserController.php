@@ -25,6 +25,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\MailLog;
+use App\Mail\UserWelcome;
 
 
 class AttendeeUserController extends Controller
@@ -405,5 +406,25 @@ public function sendMail(Request $request, $id)
     ]);
     return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
 }
+
+public function bulkAction(Request $request)
+{
+    $userIds = json_decode($request->user_ids, true);
+    $type = $request->query('type'); // email or notification
+   
+    $users = User::whereIn('id', $userIds)->get();
+    if ($type === 'email') {
+        foreach ($users as $user) {
+             Mail::to($user->email)->send(new UserWelcome($user, 'Bulk Mail', 'This is a bulk email message.'));
+        }
+    } elseif ($type === 'notification') {
+        foreach ($users as $user) {
+            // $user->notify(new AppNotification("Bulk Notification", "This is a bulk notification."));
+        }
+    }
+
+    return redirect()->back()->with('success', ucfirst($type) . " sent successfully to selected users.");
+}
+
 
 }

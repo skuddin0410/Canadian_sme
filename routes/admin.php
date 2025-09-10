@@ -12,6 +12,7 @@ use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
+use App\Http\Controllers\EmailTemplateController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
@@ -82,6 +83,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('speakers.sendMail');
     Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
     ->name('attendee-users.sendMail');
+    Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
+    ->name('attendee-users.bulkAction');
 
 
 
@@ -145,5 +148,6 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
-
+    Route::resource('email-templates', EmailTemplateController::class);
+    
     });

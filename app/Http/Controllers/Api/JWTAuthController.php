@@ -552,12 +552,7 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
 }
 
 
-
-
-
-
-
-public function getSpeaker()
+public function getSpeaker(Request $request)
 {
     try {
        
@@ -577,47 +572,180 @@ public function getSpeaker()
         if ($speakers->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No speakers found!',
-                'data'    => collect(),
+                'message' => 'No speakers found!'
             ], 404);
         }
 
         
-        $response = $speakers->map(function ($speaker) {
+       $response = $speakers->map(function ($speaker) {
             return [
+                'id'     => $speaker->id,
                 'name'     => $speaker->full_name,
-                'company'  => $speaker->company ?? '',
-                'designation'  => $speaker->company ?? '',
-                'location' => '',
-                'email'    => $speaker->email ?? '',
-                'phone'    => $speaker->mobile ?? '',
-                'website'  => $speaker->website_url ?? '',
-                'avatar'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
-                'tags' => !empty($speaker->tags) ? explode(',',$speaker->tags) : '',
-                'groups' => groups($speaker),
-
-                'social_links' => [
-                    ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
-                    ['name' => 'instagram', 'url' => $speaker->instagram_url ?? ''],
-                    ['name' => 'linkedin', 'url' => $speaker->linkedin_url ?? ''],
-                    ['name' => 'twitter', 'url' => $speaker->twitter_url ?? ''],
-                    ['name' => 'github', 'url' => $speaker->github_url ?? ''],
-                ],
-
-                'bio'   => $speaker->bio ?? '',
+                'company_name'  => $speaker->company ?? '',
+                'role'  => $speaker->designation ?? '',
+                'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                'roles' => groups($speaker)
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data'    => $response,
-        ], 200);
+        return response()->json($response);
 
     } catch (\Exception $e) {
         return response()->json([
-            'success' => false,
-            'message' => 'Something went wrong: ' . $e->getMessage(),
-            'data'    => collect(),
+            'message' => 'Fail to load data! ',
+        ], 500);
+    }
+}
+
+public function getSpeakerById(Request $request){
+   try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+        $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Speaker');
+        })->where('id',$request->id)->first();
+    
+        if (empty($speaker)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!'
+            ], 404);
+        }
+
+        $response =  [
+            'id'     => $speaker->id,
+            'name'     => $speaker->full_name,
+            'company_name'  => $speaker->company ?? '',
+            "company_details"=>"Microsoft Corporation is an American multinational technology corporation which produces computer software",
+            "bio"=> $speaker->bio ?? '',
+            'role'  => $speaker->designation ?? '',
+            'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+            'roles' => groups($speaker),
+            "contact_details"=>[
+               "email"=> $speaker->email,
+               "phone"=> $speaker->mobile ?? '',
+                "social_media_links"=>[
+                  "linkedin"=> $speaker->linkedin_url,
+                  "facebook"=> $speaker->facebook_url,
+                  "instagram"=> $speaker->instagram_url,
+                  "twitter"=> $speaker->twitter_url
+
+                ]
+
+            ]
+        ];
+    
+        return response()->json([$response]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Fail to load data! ',
+        ], 500);
+    }
+}
+
+public function getAttendee(Request $request)
+{
+    try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+     
+        $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Attendee');
+        })->get();
+
+        if ($speakers->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!'
+            ], 404);
+        }
+
+        
+       $response = $speakers->map(function ($speaker) {
+            return [
+                'id'     => $speaker->id,
+                'name'     => $speaker->full_name,
+                'company_name'  => $speaker->company ?? '',
+                'role'  => $speaker->designation ?? '',
+                'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                'roles' => groups($speaker)
+            ];
+        });
+
+        return response()->json($response);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Fail to load data! ',
+        ], 500);
+    }
+}
+
+public function getAttendeeById(Request $request){
+   try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+        $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Attendee');
+        })->where('id',$request->id)->first();
+    
+        if (empty($speaker)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!'
+            ], 404);
+        }
+
+        $response =  [
+            'id'     => $speaker->id,
+            'name'     => $speaker->full_name,
+            'company_name'  => $speaker->company ?? '',
+            "company_details"=>"Microsoft Corporation is an American multinational technology corporation which produces computer software",
+            "bio"=> $speaker->bio ?? '',
+            'role'  => $speaker->designation ?? '',
+            'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+            'roles' => groups($speaker),
+            "contact_details"=>[
+               "email"=> $speaker->email,
+               "phone"=> $speaker->mobile ?? '',
+                "social_media_links"=>[
+                  "linkedin"=> $speaker->linkedin_url,
+                  "facebook"=> $speaker->facebook_url,
+                  "instagram"=> $speaker->instagram_url,
+                  "twitter"=> $speaker->twitter_url
+
+                ]
+
+            ]
+        ];
+    
+        return response()->json([$response]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Fail to load data! ',
         ], 500);
     }
 }
