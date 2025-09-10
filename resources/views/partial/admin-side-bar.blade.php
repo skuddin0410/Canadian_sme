@@ -200,8 +200,8 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->is('admin/email-template-settings*') ? 'active open' : '' }}">
-                    <a href="{{ route('email-template-settings') }}" class="menu-link">
+                <li class="menu-item {{ request()->is('admin/email-templates*') ? 'active open' : '' }}">
+                    <a href="{{ route('email-templates.index') }}" class="menu-link">
                         <div data-i18n="newsletters">Email Template</div>
                     </a>
                 </li>       
