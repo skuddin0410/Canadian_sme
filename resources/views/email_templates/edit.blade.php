@@ -22,11 +22,15 @@
         </div>
         <div class="mb-3">
             <label>Type</label>
-            <input type="text" name="type" value="{{ $emailTemplate->type }}" class="form-control">
+            <select name="type" class="form-control" required>
+                <option value="email" {{ $emailTemplate->type == 'email' ? 'selected' : '' }}>Email</option>
+                <option value="notifications" {{ $emailTemplate->type == 'notifications' ? 'selected' : '' }}>Notifications</option>
+            </select>
+
         </div>
         <div class="mb-3">
             <label>Message</label>
-            <textarea name="message" class="form-control" rows="5" required>{{ $emailTemplate->message }}</textarea>
+            <textarea name="message" class="form-control" rows="20" required>{{ $emailTemplate->message }}</textarea>
         </div>
         <button class="btn btn-success">Update</button>
     </form>

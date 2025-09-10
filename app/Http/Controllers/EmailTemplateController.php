@@ -23,8 +23,16 @@ class EmailTemplateController extends Controller
         $request->validate([
             'template_name' => 'required|unique:email_templates,template_name',
             'subject' => 'required',
-            'type' => 'nullable|string',
-            'message' => 'required',
+            'type' => 'required|in:email,notifications',
+            'message' => [
+                'required',
+                function ($attribute, $value, $fail) use ($request) {
+                    $max = $request->type === 'notifications' ? 150 : 500;
+                    if (strlen($value) > $max) {
+                        $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
+                    }
+                }
+            ]
         ]);
 
         EmailTemplate::create($request->all());
@@ -44,7 +52,15 @@ class EmailTemplateController extends Controller
             'template_name' => 'required|unique:email_templates,template_name,' . $emailTemplate->id,
             'subject' => 'required',
             'type' => 'nullable|string',
-            'message' => 'required',
+            'message' => [
+                'required',
+                function ($attribute, $value, $fail) use ($request) {
+                    $max = $request->type === 'notifications' ? 150 : 1000;
+                    if (strlen($value) > $max) {
+                        $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
+                    }
+                }
+            ]
         ]);
 
         $emailTemplate->update($request->all());

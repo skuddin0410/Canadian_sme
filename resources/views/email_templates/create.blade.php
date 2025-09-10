@@ -24,11 +24,15 @@
         </div>
         <div class="mb-3">
             <label>Type</label>
-            <input type="text" name="type" class="form-control">
+                <select name="type" class="form-control" required>
+                    <option value="email">Email</option>
+                    <option value="notifications">Notifications</option>
+                </select>
+
         </div>
         <div class="mb-3">
             <label>Message</label>
-            <textarea name="message" class="form-control" rows="5" required></textarea>
+            <textarea name="message" class="form-control" rows="20" required></textarea>
         </div>
         <button class="btn btn-success">Save</button>
     </form>
