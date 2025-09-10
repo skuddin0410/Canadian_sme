@@ -40,27 +40,7 @@ class TicketSystemSeeder extends Seeder
             ]);
         }
 
-    $categories = [
-        // 🔹 Summit / Conference related
-        [ 'name' => 'Leadership Summit', 'type' => 'event' ],
-        [ 'name' => 'Startup & Investment', 'type' => 'event' ],
-        [ 'name' => 'Digital Marketing', 'type' => 'event' ],
-        [ 'name' => 'Sustainability & Environment', 'type' => 'event' ],
-        [ 'name' => 'Blockchain & FinTech', 'type' => 'event' ],
-        [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
-        [ 'name' => 'Government & Policy', 'type' => 'event' ],
-        [ 'name' => 'Women in Leadership', 'type' => 'event' ],
-        [ 'name' => 'Event', 'type' => 'tags' ],
-        [ 'name' => 'CloudTrends', 'type' => 'tags' ],
-        [ 'name' => 'DataSecurity', 'type' => 'tags' ],
-        [ 'name' => 'TechnoVation', 'type' => 'tags' ],
-        [ 'name' => 'Gold','type' => 'sponsor', 'color' => '#FFD700' ], 
-        [ 'name' => 'Majlislounge','type' => 'sponsor', 'color' => '#8B0000' ],
-        [ 'name' => 'Platinum','type' => 'sponsor', 'color' => '#E5E4E2' ], 
-        [ 'name' => 'Silver','type' => 'sponsor', 'color' => '#C0C0C0' ], 
-        [ 'name' => 'Innovationpartner', 'type' => 'sponsor', 'color' => '#1E90FF' ],
-        [ 'name' => 'Bronze','type' => 'sponsor', 'color' => '#CD7F32' ], 
-    ];
+  
 
 
        $tracks = [
@@ -102,13 +82,7 @@ class TicketSystemSeeder extends Seeder
             ]);
         }
 
-        foreach ($categories as $category) {
-            Category::create([
-                'name' => $category['name'],
-                'slug' => Str::slug($category['name']),
-                'type' => $category['type']
-            ]);
-        }
+      
 
         // Create sample events if they don't exist
         if (Event::count() == 0) {
@@ -117,6 +91,8 @@ class TicketSystemSeeder extends Seeder
 
         $events = [];
 
+
+        $categoyName = getCategory("event,tags")->pluck('name')->toArray();
         // --- 7 past events ---
         for ($i = 1; $i <=1; $i++) {
             $start = now()->subDay();
@@ -127,7 +103,7 @@ class TicketSystemSeeder extends Seeder
                 'description' => $faker->paragraph(3),
                 'location' => $faker->address,
                 'tags' => implode(',', $faker->randomElements(
-                        ['past','event','future','conference','workshop','online','tech','health'],
+                         $categoyName,
                         rand(1, 3)
                     )),
                 'start_date' => $start,

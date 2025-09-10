@@ -10,6 +10,7 @@ use App\Models\User;
 Use App\Models\Company;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
+use App\Models\Category;
 
 class UserSeeder extends Seeder
 {
@@ -17,7 +18,38 @@ class UserSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void
-    {
+    {   
+
+          $categories = [
+        // 🔹 Summit / Conference related
+        [ 'name' => 'Leadership Summit', 'type' => 'event' ],
+        [ 'name' => 'Startup & Investment', 'type' => 'event' ],
+        [ 'name' => 'Digital Marketing', 'type' => 'event' ],
+        [ 'name' => 'Sustainability & Environment', 'type' => 'event' ],
+        [ 'name' => 'Blockchain & FinTech', 'type' => 'event' ],
+        [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
+        [ 'name' => 'Government & Policy', 'type' => 'event' ],
+        [ 'name' => 'Women in Leadership', 'type' => 'event' ],
+        [ 'name' => 'Event', 'type' => 'tags' ],
+        [ 'name' => 'CloudTrends', 'type' => 'tags' ],
+        [ 'name' => 'DataSecurity', 'type' => 'tags' ],
+        [ 'name' => 'TechnoVation', 'type' => 'tags' ],
+        [ 'name' => 'Gold','type' => 'sponsor', 'color' => '#FFD700' ], 
+        [ 'name' => 'Majlislounge','type' => 'sponsor', 'color' => '#8B0000' ],
+        [ 'name' => 'Platinum','type' => 'sponsor', 'color' => '#E5E4E2' ], 
+        [ 'name' => 'Silver','type' => 'sponsor', 'color' => '#C0C0C0' ], 
+        [ 'name' => 'Innovationpartner', 'type' => 'sponsor', 'color' => '#1E90FF' ],
+        [ 'name' => 'Bronze','type' => 'sponsor', 'color' => '#CD7F32' ], 
+    ];
+
+      foreach ($categories as $category) {
+            Category::create([
+                'name' => $category['name'],
+                'slug' => Str::slug($category['name']),
+                'type' => $category['type']
+            ]);
+        }
+
         $eventAdmin = User::create([
             'name' => 'Event',
             'lastname'=>'Admin',
@@ -146,7 +178,7 @@ class UserSeeder extends Seeder
 
         }
 
-
+        $categoyName = getCategory("tags")->pluck('name')->toArray();
         foreach ($speakers as $speakerVal) {
             $randomThree = collect($groups)->random(3)->toArray();
             $speaker = User::create([
@@ -155,7 +187,7 @@ class UserSeeder extends Seeder
                 'company' =>$faker->company,
                 'email' => strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
-                'tags'=>implode(',', $faker->randomElements($roles, rand(1, 3))),
+                'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
                 'designation'=>$faker->jobTitle,
                 'bio'=>$faker->paragraph(3),
                 'password' => Hash::make('password'),
@@ -181,7 +213,7 @@ class UserSeeder extends Seeder
             'lastname'=>$representativeVal['last_name'],
             'email' => strtolower($representativeVal['first_name'] . '.' . $representativeVal['last_name']) . '@example.com',
             'mobile' => $faker->numerify('##########'),
-            'tags'=>implode(',', $faker->randomElements($roles, rand(1, 3))),
+            'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
             'designation'=>$faker->jobTitle,
             'bio'=>$faker->paragraph(3),
             'password' => Hash::make('password'),
@@ -206,7 +238,7 @@ class UserSeeder extends Seeder
                 'lastname'=>$attendeeVal['last_name'],
                 'email' => strtolower($attendeeVal['first_name'] . '.' . $attendeeVal['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
-                'tags'=>implode(',', $faker->randomElements($roles, rand(1, 3))),
+                'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
                 'designation'=>$faker->jobTitle,
                 'bio'=>$faker->paragraph(3),
                 'password' => Hash::make('password'),
