@@ -12,13 +12,19 @@ use Illuminate\Queue\SerializesModels;
 class UserWelcome extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $user;
+    public $bodyText;
+    public $subjectLine;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($user)
+    public function __construct($user, $subject = null, $bodyText = null)
     {
         $this->user = $user;
+        $this->bodyText = $bodyText;
+        $this->subjectLine = $subject;
     }
 
     /**
@@ -27,7 +33,7 @@ class UserWelcome extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome',
+            subject: $this->subjectLine ?? 'Welcome',
         );
     }
 
