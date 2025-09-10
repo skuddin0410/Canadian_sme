@@ -155,9 +155,8 @@ public function getNotifications(Request $request)
     $userPhoto = !empty($user->photo) ? $user->photo->file_path : asset('images/default.png');
     
     $notifications = GeneralNotification::query()
-        ->where(function ($q) use ($user) {
-            $q->whereNull('user_id');          
-            $q->orWhere('user_id', $user->id); 
+        ->where(function ($q) use ($user) {        
+            $q->Where('user_id', $user->id); 
         })
         ->latest()
         ->take(20)
