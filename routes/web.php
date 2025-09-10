@@ -3,9 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
+use Illuminate\Support\Facades\Artisan;
+
 
 Route::get('/login', function () {
     return redirect()->route('login');
+});
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+    return 'All caches cleared!';
 });
 
 require __DIR__.'/landing.php';
