@@ -30,10 +30,22 @@ Route::get('/email/open/{id}', function ($id) {
 
 Auth::routes();
 
-Route::group(['middleware' => 'auth:web'], function () {
-   require __DIR__.'/common.php'; //used by all users in web
-   require __DIR__.'/admin.php';  //Admin and Admin 
-   require __DIR__.'/exhibitor.php';
-   require __DIR__.'/helpdesk.php';
-   require __DIR__.'/ticket.php';
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+
+   Route::prefix('admin')->group(function () {
+       require __DIR__.'/common.php'; //used by all users in web
+       require __DIR__.'/admin.php';  //Admin and Admin 
+       require __DIR__.'/exhibitor.php';
+       require __DIR__.'/helpdesk.php';
+
+       require __DIR__.'/newsletters.php';
+       require __DIR__.'/formbuilder.php';
+       require __DIR__.'/lead.php';
+   });
+   
+
+});
+
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+    require __DIR__.'/ticket.php';
 });

@@ -3,11 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HomeController;
 
-Route::post('/register', [App\Http\Controllers\Api\JWTAuthController::class, 'register']);
-Route::post('/login', [App\Http\Controllers\Api\JWTAuthController::class, 'login']);
-Route::post('/login-by-user', [App\Http\Controllers\Api\JWTAuthController::class, 'loginByUser']);
-Route::post('/social', [App\Http\Controllers\Api\JWTAuthController::class, 'social']);
-
 Route::prefix('auth')->group(function () {
     Route::post('login', [App\Http\Controllers\Api\OtpController::class, 'generate']);
     Route::post('verify-otp', [App\Http\Controllers\Api\OtpController::class, 'verify']);

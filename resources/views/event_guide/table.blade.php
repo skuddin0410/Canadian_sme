@@ -35,10 +35,7 @@
 		<th>Category</th>
 		<th>Title</th>
 		<th>Type</th>
-		{{-- <th>Weblink</th>
-		<th>Document</th>
-		<th>Created At</th> --}}
-		<th width="12%">Action</th>
+		<th width="10%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -51,7 +48,7 @@
 		<td>
 			<div class="row">
 				<div class="col-4 p-1">
-					<a href="{{route('event-guides.show',$guide->id)}}" class="btn btn-sm btn-icon item-show"><i class="bx bx-show"></i></a>
+					<a href="{{route('event-guides.show',$guide->id)}}" class="btn btn-sm btn-icon btn-primary" title="Show"><i class="bx bx-show"></i></a>
         
 				</div>
 				<div class="col-4 p-1">

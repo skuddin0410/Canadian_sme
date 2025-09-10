@@ -10,7 +10,7 @@
 @endpush
 
 @section('content')
-<div class="container py-4">
+<div class="container flex-grow-1 container-p-y p-4 mt-4">
     <div class="mb-4">
         <h1 class="h4 fw-bold text-dark">Create New Lead</h1>
         <p class="text-muted">Fill in the details to add a new lead</p>
@@ -28,7 +28,7 @@
         </div>
     @endif
 
-    <div class="card shadow-sm border-0 rounded-3">
+    <div class="card shadow-sm border-0 rounded-3  p-4">
         <div class="card-body p-4">
             <form action="{{ route('leads.store') }}" method="POST">
                 @csrf
@@ -102,30 +102,6 @@
                     </div>
                 </div>
 
-                <hr class="my-4">
-
-                {{-- Desired Amenities --}}
-                <h5 class="fw-bold mb-3">Desired Amenities</h5>
-                
-                @php
-    $amenities = ['parking','gym','pool','laundry','pet_friendly','balcony','concierge','storage'];
-    $selectedAmenities = old('desired_amenities', []);
-@endphp
-
-<div class="row">
-    @foreach($amenities as $amenity)
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" 
-                       name="desired_amenities[]" 
-                       value="{{ $amenity }}" 
-                       {{ in_array($amenity, $selectedAmenities) ? 'checked' : '' }}>
-                <label class="form-check-label">
-                    {{ ucfirst(str_replace('_',' ',$amenity)) }}
-                </label>
-            </div>
-        </div>
-    @endforeach
 </div>
 
 <hr class="my-4">

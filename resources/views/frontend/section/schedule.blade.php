@@ -1,28 +1,26 @@
     <!-- Schedule -->
     <section class="schedule">
         <div class="container">
-                <section class="py-5">
-                  <div class="container">
-                    <div class="row justify-content-center text-center">
-                      <div class="col-lg-10 col-xl-8">
-                        <span class="small-heading-blue d-inline-block mb-2">Scheduled Event</span>
-
-                        <h2 class="mb-2">Our Events Scheduled Plan</h2>
-
-                        <h3 class="fs-5 text-secondary fw-normal mb-4">
+                <!-- <section class="py-5"> -->
+                  <!-- <div class="container"> -->
+                    <!-- <div class="row justify-content-center text-center"> -->
+                      <div class="text-center">
+                        <span class="small-heading-blue">Scheduled Event</span>
+                        <h2 class="h2-black d-inline">Our Events Scheduled Plan</h2>
+                        <p class="text-secondary mt-3">
                           Like previous year this year we are arrnaging world marketing summit
-                        </h3>
+                        </p>
                       </div>
-                    </div>
-                  </div>
-                </section>
+                    <!-- </div> -->
+                  <!-- </div> -->
+                <!-- </section> -->
 
             <div class="schedule-box mt-4 mt-lg-5 d-flex flex-column">
                 @if(!empty($schedules))
                     @foreach($schedules as $schedule)
 
                     <div class="schedule-card shadow">
-                        <div class="d-flex align-items-center gap-4">
+                        <div class="d-flex align-items-center gap-4 date-col">
                             <div class="pe-4 pe-xxl-5 border-sm-end">
                                 <span class="blue-text-18 mb-2">{{!empty($schedule->start_time) ? $schedule->start_time?->format('M d, Y') : '-'}}</span>
                                 <span class="small-heading-black fw-semibold">{{ !empty($schedule->start_time) ? $schedule->start_time?->format('h:i A'): '' }} - {{!empty($schedule->start_time) ? $schedule->end_time?->format('h:i A') : '' }}</span>

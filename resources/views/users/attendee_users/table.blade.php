@@ -37,11 +37,10 @@
 <thead>
 	<tr>
 		<th>Name</th>
-		{{-- <th>Email</th>
-		<th>Mobile</th> --}}
+		<th>Email</th>
+		<th>Mobile</th>
     <th>Added on</th>
     <th>QR</th>
-		{{-- <th>Referral coupon</th> --}}
 		
 		<th width="28%">Action</th>
 	</tr>
@@ -50,8 +49,8 @@
     @foreach($users as $user)
     <tr>
     <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
-		{{-- <th style="text-transform:none">{{$user->email ?? ''}}</th>
-		<th>{{$user->mobile ?? ''}}</th> --}}
+		<th>{{$user->email ?? ''}}</th>
+		<th>{{$user->mobile ?? ''}}</th>
     <th>{{dateFormat($user->created_at) ?? '' }}</th>
     <th>
 		
@@ -72,13 +71,13 @@
   <div class="d-flex gap-2">
         <form action="{{ route('attendee-users.allow-access', $user->id) }}" method="POST" style="display:inline;">
     @csrf
-    @if($user->is_approve)
+    @if($user->is_approve ==1)
         <button type="submit" class="btn btn-sm btn-success" title="App access approved">
-            ✔ Approved
+            ✔ App Access Approved
         </button>
     @else
         <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
-            Allow app access
+            Allow App Access
         </button>
     @endif
 </form>
@@ -100,7 +99,7 @@
     </a>
 
     {{-- Delete --}}
-    <form action="{{ route('attendee-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this representative user?');">
+    <form action="{{ route('attendee-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');">
       @csrf
       @method('DELETE')
       <button class="btn btn-sm btn-danger btn-icon" type="submit" title="Delete">
@@ -129,16 +128,17 @@
           <h5 class="modal-title">Send Mail to {{ $user->name }} {{ $user->lastname }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
         <div class="modal-body">
           <!-- Subject -->
           <div class="mb-3">
             <label class="form-label">Subject</label>
-            <input type="text" name="subject" class="form-control" required>
+            <input type="text" name="subject" class="form-control" value="{{ getKeyValue('email_subject')->value ?? '' }}" required>
           </div>
           <!-- Message -->
           <div class="mb-3">
             <label class="form-label">Message</label>
-            <textarea name="message" class="form-control" rows="5" required></textarea>
+            <textarea name="message" class="form-control" rows="5" required>{{getKeyValue('email_content')->value ?? ''}}</textarea>
           </div>
         </div>
         <div class="modal-footer">

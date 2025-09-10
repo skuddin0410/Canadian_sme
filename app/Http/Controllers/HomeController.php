@@ -13,7 +13,6 @@ use Auth;
 use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
-use App\Models\Order;
 use App\Models\Page;
 
 class HomeController extends Controller
@@ -63,7 +62,7 @@ class HomeController extends Controller
                 ->whereHas("roles", function ($q) {
                     $q->whereNotIn("name", ["Exhibitor"]);
                 })->count();
-            $revenue = Order::sum('amount') ?? 0;
+            $revenue = 0;
             if(Auth::user()->hasRole('Admin') ){
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   

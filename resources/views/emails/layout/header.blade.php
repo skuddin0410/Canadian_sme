@@ -38,13 +38,13 @@
     }
   </style>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f4f6f8">
+<body style="margin:0; padding:0; background-color:#002364; font-family:Arial, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#002364">
     <tr>
       <td align="center" style="padding:20px 10px;">
         <table role="presentation" class="container" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:8px; overflow:hidden;">
           <tr>
-            <td align="center" bgcolor="#004fb8" style="padding:20px;">
+            <td align="center" bgcolor="#002364" style="padding:20px;">
               <img src="{{ asset('images/footer-logo.png') }}" alt="Company Logo" width="120" style="display:block; max-width:120px; width:100%; height:auto;">
             </td>
           </tr>

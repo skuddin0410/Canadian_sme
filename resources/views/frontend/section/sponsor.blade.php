@@ -3,12 +3,12 @@
         <div class="container">
             <span class="small-heading-white">Sponsors</span>
             <div class="row">
-                <div class="col-lg-5">
+                <div class="col-lg-6">
                     <div>
                         <h2 class="h2-white mb-4">Meet The Proud Sponsors Supporting Us</h2>
                     </div>
                 </div>
-                <div class="col-lg-4"></div>
+                <div class="col-lg-3"></div>
                 <div class="col-lg-3">
                     <!-- Navigation Arrows -->
                     <div class="sponsors-nav d-flex gap-3 align-items-center justify-content-end">
@@ -38,7 +38,7 @@
                                 </a>
                                 <div class="swiper-img-text">
                                     <span class="sponsors-name">{{$sponsor->name ?? ''}}</span>
-                                    <span class="sponsors-title">Sponsor</span>
+                                    <span class="sponsors-title gold">Sponsor</span>
                                 </div>
                             </div>
                              @endforeach
@@ -49,6 +49,7 @@
                 <div class="d-flex justify-content-center">
                     <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index')}}">View More </a>
                 </div>
+</div>
             </div>
     </section>
     <!-- sponsors end -->

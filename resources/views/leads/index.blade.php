@@ -8,10 +8,10 @@
 @endpush
 
 @section('content')
-<div class="container py-4">
+<div class="container flex-grow-1 container-p-y pt-0">
 
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-4 mt-4">
         <div>
             <h1 class="h4 fw-bold text-dark mb-1">Lead Management</h1>
             <p class="text-muted mb-0">Manage and track your event leads</p>
@@ -63,14 +63,6 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-search"></i></span>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search leads..." class="form-control">
-                    </div>
-                </div>
-
-                <!-- Search by Company -->
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-building"></i></span>
-                        <input type="text" name="company" value="{{ request('company') }}" placeholder="Search by company..." class="form-control">
                     </div>
                 </div>
 
@@ -167,17 +159,7 @@
                                 @endif
                             </td>
 
-                            <!-- Desired Amenities -->
-                            <td>
-                                @php
-                                    $amenities = $lead->desired_amenities ? json_decode($lead->desired_amenities, true) : [];
-                                @endphp
-                                @if(!empty($amenities))
-                                    {{ implode(', ', $amenities) }}
-                                @else
-                                    -
-                                @endif
-                            </td>
+
 
                             <!-- Status -->
                             <td>
@@ -200,25 +182,18 @@
 
                             <!-- Owner -->
                             <td>
-                                @if($lead->company)
-                                    <a href="#" class="fw-semibold text-decoration-none text-dark">{{ $lead->company->name }}</a>
-                                    <div class="text-muted small">(Company)</div>
-                                @elseif($lead->user)
-                                    <a href="#" class="fw-semibold text-decoration-none text-dark">{{ $lead->user->full_name }}</a>
-                                    <div class="text-muted small">(User)</div>
-                                @else
-                                    -
-                                @endif
+                               ---
                             </td>
 
                             <!-- Actions -->
                             <td>
-                                <a href="{{ route('leads.show',$lead) }}" class="text-primary me-2"><i class="fa fa-eye"></i></a>
-                                <a href="{{ route('leads.edit',$lead) }}" class="text-success me-2"><i class="fa fa-edit"></i></a>
+                                <a href="{{ route('leads.show',$lead) }}" class="btn btn-sm btn-icon btn-primary" title="Show"><i class="bx bxs-show"></i></a>
+                                <a href="{{ route('leads.edit',$lead) }}" class="btn btn-sm btn-icon item-edit" title="Edit">
+                                <i class="bx bxs-edit"></i></a>
                                 <form action="{{ route('leads.destroy',$lead) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-link text-danger p-0 m-0" onclick="return confirm('Are you sure?')">
+                                    <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Delete" onclick="return confirm('Are you sure?')">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </form>

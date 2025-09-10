@@ -9,9 +9,6 @@ use DataTables;
 use App\Models\User;
 use App\Mail\KycMail;
 use App\Models\Drive;
-use App\Models\Order;
-use App\Models\Wallet;
-
 
 use App\Models\Company;
 use App\Exports\UsersExport;
@@ -337,10 +334,16 @@ class SpeakerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->roles()->detach();
+        $user->delete();
+
+        return redirect()
+            ->route('speaker.index')
+            ->withSuccess('Speaker user deleted successfully.');
     }
-      public function toggleBlock(User $user)
-{
+    public function toggleBlock(User $user)
+    {
     $currentUser = auth()->user();
 
     // Admin or Admin can block
@@ -354,7 +357,6 @@ class SpeakerController extends Controller
         } else {
             return back()->withErrors('You are not allowed to block this type of user.');
         }
-    
 
     }
 
@@ -362,26 +364,14 @@ class SpeakerController extends Controller
 
     return back()->withErrors('You do not have permission to perform this action.');
 }
-  public function downloadQr($userid){
-        return downloadQrCode($userid);
-    }
-  public function exportSpeakers()
-    {
-        return Excel::download(new SpeakersExport, 'speakers.xlsx');
-    }
-//    public function allowAccess(string $id)
-// {
-//     $user = User::with('roles')
-//         ->whereHas('roles', function ($q) {
-//             $q->where('name', 'Speaker');
-//         })
-//         ->findOrFail($id);
+public function downloadQr($userid){
+    return downloadQrCode($userid);
+}
+public function exportSpeakers()
+{
+    return Excel::download(new SpeakersExport, 'speakers.xlsx');
+}
 
-//     $user->is_approve = true; 
-//     $user->save();
-
-//     return back()->withSuccess('App access allowed successfully for Speaker.');
-// }
 public function allowAccess(string $id)
 {
     $user = User::with('roles')
@@ -389,25 +379,18 @@ public function allowAccess(string $id)
             $q->where('name', 'Speaker');
         })
         ->findOrFail($id);
-
-  
-    $user->is_approve = true;
-
- 
-    $existingAccess = !empty($user->access_speaker_ids) 
-        ? explode(',', $user->access_speaker_ids) 
-        : [];
-
-    if (!in_array($user->id, $existingAccess)) {
-        $existingAccess[] = $user->id; 
-    }
-
-   
-    $user->access_speaker_ids = implode(',', $existingAccess);
+    
+    if($user->is_approve == 1){
+       $user->is_approve = 0;
+       $message = "App access allowed successfully";
+    }else{
+        $user->is_approve = 1;
+        $message = "App access removed successfully";
+    } 
 
     $user->save();
-
-    return back()->withSuccess('App access allowed successfully for Speaker and stored in access_speaker_ids.');
+   
+    return back()->withSuccess($message);
 }
 public function sendMail(Request $request, $id)
 {   

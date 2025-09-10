@@ -48,13 +48,6 @@
                 </div>
 
 				<div class="card-body pt-0">
-				  @if(Session::has('success'))
-		              <div class="alert alert-success">{{ Session::get('success') }}</div>
-		          @endif
-		          @if(Session::has('error'))
-		              <div class="alert alert-danger">{{ Session::get('error') }}</div>
-		          @endif
-
                     <div class="col text-center">
                         <div class="spinner-border spinner-border-sm"></div>
                     </div>

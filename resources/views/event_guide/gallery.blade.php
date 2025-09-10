@@ -8,7 +8,7 @@
   .gallery-thumb { width: 100%; height: 100%; object-fit: cover; transition: transform .25s ease; }
   .gallery-card:hover .gallery-thumb { transform: scale(1.02); }
 </style>
-<div class="container py-4">
+<div class="container flex-grow-1 container-p-y pt-0">
   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
     <h2 class="mb-0"> Gallery</h2>
     @if(!empty($images))
@@ -28,7 +28,7 @@
             
             </div>
             <div class="col-4">
-            <button type="submit" class="btn btn-success w-100">
+            <button type="submit" class="btn btn-primary w-100">
             <i class="bi bi-cloud-arrow-up me-1"></i> Upload
             </button>
             </div>

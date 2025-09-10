@@ -10,8 +10,6 @@ use App\Models\User;
 use App\Mail\KycMail;
 use App\Models\Booth;
 use App\Models\Drive;
-use App\Models\Order;
-use App\Models\Wallet;
 
 use App\Models\Company;
 use App\Exports\UsersExport;
@@ -26,6 +24,7 @@ use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\MailLog;
 
 
 class AttendeeUserController extends Controller
@@ -362,19 +361,26 @@ class AttendeeUserController extends Controller
         return Excel::download(new AttendeesExport, 'attendees.xlsx');
     }
     public function allowAccess(string $id)
-{
-    $user = User::with('roles')
-        ->whereHas('roles', function ($q) {
-            $q->where('name', 'Attendee');
-        })
-        ->findOrFail($id);
+    {
+        $user = User::with('roles')
+            ->whereHas('roles', function ($q) {
+                $q->where('name', 'Attendee');
+            })
+            ->findOrFail($id);
 
 
-    $user->is_approve = true; // allow access
-    $user->save();
+        if($user->is_approve == 1){
+           $user->is_approve = 0;
+           $message = "App access allowed successfully";
+        }else{
+            $user->is_approve = 1;
+            $message = "App access removed successfully";
+        } 
+        $user->save();
+        return back()->withSuccess($message);
 
-    return back()->withSuccess('App access allowed successfully to Attendee.');
-}
+  }
+
 public function sendMail(Request $request, $id)
 {
     $request->validate([
@@ -388,8 +394,15 @@ public function sendMail(Request $request, $id)
         })
         ->findOrFail($id);
 
-    Mail::to($user->email)->send(new CustomSpeakerMail($request->subject, $request->message));
-
+    Mail::to($user->email)->send(new CustomSpeakerMail($user,$request->subject, $request->message));
+    MailLog::create([
+        'user_id' => $user->id,
+        'email'   => $user->email,
+        'subject' => $request->subject,
+        'message' => $request->message,
+        'status'  => 'sent',
+        'send_by'  => auth()->id(),
+    ]);
     return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
 }
 

@@ -3,7 +3,7 @@
 @section('title', 'Create Ticket Category')
 
 @section('content')
-<div class="container">
+<div class="container flex-grow-1 container-p-y pt-0">
     <div class="row">
         <div class="col-12 mt-3">
             <div class="d-flex justify-content-between align-items-center mb-4">

@@ -689,10 +689,32 @@ public function createConnection(Request $request){
 
 
 public function sendPushNotification(Request $request){
-    OneSignal::sendNotificationToUser(
-        "Hi this is a test push notification",
-         $request->onesignal_userid 
-    );
+
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'onesignal_userid' => 'required|string'    
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["message" => $validator->errors()->first()]);
+        }
+        $user->onesignal_userid = $request->onesignal_userid;
+        $user->save(); 
+        OneSignal::sendNotificationToUser(
+            "Hi this is a test push notification",
+             $request->onesignal_userid 
+        );
+
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
 }
 
 }
