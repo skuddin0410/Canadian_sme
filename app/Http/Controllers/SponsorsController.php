@@ -147,7 +147,7 @@ public function index(Request $request)
                 $company->id
             );
         }
-    qrCode($user->id, "user");
+    // qrCode($user->id, "user");
 
 
     DB::commit();
