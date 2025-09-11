@@ -719,4 +719,22 @@ public function sendPushNotification(Request $request){
     }
 }
 
+public function readAllNotifications(Request $request){
+
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+       GeneralNotification::where("user_id",$user->id)->update(["is_read"=>1, "read_at"=>Now()]);
+       return response()->json(["message" => "Notification all read!"]);
+    
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
+}
+
 }

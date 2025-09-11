@@ -50,6 +50,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::post('/home', [HomeController::class, 'index']);
 
     Route::get('/get-notifications', [HomeController::class, 'getNotifications']);
+    Route::get('/notification-read-all', [HomeController::class, 'readAllNotifications']);
 
     
     Route::prefix('connections')->group(function () {
