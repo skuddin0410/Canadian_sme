@@ -915,9 +915,8 @@ public function getAllExhibitor(Request $request){
                     ], 404);
                 }
 
-                // Prepare data
-
                 $data = [
+                    "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
                     "avatar" => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
                     "word_no" => $sponsor->booth ?? '',
@@ -945,9 +944,9 @@ public function getAllExhibitor(Request $request){
                     ],
                     "bio" => $sponsor->description,
                     "uploaded_files" => $sponsor->Docs->map(fn ($sp) => [
-                        "name" => $sp->name, 
-                        "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')
-                    ]),
+                           "name"=> $sp->file_name,
+                           "url"=> $sp->file_path
+                    ])->values(),
                 ];
 
 
