@@ -289,6 +289,40 @@ public function index(Request $request)
 {
     return Excel::download(new SponsorExport, 'sponsors.xlsx');
 }
+ public function uploadDocs(Request $request, $companyId)
+{
+    $request->validate([
+        'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
+    ]);
+
+    $company = Company::findOrFail($companyId);
+
+    if ($request->hasFile('private_docs')) {
+        foreach ($request->file('private_docs') as $file) {
+           
+            $this->imageUpload($file,"companies",$company->id,'companies','private_docs');
+
+           
+        }
+    }
+
+    return redirect()->back()->with('success', 'Documents uploaded successfully.');
+}
+  
+
+public function deleteDoc($id)
+{
+    $doc =Drive::findOrFail($id);
+
+    // delete file from storage
+    if ($doc->file_path && \Storage::disk('public')->exists(str_replace('/storage/', '', $doc->file_path))) {
+        \Storage::disk('public')->delete(str_replace('/storage/', '', $doc->file_path));
+    }
+
+    $doc->delete();
+
+    return redirect()->back()->with('success', 'Document deleted successfully.');
+}
    
     
 }
