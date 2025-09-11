@@ -234,13 +234,23 @@
                 </div>
               </div>
 
-              <div class="col-12">
+              <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Booth</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bxl-book"></i></span>
                     <input type="text" name="booth" class="form-control"
                            value="{{ old('booth') }}">
+                  </div>
+                </div>
+              </div>
+               <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Industry</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-book"></i></span>
+                    <input type="text" name="industry" class="form-control"
+                           value="{{ old('industry') }}">
                   </div>
                 </div>
               </div>
