@@ -36,7 +36,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->boolean('is_approve')->default(true)->comment('Approval status by admin');
             $table->boolean('is_block')->default(false);
-            $table->boolean('gdpr_consent')->default(false);
+            $table->boolean('gdpr_consent')->nullable()->default(false);
             $table->string('status')->nullable();
             $table->string('primary_group')->nullable();
             $table->string('secondary_group')->nullable();
