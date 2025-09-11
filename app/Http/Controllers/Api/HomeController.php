@@ -425,7 +425,7 @@ public function getConnectionsDetails(Request $request)
 public function addSessionToFavourite(Request $request){
 
     if(!isFavorite($request->sessionId)){
-         addFavorite($request->sessionId);
+          addFavorite($request->sessionId);
         
           return response()->json(["message"=> "Session added as favourite"]);
         }else{
@@ -702,17 +702,35 @@ public function sendPushNotification(Request $request){
         ]);
 
         if ($validator->fails()) {
-            return response()->json(["message" => $validator->errors()->first()]);
+            return response()->json(["message" => "Fail to change!"]);
         }
         $user->onesignal_userid = $request->onesignal_userid;
         $user->save(); 
         
-        OneSignal::sendNotificationToUser(
-            "Hi this is a test push notification",
-             $request->onesignal_userid 
-        );
-        
+        // OneSignal::sendNotificationToUser(
+        //     "Hi this is a test push notification",
+        //      $request->onesignal_userid 
+        // );
+
         return response()->json(["message" => "Onesignal added with profile"]);
+    
+    } catch (\Exception $e) {
+        return response()->json(["message" => $e->getMessage()]);
+    }
+}
+
+public function readAllNotifications(Request $request){
+
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+       GeneralNotification::where("user_id",$user->id)->update(["is_read"=>1, "read_at"=>Now()]);
+       return response()->json(["message" => "Notification all read!"]);
     
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
