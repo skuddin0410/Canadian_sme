@@ -109,7 +109,7 @@ class SpeakerController extends Controller
          
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
+            'email' => 'nullable|string|max:255|email|unique:users,email',
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
@@ -242,7 +242,7 @@ class SpeakerController extends Controller
             
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
+            'email' => 'nullable|string|max:255|email|unique:users,email,' . $user->id,
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',

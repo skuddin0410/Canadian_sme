@@ -3,16 +3,17 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;   
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SpeakerController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\SponsorsController;
 use App\Http\Controllers\UserGroupController;
 use App\Http\Controllers\EventGuideController;
 use App\Http\Controllers\EventTrackController;
 use App\Http\Controllers\AttendeeUserController;
+use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
-use App\Http\Controllers\EmailTemplateController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
@@ -92,6 +93,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     
     Route::resource('speaker', SpeakerController::class);
     Route::resource('booths', BoothController::class);
+    Route::resource('supports', SupportController::class);
+
 
 
     Route::any('categories/{id}/order/{order}', '\App\Http\Controllers\CategoryController@order');

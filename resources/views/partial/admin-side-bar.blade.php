@@ -213,6 +213,13 @@
                 
             </ul>
         </li>
+        <li class="menu-item {{ request()->is('supports*') ? 'active' : '' }}">
+            <a href="{{ route('supports.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+            <div data-i18n="tickets">Support</div>
+            </a>
+        </li>
+
        
 
     </ul>
