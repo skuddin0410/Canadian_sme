@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\MailLog;
 use App\Mail\UserWelcome;
+use App\Models\EmailTemplate;
 
 
 class AttendeeUserController extends Controller
@@ -411,13 +412,26 @@ public function bulkAction(Request $request)
 {
     $userIds = json_decode($request->user_ids, true);
     $type = $request->query('type'); // email or notification
-   
     $users = User::whereIn('id', $userIds)->get();
-    if ($type === 'email') {
+   
+    $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
+    $subject = $emailTemplate->subject ?? '';
+    $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+    $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+
+    if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
         foreach ($users as $user) {
-             Mail::to($user->email)->send(new UserWelcome($user, 'Bulk Mail', 'This is a bulk email message.'));
+            $qr_code_url = asset($user->qr_code);
+            $message = $emailTemplate->message ?? '';
+            $message = str_replace('{{name}}', $user->full_name, $message);
+            $message = str_replace('{{site_name}}', config('app.name'), $message);
+            if (strpos($message, '{{qr_code}}') !== false) {
+              $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
+            }
+          
+            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
-    } elseif ($type === 'notification') {
+    } elseif (!empty($emailTemplate) && $emailTemplate->type === 'notification') {
         foreach ($users as $user) {
             // $user->notify(new AppNotification("Bulk Notification", "This is a bulk notification."));
         }
