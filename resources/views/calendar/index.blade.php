@@ -265,22 +265,22 @@
 
                         <div class="col-6">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description2" name="description" rows="3" maxlength="300"></textarea>
+                            <textarea class="form-control" id="description2" name="description" rows="3" maxlength="1000"></textarea>
                         </div>
 
                         <div class="col-6">
                             <label for="keynote" class="form-label">Keynote</label>
-                            <textarea class="form-control" id="keynote2" name="keynote" rows="3" maxlength="250"></textarea>
+                            <textarea class="form-control" id="keynote2" name="keynote" rows="3" maxlength="1000"></textarea>
                         </div>
 
                         <div class="col-6">
                             <label for="panels" class="form-label">Panels</label>
-                            <textarea class="form-control" id="panels2" name="panels" rows="3" maxlength="250"></textarea>
+                            <textarea class="form-control" id="panels2" name="panels" rows="3" maxlength="1000"></textarea>
                         </div>
 
                         <div class="col-6">
                             <label for="demoes" class="form-label">Demoes</label>
-                            <textarea class="form-control" id="demoes2" name="demoes" rows="3" maxlength="250"></textarea>
+                            <textarea class="form-control" id="demoes2" name="demoes" rows="3" maxlength="1000"></textarea>
                         </div>
 
                     </div>
