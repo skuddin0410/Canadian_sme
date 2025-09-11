@@ -702,16 +702,16 @@ public function sendPushNotification(Request $request){
         ]);
 
         if ($validator->fails()) {
-            return response()->json(["message" => $validator->errors()->first()]);
+            return response()->json(["message" => "Fail to change!"]);
         }
         $user->onesignal_userid = $request->onesignal_userid;
         $user->save(); 
         
-        OneSignal::sendNotificationToUser(
-            "Hi this is a test push notification",
-             $request->onesignal_userid 
-        );
-        
+        // OneSignal::sendNotificationToUser(
+        //     "Hi this is a test push notification",
+        //      $request->onesignal_userid 
+        // );
+
         return response()->json(["message" => "Onesignal added with profile"]);
     
     } catch (\Exception $e) {

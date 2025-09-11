@@ -120,8 +120,11 @@ public function verify(Request $request)
                 'message' => 'Invalid credentials',
             ], 401);
         }
-
-    
+        
+        $user->update([
+          'jwt_token' => $token
+        ]);
+  
         $session = SessionDate::updateOrCreate(
             ['user_id' => $user->id], 
             ['expires_at' => now()->addMonths(2)] 
