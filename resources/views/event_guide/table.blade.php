@@ -32,7 +32,7 @@
 <table class="table table-striped table-bordered dt-responsive display nowrap">
 <thead>
 	<tr>
-		<th>Category</th>
+	
 		<th>Title</th>
 		<th>Type</th>
 		<th width="10%">Action</th>
@@ -41,7 +41,7 @@
 <tbody>	
     @foreach($guides as $guide)
     <tr> 
-    	<td>{{ $guide->category }}</td>
+     
     	<td>{{ $guide->title }}</td>
     	<td>{{ $guide->type }}</td>
     	

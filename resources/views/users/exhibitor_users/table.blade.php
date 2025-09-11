@@ -38,7 +38,7 @@
        class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
 	<tr>
-		<th>Content Icon</th>
+		<th>Exhibitor Logo</th>
 		<th>Name</th>
 		<th>Industry</th>
 		<th>Email</th>

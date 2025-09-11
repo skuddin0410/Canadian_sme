@@ -3,12 +3,12 @@
 @section('title', config('app.name'))
 @section('content')
 
-<div class="container py-5">
+<div class="container py-4 py-lg-5">
   <div class="row justify-content-center">
     <!-- Company Info -->
-    <div class="col-md-8">
+    <div class="col-lg-8">
       <div class="card shadow-sm rounded-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-sm-4">
           <div class="d-flex align-items-center mb-4">
              @if(!empty($company->contentIconFile) && !empty($company->contentIconFile->file_path))
   <div class="me-3">
@@ -42,50 +42,52 @@
 
           <!-- Company Info Grid -->
           <div class="row g-3">
-            <div class="col-sm-12">
-              <p class="mb-1 text-muted"><i class="fas fa-align-left me-2 text-primary"></i>Bio</p>
-              <p class="fw-semibold">{{ $company->description ?? 'N/A' }}</p>
+            <div class="col-sm-12 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fas fa-align-left me-2 text-primary"></i>Bio</p>
+              <p class="text-secondary black-text-18 fw-medium">{{ $company->description ?? 'N/A' }}</p>
             </div>
 
-            <div class="col-sm-6">
-              <p class="mb-1 text-muted"><i class="fas fa-envelope me-2 text-primary"></i>Email</p>
-              <p class="fw-semibold">{{ $company->email ?? 'N/A' }}</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fas fa-envelope me-2 text-primary"></i>Email</p>
+              <p class="text-secondary black-text-18 fw-medium">{{ $company->email ?? 'N/A' }}</p>
             </div>
 
-            <div class="col-sm-6">
-              <p class="mb-1 text-muted"><i class="fas fa-phone me-2 text-primary"></i>Phone</p>
-              <p class="fw-semibold">{{ $company->phone ?? 'N/A' }}</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fas fa-phone me-2 text-primary"></i>Phone</p>
+              <p class="text-secondary black-text-18 fw-medium">{{ $company->phone ?? 'N/A' }}</p>
             </div>
 
-            <div class="col-sm-12">
-              <p class="mb-1 text-muted"><i class="fas fa-building me-2 text-primary"></i>Exhibitor</p>
-                <p class="fw-semibold">{{ $company->name ?? 'N/A' }}</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fas fa-building me-2 text-primary"></i>Exhibitor</p>
+                <p class="text-secondary black-text-18 fw-medium">{{ $company->name ?? 'N/A' }}</p>
               </div> 
-              <div class="col-sm-6"> <p class="mb-1 text-muted"> <i class="fas fa-globe me-2 text-primary"></i>Website</p> <p class="fw-semibold">
+              <div class="col-lg-6 mb-2"> 
+                <p class="mb-1 black-text-18 fw-medium"> <i class="fas fa-globe me-2 text-primary"></i>Website</p> 
+                <p class="fw-semibold">
             
               @if(!empty($company->website))
                 <p>
-                  <a href="{{ $company->website }}" target="_blank" class="fw-semibold">
+                  <a href="{{ $company->website }}" target="_blank" class="text-primary black-text-18 fw-medium">
                      {{ $company->website }}
                   </a>
                 </p>
               @endif
             </div>
 
-            <div class="col-sm-12">
-              <p class="mb-1 text-muted"><i class="fas fa-map-marker-alt me-2 text-primary"></i>Location</p>
-              <p class="fw-semibold">{{ $company->location ?? 'N/A' }}</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fas fa-map-marker-alt me-2 text-primary"></i>Location</p>
+              <p class="text-secondary black-text-18 fw-medium">{{ $company->location ?? 'N/A' }}</p>
             </div>
 
             <!-- Social -->
-            <div class="col-sm-12 mt-3">
-              <h5 class="text-primary"><i class="fas fa-share-alt me-2"></i>Social</h5>
+            <div class="col-12 mt-3">
+              <h5 class="mb-1 small-heading-black fw-medium"><i class="fas fa-share-alt me-2 text-primary"></i>Social</h5>
             </div>
-            <div class="col-sm-6">
-              <p class="mb-1 text-muted"><i class="fab fa-linkedin me-2 text-primary"></i>LinkedIn</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fab fa-linkedin me-2 text-primary"></i>LinkedIn</p>
               <p class="fw-semibold">
                 @if(!empty($company->linkedin))
-                  <a href="{{ $company->linkedin }}" target="_blank" class="text-dark">
+                  <a href="{{ $company->linkedin }}" target="_blank" class="text-primary black-text-18 fw-medium">
                     {{ $company->linkedin }}
                   </a>
                 @else
@@ -93,11 +95,11 @@
                 @endif
               </p>
             </div>
-            <div class="col-sm-6">
-              <p class="mb-1 text-muted"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</p>
               <p class="fw-semibold">
                 @if(!empty($company->facebook))
-                  <a href="{{ $company->facebook }}" target="_blank" class="text-dark">
+                  <a href="{{ $company->facebook }}" target="_blank" class="text-primary black-text-18 fw-medium">
                     {{ $company->facebook }}
                   </a>
                 @else
@@ -105,11 +107,11 @@
                 @endif
               </p>
             </div>
-            <div class="col-sm-6">
-              <p class="mb-1 text-muted"><i class="fab fa-x-twitter me-2 text-primary"></i>Twitter</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fab fa-x-twitter me-2 text-primary"></i>Twitter</p>
               <p class="fw-semibold">
                 @if(!empty($company->twitter))
-                  <a href="{{ $company->twitter }}" target="_blank" class="text-dark">
+                  <a href="{{ $company->twitter }}" target="_blank" class="text-primary black-text-18 fw-medium">
                     {{ $company->twitter }}
                   </a>
                 @else
@@ -117,11 +119,11 @@
                 @endif
               </p>
             </div>
-            <div class="col-sm-6">
-              <p class="mb-1 text-muted"><i class="fab fa-instagram me-2 text-primary"></i>Instagram</p>
+            <div class="col-lg-6 mb-2">
+              <p class="mb-1 black-text-18 fw-medium"><i class="fab fa-instagram me-2 text-primary"></i>Instagram</p>
               <p class="fw-semibold">
                 @if(!empty($company->instagram))
-                  <a href="{{ $company->instagram }}" target="_blank" class="text-dark">
+                  <a href="{{ $company->instagram }}" target="_blank" class="text-primary black-text-18 fw-medium">
                     {{ $company->instagram }}
                   </a>
                 @else
@@ -135,19 +137,19 @@
     </div>
 
     <!-- Sessions/Event Info (Right Sidebar) -->
-    <div class="col-md-4">
-      <div class="list-group shadow-sm rounded-4">
-        <h6 class="list-group-item bg-light fw-bold">Upcoming Sessions</h6>
+    <div class="col-lg-4">
+      <div class="list-group shadow-sm rounded-4 mt-3 mt-lg-0">
+        <h6 class="list-group-item bg-light fw-bold py-2">Upcoming Sessions</h6>
         @forelse($sessions as $session)
-          <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
-            <div class="ms-2 me-auto">
-              <div class="fw-bold">{{ $session->title ?? 'Untitled Session' }}</div>
-              <small class="text-muted">
+          <div class="list-group-item list-group-item-action d-xxl-flex justify-content-between align-items-start">
+            <div class="me-auto">
+              <div class="black-text-18 fw-medium">{{ $session->title ?? 'Untitled Session' }}</div>
+              <small class="text-secondary d-block mt-2">
                 <i class="fas fa-clock me-1 text-primary"></i>
                 {{ \Carbon\Carbon::parse($session->start_time)->format('M d, Y h:i A') }}
               </small>
             </div>
-            <span class="badge bg-primary rounded-pill align-self-center">
+            <span class="badge bg-primary rounded-pill align-self-center px-2 mt-0 mt-xxl-0">
               {{ $session->location ?? 'Hall' }}
             </span>
           </div>

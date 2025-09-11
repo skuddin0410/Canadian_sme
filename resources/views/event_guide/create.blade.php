@@ -31,13 +31,13 @@
             @csrf
             <div class="row">
               
-              <div class="col-6">
+              {{-- <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Category<span class="text-danger">*</span></label>
                   <input type="text" name="category" class="form-control" value="{{ old('category') }}">
                   @error('category') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-              </div>
+              </div> --}}
 
               <div class="col-6">
                 <div class="mb-3">
@@ -47,13 +47,8 @@
                 </div>
               </div>
 
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Type<span class="text-danger">*</span></label>
-                  <input type="text" name="type" class="form-control" value="{{ old('type') }}">
-                  @error('type') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-              </div>
+            
+
 
               <div class="col-6">
                 <div class="mb-3">
@@ -62,11 +57,20 @@
                   @error('weblink') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>
-
-              <div class="col-12">
+              <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Document (PDF/DOC)</label>
-                  <input type="file" name="doc" class="form-control" accept=".pdf,.doc,.docx">
+                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                    <textarea name="type" class="form-control" rows="4">{{ old('type') }}</textarea>
+                    @error('type') 
+                    <span class="text-danger">{{ $message }}</span> 
+                    @enderror
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Document (PDF/DOC/JPG/PNG)</label>
+                  <input type="file" name="doc" class="form-control" accept=".pdf,.jpg,.png,.doc,.docx">
                   @error('doc') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>

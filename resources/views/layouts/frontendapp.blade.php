@@ -3,6 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{-- <meta property="og:title" content="{{ $event->title ?? config('app.name') }}">
+    <meta property="og:description" content="{{ $event->description ?? 'Join our amazing event!' }}">
+    <meta property="og:image" content="{{ $event->photo->file_path ?? asset('frontend/images/default-event.jpg') }}">
+    <meta property="og:url" content="{{ $shareUrl }}">
+    <meta property="og:type" content="website"> --}}
+
     <title>@yield('title', config('app.name'))</title>
 
     {{-- SEO slots (optional) --}}

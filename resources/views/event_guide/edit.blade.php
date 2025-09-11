@@ -37,16 +37,8 @@
             @method('PUT')
 
             <div class="row">
-              <!-- Category -->
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label" for="category">Category <span class="text-danger">*</span></label>
-                  <input type="text" name="category" class="form-control" value="{{ old('category', $eventGuide->category) }}">
-                  @error('category')
-                    <span class="text-danger text-left">{{ $message }}</span>
-                  @enderror
-                </div>
-              </div>
+            
+          
 
               <!-- Title -->
               <div class="col-6">
@@ -59,16 +51,7 @@
                 </div>
               </div>
 
-              <!-- Type -->
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label" for="type">Type <span class="text-danger">*</span></label>
-                  <input type="text" name="type" class="form-control" value="{{ old('type', $eventGuide->type) }}">
-                  @error('type')
-                    <span class="text-danger text-left">{{ $message }}</span>
-                  @enderror
-                </div>
-              </div>
+             
 
               <!-- Weblink -->
               <div class="col-6">
@@ -80,17 +63,28 @@
                   @enderror
                 </div>
               </div>
+               <!-- Type -->
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="type">Description  <span class="text-danger">*</span></label>
+                  <textarea name="type" class="form-control" rows="4">{{ old('type', $eventGuide->type) }}</textarea>
+                 
+                  @error('type')
+                    <span class="text-danger text-left">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
 
               <!-- Document Upload -->
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label" for="doc">Document</label>
-                  <input type="file" name="doc" class="form-control">
+                  <input type="file" name="doc" class="form-control" accept=".pdf,.jpg,.png,.doc,.docx">
                   @if($eventGuide->doc)
                     <p class="mt-2">
                       <a href="{{ asset('storage/event_guides/'.$eventGuide->doc) }}" target="_blank">
-    View Current Document
-</a>
+                       View Current Document
+                      </a>
 
                     </p>
                   @endif

@@ -84,7 +84,7 @@ class EventGuideController extends Controller
 public function store(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'category' => 'required|string|max:255',
+        // 'category' => 'required|string|max:255',
         'title'    => 'required|string|max:255',
         'type'     => 'required|string|max:100',
         'weblink'  => 'nullable|url|max:255',
@@ -99,7 +99,7 @@ public function store(Request $request)
 
   
     $eventGuide = new EventGuide();
-    $eventGuide->category = $request->category;
+    // $eventGuide->category = $request->category;
     $eventGuide->title    = $request->title;
     $eventGuide->type     = $request->type;
     $eventGuide->weblink  = $request->weblink;
@@ -159,7 +159,7 @@ public function store(Request $request)
    public function update(Request $request, string $id)
 {
     $validator = Validator::make($request->all(), [
-        'category' => 'required|string|max:255',
+        // 'category' => 'required|string|max:255',
         'title'    => 'required|string|max:255',
         'type'     => 'required|string|max:100',
         'weblink'  => 'nullable|url|max:255',
@@ -174,7 +174,7 @@ public function store(Request $request)
 
     $eventGuide = EventGuide::findOrFail($id);
 
-    $eventGuide->category = $request->category;
+    // $eventGuide->category = $request->category;
     $eventGuide->title    = $request->title;
     $eventGuide->type     = $request->type;
     $eventGuide->weblink  = $request->weblink;
