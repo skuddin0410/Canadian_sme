@@ -17,6 +17,7 @@ use App\Models\Company;
 use App\Models\UserAgenda;
 use App\Models\FavoriteSession;
 use App\Models\UserConnection;
+use App\Models\EmailTemplate;
 
 
 if (!function_exists('getCategory')) {
@@ -341,3 +342,20 @@ if (! function_exists('removeFavorite')) {
     }
 }
 
+
+if (!function_exists('fetchEmailTemplates')) {
+    function fetchEmailTemplates()
+    {  
+       $emailTemplate = EmailTemplate::where('type','email')->orderBy("created_at","DESC")->get();
+       return $emailTemplate;
+    }
+}
+
+
+if (!function_exists('fetchNotificationTemplates')) {
+    function fetchNotificationTemplates()
+    {  
+       $emailTemplate = EmailTemplate::where('type','notifications')->orderBy("created_at","DESC")->get();
+       return $emailTemplate;
+    }
+}

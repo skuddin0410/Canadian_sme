@@ -51,10 +51,10 @@
                             <input type="hidden" name="user_ids" id="selectedUserIds">
 
                             <div class="d-inline-block">
-                                <button type="button" class="btn btn-primary" onclick="submitBulkAction('email')">
+                                <button type="button" class="btn btn-primary" onclick="openModal('email')">
                                     Send Email (<span id="emailCount">0</span>)
                                 </button>
-                                <button type="button" class="btn btn-success" onclick="submitBulkAction('notification')">
+                                <button type="button" class="btn btn-success" onclick="openModal('notification')">
                                     Send Notification (<span id="notifCount">0</span>)
                                 </button>
                             </div>
@@ -73,6 +73,63 @@
                     <!-- User Table -->
                     <div class="table-responsive" id="user-table"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bulkActionModalEmail" tabindex="-1" role="dialog" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkActionModalLabel">Select Email Template</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="actionType">Choose Template</label>
+                <select id="emailTemplate" class="form-control" name="template_name">
+                    <option value="">Please Select Template</option>
+                    @if(!empty(fetchEmailTemplates()))
+                        @foreach(fetchEmailTemplates() as $emailtemplate)
+                          <option value="{{$emailtemplate->template_name}}">{{$emailtemplate->template_name}}</option>
+                        @endforeach
+                    @endif
+                </select> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitBulkAction()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="bulkActionModalNotifications" tabindex="-1" role="dialog" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkActionModalLabel">Select Select Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="actionType">Choose Notification Template</label>
+                <select id="notificationTemplate" class="form-control" name="template_name">
+                    <option value="">Please Select Template</option>
+                    @if(!empty(fetchNotificationTemplates()))
+                        @foreach(fetchNotificationTemplates() as $emailtemplate)
+                          <option value="{{$emailtemplate->template_name}}">{{$emailtemplate->template_name}}</option>
+                        @endforeach
+                    @endif
+                </select> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitBulkAction()">Submit</button>
             </div>
         </div>
     </div>
@@ -136,6 +193,29 @@ $(document).ready(function() {
         });
     });
 });
+
+
+function openModal(actionType) {
+    window.selectedActionType = actionType;
+    if (actionType === 'email') {
+        $('#bulkActionModalEmail').modal('show');
+    } 
+
+    if (actionType === 'notification') {
+        $('#bulkActionModalNotifications').modal('show');
+    }
+
+    document.getElementById('emailTemplate').value=''
+    document.getElementById('notificationTemplate').value=''
+}
+
+function closeModal(){
+    $('#bulkActionModalEmail').modal('hide');
+    $('#bulkActionModalNotifications').modal('hide');
+    document.getElementById('emailTemplate').value=''
+    document.getElementById('notificationTemplate').value=''
+
+}
 </script>
 
 

@@ -10,6 +10,16 @@ Route::get('/login', function () {
     return redirect()->route('login');
 });
 
+Route::get('/admin/login', function () {
+    return redirect()->route('login');
+});
+
+Route::get('/admin', function () {
+    return redirect()->route('login');
+});
+
+
+
 Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
