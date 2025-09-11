@@ -787,8 +787,7 @@ public function getTags()
 
 public function checkSession(Request $request)
 {
-    $user = $request->user(); // or Auth::user()
-
+ 
     if (!$user = JWTAuth::parseToken()->authenticate()) {
         return response()->json([
             'success' => false,
@@ -820,7 +819,148 @@ public function checkSession(Request $request)
     ]);
 }
 
+public function getAllExhibitor(Request $request){
+    
+    try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
 
+          $exhibitors = Company::with(['contentIconFile'])->where('is_sponsor', 0)->orderBy('id', 'DESC')->get();
+
+            if ($exhibitors->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No exhibitors found!'
+                ], 404);
+            }
+
+            $response = $exhibitors->map(function ($exhibitor) {
+                return [
+                    'id'          => $exhibitor->id,
+                    'name'        => $exhibitor->name,
+                    'image_url'   => $exhibitor->contentIconFile ? $exhibitor->contentIconFile->file_path : asset('images/default.png'),
+                    'location'    => $exhibitor->booth ?? '',
+                ];
+            });
+
+            return response()->json($response);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to get data! ',
+            ], 500);
+        }
+
+    }
+
+
+    public function getAllSponsor(Request $request){
+    try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+          $sponsors = Company::with(['contentIconFile'])->where('is_sponsor', 1)->orderBy('id', 'DESC')->get();
+
+            if ($sponsors->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No sponsors found!'
+                ], 404);
+            }
+            $response = $sponsors->map(function ($sponsor) {
+                return [
+                    'id'          => $sponsor->id,
+                    'name'        => $sponsor->name,
+                    'image_url'   => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
+                    'level'    => ucfirst($sponsor->type) ?? '',
+                ];
+            });
+            return response()->json($response);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to get data! ',
+            ], 500);
+        }
+
+    }
+
+
+    public function getSponsor(Request $request){
+    try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+                $sponsor = Company::with(['contentIconFile', 'Docs'])->where('id', $request->id)->where('is_sponsor', 1)->first();
+
+                if (!$sponsor) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No sponsors found!'
+                    ], 404);
+                }
+
+                // Prepare data
+
+                $data = [
+                    "name" => $sponsor->name ?? '',
+                    "avatar" => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
+                    "word_no" => $sponsor->booth ?? '',
+                    "location" => $sponsor->booth ?? '',
+                    "email" => $sponsor->email ?? '',
+                    "phone" => $sponsor->phone ?? '',
+                    "website" => $sponsor->website ?? '',
+                    "social_links" => [
+                        [
+                            "name" => "facebook",
+                            "url" => $sponsor->facebook ?? ''
+                        ],
+                        [
+                            "name" => "instagram",
+                            "url" => $sponsor->instagram ?? ''
+                        ],
+                        [
+                            "name" => "twitter",
+                            "url" => $sponsor->twitter ?? ''
+                        ],
+                        [
+                            "name" => "linkedin",
+                            "url" => $sponsor->linkedin ?? ''
+                        ],
+                    ],
+                    "bio" => $sponsor->description,
+                    "uploaded_files" => $sponsor->Docs->map(fn ($sp) => [
+                        "name" => $sp->name, 
+                        "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')
+                    ]),
+                ];
+
+
+                return response()->json($data);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to get data! ',
+            ], 500);
+        }
+
+    }
 
 
 }
