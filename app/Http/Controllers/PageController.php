@@ -211,7 +211,11 @@ class PageController extends Controller
         if($slug=='terms-condition'){
             $slug = 'terms';
         }
-        
+
+        if($slug=='help-support'){
+            $slug = 'support';
+        }
+      
         $page = Page::where('slug', $slug)->first();
         if(!$page){
             return response()->json([

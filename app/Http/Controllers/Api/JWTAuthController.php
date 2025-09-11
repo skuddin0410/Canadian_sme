@@ -32,39 +32,31 @@ class JWTAuthController extends Controller
 
         $token = request()->bearerToken() ?? JWTAuth::refresh();
         $roles = $user->getRoleNames();
-        $address = [
-            'street'   => $user->address ?? null,
-            'city'     => $user->city ?? null,
-            'state'    => $user->state ?? null,
-            'country'  => $user->country ?? null,
-            'zipcode'  => $user->zipcode ?? null,
-        ];
         $user->load(['photo', 'usercompany']);
         return response()->json([
             'success' => true,
             'message' => 'successful',
             'id'        => $user->id,
-            'first_name'      => $user->name ?? '',
-            'lastname'  => $user->lastname ?? '',
             'name' => $user->full_name ?? '',
-            'company' => $user->company ?? '',
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
-            'designation'=> $user->designation,
-            'bio'       => $user->bio,
-            'tag'      => !empty($user->tags) ? explode(',',$user->tags) : [],
-            'my_qr_code' => asset($user->qr_code),
-            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
-            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 
-            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
-            'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : '', 
-            'image_url' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png') ,
-            'roles'     => $user->getRoleNames(),
             'company_about_page'  => config('app.url').'app/page/about',
             'company_location_page'    => config('app.url').'app/page/location',
             'company_privacy_policy_page' => config('app.url').'app/page/privacy',
             'company_terms_of_service_page' => config('app.url').'app/page/terms',
+            'designation'=> $user->designation,
+            'bio'       => $user->bio,
+            'tag'      => !empty($user->tags) ? explode(',',$user->tags) : [],
+            'my_qr_code' => asset($user->qr_code),
+
+            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : $user->company, 
+            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : $user->email, 
+            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile, 
+            'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : $user->website_url, 
+
+            'roles'     => $user->getRoleNames(),
+            
         ]);
 
 
@@ -128,6 +120,9 @@ public function updateUser(Request $request)
         $user->save();
         qrCode($user->id);
         
+        if(!empty($user->access_exhibitor_ids)){
+          Company::where('id', $user->access_exhibitor_ids)->update(["name"=>$request->company_name, "website"=>$request->company_website]);
+        }
 
         return response()->json([
             'success' => true,
@@ -404,16 +399,14 @@ public function getExhibitor($exhibitorId)
             ],
             'bio'         => $exhibitor->description ?? '',
             "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
+                           "file_id"=> $sp->id,
                            "name"=> $sp->file_name,
                            "url"=> $sp->file_path
                 ])->values()
         ];
         
         
-        return response()->json([
-            'success' => true,
-            'data'    => $response,
-        ], 200);
+        return response()->json($response, 200);
 
     } catch (\Exception $e) {
         return response()->json([
@@ -435,7 +428,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             ], 404);
         }
 
-        $exhibitor = Company::with('usercompany','usercompany.files')->find($exhibitorId);
+        $exhibitor = Company::find($exhibitorId);
       
         if (! $exhibitor) {
             return response()->json([
@@ -461,22 +454,22 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             $fileRecord = $this->imageUpload(
                 $request->file("file"),
                 'companies',
-                $exhibitor->usercompany->id,
+                $exhibitor->id,
                 'companies',
-                'files'
+                'private_docs'
             );
          
         }
     
-        $exhibitor = User::where('id', $exhibitor->id)->with(['files' => function ($query) {
+        $exhibitor = Company::where('id', $exhibitor->id)->with(['Docs' => function ($query) {
             $query->latest()->take(1); 
          }])->first();
  
         return response()->json([
           
             'message'   => 'File uploaded successfully.',
-            'file_id'   =>  !empty($exhibitor->files) ? $exhibitor->files[0]->id : null,
-            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : asset('images/default.png'),
+            'file_id'   =>  !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->id : null,
+            'image_url' => !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->file_path : asset('images/default.png'),
         ]);
 
     } catch (\Exception $e) {
@@ -497,7 +490,7 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
             ], 404);
         }
 
-        $exhibitor = User::find($exhibitorId);
+        $exhibitor = Company::find($exhibitorId);
 
         if (! $exhibitor) {
             return response()->json([
@@ -509,8 +502,6 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
         // Fetch file record from Drive table
         $file = Drive::where('id', $fileId)
             ->where('table_id', $exhibitor->id)
-            ->where('table_type', 'users')
-            ->where('file_type', 'photo')
             ->first();
 
         if (! $file) {

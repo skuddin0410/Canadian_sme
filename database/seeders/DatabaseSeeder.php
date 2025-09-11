@@ -36,7 +36,8 @@ class DatabaseSeeder extends Seeder
             InsertLocaions::class, // php artisan db:seed --class=InsertLocaions,
             AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
-            UserConnectionSeeder::class // php artisan db:seed --class=UserConnectionSeeder
+            UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder
+            EmailTemplateSeeder::class //php artisan db:seed --class=EmailTemplateSeeder
         ]);
     }
 }
