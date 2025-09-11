@@ -262,7 +262,6 @@ class HomeController extends Controller
     }
 
     public function registrationSettings(Request $request){
-
         if($request->mode == 'save'){
                $data = $request->validate([
                 'company_name'     => ['required','string','max:255'],
@@ -272,6 +271,7 @@ class HomeController extends Controller
                 'tax_percentage'   => ['required','numeric','between:0,100'],
                 'company_number'   => ['required','string','max:100'],
                 'privacy_policy'   => ['nullable','string'],
+                'support'=>['nullable','string'],
                 'about'   => ['nullable','string'],
                 'location'   => ['nullable','string'],
                 'terms_conditions' => ['nullable','string'],
@@ -296,7 +296,12 @@ class HomeController extends Controller
                 if($key == 'terms_conditions'){
                    Page::where('slug','terms')->update(['description' => $value]);
                 }
-            } 
+
+
+                if($key == 'support'){
+                   Page::updateOrCreate(['slug' => "support"], ['description' => $value]);
+                }
+            }  
             session()->flash('success', 'Saved successfully.');
 
             return redirect()->route('registration-settings'); 

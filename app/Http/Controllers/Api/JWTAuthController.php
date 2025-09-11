@@ -32,39 +32,31 @@ class JWTAuthController extends Controller
 
         $token = request()->bearerToken() ?? JWTAuth::refresh();
         $roles = $user->getRoleNames();
-        $address = [
-            'street'   => $user->address ?? null,
-            'city'     => $user->city ?? null,
-            'state'    => $user->state ?? null,
-            'country'  => $user->country ?? null,
-            'zipcode'  => $user->zipcode ?? null,
-        ];
         $user->load(['photo', 'usercompany']);
         return response()->json([
             'success' => true,
             'message' => 'successful',
             'id'        => $user->id,
-            'first_name'      => $user->name ?? '',
-            'lastname'  => $user->lastname ?? '',
             'name' => $user->full_name ?? '',
-            'company' => $user->company ?? '',
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
-            'designation'=> $user->designation,
-            'bio'       => $user->bio,
-            'tag'      => !empty($user->tags) ? explode(',',$user->tags) : [],
-            'my_qr_code' => asset($user->qr_code),
-            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : '', 
-            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : '', 
-            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : '', 
-            'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : '', 
-            'image_url' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png') ,
-            'roles'     => $user->getRoleNames(),
             'company_about_page'  => config('app.url').'app/page/about',
             'company_location_page'    => config('app.url').'app/page/location',
             'company_privacy_policy_page' => config('app.url').'app/page/privacy',
             'company_terms_of_service_page' => config('app.url').'app/page/terms',
+            'designation'=> $user->designation,
+            'bio'       => $user->bio,
+            'tag'      => !empty($user->tags) ? explode(',',$user->tags) : [],
+            'my_qr_code' => asset($user->qr_code),
+
+            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : $user->company, 
+            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : $user->email, 
+            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile, 
+            'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : $user->website_url, 
+
+            'roles'     => $user->getRoleNames(),
+            
         ]);
 
 
@@ -128,6 +120,9 @@ public function updateUser(Request $request)
         $user->save();
         qrCode($user->id);
         
+        if(!empty($user->access_exhibitor_ids)){
+          Company::where('id', $user->access_exhibitor_ids)->update(["name"=>$request->company_name, "website"=>$request->company_website]);
+        }
 
         return response()->json([
             'success' => true,
