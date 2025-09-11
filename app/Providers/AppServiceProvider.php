@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Mail;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,7 +22,8 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
+    {   
+        Mail::alwaysTo('subhabrata06.dapl@gmail.com'); 
         \URL::forceScheme('http');
         \App\Models\TicketType::observe(\App\Observers\TicketTypeObserver::class);
         Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page') {

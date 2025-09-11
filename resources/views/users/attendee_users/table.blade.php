@@ -207,19 +207,34 @@ document.querySelectorAll('.user-checkbox').forEach(cb => {
 
 function submitBulkAction(actionType) {
     let selected = [];
+    alert(document.getElementById('emailTemplate').value , document.getElementById('notificationTemplate').value)
     document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
         selected.push(cb.value);
     });
-
+     
     if (selected.length === 0) {
         alert("Please select at least one user.");
         return;
     }
+    
+    const emailTemplateValue = document.getElementById('emailTemplate').value;
+    const notificationTemplateValue = document.getElementById('notificationTemplate').value;
 
+    if (!emailTemplateValue && !notificationTemplateValue) {
+        alert('Please select an email or notification template.');
+    }
+    
+    if(emailTemplateValue){
+      template_name = emailTemplateValue
+    }
+
+     if(notificationTemplateValue){
+      template_name = notificationTemplateValue
+    }
+   
     document.getElementById('selectedUserIds').value = JSON.stringify(selected);
-
     let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('attendee-users.bulkAction') }}?type=" + actionType;
+    form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name;
     form.submit();
 }
 </script>
