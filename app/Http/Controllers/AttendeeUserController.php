@@ -200,7 +200,7 @@ class AttendeeUserController extends Controller
         }
         qrCode($user->id);
 
-        return redirect()->to(route('attendee-users.edit', $user->id))->withSuccess('Saved successfully.');
+        return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
     }
 
     /**
@@ -325,7 +325,7 @@ class AttendeeUserController extends Controller
           
         }
         qrCode($user->id);
-        return redirect()->to(route('attendee-users.edit', $user->id))->withSuccess('Saved successfully.');   
+        return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');   
     
 
     }
