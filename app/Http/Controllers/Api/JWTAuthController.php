@@ -404,16 +404,14 @@ public function getExhibitor($exhibitorId)
             ],
             'bio'         => $exhibitor->description ?? '',
             "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
+                           "file_id"=> $sp->id,
                            "name"=> $sp->file_name,
                            "url"=> $sp->file_path
                 ])->values()
         ];
         
         
-        return response()->json([
-            'success' => true,
-            'data'    => $response,
-        ], 200);
+        return response()->json($response, 200);
 
     } catch (\Exception $e) {
         return response()->json([
@@ -435,7 +433,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             ], 404);
         }
 
-        $exhibitor = Company::with('usercompany','usercompany.files')->find($exhibitorId);
+        $exhibitor = Company::find($exhibitorId);
       
         if (! $exhibitor) {
             return response()->json([
@@ -461,22 +459,22 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             $fileRecord = $this->imageUpload(
                 $request->file("file"),
                 'companies',
-                $exhibitor->usercompany->id,
+                $exhibitor->id,
                 'companies',
-                'files'
+                'private_docs'
             );
          
         }
     
-        $exhibitor = User::where('id', $exhibitor->id)->with(['files' => function ($query) {
+        $exhibitor = Company::where('id', $exhibitor->id)->with(['Docs' => function ($query) {
             $query->latest()->take(1); 
          }])->first();
  
         return response()->json([
           
             'message'   => 'File uploaded successfully.',
-            'file_id'   =>  !empty($exhibitor->files) ? $exhibitor->files[0]->id : null,
-            'image_url' => !empty($exhibitor->files) ? $exhibitor->files[0]->file_path : asset('images/default.png'),
+            'file_id'   =>  !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->id : null,
+            'image_url' => !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->file_path : asset('images/default.png'),
         ]);
 
     } catch (\Exception $e) {
@@ -497,7 +495,7 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
             ], 404);
         }
 
-        $exhibitor = User::find($exhibitorId);
+        $exhibitor = Company::find($exhibitorId);
 
         if (! $exhibitor) {
             return response()->json([
@@ -509,8 +507,6 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
         // Fetch file record from Drive table
         $file = Drive::where('id', $fileId)
             ->where('table_id', $exhibitor->id)
-            ->where('table_type', 'users')
-            ->where('file_type', 'photo')
             ->first();
 
         if (! $file) {
