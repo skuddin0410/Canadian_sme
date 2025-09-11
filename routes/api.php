@@ -23,15 +23,21 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     });
     
     Route::prefix('exhibitors')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAllExhibitor']);
         Route::get('/{exhibitorId}', [App\Http\Controllers\Api\JWTAuthController::class, 'getExhibitor']);
         Route::post('/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'uploadExhibitorFiles']);
         Route::put('/{exhibitorId}/files/{fileId}', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
     });
 
+     Route::prefix('sponsors')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAllSponsor']);
+        Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getSponsor']);
+    });
+
     Route::prefix('sessions')->group(function () {
         Route::get('/', [HomeController::class, 'getAllSession']);
         Route::get('/{sessionId}', [HomeController::class, 'getSession']);
-        Route::post('/{sessionId}', [HomeController::class, 'addSessionToFavourite']);
+        Route::get('/{sessionId}/favourite', [HomeController::class, 'addSessionToFavourite']);
         Route::post('/{sessionId}/agenda', [HomeController::class, 'createAgenda']);
     }); 
     

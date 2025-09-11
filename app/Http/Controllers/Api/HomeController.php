@@ -425,7 +425,7 @@ public function getConnectionsDetails(Request $request)
 public function addSessionToFavourite(Request $request){
 
     if(!isFavorite($request->sessionId)){
-         addFavorite($request->sessionId);
+          addFavorite($request->sessionId);
         
           return response()->json(["message"=> "Session added as favourite"]);
         }else{
