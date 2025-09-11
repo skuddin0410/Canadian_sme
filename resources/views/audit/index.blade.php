@@ -150,10 +150,10 @@
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <div class="btn-group" role="group">
-                                        <a href="{{ route('audit.show', $log) }}" class="btn btn-outline-primary btn-sm" title="View Details">
-                                            <i class="bi bi-eye"></i>
+                                        <a href="{{ route('audit.show', $log) }}" class="btn btn-sm btn-icon btn-primary" title="View Details">
+                                            <i class="bx bxs-show"></i>
                                         </a>
-                                        <a href="{{ route('audit.edit', ['entityType'=>$log->auditable_type, 'entityId'=>$log->auditable_id]) }}" class="btn btn-outline-secondary btn-sm" title="View History">
+                                        <a href="{{ route('audit.edit', ['entityType'=>$log->auditable_type, 'entityId'=>$log->auditable_id]) }}" class="btn btn-sm btn-icon btn-primary" title="View History">
                                             <i class="bi bi-clock-history"></i>
                                         </a>
                                     </div>

@@ -12,16 +12,13 @@ use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
+use App\Http\Controllers\EmailTemplateController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
     Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
-    Route::resource('coupons', App\Http\Controllers\CouponController::class);
-    Route::resource('faqs', App\Http\Controllers\FaqController::class);
     Route::resource('otps', App\Http\Controllers\OtpController::class);
-    Route::resource('orders', App\Http\Controllers\OrderController::class);
-    Route::resource('transactions', App\Http\Controllers\TransactionController::class);
     Route::resource('settings', App\Http\Controllers\SettingController::class);
     Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
 
@@ -86,6 +83,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('speakers.sendMail');
     Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
     ->name('attendee-users.sendMail');
+    Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
+    ->name('attendee-users.bulkAction');
 
 
 
@@ -149,14 +148,6 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
-
+    Route::resource('email-templates', EmailTemplateController::class);
+    
     });
-
-
-Route::group(['middleware' => ['webauth']], function () {
-
- require __DIR__.'/newsletters.php';
- require __DIR__.'/formbuilder.php';
-  require __DIR__.'/lead.php';
-
-});

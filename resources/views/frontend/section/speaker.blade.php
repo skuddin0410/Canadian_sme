@@ -3,7 +3,7 @@
         <div class="container">
             <div class="d-block d-xl-flex align-items-center gap-4 gap-xl-0">
                 <div class="d-block col-xl-4 pe-xl-5 ps-0">
-                    <div>
+                    <div class="mb-4 mb-xl-0">
                         <span class="small-heading-white">Speakers</span>
                         <h2 class="h2-white mb-4">Our Amazing & learned event Speakers</h2>
                         <span class="small-heading-white">

@@ -3,9 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
+use Illuminate\Support\Facades\Artisan;
+
 
 Route::get('/login', function () {
     return redirect()->route('login');
+});
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+    return 'All caches cleared!';
 });
 
 require __DIR__.'/landing.php';
@@ -30,10 +41,22 @@ Route::get('/email/open/{id}', function ($id) {
 
 Auth::routes();
 
-Route::group(['middleware' => 'auth:web'], function () {
-   require __DIR__.'/common.php'; //used by all users in web
-   require __DIR__.'/admin.php';  //Admin and Admin 
-   require __DIR__.'/exhibitor.php';
-   require __DIR__.'/helpdesk.php';
-   require __DIR__.'/ticket.php';
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+
+   Route::prefix('admin')->group(function () {
+       require __DIR__.'/common.php'; //used by all users in web
+       require __DIR__.'/admin.php';  //Admin and Admin 
+       require __DIR__.'/exhibitor.php';
+       require __DIR__.'/helpdesk.php';
+
+       require __DIR__.'/newsletters.php';
+       require __DIR__.'/formbuilder.php';
+       require __DIR__.'/lead.php';
+   });
+   
+
+});
+
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+    require __DIR__.'/ticket.php';
 });

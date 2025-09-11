@@ -14,7 +14,7 @@ class LeadController extends Controller
 
 public function index(Request $request)
 {
-    $query = Lead::with(['user', 'company']);
+    $query = Lead::with(['user']);
 
     // Search by lead's first_name or last_name
     if ($request->filled('search')) {
@@ -25,13 +25,6 @@ public function index(Request $request)
         });
     }
 
-    // Search by company name
-    if ($request->filled('company')) {
-        $company = $request->company;
-        $query->whereHas('company', function($q) use ($company) {
-            $q->where('name', 'like', "%{$company}%");
-        });
-    }
 
     // Optional filters: status, source
     if ($request->filled('status')) {

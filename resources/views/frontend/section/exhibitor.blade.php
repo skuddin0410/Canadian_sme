@@ -8,9 +8,8 @@
                 <h2 class="h2-black">
                     Exhibitors Showcasing Innovation Across All Industries
                 </h2>
-                <div class="">
-                    <a class="view-more position-relative d-flex
-                        align-items-center gap-2" href="{{route('exhibitor-index')}}">
+                <div class="d-none d-xl-block">
+                    <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
                          View More
                     </a>
                     {{-- <button class="heroBtn btn-long">View More</button> --}}
@@ -53,7 +52,9 @@
                 @endif
             </div>
             <div class="d-flex justify-content-center mt-4 d-xl-none">
-                <button class="heroBtn btn-long">View More</button>
+                 <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
+                         View More
+                    </a>
             </div>
         </div>
     </section>

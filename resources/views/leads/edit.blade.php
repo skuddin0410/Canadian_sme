@@ -10,7 +10,7 @@
 @endpush
 
 @section('content')
-<div class="container py-4">
+<div class="container flex-grow-1 container-p-y pt-0">
     <div class="mb-4">
         <h1 class="h4 fw-bold text-dark">Edit Lead</h1>
         <p class="text-muted">Update the details of this lead</p>
@@ -110,32 +110,7 @@
                     </div>
                 </div>
 
-                <hr class="my-4">
 
-                {{-- Desired Amenities --}}
-                <h5 class="fw-bold mb-3">Desired Amenities</h5>
-               @php
-    $amenities = ['parking','gym','pool','laundry','pet_friendly','balcony','concierge','storage'];
-
-    // Decode if it's a JSON string
-    $selectedAmenities = old('desired_amenities', $lead->desired_amenities ? json_decode($lead->desired_amenities, true) : []);
-@endphp
-
-                <div class="row">
-                    @foreach($amenities as $amenity)
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       name="desired_amenities[]" 
-                                       value="{{ $amenity }}" 
-                                       {{ in_array($amenity, $selectedAmenities) ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    {{ ucfirst(str_replace('_',' ',$amenity)) }}
-                                </label>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
                 <hr class="my-4">
 
 {{-- Lead Organization: Tagging System --}}

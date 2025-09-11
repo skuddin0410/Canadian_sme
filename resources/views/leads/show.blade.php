@@ -10,7 +10,7 @@
 @endpush
 
 @section('content')
-<div class="container mt-3 py-4">
+<div class="container flex-grow-1 container-p-y pt-0">
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <div>
             <h1 class="h4 fw-bold text-dark">Lead Details</h1>
@@ -62,25 +62,6 @@
                     <p><strong>Source:</strong> {{ ucfirst(str_replace('_',' ', $lead->source)) }}</p>
                 </div>
             </div>
-
-            <hr class="my-4">
-
-            {{-- Desired Amenities --}}
-            <h5 class="fw-bold mb-3">Desired Amenities</h5>
-            @php
-                $amenities = $lead->desired_amenities ? json_decode($lead->desired_amenities, true) : [];
-            @endphp
-            @if(!empty($amenities))
-                <ul class="list-inline">
-                    @foreach($amenities as $amenity)
-                        <li class="list-inline-item badge bg-dark me-1">
-                            {{ ucfirst(str_replace('_',' ',$amenity)) }}
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <p class="text-muted">No amenities selected</p>
-            @endif
 
             <hr class="my-4">
 

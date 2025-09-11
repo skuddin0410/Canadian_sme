@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Drive;
-use App\Models\Wallet;
 use App\Models\Company;
 use App\Models\Setting;
 use App\Models\Category;
@@ -20,256 +19,7 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class JWTAuthController extends Controller
 {
-    public function register(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'lastname' => 'sometimes|nullable|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
-            'mobile' => 'required|string|unique:users,mobile',
-            'username' => 'required|string|unique:users,username',
-            'password' => 'required|string|min:8',
-            'dob' => 'required|date|date_format:Y-m-d|before_or_equal:' . date('Y-m-d', strtotime('-18 years')),
-            'gender' => 'required|string|max:255',
-            'place' => 'sometimes|nullable|string|max:255',
-            'street' => 'sometimes|nullable|string|max:255',
-            'zipcode' => 'sometimes|nullable|string|max:255',
-            'city' => 'sometimes|nullable|string|max:255',
-            'state' => 'sometimes|nullable|string|max:255',
-            'country' => 'sometimes|nullable|string|max:255',
-            'referral_coupon' => 'nullable|string',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors(),
-                'data' => $request->all(),
-            ], 422);
-        }
 
-        $user = new User();
-        $user->name = $request->name;
-        if ($request->lastname) {
-            $user->lastname = $request->lastname;
-        }
-        $user->email = $request->email;
-        $user->mobile = $request->mobile;
-        $user->username = $request->username;
-        $user->password = Hash::make($request->password);
-        if ($request->dob) {
-            $user->dob = $request->dob;
-        }
-        if ($request->gender) {
-            $user->gender = $request->gender;
-        }
-        if ($request->place) {
-            $user->place = $request->place;
-        }
-        if ($request->street) {
-            $user->street = $request->street;
-        }
-        if ($request->zipcode) {
-            $user->zipcode = $request->zipcode;
-        }
-        if ($request->city) {
-            $user->city = $request->city;
-        }
-        if ($request->state) {
-            $user->state = $request->state;
-        }
-        if ($request->country) {
-            $user->country = $request->country;
-        }
-        $user->referral_coupon = strtoupper(substr(str_shuffle(uniqid()), 5, 13));
-        $user->referral_percentage = Setting::firstWhere('key', 'referrer')->value ?? 0.00;
-        $user->save();
-        $user->assignRole('User');
-
-        $token = JWTAuth::fromUser($user); // JWTAuth::login($user);
-
-        if ($request->referral_coupon) {
-            $referrerUser = User::firstWhere('referral_coupon', $request->referral_coupon);
-            if ($referrerUser) {
-                $wallet = new Wallet();
-                $wallet->user_id = $user->id;
-                $wallet->table_id = $referrerUser->id;
-                $wallet->table_type = 'users';
-                $wallet->amount = $referrerUser->referral_percentage ?? 0.00;
-                $wallet->status = 'init';
-                $wallet->save();
-            }
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'successful',
-            'data' => compact('user', 'token'),
-        ]);
-    }
-
-    public function login(Request $request) {
-        try {
-            $validator = Validator::make($request->all(), [
-                'username' => 'required|string|max:255',
-                'password' => 'required|string|min:8',
-            ]);
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $validator->errors(),
-                    'data' => $request->all(),
-                ], 422);
-            }
-
-            if (filter_var($request->username, FILTER_VALIDATE_EMAIL)) {
-                // It's an email
-                $credentials = ['email' => $request->username, 'password' => $request->password];
-            } else {
-                // It's a username
-                $credentials = ['username' => $request->username, 'password' => $request->password];
-            }
-
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid credentials',
-                    'data' => $request->all(),
-                ], 401);
-            }
-
-            $user = JWTAuth::user(); // alias: auth()->guard('api')->user();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'successful',
-                'data' => compact('user', 'token'),
-            ]);
-        } catch (JWTException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-                'data' => $e,
-            ], 500);
-        }
-    }
-
-    public function loginByUser(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'email' => 'sometimes|nullable|string|max:255|email',
-            'mobile' => 'sometimes|nullable|string',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors(),
-                'data' => $request->all(),
-            ], 422);
-        }
-
-        $user = User::query()
-            ->when($request->email, function ($query) use ($request) {
-                $query->where('email', $request->email);
-            })
-            ->when($request->mobile, function ($query) use ($request) {
-                $query->where('mobile', $request->mobile);
-            })
-            ->first();
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found.',
-                'data' => $request->all(),
-            ], 404);
-        }
-
-        $token = JWTAuth::fromUser($user); // JWTAuth::login($user);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'successful',
-            'data' => compact('user', 'token'),
-        ]);
-    }
-
-    public function social(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'name' => 'nullable|string|max:255',
-            'lastname' => 'nullable|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
-            'mobile' => 'sometimes|nullable|string|unique:users,mobile',
-            'dob' => 'sometimes|nullable|date|date_format:Y-m-d|before_or_equal:' . date('Y-m-d', strtotime('-18 years')),
-            'gender' => 'nullable|string|max:255',
-            'place' => 'nullable|string|max:255',
-            'street' => 'nullable|string|max:255',
-            'zipcode' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
-            'country' => 'nullable|string|max:255',
-            'google_id' => 'sometimes|nullable|string|max:255',
-            'meta_id' => 'sometimes|nullable|string|max:255',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors(),
-                'data' => $request->all(),
-            ], 422);
-        }
-
-        $user = User::firstWhere('email', $request->email);
-        if (!$user) {
-            $user = new User();
-            $user->name = $request->name;
-            if ($request->lastname) {
-                $user->lastname = $request->lastname;
-            }
-            $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            if ($request->dob) {
-                $user->dob = $request->dob;
-            }
-            if ($request->gender) {
-                $user->gender = $request->gender;
-            }
-            if ($request->place) {
-                $user->place = $request->place;
-            }
-            if ($request->street) {
-                $user->street = $request->street;
-            }
-            if ($request->zipcode) {
-                $user->zipcode = $request->zipcode;
-            }
-            if ($request->city) {
-                $user->city = $request->city;
-            }
-            if ($request->state) {
-                $user->state = $request->state;
-            }
-            if ($request->country) {
-                $user->country = $request->country;
-            }
-            $user->referral_coupon = strtoupper(substr(str_shuffle(uniqid()), 5, 13));
-            $user->save();
-            $user->assignRole('User');
-        }
-        if ($request->google_id) {
-            $user->google_id = $request->google_id;
-        }
-        if ($request->meta_id) {
-            $user->meta_id = $request->meta_id;
-        }
-        $user->save();
-
-        $token = JWTAuth::fromUser($user); // JWTAuth::login($user);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'successful',
-            'data' => compact('user', 'token'),
-        ]);
-    }
-
-   
     public function getUser() {
     try {
         if (! $user = JWTAuth::parseToken()->authenticate()) {
@@ -802,12 +552,7 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
 }
 
 
-
-
-
-
-
-public function getSpeaker()
+public function getSpeaker(Request $request)
 {
     try {
        
@@ -827,47 +572,180 @@ public function getSpeaker()
         if ($speakers->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No speakers found!',
-                'data'    => collect(),
+                'message' => 'No speakers found!'
             ], 404);
         }
 
         
-        $response = $speakers->map(function ($speaker) {
+       $response = $speakers->map(function ($speaker) {
             return [
+                'id'     => $speaker->id,
                 'name'     => $speaker->full_name,
-                'company'  => $speaker->company ?? '',
-                'designation'  => $speaker->company ?? '',
-                'location' => '',
-                'email'    => $speaker->email ?? '',
-                'phone'    => $speaker->mobile ?? '',
-                'website'  => $speaker->website_url ?? '',
-                'avatar'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
-                'tags' => !empty($speaker->tags) ? explode(',',$speaker->tags) : '',
-                'groups' => groups($speaker),
-
-                'social_links' => [
-                    ['name' => 'facebook', 'url' => $speaker->facebook_url ?? ''],
-                    ['name' => 'instagram', 'url' => $speaker->instagram_url ?? ''],
-                    ['name' => 'linkedin', 'url' => $speaker->linkedin_url ?? ''],
-                    ['name' => 'twitter', 'url' => $speaker->twitter_url ?? ''],
-                    ['name' => 'github', 'url' => $speaker->github_url ?? ''],
-                ],
-
-                'bio'   => $speaker->bio ?? '',
+                'company_name'  => $speaker->company ?? '',
+                'role'  => $speaker->designation ?? '',
+                'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                'roles' => groups($speaker)
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data'    => $response,
-        ], 200);
+        return response()->json($response);
 
     } catch (\Exception $e) {
         return response()->json([
-            'success' => false,
-            'message' => 'Something went wrong: ' . $e->getMessage(),
-            'data'    => collect(),
+            'message' => 'Fail to load data! ',
+        ], 500);
+    }
+}
+
+public function getSpeakerById(Request $request){
+   try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+        $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Speaker');
+        })->where('id',$request->id)->first();
+    
+        if (empty($speaker)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!'
+            ], 404);
+        }
+
+        $response =  [
+            'id'     => $speaker->id,
+            'name'     => $speaker->full_name,
+            'company_name'  => $speaker->company ?? '',
+            "company_details"=>"Microsoft Corporation is an American multinational technology corporation which produces computer software",
+            "bio"=> $speaker->bio ?? '',
+            'role'  => $speaker->designation ?? '',
+            'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+            'roles' => groups($speaker),
+            "contact_details"=>[
+               "email"=> $speaker->email,
+               "phone"=> $speaker->mobile ?? '',
+                "social_media_links"=>[
+                  "linkedin"=> $speaker->linkedin_url,
+                  "facebook"=> $speaker->facebook_url,
+                  "instagram"=> $speaker->instagram_url,
+                  "twitter"=> $speaker->twitter_url
+
+                ]
+
+            ]
+        ];
+    
+        return response()->json([$response]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Fail to load data! ',
+        ], 500);
+    }
+}
+
+public function getAttendee(Request $request)
+{
+    try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+     
+        $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Attendee');
+        })->get();
+
+        if ($speakers->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!'
+            ], 404);
+        }
+
+        
+       $response = $speakers->map(function ($speaker) {
+            return [
+                'id'     => $speaker->id,
+                'name'     => $speaker->full_name,
+                'company_name'  => $speaker->company ?? '',
+                'role'  => $speaker->designation ?? '',
+                'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                'roles' => groups($speaker)
+            ];
+        });
+
+        return response()->json($response);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Fail to load data! ',
+        ], 500);
+    }
+}
+
+public function getAttendeeById(Request $request){
+   try {
+       
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+
+        $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
+         $q->where('name', 'Attendee');
+        })->where('id',$request->id)->first();
+    
+        if (empty($speaker)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No speakers found!'
+            ], 404);
+        }
+
+        $response =  [
+            'id'     => $speaker->id,
+            'name'     => $speaker->full_name,
+            'company_name'  => $speaker->company ?? '',
+            "company_details"=>"Microsoft Corporation is an American multinational technology corporation which produces computer software",
+            "bio"=> $speaker->bio ?? '',
+            'role'  => $speaker->designation ?? '',
+            'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+            'roles' => groups($speaker),
+            "contact_details"=>[
+               "email"=> $speaker->email,
+               "phone"=> $speaker->mobile ?? '',
+                "social_media_links"=>[
+                  "linkedin"=> $speaker->linkedin_url,
+                  "facebook"=> $speaker->facebook_url,
+                  "instagram"=> $speaker->instagram_url,
+                  "twitter"=> $speaker->twitter_url
+
+                ]
+
+            ]
+        ];
+    
+        return response()->json([$response]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Fail to load data! ',
         ], 500);
     }
 }

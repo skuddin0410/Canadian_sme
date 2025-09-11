@@ -21,6 +21,7 @@ return new class extends Migration
 
          Schema::table('users', function (Blueprint $table) {
             $table->string('title', 6)->nullable()->after('id');
+            $table->string('onesignal_userid')->nullable()->after('title');
         });
     }
 
@@ -36,6 +37,7 @@ return new class extends Migration
 
          Schema::table('users', function (Blueprint $table) {
             $table->dropColumn(['title']);
+            $table->dropColumn(['onesignal_userid']);
         });
     }
 };

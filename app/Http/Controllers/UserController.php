@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Wallet;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Drive;
 use Storage;

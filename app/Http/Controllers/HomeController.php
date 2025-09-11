@@ -13,7 +13,6 @@ use Auth;
 use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
-use App\Models\Order;
 use App\Models\Page;
 
 class HomeController extends Controller
@@ -63,7 +62,7 @@ class HomeController extends Controller
                 ->whereHas("roles", function ($q) {
                     $q->whereNotIn("name", ["Exhibitor"]);
                 })->count();
-            $revenue = Order::sum('amount') ?? 0;
+            $revenue = 0;
             if(Auth::user()->hasRole('Admin') ){
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
@@ -306,5 +305,31 @@ class HomeController extends Controller
 
         return view('registration-settings');
     }
+    
+   public function emailTemplateSettings(Request $request){
+        if($request->mode == 'save'){
+               $data = $request->validate([
+                'subject'     => ['required','string','max:255'],
+                'content'  => ['required','string',"max:500"],
+               ]);
+            
+            if(!empty($request->subject)) {
+                $subject = Setting::where('key','email_subject')->first();
+                $subject->value = $request->subject;
+                $subject->save();   
+            }  
+
+             if(!empty($request->content)) {
+                $content = Setting::where('key','email_content')->first();
+                $content->value = $request->content;
+                $content->save();   
+            }
+            
+            session()->flash('success', 'Saved successfully.');     
+            return redirect()->route('email-template-settings'); 
+        }
+            
+       return view('EmailTemplate');
+   }
     
 }
