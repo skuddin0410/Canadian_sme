@@ -375,10 +375,9 @@ public function getExhibitor($exhibitorId)
         }
 
      
-        $exhibitor = User::with([
-            'photo',
-            'usercompany',
-            'usercompany.files',
+        $exhibitor = Company::with([
+            'contentIconFile',
+            'Docs',
         ])->find($exhibitorId);
 
         if (! $exhibitor) {
@@ -389,33 +388,25 @@ public function getExhibitor($exhibitorId)
             ], 404);
         }
 
-        $company = $exhibitor->usercompany;          // may be null
-        $booth   = $company?->booth;      // first booth (Collection-safe)
-
         $response = [
-            'name'     => $exhibitor->full_name ?? '',
-            'word_no'  => $booth ?? '-',
-            'avatar'   => $exhibitor->photo?->file_path ?? asset('images/default.png'),
-            'location' => $booth ?? '-',
+            'name'     => $exhibitor->name ?? '',
+            'word_no'  => $exhibitor->booth ?? '-',
+            'avatar'   => $exhibitor->contentIconFile?->file_path ?? asset('images/default.png'),
+            'location' => $exhibitor->booth ?? '-',
             'email'    => $exhibitor->email ?? '',
-            'phone'    => $exhibitor->mobile ?? '',
-            'website'  => $exhibitor->website_url ?? '',
+            'phone'    => $exhibitor->phone ?? '',
+            'website'  => $exhibitor->website ?? '',
             'social_links' => [
-                ['name' => 'linkedin',  'url' => $exhibitor->linkedin_url  ?? ''],
-                ['name' => 'facebook',  'url' => $exhibitor->facebook_url  ?? ''],
-                ['name' => 'instagram', 'url' => $exhibitor->instagram_url ?? ''],
-                ['name' => 'twitter',   'url' => $exhibitor->twitter_url   ?? ''],
-                ['name' => 'github',    'url' => $exhibitor->github_url    ?? ''],
+                ['name' => 'linkedin',  'url' => $exhibitor->linkedin  ?? ''],
+                ['name' => 'facebook',  'url' => $exhibitor->facebook  ?? ''],
+                ['name' => 'instagram', 'url' => $exhibitor->instagram ?? ''],
+                ['name' => 'twitter',   'url' => $exhibitor->twitter   ?? '']
             ],
-            'bio'         => $exhibitor->bio ?? '',
-            'my_qr_code'  => $exhibitor->qr_code ? asset($exhibitor->qr_code) : '',
-            'uploaded_files' => ($company?->files ?? collect())
-                ->map(fn ($file) => [
-                    'name' => $file->file_name,
-                    'url'  => $file->file_path,
-                ])
-                ->values()
-                ->all(),
+            'bio'         => $exhibitor->description ?? '',
+            "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
+                           "name"=> $sp->file_name,
+                           "url"=> $sp->file_path
+                ])->values()
         ];
         
         
@@ -444,7 +435,7 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             ], 404);
         }
 
-        $exhibitor = User::with('usercompany','usercompany.files')->find($exhibitorId);
+        $exhibitor = Company::with('usercompany','usercompany.files')->find($exhibitorId);
       
         if (! $exhibitor) {
             return response()->json([
