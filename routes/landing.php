@@ -14,7 +14,7 @@ Route::get('app/page/{slug}', [PageController::class, 'appPage'])->name('public.
 // Route::prefix('form-builder')->group(function () {
   Route::post('/forms/{id}/submit', [FormBuilderController::class, 'submitForm'])->name('forms.submit');
 // });
-
+Route::get('/schedule', [LandingController::class, 'scheduleIndex'])->name('schedule-index');
 Route::get('/profile/{id}', [LandingController::class, 'profile'])->name('profile');
 
 Route::get('/exhibitors', [LandingController::class, 'exhibitorIndex'])->name('exhibitor-index');
