@@ -72,11 +72,11 @@
     <style>
         .sponsors-title {
     display: inline-block;
-    padding: 0.45rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 700;
+    padding: 0.35rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
     color: #fff;
     border-radius: 4px; /* small radius for rectangle look */
 }
@@ -112,4 +112,4 @@
     color: #fff;
 }
 
-        </style>
+</style>

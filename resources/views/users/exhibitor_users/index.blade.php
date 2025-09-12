@@ -20,7 +20,7 @@
                             <a href="{{route('exhibitors.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
 							<a href="{{route('exhibitor-users.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
 								<span><i class="bx bx-plus me-sm-1"></i> 
-									<span class="d-none d-sm-inline-block">Add Exhibitor User</span>
+									<span class="d-none d-sm-inline-block">Add Exhibitor</span>
 								</span>
 							</a> 
 						</div>

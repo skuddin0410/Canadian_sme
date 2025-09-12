@@ -15,8 +15,7 @@
                     <h5 class="mb-0">Sponsors List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
                        <a href="{{ route('sponsors.export') }}" class="btn btn-outline-primary btn-pill">Export</a>
-                        <a href="{{ route('sponsors.index') }}" class="btn btn-outline-primary btn-pill">Back</a>
-
+                     
                         <a href="{{ route('sponsors.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add New
                             </a>
