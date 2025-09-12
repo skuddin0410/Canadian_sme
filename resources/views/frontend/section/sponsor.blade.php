@@ -38,7 +38,23 @@
                                 </a>
                                 <div class="swiper-img-text">
                                     <span class="sponsors-name">{{$sponsor->name ?? ''}}</span>
-                                    <span class="sponsors-title gold">Sponsor</span>
+                                    @php
+                                        $typeColors = match(strtolower($sponsor->type ?? 'general')) {
+                                        'gold' => 'gold',
+                                        'silver' => 'silver',
+                                        'bronze' => 'bronze',
+                                        'platinum' => 'platinum',
+                                        'majlislounge' => 'majlislounge',
+                                        default => 'general'
+                                       };
+
+                                        $displayType = $sponsor->type ? ucfirst(strtolower($sponsor->type)) : 'General';
+                                        if (strtolower($sponsor->type ?? '') === 'majlislounge') $displayType = 'Majlis Lounge';
+                                    @endphp
+
+                                    <span class="sponsors-title {{ $typeColors }}">{{ $displayType }}</span>
+
+                                   
                                 </div>
                             </div>
                              @endforeach
@@ -53,3 +69,47 @@
             </div>
     </section>
     <!-- sponsors end -->
+    <style>
+        .sponsors-title {
+    display: inline-block;
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
+    border-radius: 4px; /* small radius for rectangle look */
+}
+
+/* Color themes */
+.sponsors-title.gold {
+    background: linear-gradient(45deg, #FFD700, #FFC300);
+    color: #5a3e00;
+}
+
+.sponsors-title.silver {
+    background: linear-gradient(45deg, #C0C0C0, #A8A8A8);
+    color: #2c2c2c;
+}
+
+.sponsors-title.bronze {
+    background: linear-gradient(45deg, #CD7F32, #B87333);
+    color: #fff;
+}
+
+.sponsors-title.platinum {
+    background: linear-gradient(45deg, #E5E4E2, #D4D4D4);
+    color: #2C3E50;
+}
+
+.sponsors-title.majlislounge {
+    background: linear-gradient(45deg, #8B4513, #5A2E0D);
+    color: #fff;
+}
+
+.sponsors-title.general {
+    background: #6c757d;
+    color: #fff;
+}
+
+        </style>
