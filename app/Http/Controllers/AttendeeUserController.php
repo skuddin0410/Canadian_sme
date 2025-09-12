@@ -27,6 +27,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\MailLog;
 use App\Mail\UserWelcome;
 use App\Models\EmailTemplate;
+use OneSignal;
 
 
 class AttendeeUserController extends Controller
@@ -418,7 +419,6 @@ public function bulkAction(Request $request)
     $subject = $emailTemplate->subject ?? '';
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);
-
     if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
         foreach ($users as $user) {
             $qr_code_url = asset($user->qr_code);
@@ -431,9 +431,23 @@ public function bulkAction(Request $request)
           
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
-    } elseif (!empty($emailTemplate) && $emailTemplate->type === 'notification') {
-        foreach ($users as $user) {
-            // $user->notify(new AppNotification("Bulk Notification", "This is a bulk notification."));
+    } else if (!empty($emailTemplate) && $emailTemplate->type === 'notifications') {
+         foreach ($users as $user) {
+            $message = $emailTemplate->message ?? '';
+            $message = str_replace('{{name}}', $user->full_name, $message);
+            $message = str_replace('{{site_name}}', config('app.name'), $message);
+            
+                if($request->onesignal_userid){
+                    OneSignal::sendNotificationToUser(
+                        $message,                     // 👈 body text
+                        $request->onesignal_userid,   // 👈 user/player id
+                        null,                         // URL (optional)
+                        null,                         // data (optional)
+                        null,                         // buttons (optional)
+                        null,                         // schedule (optional)
+                        $subject                      // 👈 title
+                    );
+            }
         }
     }
 

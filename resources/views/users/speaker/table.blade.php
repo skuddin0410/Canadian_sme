@@ -78,13 +78,13 @@
             @endif
         </form>
 		
-		    <button type="button" 
+		  <!--   <button type="button" 
         class="btn btn-sm btn-primary" 
         data-bs-toggle="modal" 
         data-bs-target="#sendMailModal{{ $user->id }}">
          Send Mail
         </button>
-        
+         -->
         <a href="{{ route('speaker.show', $user->id) }}" class="btn btn-sm btn-icon btn-primary"  title="View">
             <i class="bx bxs-show"></i>
         </a>
