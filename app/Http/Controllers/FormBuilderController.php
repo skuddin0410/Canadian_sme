@@ -113,38 +113,8 @@ class FormBuilderController extends Controller
         $forms = Form::where('is_active', true)->get();
         return response()->json(['forms' => $forms]);
     }
-// public function submitForm(Request $request, $id): JsonResponse
-// {
-//     $form = Form::findOrFail($id);
-//      $data = $request->json()->all();
-//      dd($data);
 
-//     // Dynamic validation
-//     $rules = $form->validation_rules ?? [];
-//     $validator = Validator::make($request->all(), $rules);
-
-//     if ($validator->fails()) {
-//         return response()->json(['errors' => $validator->errors()], 422);
-//     }
-
-//     // Apply conditional logic
-//     $filteredData = $this->applyConditionalLogic($request->all(), $form->conditional_logic ?? []);
-//     $filteredData = is_array($filteredData) ? $filteredData : [];
-
-//     // Save submission
-//     $submission = FormSubmission::create([
-//         'form_id' => $form->id,
-//         'submission_data' => $filteredData,
-//         'ip_address' => $request->ip(),
-//         'user_agent' => $request->userAgent(),
-//     ]);
-
-//     return response()->json([
-//         'message' => 'Form submitted successfully',
-//         'submission' => $submission
-//     ], 201);
-// }
-public function submitForm(Request $request, $id): JsonResponse
+public function submitForm(Request $request, $id)
     {
         $form = Form::findOrFail($id);
 
@@ -172,11 +142,14 @@ public function submitForm(Request $request, $id): JsonResponse
             'ip_address'    => $request->ip(),
             'user_agent'    => $request->userAgent(),
         ]);
+         return redirect()
+        ->back()
+        ->with('success', 'Form submitted successfully!');
 
-        return response()->json([
-            'message' => 'Form submitted successfully',
-            'submission' => $submission,
-        ], 201);
+        // return response()->json([
+        //     'message' => 'Form submitted successfully',
+        //     'submission' => $submission,
+        // ], 201);
     }
 
     private function applyConditionalLogic(array $data, array $logic = [])
@@ -185,75 +158,6 @@ public function submitForm(Request $request, $id): JsonResponse
         // TODO: add logic processing
         return $data;
     }
-
-// public function submitForm(Request $request, $id): JsonResponse
-// {
-    
-//     $form = Form::findOrFail($id);
-
-//     // Decode JSON payload
-//     $data = $request->all();
-
-//     // Debug first
-//     \Log::info('Form submission received', $data);
-
-//     // Validate
-//     $rules = $form->validation_rules ?? [];
-//     $validator = Validator::make($data, $rules);
-
-//     if ($validator->fails()) {
-//         return response()->json(['errors' => $validator->errors()], 422);
-//     }
-
-//     // Apply conditional logic
-//     $filteredData = $this->applyConditionalLogic($data, $form->conditional_logic ?? []);
-//     $filteredData = is_array($filteredData) ? $filteredData : [];
-
-//     // Save
-//     $submission = FormSubmission::create([
-//         'form_id'        => $form->id,
-//         'submission_data'=> $filteredData,
-//         'ip_address'     => $request->ip(),
-//         'user_agent'     => $request->userAgent(),
-//     ]);
-
-//     return response()->json([
-//         'message' => 'Form submitted successfully',
-//         'submission' => $submission
-//     ], 201);
-// }
-
-
-
-// private function applyConditionalLogic(array $data, ?array $conditionalLogic): array
-// {
-//     if (empty($conditionalLogic)) {
-//         return $data;
-//     }
-
-//     foreach ($conditionalLogic as $rule) {
-//         $condition    = $rule['condition'] ?? '';
-//         $targetField  = $rule['target_field'] ?? '';
-//         $sourceField  = $rule['source_field'] ?? '';
-//         $operator     = $rule['operator'] ?? '==';
-//         $value        = $rule['value'] ?? '';
-
-//         if (!array_key_exists($sourceField, $data)) {
-//             continue;
-//         }
-
-//         $sourceValue  = $data[$sourceField];
-//         $conditionMet = $this->evaluateCondition($sourceValue, $operator, $value);
-
-//         if ($condition === 'show' && !$conditionMet) {
-//             unset($data[$targetField]);
-//         } elseif ($condition === 'hide' && $conditionMet) {
-//             unset($data[$targetField]);
-//         }
-//     }
-
-//     return $data;
-// }
 
 
 private function evaluateCondition($sourceValue, string $operator, $value): bool
