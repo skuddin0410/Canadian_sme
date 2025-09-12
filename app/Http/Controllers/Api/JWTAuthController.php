@@ -38,6 +38,8 @@ class JWTAuthController extends Controller
             'message' => 'successful',
             'id'        => $user->id,
             'name' => $user->full_name ?? '',
+            'first_name' => $user->name ?? '',
+            'last_name' => $user->lastname ?? '',
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
             'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
@@ -92,8 +94,8 @@ public function updateUser(Request $request)
             'designation' => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,
             'phone'      => 'required|string|max:20',
-            'bio'    => 'nullable|max:300',
-            'tags'   => 'nullable|string',
+            'bio'    => 'required|max:300',
+            'tags'   => 'required|string',
             // company fields
             'company_name'     => 'required|string|max:255',
             'company_website'     => 'nullable|string|max:255'

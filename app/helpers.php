@@ -18,6 +18,8 @@ use App\Models\UserAgenda;
 use App\Models\FavoriteSession;
 use App\Models\UserConnection;
 use App\Models\EmailTemplate;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserWelcome;
 
 
 if (!function_exists('getCategory')) {
@@ -357,5 +359,34 @@ if (!function_exists('fetchNotificationTemplates')) {
     {  
        $emailTemplate = EmailTemplate::where('type','notifications')->orderBy("created_at","DESC")->get();
        return $emailTemplate;
+    }
+}
+
+
+if (!function_exists('sendNotification')) {
+    function sendNotification($template_name, $user)
+    {  
+
+        $emailTemplate = EmailTemplate::where('template_name', $template_name)->first();
+        if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
+            $subject = $emailTemplate->subject ?? '';
+            $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+            $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+
+            $qr_code_url = asset($user->qr_code);
+            $message = $emailTemplate->message ?? '';
+            $message = str_replace('{{name}}', $user->full_name, $message);
+            $message = str_replace('{{site_name}}', config('app.name'), $message);
+            if (strpos($message, '{{qr_code}}') !== false) {
+              $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
+            }
+            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+ 
+        } elseif (!empty($emailTemplate) && $emailTemplate->type === 'notification') {
+            foreach ($users as $user) {
+                //$user->notify(new AppNotification("Bulk Notification", "This is a bulk notification."));
+            }
+        }
+
     }
 }

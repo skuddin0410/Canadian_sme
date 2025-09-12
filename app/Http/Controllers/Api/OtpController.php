@@ -33,12 +33,19 @@ class OtpController extends Controller
             ], 422);
         }
         
-        if($request->email != "henry.roy@example.com"){
-           return response()->json([
-                'success' => true,
-                'message' => 'Please use test account',
-            ]);
-        } 
+            $allowedEmails = [
+                "henry.roy@example.com",
+                "subhabrata1@example.com",
+                "arafat@example.com",
+                "debanjan@example.com"
+            ];
+
+            if (!in_array($request->email, $allowedEmails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please use test account',
+                ]);
+            }
         $code = rand(1000, 9999);
         $currentDateTime = Carbon::now();
 
@@ -65,12 +72,19 @@ public function verify(Request $request)
         'otp'   => 'required|digits:4',
     ]);
     
-     if($request->email != "henry.roy@example.com"){
-           return response()->json([
-                'success' => true,
-                'message' => 'Please use test account'
+        $allowedEmails = [
+            "henry.roy@example.com",
+            "subhabrata1@example.com",
+            "arafat@example.com",
+            "debanjan@example.com"
+        ];
+
+        if (!in_array($request->email, $allowedEmails)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please use test account',
             ]);
-        } 
+        }
 
     if ($validator->fails()) {
         return response()->json([
@@ -131,12 +145,7 @@ public function verify(Request $request)
         );
         qrCode($user->id);
         notification($user->id);
-
-        if (! $user->wasRecentlyCreated) {
-           Mail::to($user->email)->send(new UserWelcome($user,"Welcome","Welcome! We’re glad to have you with us.")); 
-        }else{
-            Mail::to($user->email)->send(new UserWelcome($user,"Welcome",""));
-        }
+        sendNotification("Welcome Email",$user);
 
         return response()->json([
             'success'    => true,
