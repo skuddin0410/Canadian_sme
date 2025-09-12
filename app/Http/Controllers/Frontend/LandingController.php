@@ -123,7 +123,62 @@ public function attendeeIndex()
 
     return view('frontend.page.attendee', compact('attendees', 'session', 'event'));
 }
+public function scheduleIndex()
+{
+    $event = Event::with(['photo'])->first();
 
+    // 🔹 Get ALL sessions
+    $allSessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+        ->orderBy('start_time', 'ASC')
+        ->get();
+
+    // 🔹 Get filtered sessions (today / next available date)
+    $schedules = $this->schedules();
+
+    return view('frontend.page.schedule', compact('event', 'schedules', 'allSessions'));
+}
+
+public function schedules()
+{
+    $now        = now();
+    $startToday = $now->copy()->startOfYear();
+    $endToday   = $now->copy()->endOfYear();
+
+    $base = Session::with(['speakers']);
+
+    // Today’s sessions (ongoing or upcoming)
+    $schedules = (clone $base)
+        ->whereBetween('start_time', [$startToday, $endToday])
+        ->where(function ($q) use ($now) {
+            $q->where('end_time', '>=', $now)
+              ->orWhere(function ($q) use ($now) {
+                  $q->whereNull('end_time')
+                    ->where('start_time', '>=', $now);
+              });
+        })
+        ->orderBy('start_time')
+        ->get();
+
+    // If no sessions today, pick the next date’s sessions
+    if ($schedules->isEmpty()) {
+        $firstFuture = (clone $base)
+            ->where('start_time', '>', $endToday)
+            ->orderBy('start_time')
+            ->first();
+
+        if ($firstFuture) {
+            $targetDate = $firstFuture->start_time->toDateString();
+            $schedules = (clone $base)
+                ->whereDate('start_time', $targetDate)
+                ->orderBy('start_time')
+                ->get();
+        } else {
+            $schedules = collect();
+        }
+    }
+
+    return $schedules;
+}
 
 public function profile($id)
 {
@@ -211,14 +266,7 @@ public function session(Request $request , $id){
         : null;
        return view('frontend.venue',compact('location','mapUrl'));
     }
-//  public function venue()
-// {
-//     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
-//     $location = $locationSetting ? $locationSetting->value : null;
-//     $googleApiKey = config('services.google_maps.key');
 
-//     return view('frontend.venue', compact('location', 'googleApiKey'));
-// }
 
 
 }
