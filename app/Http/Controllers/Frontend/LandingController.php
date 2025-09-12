@@ -202,20 +202,23 @@ public function session(Request $request , $id){
     }
     
     
-    // public function venue(){
-    // $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
-    // $location = $locationSetting ? $locationSetting->value : null;
-    // $mapUrl = $location ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed" : null;
-    //    return view('frontend.venue',compact('location','mapUrl'));
-    // }
- public function venue()
-{
-    $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
-    $location = $locationSetting ? $locationSetting->value : null;
-    $googleApiKey = config('services.google_maps.key');
+    public function venue(){
+     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
+     $location = $locationSetting ? $locationSetting->value : null;
+        // $mapUrl = $location ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed" : null;
+         $mapUrl = $location 
+        ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed"
+        : null;
+       return view('frontend.venue',compact('location','mapUrl'));
+    }
+//  public function venue()
+// {
+//     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
+//     $location = $locationSetting ? $locationSetting->value : null;
+//     $googleApiKey = config('services.google_maps.key');
 
-    return view('frontend.venue', compact('location', 'googleApiKey'));
-}
+//     return view('frontend.venue', compact('location', 'googleApiKey'));
+// }
 
 
 }
