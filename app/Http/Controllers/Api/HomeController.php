@@ -707,11 +707,7 @@ public function sendPushNotification(Request $request){
         $user->onesignal_userid = $request->onesignal_userid;
         $user->save(); 
         
-        // OneSignal::sendNotificationToUser(
-        //     "Hi this is a test push notification",
-        //      $request->onesignal_userid 
-        // );
-
+   
         return response()->json(["message" => "Onesignal added with profile"]);
     
     } catch (\Exception $e) {
