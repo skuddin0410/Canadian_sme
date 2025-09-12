@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Form;
+use App\Models\User;
+use Illuminate\Http\Request;
 use App\Models\FormSubmission;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -114,43 +115,95 @@ class FormBuilderController extends Controller
         return response()->json(['forms' => $forms]);
     }
 
+
+// public function submitForm(Request $request, $id)
+//     {
+//         $form = Form::findOrFail($id);
+
+//         // Detect request type (web fetch with JSON or API client)
+//         $data = $request->expectsJson()
+//             ? $request->json()->all()
+//             : $request->all();
+
+//         // Dynamic validation from form config
+//         $rules = $form->validation_rules ?? [];
+//         $validator = Validator::make($data, $rules);
+
+//         if ($validator->fails()) {
+//             return response()->json(['errors' => $validator->errors()], 422);
+//         }
+
+//         // Apply conditional logic (if any)
+//         $filteredData = $this->applyConditionalLogic($data, $form->conditional_logic ?? []);
+//         $filteredData = is_array($filteredData) ? $filteredData : [];
+
+//         // Save submission
+//         $submission = FormSubmission::create([
+//             'form_id'       => $form->id,
+//             'submission_data' => $filteredData,
+//             'ip_address'    => $request->ip(),
+//             'user_agent'    => $request->userAgent(),
+//         ]);
+//          return redirect()
+//         ->back()
+//         ->with('success', 'Form submitted successfully!');
+
+      
+//     }
 public function submitForm(Request $request, $id)
-    {
-        $form = Form::findOrFail($id);
+{
+    $form = Form::findOrFail($id);
 
-        // Detect request type (web fetch with JSON or API client)
-        $data = $request->expectsJson()
-            ? $request->json()->all()
-            : $request->all();
+    // Detect request type (web fetch with JSON or API client)
+    $data = $request->expectsJson()
+        ? $request->json()->all()
+        : $request->all();
 
-        // Dynamic validation from form config
-        $rules = $form->validation_rules ?? [];
-        $validator = Validator::make($data, $rules);
+    // Dynamic validation from form config (fallback if none set)
+    $rules = $form->validation_rules ?? [
+        'name'   => 'required|string|max:255',
+        'last_name'    => 'required|string|max:255',
+        'email'        => 'required|email|unique:users,email',
+        'phone_number' => 'required|string|max:20',
+        'designation'  => 'nullable|string|max:255',
+        'company'      => 'nullable|string|max:255',
+    ];
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+    $validator = Validator::make($data, $rules);
 
-        // Apply conditional logic (if any)
-        $filteredData = $this->applyConditionalLogic($data, $form->conditional_logic ?? []);
-        $filteredData = is_array($filteredData) ? $filteredData : [];
-
-        // Save submission
-        $submission = FormSubmission::create([
-            'form_id'       => $form->id,
-            'submission_data' => $filteredData,
-            'ip_address'    => $request->ip(),
-            'user_agent'    => $request->userAgent(),
-        ]);
-         return redirect()
-        ->back()
-        ->with('success', 'Form submitted successfully!');
-
-        // return response()->json([
-        //     'message' => 'Form submitted successfully',
-        //     'submission' => $submission,
-        // ], 201);
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
     }
+
+    // Apply conditional logic (if any)
+    $filteredData = $this->applyConditionalLogic($data, $form->conditional_logic ?? []);
+    $filteredData = is_array($filteredData) ? $filteredData : [];
+
+    // Save submission in form_submissions table
+    $submission = FormSubmission::create([
+        'form_id'         => $form->id,
+        'submission_data' => $filteredData,
+        'ip_address'      => $request->ip(),
+        'user_agent'      => $request->userAgent(),
+    ]);
+
+    // Create user with role "attendee"
+    $user = User::create([
+        'name'        => $data['name'].' '.$data['last_name'],
+        'email'       => $data['email'],
+        // 'password'    => Hash::make('password'), // default or generate random
+        'phone'       => $data['phone_number'] ?? null,
+        'designation' => $data['designation'] ?? null,
+        'company'     => $data['company'] ?? null,
+       
+    ]);
+    $user->assignRole('Attendee');
+
+    return redirect()
+        ->back()
+        ->with('success', 'Form submitted successfully and attendee created!');
+}
+
 
     private function applyConditionalLogic(array $data, array $logic = [])
     {
