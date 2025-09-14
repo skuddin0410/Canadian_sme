@@ -40,7 +40,7 @@
 		<th>Email</th>
 		<th>Mobile</th>
 		<th>QR Code</th>
-		<th width="22%">Action</th>
+		<th width="28%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -68,12 +68,12 @@
 		 <form action="{{ route('speakers.allow-access', $user->id) }}" method="POST" style="display:inline;">
             @csrf
             @if($user->is_approve == 1)
-                <button type="submit" class="btn btn-sm btn-success" title="App access approved">
-                    ✔ App Access Approved
+                <button type="submit" class="btn btn-sm btn-primary" title="App access approved">
+                   Allow App Access
                 </button>
             @else
-                <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
-                    Allow App Access
+                <button type="submit" class="btn btn-sm btn-secondary" title="Reject app access">
+                    Reject App Access
                 </button>
             @endif
         </form>
