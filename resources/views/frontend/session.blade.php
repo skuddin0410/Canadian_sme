@@ -2,47 +2,47 @@
 
 @section('title', config('app.name'))
 @section('content')
-<div class="container py-5">
+<div class="container py-4 py-lg-5">
   <div class="row">
     <div class="col-lg-8">
 
       <!-- Session Details Card -->
       <div class="card shadow-sm rounded-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-sm-4">
 
           <!-- Title + Badge -->
-          <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-sm-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0">{{ $session->title ?? 'Session Title' }}</h3>
-            <span class="badge bg-success">{{ $session->location ?? 'TBD' }}</span>
+            <span class="badge bg-success px-2 mt-2 mt-sm-0">{{ $session->location ?? 'TBD' }}</span>
           </div>
 
           <!-- Meta Info -->
           <ul class="list-unstyled mb-4">
-            <li class="mb-2">
+            <li class="mb-3 text-secondary black-text-18 fw-medium">
               <i class="fas fa-user me-2 text-primary"></i>
-              <strong>Speakers:</strong> 
+              <strong class="black-text-18 fw-medium">Speakers:</strong> 
               @if($session->speakers && $session->speakers->count())
                 {{ $session->speakers->pluck('full_name')->join(', ') }}
               @else
                 N/A
               @endif
             </li>
-            <li class="mb-2">
+            <li class="mb-3 text-secondary black-text-18 fw-medium">
               <i class="fas fa-clock me-2 text-primary"></i>
-              <strong>Time:</strong> 
+              <strong class="black-text-18 fw-medium">Time:</strong> 
               {{ $session->start_time ? $session->start_time->format('h:i A') : 'TBD' }} – 
               {{ $session->end_time ? $session->end_time->format('h:i A') : 'TBD' }}
             </li>
-            <li>
+            <li class="text-secondary black-text-18 fw-medium">
               <i class="fas fa-calendar me-2 text-primary"></i>
-              <strong>Date:</strong> 
+              <strong class="black-text-18 fw-medium">Date:</strong> 
               {{ $session->start_time ? $session->start_time->format('F d, Y') : 'TBD' }}
             </li>
           </ul>
 
           <!-- Description -->
-          <h5 class="mb-2">About this Session</h5>
-          <p class="text-muted">
+          <h5 class="mb-2 small-heading-black fw-bold">About this Session</h5>
+          <p class="text-secondary">
             {{ $session->description ?? 'No description available.' }}
           </p>
 
@@ -56,7 +56,7 @@
       <!-- Speakers -->
       @if($session->speakers && $session->speakers->count())
         <div class="card shadow-sm rounded-4 mb-4">
-          <div class="card-header bg-white fw-bold">
+          <div class="card-header bg-white mb-2 small-heading-black fw-bold">
             <i class="fas fa-users me-2 text-primary"></i>Speakers
           </div>
           <ul class="list-group list-group-flush">
@@ -67,8 +67,8 @@
                      alt="{{ $speaker->full_name ?? 'Speaker' }}" 
                      width="40" height="40">
                 <div>
-                  <strong>{{ $speaker->full_name ?? 'N/A' }}</strong><br>
-                  <small class="text-muted">{{ $speaker->designation ?? '' }}</small>
+                  <strong class="black-text-18 fw-medium">{{ $speaker->full_name ?? 'N/A' }}</strong><br>
+                  <small class="text-secondary">{{ $speaker->designation ?? '' }}</small>
                 </div>
               </li>
             @endforeach
@@ -79,12 +79,12 @@
       <!-- Event Info -->
       @if($event)
         <div class="card mt-3 shadow-sm rounded-4">
-          <div class="card-body text-center">
-            <h6 class="fw-bold">{{ $event->title ?? 'Event' }}</h6>
+          <div class="card-body text-start">
+            <h6 class="black-text-18 fw-medium">{{ $event->title ?? 'Event' }}</h6>
             @if(!empty($event->photo) && $event->photo->file_path)
               <img src="{{ $event->photo->file_path }}" alt="Event" class="img-fluid rounded mt-2">
             @endif
-            <p class="text-muted mt-2">{{ $event->description ?? '' }}</p>
+            <p class="text-secondary mt-2">{{ $event->description ?? '' }}</p>
           </div>
         </div>
       @endif

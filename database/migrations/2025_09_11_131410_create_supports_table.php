@@ -15,6 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('subject');
             $table->string('description');
+            $table->foreignId('added_by')
+             ->constrained('users')
+             ->onDelete('cascade');
+            $table->enum('status', ['pending', 'inprogress', 'completed'])
+           ->default('pending');
             $table->timestamps();
         });
     }

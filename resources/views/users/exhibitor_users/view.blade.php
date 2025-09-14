@@ -44,7 +44,7 @@
         <div class="row">
             <!-- Content Icon -->
             <div class="col-md-6">
-                <h6>Content Icon</h6>
+                <h6>Logo</h6>
                 @if(!empty($company->contentIconFile) && !empty($company->contentIconFile->file_path))
                     <img src="{{$company->contentIconFile->file_path }}"
                          alt="Content Icon"
@@ -58,7 +58,7 @@
             <!-- Quick Link Icon -->
             <div class="col-md-6">
 
-                <h6>Quick Link Icon</h6>
+                <h6>Banner</h6>
                 @if(!empty($company->quickLinkIconFile) && !empty($company->quickLinkIconFile->file_path))
                     <img src="{{$company->quickLinkIconFile->file_path}}"
                          alt="Quick Link Icon"

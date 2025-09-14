@@ -3,11 +3,11 @@
 @section('title', config('app.name'))
 
 @section('content')
-<div class="container py-5">
+<div class="container py-4 py-lg-5">
   <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-lg-8">
       <div class="card shadow-sm rounded-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-sm-4">
           <div class="d-flex align-items-center mb-4">
             <div class="text-left mb-2" style="width:100%">
 
