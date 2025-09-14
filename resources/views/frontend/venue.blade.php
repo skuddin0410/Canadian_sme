@@ -3,11 +3,11 @@
 @section('title', config('app.name'))
 
 @section('content')
-<div class="container py-5">
+<div class="container py-4 py-lg-5">
   <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-lg-8">
       <div class="card shadow-sm rounded-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-sm-4">
           <div class="d-flex align-items-center mb-4">
             <div class="text-left mb-2" style="width:100%">
 
@@ -16,16 +16,8 @@
                 @if(!empty($location))
                   <p>{{ $location }}</p>
 
-                 
-                  <iframe 
-                      src="{{ $mapUrl }}" 
-                      width="100%" 
-                      height="400" 
-                      style="border:0;" 
-                      allowfullscreen="" 
-                      loading="lazy" 
-                      referrerpolicy="no-referrer-when-downgrade">
-                  </iframe>
+                  <!-- Map container -->
+                  <div id="map" style="width:100%; height:400px;"></div>
                 @else
                   <p>Location not available.</p>
                 @endif
@@ -38,4 +30,42 @@
     </div>
   </div>
 </div>
+
+@if(!empty($location))
+  <!-- Load Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ $googleApiKey }}"></script>
+  <script>
+    function initMap() {
+        let geocoder = new google.maps.Geocoder();
+        let address = @json($location);
+
+        geocoder.geocode({ 'address': address }, function(results, status) {
+            if (status === 'OK') {
+                // Create the map
+                let map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 15,
+                    center: results[0].geometry.location
+                });
+
+                // Drop the pin
+                let marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+
+                // Force center on marker after map loads
+                google.maps.event.addListenerOnce(map, 'idle', function() {
+                    map.setCenter(marker.getPosition());
+                });
+            } else {
+                document.getElementById('map').innerHTML =
+                  "<p style='color:red'>Could not load map: " + status + "</p>";
+            }
+        });
+    }
+
+    // Load map after page is ready
+    window.onload = initMap;
+  </script>
+@endif
 @endsection
