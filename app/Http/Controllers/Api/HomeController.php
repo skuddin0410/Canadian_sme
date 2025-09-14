@@ -222,6 +222,7 @@ public function getAllSession()
                             "status"      => $status,
                             "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
                             "isFavorite"  => isFavorite($session->id),
+                            "my_agenda" => isAgenda($session->id)
                         ];
                     })->values()
                 ];
