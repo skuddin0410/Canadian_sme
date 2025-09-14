@@ -123,8 +123,8 @@ class HomeController extends Controller
 
     //================= My Stats =================
     $myStats = [
-        "totalAgents" => !empty($upcomingSession->sponsors) ? $upcomingSession->sponsors->count() : 0,
-        "totalConnections" => User::count(),
+        "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
+        "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
         "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
     ];
 

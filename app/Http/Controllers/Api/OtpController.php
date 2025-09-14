@@ -21,47 +21,55 @@ use App\Mail\UserWelcome;
 class OtpController extends Controller
 {
     public function generate(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|nullable|string|max:255|email',
-            // 'mobile' => 'sometimes|nullable|string',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                // 'success' => false,
-                'error' => "Invalid email format",
-                // 'data' => $request->all(),
-            ], 422);
-        }
-        
-            $allowedEmails = [
-                "henry.roy@example.com",
-                "subhabrata1@example.com",
-                "arafat@example.com",
-                "debanjan@example.com"
-            ];
 
-            if (!in_array($request->email, $allowedEmails)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please use test account',
-                ]);
-            }
-        $code = rand(1000, 9999);
-        $currentDateTime = Carbon::now();
-
-      
-            $otp = Otp::firstOrNew(['email' => $request->email]);
-            $otp->otp = $code;
-            $otp->expired_at = $currentDateTime->addMinutes(5);
-            $otp->save();
-
-            Mail::to($request->email)->send(new OtpMail($code));
-
-            return response()->json([
-                'success' => true,
-                'message' => 'successful',
-                'data' => $otp,
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|nullable|string|max:255|email',
+                // 'mobile' => 'sometimes|nullable|string',
             ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => "Invalid email format",
+                ], 422);
+            }
+            
+                $allowedEmails = [
+                    "henry.roy@example.com",
+                    "subhabrata1@example.com",
+                    "arafat@example.com",
+                    "debanjan@example.com"
+                ];
+
+                if (!in_array($request->email, $allowedEmails)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Please use test account',
+                    ]);
+                }
+            $code = rand(1000, 9999);
+            $currentDateTime = Carbon::now();
+
+          
+                $otp = Otp::firstOrNew(['email' => $request->email]);
+                $otp->otp = $code;
+                $otp->expired_at = $currentDateTime->addMinutes(5);
+                $otp->save();
+
+                Mail::to($request->email)->send(new OtpMail($code));
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OTP sent successfully to '.$request->email. '.',
+                    'data' => $otp,
+                ]);
+
+            } catch (JWTException $e) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Fail to send OTP."',
+                        'error'   => $e->getMessage(),
+                    ], 500);
+            }
         
     }
 
@@ -131,7 +139,7 @@ public function verify(Request $request)
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid credentials',
+                'message' => 'Invalid OTP.',
             ], 401);
         }
         
@@ -157,7 +165,7 @@ public function verify(Request $request)
     } catch (JWTException $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Could not create token',
+            'message' => 'Invalid OTP.',
             'error'   => $e->getMessage(),
         ], 500);
     }
