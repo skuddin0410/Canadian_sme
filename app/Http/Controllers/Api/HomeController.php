@@ -123,8 +123,8 @@ class HomeController extends Controller
 
     //================= My Stats =================
     $myStats = [
-        "totalAgents" => !empty($upcomingSession->sponsors) ? $upcomingSession->sponsors->count() : 0,
-        "totalConnections" => User::count(),
+        "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
+        "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
         "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
     ];
 
@@ -222,6 +222,7 @@ public function getAllSession()
                             "status"      => $status,
                             "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
                             "isFavorite"  => isFavorite($session->id),
+                            "my_agenda" => isAgenda($session->id)
                         ];
                     })->values()
                 ];

@@ -152,5 +152,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::patch('/users/{user}/toggle-block', [SpeakerController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::resource('email-templates', EmailTemplateController::class);
+
+    Route::post('/send-email-template', [EmailTemplateController::class, 'send'])->name('send.email.template');
     
     });

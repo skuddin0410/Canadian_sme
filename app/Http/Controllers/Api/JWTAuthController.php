@@ -792,14 +792,12 @@ public function checkSession(Request $request)
     if (Carbon::now()->greaterThan($session->expires_at)) {
         return response()->json([
             'success' => false,
-            'message' => 'Session expired'
+            'message' => 'Session expired!'
         ], 401);
     }
 
     return response()->json([
-        // 'success' => true,
         'message' => 'Session validated',
-        // 'expires_at' => $session->expires_at->toDateTimeString()
     ]);
 }
 

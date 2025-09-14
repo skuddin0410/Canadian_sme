@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\EmailTemplate;
 use Illuminate\Http\Request;
+use App\Mail\UserWelcome;
+use Illuminate\Support\Facades\Mail;
 
 class EmailTemplateController extends Controller
 {
@@ -76,4 +78,29 @@ class EmailTemplateController extends Controller
         return redirect()->route('email-templates.index')
                          ->with('success', 'Email Template deleted successfully.');
     }
+
+    public function send(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'template' => 'required|exists:email_templates,id',
+        ]);
+
+        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
+        $subject = $emailTemplate->subject ?? '';
+        $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+        $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+
+        $qr_code_url = asset($user->qr_code);
+        $message = $emailTemplate->message ?? '';
+        $message = str_replace('{{name}}', $user->full_name, $message);
+        $message = str_replace('{{site_name}}', config('app.name'), $message);
+        if (strpos($message, '{{qr_code}}') !== false) {
+          $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
+        }
+        
+        Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+        return back()->with('success', 'Email sent successfully!');
+    }
+
 }

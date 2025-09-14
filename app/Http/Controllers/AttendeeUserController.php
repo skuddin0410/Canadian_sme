@@ -365,11 +365,7 @@ class AttendeeUserController extends Controller
     }
     public function allowAccess(string $id)
     {
-        $user = User::with('roles')
-            ->whereHas('roles', function ($q) {
-                $q->where('name', 'Attendee');
-            })
-            ->findOrFail($id);
+        $user = User::with('roles')->findOrFail($id);
 
 
         if($user->is_approve == 1){
