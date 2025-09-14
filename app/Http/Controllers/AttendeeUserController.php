@@ -443,6 +443,8 @@ public function bulkAction(Request $request)
                         null,                         // schedule (optional)
                         $subject                      // 👈 title
                     );
+
+                    notification($user->id, 'bulk_notification',null, $subject, $message);
             }
         }
     }

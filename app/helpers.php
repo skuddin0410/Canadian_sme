@@ -181,7 +181,7 @@ if (!function_exists('qrCode')) {
 }
 
 if (!function_exists('notification')) {
-  function notification($user_id,$type='welcome', $session_id=null)
+  function notification($user_id,$type='welcome', $session_id=null, $title='',$body='')
   {  
     $user = User::find($user_id);
     $session=null;
