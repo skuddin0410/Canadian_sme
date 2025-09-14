@@ -207,7 +207,7 @@ if (!function_exists('notification')) {
 
     if($type == 'Speaker_Reminder'){
         $title = 'Hi, '.$user->full_name; //welcome,Attendee,Exhibitors,Speaker 
-        $body = '⏰ Reminder, '.$user->full_name.': Your talk ‘'.$session->title.'’ at '.$session->event->title.' starts in '.$session->starts_in.' minutes.';
+        $body = '⏰ Reminder, '.$user->full_name.': Your talk "'.$session->title.'" is scheduled for '.$session->event->title.'. Please be ready to join.';
     }
 
     if($type == 'Speaker_Thankyou'){
@@ -269,6 +269,11 @@ if (! function_exists('addAgenda')) {
             'session_id' => $sessionId,
             'agenda_type' => $agenda_type
         ]);
+
+        $session = Session::find($sessionId); 
+        $title= $session->title. " added to agenda";
+        $body = $session->title. " has been added to your agenda list";
+        notification(!empty($userId) ? $userId : auth()->id(),$type='general_notifications',$sessionId, $title,$body);
     }
 }
 
@@ -279,6 +284,11 @@ if (! function_exists('addFavorite')) {
             'user_id' => !empty($userId) ? $userId : auth()->id(),
             'session_id' => $sessionId
         ]);
+
+        $session = Session::find($sessionId); 
+        $title="Favorite list updated";
+        $body = $session->title. " has been added to your favorite list";
+        notification(!empty($userId) ? $userId : auth()->id(),$type='general_notifications',$sessionId, $title,$body); 
     }
 }
 
