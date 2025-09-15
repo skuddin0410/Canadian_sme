@@ -35,7 +35,6 @@
     </section>
 @endif
 
-<!-- Bootstrap Modal -->
 <!-- Bootstrap Fullscreen Modal -->
 @if($embedUrl)
 <div class="modal fade" id="youtubeModal" tabindex="-1" aria-hidden="true">
@@ -46,7 +45,7 @@
                 data-bs-dismiss="modal" aria-label="Close"></button>
         
         <iframe id="youtubeIframe" width="100%" height="100%"
-                src="{{ $embedUrl }}?autoplay=1"
+                src=""
                 title="YouTube video"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -56,5 +55,21 @@
     </div>
   </div>
 </div>
-@endif
 
+<!-- Script to control autoplay -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('youtubeModal');
+        const iframe = document.getElementById('youtubeIframe');
+        const videoUrl = @json($embedUrl);
+
+        modal.addEventListener('show.bs.modal', function () {
+            iframe.src = videoUrl + "?autoplay=1";
+        });
+
+        modal.addEventListener('hidden.bs.modal', function () {
+            iframe.src = ""; // stop video when modal closes
+        });
+    });
+</script>
+@endif
