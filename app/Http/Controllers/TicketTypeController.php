@@ -89,7 +89,7 @@ class TicketTypeController extends Controller
 
     public function show(TicketType $ticketType)
     {
-        $ticketType->load(['event', 'category', 'pricingRules', 'inventoryLogs.user']);
+        $ticketType->load(['event', 'category',  'inventoryLogs.user']);
         return view('tickets.types.show', compact('ticketType'));
     }
 
