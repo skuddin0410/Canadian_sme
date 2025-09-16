@@ -51,15 +51,31 @@ Admin | Attendee Details
 
                     <div class="info-container">
                     <div class="row">   
+                        <div class="row mb-4">
+    <div class="col-6 text-left">
+        <label for="profileImageInput">
+            <img id="profileImagePreview" 
+                 src="{{ !empty($user->photo) ? $user->photo->file_path : '' }}" 
+                 class="border border-2" 
+                 style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+        </label>
+        <div class="form-text mt-1">Profile Image</div>
+    </div>
+    <div class="col-6 text-left">
+        <label for="coverImageInput">
+            <img id="coverImagePreview" 
+                 src="{{ !empty($user->coverphoto) ? $user->coverphoto->file_path : '' }}" 
+                 class="border border-2" 
+                 style="width: 250px; height: 150px; object-fit: cover; cursor: pointer;">
+        </label>
+        <div class="form-text mt-1">Cover Image</div>
+    </div>
+</div>
 
-                        <div class="text-left mb-2">
-                            <label for="profileImageInput">
-                              <img id="profileImagePreview" 
-                                   src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
-                                   class="border border-2" 
-                                   style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
-                            </label>
-                        </div>    
+
+                       
+                         
+                          
                         <div class="col-12 mt-2">
                             <ul class="list-unstyled justify-content-between">
                             <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
