@@ -118,7 +118,12 @@ class SpeakerController extends Controller
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            'mobile' => 'nullable|string|unique:users,mobile',
+             'mobile' => [
+                'nullable',
+                'string',
+                'regex:/^\+?[0-9]{10,15}$/',
+                'unique:users,mobile',
+            ],
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -181,12 +186,10 @@ class SpeakerController extends Controller
        if (!in_array('Speaker', $secondaryGroupArray)) {
         $secondaryGroupArray[] = 'Speaker';
        }
-        // if(!empty($request->secondary_group)) {
-        //   $secondaryGroupArray = ['Speaker'];
-        // }
+        
           $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
           $combinedGroups = array_unique($combinedGroups); 
-        dd($combinedGroups);
+       
         if(!empty($combinedGroups)){
           $user->syncRoles($combinedGroups);  
         }
