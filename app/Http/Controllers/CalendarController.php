@@ -176,7 +176,7 @@ class CalendarController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
+            'start_time' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
             'end_time' => 'required|date|after:start_time',
             'track' => 'required',
             'description' => 'nullable|string',
@@ -272,7 +272,7 @@ class CalendarController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
+            'start_time' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
             'end_time' => 'required|date|after:start_time',
             'track' => 'required',
             'description' => 'nullable|string',
@@ -290,6 +290,7 @@ class CalendarController extends Controller
                 ->where('id', '!=', $session->id)
                 ->where('status', '!=', 'cancelled')
                 ->where(function ($query) use ($startTime, $endTime) {
+                    
                     $query->whereBetween('start_time', [$startTime, $endTime])
                           ->orWhereBetween('end_time', [$startTime, $endTime])
                           ->orWhere(function ($q) use ($startTime, $endTime) {
