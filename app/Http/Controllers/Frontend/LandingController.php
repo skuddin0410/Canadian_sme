@@ -32,10 +32,12 @@ class LandingController extends Controller
         $schedules = $this->schudled();
         $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
         $location = $locationSetting ? $locationSetting->value : null;
-        // $mapUrl = $location ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed" : null;
-         $mapUrl = $location 
-        ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed"
+
+        $googleApiKey = config('services.google_maps.key');
+        $mapUrl = $location && $googleApiKey
+        ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
         : null;
+
         return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location' , 'mapUrl','shareUrl'));
     }
 
@@ -257,15 +259,21 @@ public function session(Request $request , $id){
     }
     
     
-    public function venue(){
-     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
-     $location = $locationSetting ? $locationSetting->value : null;
-        // $mapUrl = $location ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed" : null;
-         $mapUrl = $location 
-        ? "https://www.google.com/maps?q=" . urlencode($location) . "&output=embed"
+    
+    public function venue()
+{
+    $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
+    $location = $locationSetting ? $locationSetting->value : null;
+
+    $googleApiKey = config('services.google_maps.key'); 
+
+    $mapUrl = $location && $googleApiKey
+        ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
         : null;
-       return view('frontend.venue',compact('location','mapUrl'));
-    }
+
+    return view('frontend.venue', compact('location', 'mapUrl'));
+}
+
 
 
 

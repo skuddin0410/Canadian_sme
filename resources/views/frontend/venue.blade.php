@@ -18,20 +18,21 @@
                   <p>{{ $location }}</p>
 
                   <!-- Use the mapUrl returned by the controller in an iframe -->
-                  @if(!empty($mapUrl))
-                    <div class="ratio ratio-16x9" style="height:400px;">
-                      <iframe
-                        src="{{ $mapUrl }}"
-                        width="100%"
-                        height="100%"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                  @else
-                    <p class="text-muted">Map not available.</p>
-                  @endif
+                @if(!empty($mapUrl))
+  <div class="ratio ratio-16x9" style="height:400px;">
+    <iframe
+      src="{{ $mapUrl }}"
+      width="100%"
+      height="100%"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+@else
+  <p class="text-muted">Map not available.</p>
+@endif
+
 
                 @else
                   <p>Location not available.</p>
