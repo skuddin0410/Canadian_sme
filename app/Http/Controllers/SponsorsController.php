@@ -94,7 +94,12 @@ public function index(Request $request)
          $validator = Validator::make($request->all(), [
             'company_name'          => 'required|string|max:255',
             'company_email'         => 'required|email|max:255',
-            'company_phone'         => 'nullable|string|max:20',
+            'company_phone' => [
+                'nullable',
+                'string',
+                'regex:/^\+?[0-9]{10,15}$/',
+                'unique:companies,company_phone',
+            ],
             'company_description'   => 'nullable|string',
             'website'       => 'nullable|url',
             'linkedin'      => 'nullable|url',
