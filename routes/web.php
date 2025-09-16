@@ -62,6 +62,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
        require __DIR__.'/newsletters.php';
        require __DIR__.'/formbuilder.php';
        require __DIR__.'/lead.php';
+       require __DIR__.'/badge.php';
    });
    
 
