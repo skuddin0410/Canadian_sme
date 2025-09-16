@@ -202,7 +202,7 @@ class HomeController extends Controller
             $theme_color->save();
         } 
 
-        return view('brand');
+        return view('brand')->with('message','App Branding media updated successfully');
     }
 
     public function splash(Request $request){
@@ -258,7 +258,8 @@ class HomeController extends Controller
             }
 
         }
-        return view('splash'); 
+        return redirect()->back()->with('success','App Branding media updated successfully');
+        // return view('splash'); 
     }
 
     public function registrationSettings(Request $request){
