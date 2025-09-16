@@ -11,15 +11,16 @@
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-body">
-          @if(Session::has('success'))
+          
+
+          <form action="{{ route('usergroup.store') }}" method="POST">
+            @csrf
+            @if(Session::has('success'))
               <div class="alert alert-success">{{ Session::get('success') }}</div>
           @endif
           @if(Session::has('error'))
               <div class="alert alert-danger">{{ Session::get('error') }}</div>
           @endif
-
-          <form action="{{ route('usergroup.store') }}" method="POST">
-            @csrf
             <div class ="col-6">
             <div class="mb-3">
               <label class="form-label" for="name">Role Name <span class="text-danger">*</span></label>
