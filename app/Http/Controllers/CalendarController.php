@@ -280,7 +280,7 @@ class CalendarController extends Controller
             'speaker_ids.*' => 'exists:users,id'
         ]);
 
-        // Check for venue conflicts if venue or time is being updated
+      
         if (( $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
             $startTime = $request->start_time ?? $session->start_time;
             $endTime = $request->end_time ?? $session->end_time;
