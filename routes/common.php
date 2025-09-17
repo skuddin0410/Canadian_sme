@@ -13,7 +13,9 @@ Route::post('change-user-password', [App\Http\Controllers\HomeController::class,
 
 Route::any('brand', [App\Http\Controllers\HomeController::class, 'brand'])->name('brand');
 Route::any('splash', [App\Http\Controllers\HomeController::class, 'splash'])->name('splash');
+use App\Http\Controllers\HomeController;
 
+Route::post('/brand/delete-media', [HomeController::class, 'deleteMedia'])->name('brand.deleteMedia');
 Route::any('registration-settings', [App\Http\Controllers\HomeController::class, 'registrationSettings'])->name('registration-settings');
 
 Route::any('email-template-settings', [App\Http\Controllers\HomeController::class, 'emailTemplateSettings'])->name('email-template-settings');
