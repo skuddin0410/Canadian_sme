@@ -34,7 +34,7 @@
 }
 </style>
 <div class="col-12 text-end p-3">
-
+ {{$range}} out of {{$totalRecords}} users
 </div>
 <table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
@@ -191,6 +191,8 @@ function updateCounts() {
     let selected = document.querySelectorAll('.user-checkbox:checked').length;
     document.getElementById('emailCount').innerText = selected;
     document.getElementById('notifCount').innerText = selected;
+    document.getElementById('badgeCount').innerText = selected;
+    
 }
 
 // Select All checkbox
