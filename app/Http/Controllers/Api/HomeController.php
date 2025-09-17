@@ -296,6 +296,7 @@ public function getSession($sessionId)
             ]),
             "isFavorite"  => isFavorite($session->id),
             "isInAgenda"  => isAgenda($session->id),
+            "agenda"=> agendaNote($session->id)
         ];
         
 
@@ -487,7 +488,7 @@ public function createAgenda(Request $request){
         }
 
         if(isAgenda($request->sessionId) == false){
-           addAgenda($request->sessionId);
+           addAgenda($request->sessionId,$agenda_type=null,null,$request->message);
            return response()->json([
             "message"=> "Session added to your agenda.",
             "isInAgenda" => isAgenda($request->sessionId)

@@ -38,7 +38,7 @@ class AttendeeUserController extends Controller
     public function index(Request $request)
     {
         //
-        $perPage = (int) $request->input('perPage', 20);
+        $perPage = (int) $request->input('perPage', 15);
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
         $search = $request->input('search', '');
@@ -69,14 +69,22 @@ class AttendeeUserController extends Controller
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
             $users = $users->offset($offset)->limit($perPage)->get();
+
             $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
                 'path'  => $request->url(),
                 'query' => $request->query(),
             ]);
+            $startRange = $offset + 1;
+            $endRange = min($offset + $perPage, $totalRecords);
+
+            // Prepare response data
+            $data['totalUsers'] = $totalRecords; // Total number of users
             $data['offset'] = $offset;
             $data['pageNo'] = $pageNo;
+            $range=$data['range'] = "$startRange-$endRange"; 
+
             $users->setPath(route('attendee-users.index'));
-            $data['html'] = view('users.attendee_users.table', compact('users', 'perPage'))
+            $data['html'] = view('users.attendee_users.table', compact('users', 'perPage','range','totalRecords'))
                 ->with('i', $pageNo * $perPage)
                 ->render();
 

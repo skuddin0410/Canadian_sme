@@ -25,7 +25,7 @@
                 <!-- Search Section -->
                 <div class="row p-3 align-items-center">
                     <!-- Search / Filter -->
-                    <div class="col-md-8 text-end">
+                    <div class="col-md-6 text-end">
                         <form action="#" method="GET" id="users-search-filter-form">
                             <div class="row g-2 align-items-center">
                                 <!-- Search -->
@@ -45,7 +45,7 @@
                     </div>
 
                     <!-- Bulk Actions -->
-                    <div class="col-md-4 text-end">
+                    <div class="col-md-6 text-end">
                         <form id="bulkActionForm" action="#" method="POST">
                             @csrf
                             <input type="hidden" name="user_ids" id="selectedUserIds">
@@ -56,6 +56,10 @@
                                 </button>
                                 <button type="button" class="btn btn-success" onclick="openModal('notification')">
                                     Send Notification (<span id="notifCount">0</span>)
+                                </button>
+
+                                 <button type="button" class="btn btn-secondary" onclick="openModal('notification')">
+                                    Generate Badge (<span id="badgeCount">0</span>)
                                 </button>
                             </div>
                         </form>

@@ -262,17 +262,20 @@ if (! function_exists('shortenName')) {
 
 
 if (! function_exists('addAgenda')) {
-    function addAgenda($sessionId,$agenda_type=null,$userId=null)
+    function addAgenda($sessionId,$agenda_type=null,$userId=null,$message='')
     {
-        UserAgenda::create([
-            'user_id' => !empty($userId) ? $userId : auth()->id(),
-            'session_id' => $sessionId,
-            'agenda_type' => $agenda_type
-        ]);
 
         $session = Session::find($sessionId); 
         $title= $session->title. " added to agenda";
         $body = $session->title. " has been added to your agenda list";
+
+        UserAgenda::create([
+            'user_id' => !empty($userId) ? $userId : auth()->id(),
+            'session_id' => $sessionId,
+            'agenda_type' => $agenda_type,
+            'message'=>$message ?? $body
+        ]);
+
         notification(!empty($userId) ? $userId : auth()->id(),$type='general_notifications',$sessionId, $title,$body);
     }
 }
@@ -398,5 +401,20 @@ if (!function_exists('sendNotification')) {
             }
         }
 
+    }
+}
+
+
+if (! function_exists('agendaNote')) {
+    function agendaNote($sessionId)
+    {
+        $agenda = UserAgenda::where('user_id', auth()->id())
+        ->where('session_id', $sessionId)
+        ->first();
+
+        if ($agenda) {
+            return $agenda->message ?? '';
+        }
+        return '';
     }
 }
