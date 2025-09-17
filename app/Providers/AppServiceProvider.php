@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {   
         Mail::alwaysTo('subhabrata0605@gmail.com'); 
-        \URL::forceScheme('http');
+        \URL::forceScheme('https');
         \App\Models\TicketType::observe(\App\Observers\TicketTypeObserver::class);
         Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page') {
             $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
