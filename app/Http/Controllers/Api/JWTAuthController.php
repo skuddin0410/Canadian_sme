@@ -924,7 +924,7 @@ public function getAllExhibitor(Request $request){
                     "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
                     "avatar" => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
-                    'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
+                    'banner'   => $sponsor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
                     "word_no" => $sponsor->booth ?? '',
                     "location" => $sponsor->booth ?? '',
                     "email" => $sponsor->email ?? '',
