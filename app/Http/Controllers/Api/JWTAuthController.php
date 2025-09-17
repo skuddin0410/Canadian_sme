@@ -374,6 +374,7 @@ public function getExhibitor($exhibitorId)
      
         $exhibitor = Company::with([
             'contentIconFile',
+            'quickLinkIconFile',
             'Docs',
         ])->find($exhibitorId);
 
@@ -389,6 +390,7 @@ public function getExhibitor($exhibitorId)
             'name'     => $exhibitor->name ?? '',
             'word_no'  => $exhibitor->booth ?? '-',
             'avatar'   => $exhibitor->contentIconFile?->file_path ?? asset('images/default.png'),
+            'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
             'location' => $exhibitor->booth ?? '-',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->phone ?? '',
