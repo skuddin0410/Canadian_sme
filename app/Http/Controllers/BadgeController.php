@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Badge;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
@@ -172,76 +173,52 @@ class BadgeController extends Controller
 
     public function generateBadges(Request $request)
     {   
+    
+        $badge = Badge::where('badge_name',$request->template_name)->first();
+        $badges = [];
+        $userIds = json_decode($request->user_ids, true);
 
-        $badges = [
+        $users = User::whereIn('id', $userIds)->get();
+       
+        foreach($users as $user){
 
+        $name=''; 
+        if($badge->name == 1){
+            $name = $user->full_name ?? '';
+        } 
+
+        $company_name='';
+        if($badge->company_name == 1){
+            $company_name = $user->company ?? '';
+        } 
+
+        $logo = '';
+        if($badge->logo_path == 1){
+            $logo = 1;
+        } 
+
+        $qr_code ='';
+        if($badge->qr_code_data == 1){
+           $qr_code = $user->qr_code ? asset($user->qr_code) : '';
+        }    
+        
+        $designation ='';
+        if($badge->designation == 1){
+           $designation = $user->designation ?? '';
+        } 
+        
+        array_push($badges,
             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
-            ],
-             [
-                'name' => 'John Doe',
-                'company_name' => 'Acme Corp',
-                'logo' => 'logos/acme.png', 
-               // 'qr_code' => 'data:image/png;base64,' . base64_encode(QrCode::format('png')->size(50)->generate('John Doe')),
+                'name' => $name,
+                'company_name' => $company_name ,
+                'logo' => $logo, 
+                 'qr_code' => $qr_code,
+                 'designation'=>$designation
             ]
-
-        ];
-
-        // $pdf = Pdf::loadView('badges.pdf', compact('badges'))
-        //           ->setPaper([0, 0, 252, 252], 'portrait') // 3.5" * 72 = 252pt 
-        //           ->setOptions([
-        //               'isHtml5ParserEnabled' => true, 
-        //               'isPhpEnabled' => true,       
-        //               'isRemoteEnabled' => true,    
-        //           ]);
-        return view('badges.pdf',compact('badges'));          
-        //$pdfName = 'badges'.time().'.pdf';
-        //dd($pdfName);
-        //return $pdf->download($pdfName);
+        );
+           
     }
+ 
+    return view('badges.pdf',compact('badges'));          
+  }
 }
