@@ -36,9 +36,9 @@
                                     <a href="{{ route('badges.show', $badge) }}" class="btn btn-outline-primary">
                                         <i class="fas fa-eye"></i> View
                                     </a>
-                                    <a href="{{ route('badges.download', $badge) }}" class="btn btn-outline-success">
+                                 {{--    <a href="{{ route('badges.download', $badge) }}" class="btn btn-outline-success">
                                         <i class="fas fa-download"></i> Download
-                                    </a>
+                                    </a> --}}
                                 </div>
                             </div>
                         </div>

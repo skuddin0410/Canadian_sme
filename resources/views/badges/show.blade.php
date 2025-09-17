@@ -89,9 +89,9 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ route('badges.print') }}" class="btn btn-success">
+              {{--       <a href="{{ route('badges.print') }}" class="btn btn-success">
                         <i class="fas fa-print me-2"></i>Print Badge
-                    </a>
+                    </a> --}}
                     <a href="{{ route('badges.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>Create New Badge
                     </a>
