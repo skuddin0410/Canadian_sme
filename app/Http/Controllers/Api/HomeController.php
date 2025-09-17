@@ -222,7 +222,8 @@ public function getAllSession()
                             "status"      => $status,
                             "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
                             "isFavorite"  => isFavorite($session->id),
-                            "my_agenda" => isAgenda($session->id)
+                            "agenda" => isAgenda($session->id),
+                            "my_agenda" => agendaNote($session->id)
                         ];
                     })->values()
                 ];
@@ -296,6 +297,7 @@ public function getSession($sessionId)
             ]),
             "isFavorite"  => isFavorite($session->id),
             "isInAgenda"  => isAgenda($session->id),
+            "agenda"=> agendaNote($session->id)
         ];
         
 
@@ -487,13 +489,15 @@ public function createAgenda(Request $request){
         }
 
         if(isAgenda($request->sessionId) == false){
-           addAgenda($request->sessionId);
+           addAgenda($request->sessionId,$agenda_type=null,null,$request->message);
            return response()->json([
             "message"=> "Session added to your agenda.",
             "isInAgenda" => isAgenda($request->sessionId)
            ]);
     
         }else{
+
+           addAgenda($request->sessionId,$agenda_type=null,null,$request->message); 
            return response()->json([
             "message"=> "You’ve already added this agenda.",
             "isInAgenda" => isAgenda($request->sessionId)

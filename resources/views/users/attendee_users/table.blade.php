@@ -34,7 +34,7 @@
 }
 </style>
 <div class="col-12 text-end p-3">
-
+ {{$range}} out of {{$totalRecords}} users
 </div>
 <table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
@@ -191,6 +191,8 @@ function updateCounts() {
     let selected = document.querySelectorAll('.user-checkbox:checked').length;
     document.getElementById('emailCount').innerText = selected;
     document.getElementById('notifCount').innerText = selected;
+    document.getElementById('badgeCount').innerText = selected;
+    
 }
 
 // Select All checkbox
@@ -207,7 +209,6 @@ document.querySelectorAll('.user-checkbox').forEach(cb => {
 
 function submitBulkAction(actionType) {
     let selected = [];
-    alert(document.getElementById('emailTemplate').value , document.getElementById('notificationTemplate').value)
     document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
         selected.push(cb.value);
     });
@@ -226,15 +227,46 @@ function submitBulkAction(actionType) {
     
     if(emailTemplateValue){
       template_name = emailTemplateValue
+      type= 'email'
     }
 
-     if(notificationTemplateValue){
+    if(notificationTemplateValue){
       template_name = notificationTemplateValue
+      type= 'notification'
     }
    
     document.getElementById('selectedUserIds').value = JSON.stringify(selected);
     let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name;
+    form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name+"&type="+type;
+    form.submit();
+}
+
+
+function submitBadgeAction(actionType) {
+    let selected = [];
+    document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
+        selected.push(cb.value);
+    });
+     
+    if (selected.length === 0) {
+        alert("Please select at least one user.");
+        return;
+    }
+    
+    const badge = document.getElementById('badge').value;
+
+    if (!badge) {
+        alert('Please select an badge template.');
+    }
+
+    if(badge){
+      template_name = badge
+      type= 'badge'
+    }
+   
+    document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+    let form = document.getElementById('bulkActionForm');
+    form.action = "{{ route('badges.print') }}?template_name=" + template_name+"&type="+type;
     form.submit();
 }
 </script>

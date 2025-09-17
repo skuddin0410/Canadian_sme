@@ -9,7 +9,7 @@ class UserAgenda extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'session_id', 'agenda_type'];
+    protected $fillable = ['user_id', 'session_id', 'agenda_type','message'];
 
     public function user()
     {

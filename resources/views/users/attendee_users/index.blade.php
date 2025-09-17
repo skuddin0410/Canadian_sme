@@ -25,7 +25,7 @@
                 <!-- Search Section -->
                 <div class="row p-3 align-items-center">
                     <!-- Search / Filter -->
-                    <div class="col-md-8 text-end">
+                    <div class="col-md-6 text-end">
                         <form action="#" method="GET" id="users-search-filter-form">
                             <div class="row g-2 align-items-center">
                                 <!-- Search -->
@@ -45,7 +45,7 @@
                     </div>
 
                     <!-- Bulk Actions -->
-                    <div class="col-md-4 text-end">
+                    <div class="col-md-6 text-end">
                         <form id="bulkActionForm" action="#" method="POST">
                             @csrf
                             <input type="hidden" name="user_ids" id="selectedUserIds">
@@ -56,6 +56,10 @@
                                 </button>
                                 <button type="button" class="btn btn-success" onclick="openModal('notification')">
                                     Send Notification (<span id="notifCount">0</span>)
+                                </button>
+
+                                 <button type="button" class="btn btn-secondary" onclick="openModal('badge')">
+                                    Generate Badge (<span id="badgeCount">0</span>)
                                 </button>
                             </div>
                         </form>
@@ -134,6 +138,34 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="bulkBadgeModal" tabindex="-1" role="dialog" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkActionModalLabel">Select Badge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="actionType">Choose Badge Template</label>
+                <select id="badge" class="form-control" name="template_name">
+                    <option value="">Please Select Badge Template</option>
+                    @if(!empty(fetchBadgeTemplates()))
+                        @foreach(fetchBadgeTemplates() as $emailtemplate)
+                          <option value="{{$emailtemplate->badge_name}}">{{ $emailtemplate->badge_name ?? 'Badge #' . $emailtemplate->id}}</option>
+                        @endforeach
+                    @endif
+                </select> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitBadgeAction()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -205,15 +237,22 @@ function openModal(actionType) {
         $('#bulkActionModalNotifications').modal('show');
     }
 
+    if (actionType === 'badge') {
+        $('#bulkBadgeModal').modal('show');
+    }
+
     document.getElementById('emailTemplate').value=''
     document.getElementById('notificationTemplate').value=''
+    document.getElementById('badge').value=''
 }
 
 function closeModal(){
     $('#bulkActionModalEmail').modal('hide');
     $('#bulkActionModalNotifications').modal('hide');
+    $('#bulkBadgeModal').modal('hide');
     document.getElementById('emailTemplate').value=''
     document.getElementById('notificationTemplate').value=''
+    document.getElementById('badge').value=''
 
 }
 </script>
