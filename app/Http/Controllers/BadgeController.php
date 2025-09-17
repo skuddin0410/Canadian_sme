@@ -232,16 +232,16 @@ class BadgeController extends Controller
 
         ];
 
-        $pdf = Pdf::loadView('badges.pdf', compact('badges'))
-                  ->setPaper([0, 0, 340, 340], 'landscape') 
-                  ->setOptions([
-                      'isHtml5ParserEnabled' => true, 
-                      'isPhpEnabled' => true,       
-                      'isRemoteEnabled' => true,    
-                  ]);
+        // $pdf = Pdf::loadView('badges.pdf', compact('badges'))
+        //           ->setPaper([0, 0, 252, 252], 'portrait') // 3.5" * 72 = 252pt 
+        //           ->setOptions([
+        //               'isHtml5ParserEnabled' => true, 
+        //               'isPhpEnabled' => true,       
+        //               'isRemoteEnabled' => true,    
+        //           ]);
         return view('badges.pdf',compact('badges'));          
-        $pdfName = 'badges'.time().'.pdf';
+        //$pdfName = 'badges'.time().'.pdf';
         //dd($pdfName);
-        return $pdf->download($pdfName);
+        //return $pdf->download($pdfName);
     }
 }
