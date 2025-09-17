@@ -270,12 +270,16 @@ if (! function_exists('addAgenda')) {
         $title= $session->title. " added to agenda";
         $body = $session->title. " has been added to your agenda list";
 
-        UserAgenda::create([
-            'user_id' => !empty($userId) ? $userId : auth()->id(),
-            'session_id' => $sessionId,
-            'agenda_type' => $agenda_type,
-            'message'=>$message ?? $body
-        ]);
+        UserAgenda::updateOrCreate(
+            [
+                'user_id' => !empty($userId) ? $userId : auth()->id(), 
+                'session_id' => $sessionId, 
+            ],
+            [
+                'agenda_type' => $agenda_type,
+                'message' => $message ?? $body,
+            ]
+        );
 
         notification(!empty($userId) ? $userId : auth()->id(),$type='general_notifications',$sessionId, $title,$body);
     }

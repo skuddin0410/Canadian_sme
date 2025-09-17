@@ -496,6 +496,8 @@ public function createAgenda(Request $request){
            ]);
     
         }else{
+
+           addAgenda($request->sessionId,$agenda_type=null,null,$request->message); 
            return response()->json([
             "message"=> "You’ve already added this agenda.",
             "isInAgenda" => isAgenda($request->sessionId)
