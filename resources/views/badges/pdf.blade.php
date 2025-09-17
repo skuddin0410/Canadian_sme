@@ -61,14 +61,26 @@
                 text-align:left;
                 box-sizing:border-box;
               "
-            >
+            > 
+             @if (isset($badge['logo']) && !empty($badge['logo']))
               <img
-                src="{{asset('sme-logo.png')}}"
+                src="{{ asset('sme-logo.png') }}"
                 style="max-height:80px; max-width:80px; object-fit:contain; border-radius:8px; margin-bottom:3px; display:block;"
               >
-              <p style="font-weight:bold; font-size:1rem; margin:0;">Name</p>
-              <p style="font-size:0.9rem; color:#555; margin:0;">company_name</p>
-              <p style="font-size:0.8rem; color:#888; margin:0; font-style:italic;">Designation</p>
+              @endif
+
+              @if (isset($badge['name']) && !empty($badge['name']))
+              <p style="font-weight:bold; font-size:1rem; margin:0;">{{$badge['name']}}</p>
+              @endif
+              
+              @if (isset($badge['company_name']) && !empty($badge['company_name']))
+              <p style="font-size:0.9rem; color:#555; margin:0;">{{$badge['company_name']}}</p>
+              @endif
+
+               @if (isset($badge['designation']) && !empty($badge['designation']))
+              <p style="font-size:0.8rem; color:#888; margin:0; font-style:italic;">{{$badge['designation']}}</p>
+              @endif
+
             </div>
 
             <!-- QR section -->
@@ -80,11 +92,14 @@
                 align-items:center;
                 box-sizing:border-box;
               "
-            >
+            > 
+             @if (isset($badge['qr_code']) && !empty($badge['qr_code']))
               <img
-                src="https://api.qrserver.com/v1/create-qr-code/?data=Sample-QR-Code"
+                src="{{ $badge['qr_code'] }}"
                 style="width:100px; height:100px; object-fit:contain; display:block;"
               >
+              @endif
+
             </div>
           </div>
         </div>

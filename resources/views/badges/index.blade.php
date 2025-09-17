@@ -25,7 +25,7 @@
                             @endif
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    {{ $badge->name ?? 'Badge #' . $badge->id }}
+                                    {{ $badge->badge_name ?? 'Badge #' . $badge->id }}
                                 </h5>
                                 <p class="card-text">
                                     <small class="text-muted">

@@ -17,7 +17,8 @@ class Badge extends Model
         'qr_code_data',
         'qr_code_path',
         'badge_path',
-        'selected_fields'
+        'selected_fields',
+        'badge_name'
     ];
 
     protected $casts = [

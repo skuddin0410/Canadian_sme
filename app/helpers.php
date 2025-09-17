@@ -20,6 +20,7 @@ use App\Models\UserConnection;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserWelcome;
+use App\Models\Badge;
 
 
 if (!function_exists('getCategory')) {
@@ -416,5 +417,14 @@ if (! function_exists('agendaNote')) {
             return $agenda->message ?? '';
         }
         return '';
+    }
+}
+
+
+if (!function_exists('fetchBadgeTemplates')) {
+    function fetchBadgeTemplates()
+    {  
+       $emailBadgeTemplate = Badge::orderBy("created_at","DESC")->get();
+       return $emailBadgeTemplate;
     }
 }
