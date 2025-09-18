@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EmailTemplate;
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Mail\UserWelcome;
+use Illuminate\Http\Request;
+use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 
 class EmailTemplateController extends Controller
@@ -86,7 +87,10 @@ class EmailTemplateController extends Controller
             'template' => 'required|exists:email_templates,id',
         ]);
 
-        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
+        // $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
+        $emailTemplate = EmailTemplate::findOrFail($request->template);
+
+        $user = User::where('email', $request->email)->firstOrFail();  
         $subject = $emailTemplate->subject ?? '';
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);

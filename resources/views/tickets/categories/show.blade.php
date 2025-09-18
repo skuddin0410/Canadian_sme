@@ -217,7 +217,7 @@
 
                                 @if($ticketCategory->description)
                                     <dt class="col-sm-5">Description:</dt>
-                                    <dd class="col-sm-7">{{ $ticketCategory->description }}</dd>
+                                    <dd class="col-sm-7">{!! Str::words(strip_tags($ticketCategory->description), 10, '...') !!}</dd>
                                 @endif
 
                                 <dt class="col-sm-5">Sort Order:</dt>

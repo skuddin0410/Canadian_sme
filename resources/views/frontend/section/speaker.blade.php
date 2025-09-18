@@ -32,7 +32,7 @@
                                 </div>
                             </a>
                                 <div class="swiper-img-text">
-                                    <span class="speakers-name">{{$speaker->full_name}}</span>
+                                    <span class="speakers-name">{{$speaker->full_name ? truncateString($speaker->full_name, 18) : ''}}</span>
                                     <span class="speakers-title">Speaker</span>
                                 </div>
                             </div>

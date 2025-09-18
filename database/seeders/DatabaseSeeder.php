@@ -28,16 +28,15 @@ class DatabaseSeeder extends Seeder
             //ServiceCategoriesSeeder::class,
            // ServicesSeeder::class,
             SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
-            
-             SupportSeeder::class,
-   
+            SupportSeeder::class,
             SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
             AddExhibitorUsers::class,
             InsertLocaions::class, // php artisan db:seed --class=InsertLocaions,
             AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
             UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder
-            EmailTemplateSeeder::class //php artisan db:seed --class=EmailTemplateSeeder
+            EmailTemplateSeeder::class, //php artisan db:seed --class=EmailTemplateSeeder
+            FormsTableSeeder::class //php artisan db:seed --class=FormsTableSeeder
         ]);
     }
 }

@@ -136,7 +136,7 @@
                             </a>
                         </div>
                         <div class="card-body">
-                            @if($ticketType->pricingRules->count() > 0)
+                            @if(optional($ticketType->pricingRules)->count() > 0)
                                 <div class="table-responsive">
                                     <table class="table table-sm">
                                         <thead>

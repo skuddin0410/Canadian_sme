@@ -9,8 +9,11 @@
 @section('content')
 
     <!-- sponsor -->
-    <section class="sponsor">
+    <section class="sponsor py-4 py-lg-5">
         <div class="container">
+            <div class="d-flex justify-content-end mb-2">
+  <a href="javascript:history.back()" class="heroBtn ms-md-5">Back</a>
+</div>
             <span class="small-heading-blue">Sponsors</span>
             <div class="d-flex justify-content-between gap-5">
                 <h2 class="h2-black">

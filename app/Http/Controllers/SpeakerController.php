@@ -42,7 +42,8 @@ class SpeakerController extends Controller
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
                     $q->whereIn("name", ['Speaker']);
-                })->where('primary_group','Speaker')->orderBy('created_at', 'DESC');
+                })->where('primary_group','Speaker')->orderBy('created_at', 'DESC')
+                  ->orWhere('secondary_group', 'Speaker');
 
             if ($request->search) {
                 $users = $users->where(function ($query) use ($request) {
@@ -112,9 +113,17 @@ class SpeakerController extends Controller
             'email' => 'nullable|string|max:255|email|unique:users,email',
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
-            'website_url' => 'nullable|string|max:255',
-            'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'nullable|string|unique:users,mobile',
+            'website_url' => 'nullable|url',
+            'linkedin_url' => 'nullable|url',
+            'facebook_url' => 'nullable|url',
+            'instagram_url' => 'nullable|url',
+            'twitter_url' => 'nullable|url',
+             'mobile' => [
+                'nullable',
+                'string',
+                'regex:/^\+?[0-9]{10,15}$/',
+                'unique:users,mobile',
+            ],
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -151,7 +160,7 @@ class SpeakerController extends Controller
         $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
-        $user->instagram_url = $request->linkedin_url;
+        $user->instagram_url = $request->instagram_url;
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
@@ -168,11 +177,19 @@ class SpeakerController extends Controller
           $primaryGroupArray = explode(',', $request->primary_group);   
         }
         if(!empty($request->secondary_group)) {
-          $secondaryGroupArray = $request->secondary_group ?? [];
+          $secondaryGroupArray = $request->secondary_group;
+        } else {
+          $secondaryGroupArray = ['Speaker']; 
         }
+
+
+       if (!in_array('Speaker', $secondaryGroupArray)) {
+        $secondaryGroupArray[] = 'Speaker';
+       }
+        
           $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
           $combinedGroups = array_unique($combinedGroups); 
-        
+       
         if(!empty($combinedGroups)){
           $user->syncRoles($combinedGroups);  
         }
@@ -194,7 +211,7 @@ class SpeakerController extends Controller
           
         }
         qrCode($user->id);
-    
+   
 
       return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');

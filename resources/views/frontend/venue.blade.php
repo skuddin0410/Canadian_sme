@@ -13,11 +13,27 @@
 
               <div class="venue-location my-4">
                 <h4>Venue Location</h4>
+
                 @if(!empty($location))
                   <p>{{ $location }}</p>
 
-                  <!-- Map container -->
-                  <div id="map" style="width:100%; height:400px;"></div>
+                  <!-- Use the mapUrl returned by the controller in an iframe -->
+                @if(!empty($mapUrl))
+  <div class="ratio ratio-16x9" style="height:400px;">
+    <iframe
+      src="{{ $mapUrl }}"
+      width="100%"
+      height="100%"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+@else
+  <p class="text-muted">Map not available.</p>
+@endif
+
+
                 @else
                   <p>Location not available.</p>
                 @endif
@@ -30,42 +46,4 @@
     </div>
   </div>
 </div>
-
-@if(!empty($location))
-  <!-- Load Google Maps API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key={{ $googleApiKey }}"></script>
-  <script>
-    function initMap() {
-        let geocoder = new google.maps.Geocoder();
-        let address = @json($location);
-
-        geocoder.geocode({ 'address': address }, function(results, status) {
-            if (status === 'OK') {
-                // Create the map
-                let map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 15,
-                    center: results[0].geometry.location
-                });
-
-                // Drop the pin
-                let marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location
-                });
-
-                // Force center on marker after map loads
-                google.maps.event.addListenerOnce(map, 'idle', function() {
-                    map.setCenter(marker.getPosition());
-                });
-            } else {
-                document.getElementById('map').innerHTML =
-                  "<p style='color:red'>Could not load map: " + status + "</p>";
-            }
-        });
-    }
-
-    // Load map after page is ready
-    window.onload = initMap;
-  </script>
-@endif
 @endsection

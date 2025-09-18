@@ -79,12 +79,12 @@
     <form action="{{ route('attendee-users.allow-access', $user->id) }}" method="POST" style="display:inline;">
     @csrf
     @if($user->is_approve ==1)
-        <button type="submit" class="btn btn-sm btn-success" title="App access approved">
-         ✔ App Access Approved
+        <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
+          Allow App Access
         </button>
     @else
-        <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
-           Allow App Access
+        <button type="submit" class="btn btn-sm btn-secondary" title="Reject app access">
+           Reject App Access
         </button>
     @endif
    </form>

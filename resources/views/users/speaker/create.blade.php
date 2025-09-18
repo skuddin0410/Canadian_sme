@@ -177,11 +177,15 @@ Admin | Speaker Add
                       <div class="col-md-6">
                         <label class="form-label">User Other Group</label>
                     @php
+                       $rawSelected = old('secondary_group', $user->secondary_group ?? []);
+                       $selectedSecondary = is_array($rawSelected)
+                    ? $rawSelected
+                     : (strlen((string) $rawSelected) ? explode(',', (string) $rawSelected) : []);
 
-                      $rawSelected = old('secondary_group', $user->secondary_group ?? []);
-                      $selectedSecondary = is_array($rawSelected)
-                          ? $rawSelected
-                          : (strlen((string) $rawSelected) ? explode(',', (string) $rawSelected) : []);
+  
+                    if (empty($selectedSecondary)) {
+                      $selectedSecondary = ['Speaker'];
+                    }
                     @endphp
 
                   <label class="form-label">User Secondary Group (multiple)</label>

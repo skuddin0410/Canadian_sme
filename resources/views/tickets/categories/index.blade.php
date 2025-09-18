@@ -38,7 +38,9 @@
                                             <strong>{{ $category->name }}</strong>
                                             <small class="text-muted d-block">{{ $category->slug }}</small>
                                         </td>
-                                        <td>{{ Str::limit($category->description, 50) }}</td>
+                                        <td>{!! Str::words(strip_tags($category->description), 10, '...') !!}</td>
+
+                                        {{-- <td>{{ Str::limit($category->description, 50) }}</td> --}}
                                         <td>
                                             <span class="badge badge-info">{{ $category->ticketTypes->count() }}</span>
                                         </td>

@@ -176,7 +176,7 @@ class CalendarController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
+            'start_time' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
             'end_time' => 'required|date|after:start_time',
             'track' => 'required',
             'description' => 'nullable|string',
@@ -272,7 +272,7 @@ class CalendarController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
+            'start_time' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
             'end_time' => 'required|date|after:start_time',
             'track' => 'required',
             'description' => 'nullable|string',
@@ -280,7 +280,7 @@ class CalendarController extends Controller
             'speaker_ids.*' => 'exists:users,id'
         ]);
 
-        // Check for venue conflicts if venue or time is being updated
+      
         if (( $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
             $startTime = $request->start_time ?? $session->start_time;
             $endTime = $request->end_time ?? $session->end_time;
@@ -290,6 +290,7 @@ class CalendarController extends Controller
                 ->where('id', '!=', $session->id)
                 ->where('status', '!=', 'cancelled')
                 ->where(function ($query) use ($startTime, $endTime) {
+                    
                     $query->whereBetween('start_time', [$startTime, $endTime])
                           ->orWhereBetween('end_time', [$startTime, $endTime])
                           ->orWhere(function ($q) use ($startTime, $endTime) {

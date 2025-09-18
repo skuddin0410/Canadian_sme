@@ -30,18 +30,6 @@ class UserGroupController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $roles = Role::orderBy('created_at', 'DESC');
 
-            // if ($request->search) {
-            //     $roles = $roles->where(function ($query) use ($request) {
-            //         $query->where('name', 'LIKE', '%' . $request->search . '%');
-            //         $query->orWhere('description', 'LIKE', '%' . $request->search . '%');
-            //     });
-            // }
-
-            // if ($request->start_at && $request->end_at) {
-            //     $roles = $roles->whereDate('created_at', '>=', $request->start_at)
-            //                    ->whereDate('created_at', '<=', $request->end_at);
-            // }
-
             $rolesCount = clone $roles;
             $totalRecords = $rolesCount->count(DB::raw('DISTINCT(roles.id)'));
 

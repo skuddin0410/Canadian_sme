@@ -16,7 +16,7 @@ class FormBuilderController extends Controller
      */
     public function index()
     {
-        $form = Form::find(1);;
+        $form = Form::find(1);
         return view('formbuilder.index',compact('form'));
     }
 
@@ -45,8 +45,10 @@ class FormBuilderController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
-        $form = Form::create($request->all());
+        $form = Form::updateOrCreate(
+           ['id' => 1], // The condition to check if the record exists (in this case, the form with id = 1)
+           $request->all() // The data to update or insert
+        );
 
         return response()->json(['form' => $form, 'message' => 'Form created successfully']);
     
@@ -164,7 +166,7 @@ public function submitForm(Request $request, $id)
         'name'   => 'required|string|max:255',
         'last_name'    => 'required|string|max:255',
         'email'        => 'required|email|unique:users,email',
-        'phone_number' => 'required|string|max:20',
+        'mobile' => 'required|string|max:20',
         'designation'  => 'nullable|string|max:255',
         'company'      => 'nullable|string|max:255',
     ];
@@ -192,12 +194,13 @@ public function submitForm(Request $request, $id)
         'name'        => $data['name'].' '.$data['last_name'],
         'email'       => $data['email'],
         // 'password'    => Hash::make('password'), // default or generate random
-        'phone'       => $data['phone_number'] ?? null,
+        'mobile'       => $data['mobile'] ?? null,
         'designation' => $data['designation'] ?? null,
         'company'     => $data['company'] ?? null,
        
     ]);
     $user->assignRole('Attendee');
+     qrCode($user->id);
 
     return redirect()
         ->back()

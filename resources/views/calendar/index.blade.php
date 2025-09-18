@@ -166,7 +166,7 @@
                         </div>
 
                         <div class="col-6">
-                            <label for="sessionTitle" class="form-label">Location</label>
+                            <label for="sessionTitle" class="form-label">Location *</label>
                             <input type="text" class="form-control" id="venueSelect" name="location" required>
                         </div>
 

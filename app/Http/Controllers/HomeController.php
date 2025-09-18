@@ -202,7 +202,7 @@ class HomeController extends Controller
             $theme_color->save();
         } 
 
-        return view('brand');
+        return view('brand')->with('message','App Branding media updated successfully');
     }
 
     public function splash(Request $request){
@@ -258,7 +258,8 @@ class HomeController extends Controller
             }
 
         }
-        return view('splash'); 
+        return redirect()->back()->with('success','App Branding media updated successfully');
+        // return view('splash'); 
     }
 
     public function registrationSettings(Request $request){
@@ -336,5 +337,39 @@ class HomeController extends Controller
             
        return view('EmailTemplate');
    }
-    
+ public function deleteMedia(Request $request)
+{
+    $key = trim($request->input('key'));
+
+    // Map frontend keys to Setting keys
+    $map = [
+        'event_logo'  => 'logo',
+        'brand_cover' => 'cover',
+    ];
+
+    if (!isset($map[$key])) {
+        return response()->json(['error' => 'Invalid media key'], 400);
+    }
+
+    $setting = Setting::where('key', $map[$key])->first();
+    if (!$setting) {
+        return response()->json(['error' => 'Setting not found'], 404);
+    }
+
+    // Delete associated photo record and file
+    if ($setting->photo) {
+        $photo = $setting->photo;
+
+        // Delete physical file
+        if (file_exists(public_path($photo->file_path))) {
+            @unlink(public_path($photo->file_path));
+        }
+
+        // Delete photo record
+        $photo->delete();
+    }
+
+    return response()->json(['message' => ucfirst(str_replace('_', ' ', $key)) . ' deleted successfully']);
+}
+
 }
