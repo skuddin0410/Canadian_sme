@@ -9,6 +9,7 @@ use App\Http\Controllers\SponsorsController;
 use App\Http\Controllers\UserGroupController;
 use App\Http\Controllers\EventGuideController;
 use App\Http\Controllers\EventTrackController;
+use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\ExhibitorUserController;
@@ -37,7 +38,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::post('/event-guides/gallery/upload', [EventGuideController::class, 'uploadGallery'])->name('event-guides.uploadGallery');
 
   Route::delete('event-guides/delete-gallery-image', [EventGuideController::class, 'deleteGalleryImage'])->name('event-guides.deleteGalleryImage');
-
+  
 
 
 
@@ -91,7 +92,7 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('attendee-users.bulkAction');
 
 
-
+      Route::get('/events/{event}/sessions', [TicketTypeController::class, 'getByEvent'])->name('events.sessions');
 
     
     Route::resource('speaker', SpeakerController::class);
