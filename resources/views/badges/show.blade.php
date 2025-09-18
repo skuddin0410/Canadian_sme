@@ -16,11 +16,6 @@
                 </div>
             </div>
             <div class="card-body mt-2">
-                @if($badge->badge_path)
-                    <div class="text-center mb-4">
-                        <img src="{{ Storage::url($badge->badge_path) }}" alt="Generated Badge" class="img-fluid" style="max-width: 100%; border: 1px solid #ddd; border-radius: 8px;">
-                    </div>
-                @endif
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -37,36 +32,47 @@
                         <table class="table table-sm">
                          <div class="preview-badge" id="badgePreview"></div>
 
-
                             <div class="card-body">
                                 <div class="badge-preview-container" style="border: 2px solid #333; border-radius: 10px; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 300px; position: relative;">
                                     
                                    <div class="row">
                                     <div class="col-md-6 mt-2">
-                                        <div class="preview-section" id="preview_logo_section" style="text-align: center; margin-bottom: 15px;">
-                                            <img id="preview_logo" class="img-fluid" alt="Logo" style="object-fit: contain; border-radius: 8px;" src="{{asset('sme-logo.png')}}">
-                                        </div>
 
+                                       
+                                        <div class="preview-section" id="preview_logo_section" style="text-align: center; margin-bottom: 15px;">
+                                             @if($badge->logo_path == 1)
+                                            <img id="preview_logo" class="img-fluid" alt="Logo" style="object-fit: contain; border-radius: 8px;" src="{{asset('sme-logo.png')}}">
+                                            @endif
+                                        </div>
+                                        
+                                        
+                                        @if($badge->name == 1)
                                         <!-- Name Section -->
                                         <div class="preview-section" id="preview_name_section" style="text-align: center; margin-bottom: 10px;">
                                             <h4 id="preview_name" style="margin: 0; font-weight: bold; color: #333; font-size: 1.2rem;">{{'name'}}</h4>
                                         </div>
-
+                                        @endif
+                                        
+                                        @if($badge->company_name == 1)
                                         <!-- Company Name Section -->
                                         <div class="preview-section" id="preview_company_section" style="text-align: center; margin-bottom: 8px;">
                                             <p id="preview_company_name" style="margin: 0; color: #666; font-size: 1rem;">{{'company_name'}}</p>
                                         </div>
-                             
-
+                                        @endif
+                                        
+                                        @if($badge->designation == 1)
                                         <div class="preview-section" id="preview_designation_section" style="text-align: center; margin-bottom: 15px;">
                                             <p id="preview_designation" style="margin: 0; color: #888; font-size: 0.9rem; font-style: italic;">{{'designation'}}</p>
                                         </div>
+                                        @endif
                                       
                                     </div>
 
                                     <div class="col-md-6 mt-2">
                                         <div class="preview-section" id="preview_qr_section" style="text-align: center;">
+                                            @if($badge->qr_code_data == 1)
                                             <img id="preview_qr_code" src="https://api.qrserver.com/v1/create-qr-code/?data=Sample-QR-Code" alt="QR Code" style="width: 100%; border: 1px solid #ddd;">
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
