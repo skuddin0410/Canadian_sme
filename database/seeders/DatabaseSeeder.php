@@ -22,11 +22,6 @@ class DatabaseSeeder extends Seeder
             AccountManagerPermissionSeeder::class,
             TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             PagesSeeder::class, // php artisan db:seed --class=PagesSeeder
-            //ProductsCategoriesSeeder::class,
-            //ProductsSeeder::class,
-            //ProductTechnicalSpecsSeeder::class,
-            //ServiceCategoriesSeeder::class,
-           // ServicesSeeder::class,
             SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
             SupportSeeder::class,
             SessionAttendee::class,// php artisan db:seed --class=SessionAttendee

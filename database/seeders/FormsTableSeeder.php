@@ -60,7 +60,7 @@ class FormsTableSeeder extends Seeder
                         "operator" => "==",
                         "condition" => "none",
                         "source_field" => null,
-                        "target_field" => "First Name"
+                        "target_field" => "Email"
                     ]
                 ],
                 [

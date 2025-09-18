@@ -21,6 +21,7 @@ use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserWelcome;
 use App\Models\Badge;
+use Illuminate\Support\Facades\Crypt;
 
 
 if (!function_exists('getCategory')) {
@@ -384,7 +385,7 @@ if (!function_exists('fetchNotificationTemplates')) {
 if (!function_exists('sendNotification')) {
     function sendNotification($template_name, $user)
     {  
-
+      
         $emailTemplate = EmailTemplate::where('template_name', $template_name)->first();
         if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
             $subject = $emailTemplate->subject ?? '';
@@ -395,9 +396,16 @@ if (!function_exists('sendNotification')) {
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
             $message = str_replace('{{site_name}}', config('app.name'), $message);
+
             if (strpos($message, '{{qr_code}}') !== false) {
               $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
             }
+
+            if (strpos($message, '{{profile_update_link}}') !== false) {
+              $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
+              $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
+            }
+
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
  
         } elseif (!empty($emailTemplate) && $emailTemplate->type === 'notification') {
