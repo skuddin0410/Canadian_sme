@@ -28,7 +28,6 @@ use App\Models\MailLog;
 use App\Mail\UserWelcome;
 use App\Models\EmailTemplate;
 use OneSignal;
-use Illuminate\Support\Facades\Crypt;
 
 
 class AttendeeUserController extends Controller
@@ -274,9 +273,9 @@ class AttendeeUserController extends Controller
             'mobile' => [
                  'nullable',
                  'string',
-                 'regex:/^[0-9]{10}$/',
-                 'unique:users,mobile'
-                ] . $user->id,
+                 'regex:/^[0-9]{10}$/'
+                 
+                ],
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -446,11 +445,6 @@ public function bulkAction(Request $request)
             $message = str_replace('{{site_name}}', config('app.name'), $message);
             if (strpos($message, '{{qr_code}}') !== false) {
               $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
-            }
-
-            if (strpos($message, '{{profile_update_link}}') !== false) {
-              $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
-              $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
             }
           
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
