@@ -48,10 +48,14 @@
           
           <!-- Header -->
           <tr>
-            <td align="center" bgcolor="#002364" style="padding:20px;">
-              <img src="{{ asset('images/footer-logo.png') }}" alt="Company Logo" width="120" style="display:block; max-width:120px; width:100%; height:auto;">
-            </td>
-          </tr>
+  <td align="left" bgcolor="#002364" style="padding:20px; display: flex; align-items: center; color: white;">
+    <img src="{{ asset('images/footer-logo.png') }}" alt="Company Logo" width="120" style="display:block; max-width:120px; width:100%; height:auto; margin-right: 15px;">
+    <div style="color:white;text-decoration: none;">
+      <p>{{ getKeyValue('company_name')->value }}</p>
+      <p>{{ getKeyValue('company_address')->value }}</p>
+    </div>
+  </td>
+</tr>
 
           <!-- Content -->
           <tr>
