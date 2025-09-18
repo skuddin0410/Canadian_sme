@@ -118,40 +118,6 @@ class FormBuilderController extends Controller
     }
 
 
-// public function submitForm(Request $request, $id)
-//     {
-//         $form = Form::findOrFail($id);
-
-//         // Detect request type (web fetch with JSON or API client)
-//         $data = $request->expectsJson()
-//             ? $request->json()->all()
-//             : $request->all();
-
-//         // Dynamic validation from form config
-//         $rules = $form->validation_rules ?? [];
-//         $validator = Validator::make($data, $rules);
-
-//         if ($validator->fails()) {
-//             return response()->json(['errors' => $validator->errors()], 422);
-//         }
-
-//         // Apply conditional logic (if any)
-//         $filteredData = $this->applyConditionalLogic($data, $form->conditional_logic ?? []);
-//         $filteredData = is_array($filteredData) ? $filteredData : [];
-
-//         // Save submission
-//         $submission = FormSubmission::create([
-//             'form_id'       => $form->id,
-//             'submission_data' => $filteredData,
-//             'ip_address'    => $request->ip(),
-//             'user_agent'    => $request->userAgent(),
-//         ]);
-//          return redirect()
-//         ->back()
-//         ->with('success', 'Form submitted successfully!');
-
-      
-//     }
 public function submitForm(Request $request, $id)
 {
     $form = Form::findOrFail($id);
@@ -163,12 +129,13 @@ public function submitForm(Request $request, $id)
 
     // Dynamic validation from form config (fallback if none set)
     $rules = $form->validation_rules ?? [
-        'name'   => 'required|string|max:255',
+        'first_name'   => 'required|string|max:255',
         'last_name'    => 'required|string|max:255',
         'email'        => 'required|email|unique:users,email',
-        'mobile' => 'required|string|max:20',
+        'mobile' => 'null|string|max:20',
         'designation'  => 'nullable|string|max:255',
         'company'      => 'nullable|string|max:255',
+        'bio'      => 'required|string|max:500',
     ];
 
     $validator = Validator::make($data, $rules);
@@ -191,17 +158,19 @@ public function submitForm(Request $request, $id)
 
     // Create user with role "attendee"
     $user = User::create([
-        'name'        => $data['name'].' '.$data['last_name'],
+        'name'        => $data['first_name'].' '.$data['last_name'],
         'email'       => $data['email'],
         // 'password'    => Hash::make('password'), // default or generate random
         'mobile'       => $data['mobile'] ?? null,
         'designation' => $data['designation'] ?? null,
         'company'     => $data['company'] ?? null,
+        'bio'     => $data['bio'] ?? null,
        
     ]);
     $user->assignRole('Attendee');
-     qrCode($user->id);
-
+    qrCode($user->id);
+    notification($user->id);
+    sendNotification("Welcome Email",$user);
     return redirect()
         ->back()
         ->with('success', 'Form submitted successfully and attendee created!');
