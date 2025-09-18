@@ -25,7 +25,6 @@
                         <div class="swiper-wrapper">
                             @if(!empty($sponsors))
                              @foreach($sponsors as $sponsor)
-
                             <div class="swiper-slide">
                                  <a href="{{ route('sponsor', $sponsor->id) }}" class="text-decoration-none">
                                 <div class="swiper-img-box">
@@ -37,8 +36,9 @@
                                 </div>
                                 </a>
                                 <div class="swiper-img-text">
-                                    <span class="sponsors-name">{{$sponsor->name ? truncateString($sponsor->name, 20) : ''}}</span>
+
                                     @php
+                                     if(!$sponsor?->category?->color) {
                                         $typeColors = match(strtolower($sponsor->type ?? 'general')) {
                                         'gold' => 'gold',
                                         'silver' => 'silver',
@@ -47,14 +47,14 @@
                                         'majlislounge' => 'majlislounge',
                                         default => 'general'
                                        };
-
-                                        $displayType = $sponsor->type ? ucfirst(strtolower($sponsor->type)) : 'General';
-                                        if (strtolower($sponsor->type ?? '') === 'majlislounge') $displayType = 'Majlis Lounge';
+                                      }else{
+                                        $typeColors = $sponsor->category->color;
+                                      }   
                                     @endphp
 
-                                    <span class="sponsors-title {{ $typeColors }}">{{ $displayType }}</span>
+                                    <span class="sponsors-name">{{$sponsor->name ? truncateString($sponsor->name, 20) : ''}}</span>
+                                    <span class="sponsors-title {{$typeColors}}" style="{{'background-color:'.$typeColors}}">{{ $sponsor?->category?->name}}</span>
 
-                                   
                                 </div>
                             </div>
                              @endforeach

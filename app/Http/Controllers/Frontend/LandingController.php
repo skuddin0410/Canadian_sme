@@ -31,7 +31,7 @@ class LandingController extends Controller
                 })->orderBy('created_at', 'DESC')->take(4)->get();
 
         $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(3)->get();
-        $sponsors = Company::where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
+        $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
         $attendees = $session->attendees->take(3);
         $schedules = $this->schudled();
         $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
