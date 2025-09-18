@@ -41,7 +41,9 @@
                 <textarea class="form-control" id="bio" name="bio" rows="4">{{ old('bio', $user->bio) }}</textarea>
             </div>
 
+           <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-primary mt-2 mb-2">Update Details</button>
+            </div>
         </form>
     </div>
 </div>
