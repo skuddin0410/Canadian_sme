@@ -35,11 +35,11 @@
                     </div>
                     <div class="">
                         <span class="blue-text-18 mb-2">Booth Number</span>
-                        <span class="small-heading-black fw-semibold">{{$exhibitor->booth ?? ''}}</span>
+                        <span class="small-heading-black fw-semibold">{{$exhibitor->booth ?? 'NA'}}</span>
                     </div>
                     <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
-                        <span class="small-heading-black fw-semibold">{{$session->title ? truncateString($session->title, 40) : ''}}</span>
+                        <span class="small-heading-black fw-semibold">{{$session->title ? truncateString($session->title, 40) : 'NA'}}</span>
                     </div>
                     <div>
                         <a class="view-more position-relative d-flex
