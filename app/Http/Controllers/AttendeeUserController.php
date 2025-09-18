@@ -130,7 +130,13 @@ class AttendeeUserController extends Controller
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            'mobile' => 'nullable|string|unique:users,mobile',
+            'mobile' => [
+                 'nullable',
+                 'string',
+                 'regex:/^[0-9]{10}$/',
+                 'unique:users,mobile'
+                ],
+
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -264,7 +270,12 @@ class AttendeeUserController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'nullable|string|unique:users,mobile,' . $user->id,
+            'mobile' => [
+                 'nullable',
+                 'string',
+                 'regex:/^[0-9]{10}$/',
+                 'unique:users,mobile'
+                ] . $user->id,
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
