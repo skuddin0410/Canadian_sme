@@ -126,9 +126,14 @@ class Company extends Model
             ->whereNotNull('file_name');
     }
     public function sessions()
-{
+    {
     return $this->hasMany(Session::class);
-}
+    }
+
+    public function category()
+    {
+    return $this->hasOne(Category::class,'slug','type');
+    }
 
 
 }

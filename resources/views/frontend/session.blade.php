@@ -3,6 +3,9 @@
 @section('title', config('app.name'))
 @section('content')
 <div class="container py-4 py-lg-5">
+  <div class="d-flex justify-content-end mb-2">
+    <a href="javascript:history.back()" class="heroBtn ms-md-5">Back</a>
+  </div>
   <div class="row">
     <div class="col-lg-8">
 

@@ -19,26 +19,26 @@
                         <div class="attendee-card shadow">
                             <div class="attendee-card-box">
                                 <div class="attendee-profile">
-    @if(!empty($attendee->photo) && !empty($attendee->photo->file_path))
-        <img src="{{ $attendee->photo->file_path }}" alt="">
-    @else
-        <span class="small-heading-blue mb-0">{{ shortenName($attendee->name) }}</span>
-    @endif
-</div>
+                                        @if(!empty($attendee->photo) && !empty($attendee->photo->file_path))
+                                            <img src="{{ $attendee->photo->file_path }}" alt="">
+                                        @else
+                                            <span class="small-heading-blue mb-0">{{ shortenName($attendee->name) }}</span>
+                                        @endif
+                                </div>
 
                                 
                                 <div class="abc">
                                     <span class="blue-text-18 mb-2">Full Name</span>
-                                    <span class="small-heading-black fw-semibold">{{$attendee->full_name ?? ''}}</span>
+                                    <span class="small-heading-black fw-semibold">{{$attendee->full_name ? truncateString($attendee->full_name, 13) : ''}}</span>
                                 </div>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Company</span>
-                                <span class="small-heading-black fw-semibold">{{$attendee->company ?? 'NA'}}</span>
+                                <span class="small-heading-black fw-semibold">{{$attendee->company ? truncateString($attendee->company, 25) : ''}}</span>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Job Title</span>
-                                <span class="small-heading-black fw-semibold">{{$attendee->designation ?? 'NA'}}</span>
+                                <span class="small-heading-black fw-semibold">{{$attendee->designation ? truncateString($attendee->designation, 20) : ''}}</span>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Email ID</span>

@@ -432,3 +432,12 @@ if (!function_exists('fetchBadgeTemplates')) {
        return $emailBadgeTemplate;
     }
 }
+
+if (!function_exists('truncateString')) {
+    function truncateString($string, $length) {
+        if (strlen($string) > $length) {
+            return substr($string, 0, $length) . '...';
+        }
+        return $string;
+    }
+}

@@ -205,9 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const f = createField(cloneData.type, cloneData);
             canvas.insertBefore(f, wrapper.nextSibling);
         });
-
-        actions.appendChild(delBtn);
-        actions.appendChild(dupBtn);
+        
+        if (data && data.is_delete_able !== undefined && data.is_delete_able == 0) {
+            
+        }else{
+           actions.appendChild(delBtn);
+           actions.appendChild(dupBtn);
+        }
 
         wrapper.appendChild(label);
         wrapper.appendChild(input);
@@ -520,10 +524,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Decide endpoint/method
         const endpoint = formId
-            ? `{{ url('/form-builder/forms') }}/${formId}`                // forms.update
+            ? `{{ route('forms.store') }}`                // forms.update
             : `{{ route('forms.store') }}`;                  // forms.store
 
-        const method = formId ? 'PUT' : 'POST';
+        const method = 'POST';
 
         fetch(endpoint, {
             method,

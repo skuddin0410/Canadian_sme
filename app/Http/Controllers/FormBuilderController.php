@@ -16,7 +16,7 @@ class FormBuilderController extends Controller
      */
     public function index()
     {
-        $form = Form::find(1);;
+        $form = Form::find(1);
         return view('formbuilder.index',compact('form'));
     }
 
@@ -45,8 +45,10 @@ class FormBuilderController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
-        $form = Form::create($request->all());
+        $form = Form::updateOrCreate(
+           ['id' => 1], // The condition to check if the record exists (in this case, the form with id = 1)
+           $request->all() // The data to update or insert
+        );
 
         return response()->json(['form' => $form, 'message' => 'Form created successfully']);
     
