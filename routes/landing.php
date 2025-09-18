@@ -28,6 +28,9 @@ Route::get('/speaker/{id}', [LandingController::class, 'speaker'])->name('speake
 
 Route::get('/venue', [LandingController::class, 'venue'])->name('venue');
 
+Route::get('/update-user/{userId}', [LandingController::class, 'showUpdateForm'])->name('update-user');
+Route::put('/update-user/{userId}', [LandingController::class, 'updateUserDetails'])->name('update-user');
+
 
 Route::prefix('cms')->group(function () {
     Route::get('/{slug}', [PageController::class, 'appContent']);

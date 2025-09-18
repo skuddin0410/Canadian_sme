@@ -10,12 +10,14 @@ use App\Models\Company;
 use App\Models\Session;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Crypt;
 
 class LandingController extends Controller
 {
     /**
      * Show the landing page.
-     */
+    */
+
     public function index()
     {   
         $event = Event::with(['photo'])->first();
@@ -264,8 +266,7 @@ public function session(Request $request , $id){
     
     
     
-    public function venue()
-{
+    public function venue(){
     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
     $location = $locationSetting ? $locationSetting->value : null;
 
@@ -276,9 +277,35 @@ public function session(Request $request , $id){
         : null;
 
     return view('frontend.venue', compact('location', 'mapUrl'));
-}
+    }
 
 
+    public function showUpdateForm($userId){
+        $decryptedUserId = Crypt::decryptString($request->input('encryptedId'));
+        $user = User::findOrFail($userId);
+        return view('frontend.update-user-form', compact('user'));
+    }
+
+    public function updateUserDetails(Request $request, $userId)
+    {
+    
+    $validatedData = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'company' => 'nullable|string|max:255',
+        'designation' => 'nullable|string|max:255',
+        'bio' => 'nullable|string|max:500',
+    ]);
+
+    // Find the user and update their details
+    $encryptedUserId = Crypt::encryptString($userId);
+    $user = User::findOrFail($userId);
+    $user->update($validatedData);
+
+    // Redirect or show a success message
+    return redirect()->route('update-user', $user->id)->with('success', 'Your details have been updated successfully!');
+    }
 
 
 }
