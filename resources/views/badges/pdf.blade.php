@@ -6,6 +6,12 @@
 </head>
 <body style="margin:0; padding:0; background:white;">
   <div style="width:100%; max-width:1300px; margin:0 auto; padding:20px; box-sizing:border-box;">
+      <a 
+      href="{{ route('attendee-users.index') }}" 
+      style="margin-bottom:20px; padding:10px 20px; background:#555; color:#fff; border:none; cursor:pointer; text-decoration:none; display:inline-block; border-radius:4px;"
+    >
+       Back
+    </a>
     <button
       onclick="this.style.display='none'; window.print(); setTimeout(()=>{ this.style.display='inline-block'; }, 0)"
       style="margin-bottom:20px; padding:10px 20px; background:#4CAF50; color:#fff; border:none; cursor:pointer; display:inline-block;"
