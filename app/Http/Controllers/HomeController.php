@@ -258,8 +258,9 @@ class HomeController extends Controller
             }
 
         }
-        return redirect()->back()->with('success','App Branding media updated successfully');
-        // return view('splash'); 
+        session()->flash('success', 'Saved successfully.');
+        //return redirect()->back()->with('success','App Branding media updated successfully');
+        return view('splash'); 
     }
 
     public function registrationSettings(Request $request){
