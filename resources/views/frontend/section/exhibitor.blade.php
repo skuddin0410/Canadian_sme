@@ -30,16 +30,16 @@
                         </div>
                         <div class="abc">
                             <span class="blue-text-18 mb-2">Exhibitor</span>
-                            <span class="small-heading-black fw-semibold">{{$exhibitor->name ?? ''}}</span>
+                            <span class="small-heading-black fw-semibold">{{$exhibitor->name ? truncateString($exhibitor->name, 30) : ''}}</span>
                         </div>
                     </div>
                     <div class="">
                         <span class="blue-text-18 mb-2">Booth Number</span>
-                        <span class="small-heading-black fw-semibold">{{$exhibitor->booth ?? 'NA'}}</span>
+                        <span class="small-heading-black fw-semibold">{{$exhibitor->booth ?? ''}}</span>
                     </div>
                     <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
-                        <span class="small-heading-black fw-semibold">{{$session->title ?? 'NA'}}</span>
+                        <span class="small-heading-black fw-semibold">{{$session->title ? truncateString($session->title, 40) : ''}}</span>
                     </div>
                     <div>
                         <a class="view-more position-relative d-flex

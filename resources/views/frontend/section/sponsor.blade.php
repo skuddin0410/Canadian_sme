@@ -37,7 +37,7 @@
                                 </div>
                                 </a>
                                 <div class="swiper-img-text">
-                                    <span class="sponsors-name">{{$sponsor->name ?? ''}}</span>
+                                    <span class="sponsors-name">{{$sponsor->name ? truncateString($sponsor->name, 20) : ''}}</span>
                                     @php
                                         $typeColors = match(strtolower($sponsor->type ?? 'general')) {
                                         'gold' => 'gold',

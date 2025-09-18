@@ -22,12 +22,16 @@ class LandingController extends Controller
         $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])->where('start_time', '>=', now())
         ->orderBy('start_time', 'ASC')
         ->first();
-        // $shareUrl = $event ? route('events.show', $event->id) : url('/');
-        $shareUrl = $event ? route('events.show', $event->id) : url()->current();
 
-        $speakers = $session->speakers; 
-        $exhibitors = $session->exhibitors->take(3);
-        $sponsors = $session->sponsors;
+        $shareUrl = $event ? route('events.show', $event->id) : url()->current();
+        
+        $speakers = User::with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereIn("name", ["Speaker"]);
+                })->orderBy('created_at', 'DESC')->take(4)->get();
+
+        $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(3)->get();
+        $sponsors = Company::where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
         $attendees = $session->attendees->take(3);
         $schedules = $this->schudled();
         $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
