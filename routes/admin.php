@@ -82,6 +82,9 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('speakers.allow-access');
     Route::post('/speakers/{id}/send-mail', [SpeakerController::class, 'sendMail'])
     ->name('speakers.sendMail');
+    Route::delete('/speaker/private-docs/{id}', [SpeakerController::class, 'deletePrivateDoc'])
+    ->name('speaker.private-docs.delete');
+
     Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
     ->name('attendee-users.sendMail');
     Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
@@ -94,6 +97,8 @@ Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     Route::resource('speaker', SpeakerController::class);
     Route::resource('booths', BoothController::class);
     Route::resource('supports', SupportController::class);
+    Route::patch('/support/{id}/status', [SupportController::class, 'updateStatus'])
+    ->name('support.updateStatus');
 
 
 

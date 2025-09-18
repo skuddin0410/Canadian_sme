@@ -23,16 +23,17 @@
 
                 
                     <td>
-                        @if($support->status === 'pending')
-                            <span class="badge bg-warning text-dark">Pending</span>
-                        @elseif($support->status === 'inprogress')
-                            <span class="badge bg-info text-dark">In Progress</span>
-                        @elseif($support->status === 'completed')
-                            <span class="badge bg-success">Completed</span>
-                        @else
-                            <span class="badge bg-secondary">Unknown</span>
-                        @endif
+                        <form action="{{ route('support.updateStatus', $support->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                           <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                           <option value="pending" {{ $support->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                           <option value="inprogress" {{ $support->status === 'inprogress' ? 'selected' : '' }}>In Progress</option>
+                           <option value="completed" {{ $support->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                           </select>
+                        </form>
                     </td>
+
 
                    
                     <td>{{ $support->user?->name ?? 'N/A' }}</td>
