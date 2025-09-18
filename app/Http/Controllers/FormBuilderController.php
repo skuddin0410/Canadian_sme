@@ -158,7 +158,8 @@ public function submitForm(Request $request, $id)
 
     // Create user with role "attendee"
     $user = User::create([
-        'name'        => $data['first_name'].' '.$data['last_name'],
+        'name'        => $data['first_name'],
+        'lastname'        => $data['last_name'],
         'email'       => $data['email'],
         // 'password'    => Hash::make('password'), // default or generate random
         'mobile'       => $data['mobile'] ?? null,

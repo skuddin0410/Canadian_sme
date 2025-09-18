@@ -29,7 +29,7 @@
 
         </div>
         <div class="mb-3">
-            <label>Message</label>
+            <label>Message(supported tags: name, site_name, profile_update_link, site_name, qr_code)</label>
             <textarea name="message" class="form-control" rows="20" required>{{ str_replace('<br>', "\n", $emailTemplate->message) }}</textarea>
         </div>
 

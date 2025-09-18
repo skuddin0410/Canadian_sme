@@ -281,30 +281,43 @@ public function session(Request $request , $id){
 
 
     public function showUpdateForm($userId){
-        $decryptedUserId = Crypt::decryptString($request->input('encryptedId'));
-        $user = User::findOrFail($userId);
-        return view('frontend.update-user-form', compact('user'));
+        try{
+            $decryptedUserId = Crypt::decryptString($userId);
+            $user = User::findOrFail($decryptedUserId);
+            return view('frontend.update-user-form', compact('user'));
+
+        } catch (\Exception $e) {
+          return response()->json(["message" => $e->getMessage()]);
+        }
     }
 
     public function updateUserDetails(Request $request, $userId)
     {
-    
-    $validatedData = $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'company' => 'nullable|string|max:255',
-        'designation' => 'nullable|string|max:255',
-        'bio' => 'nullable|string|max:500',
-    ]);
-
-    // Find the user and update their details
-    $encryptedUserId = Crypt::encryptString($userId);
-    $user = User::findOrFail($userId);
-    $user->update($validatedData);
-
-    // Redirect or show a success message
-    return redirect()->route('update-user', $user->id)->with('success', 'Your details have been updated successfully!');
+        try{
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'company' => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
+            'bio' => 'nullable|string|max:500',
+        ]);
+        
+        $encryptedUserId = Crypt::encryptString($userId);
+        $user = User::findOrFail($userId);
+        $user->update([
+        'name'        => $request->first_name,
+        'lastname'    => $request->last_name,
+        'mobile'      => $request->mobile ?? null,
+        'designation' => $request->designation ?? null,
+        'company'     => $request->company ?? null,
+        'bio'         => $request->bio ?? null,
+        ]);
+        
+        return redirect()->route('update-user', $encryptedUserId)->with('success', 'Your details have been updated successfully!');
+        }catch (\Exception $e) {
+          return response()->json(["message" => $e->getMessage()]);
+        }
     }
 
 
