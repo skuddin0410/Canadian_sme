@@ -374,6 +374,7 @@ public function getExhibitor($exhibitorId)
      
         $exhibitor = Company::with([
             'contentIconFile',
+            'quickLinkIconFile',
             'Docs',
         ])->find($exhibitorId);
 
@@ -389,6 +390,7 @@ public function getExhibitor($exhibitorId)
             'name'     => $exhibitor->name ?? '',
             'word_no'  => $exhibitor->booth ?? '-',
             'avatar'   => $exhibitor->contentIconFile?->file_path ?? asset('images/default.png'),
+            'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
             'location' => $exhibitor->booth ?? '-',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->phone ?? '',
@@ -420,7 +422,7 @@ public function getExhibitor($exhibitorId)
 }
 
 
-public function uploadExhibitorFiles(Request $request, $exhibitorId)
+public function uploadExhibitorFiles(Request $request, $detailsID)
 {
     try {
         if (! $user = JWTAuth::parseToken()->authenticate()) {
@@ -430,18 +432,11 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
             ], 404);
         }
 
-        $exhibitor = Company::find($exhibitorId);
-      
-        if (! $exhibitor) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load exhibitor details!',
-                'data'    => collect(),
-            ], 404);
-        }
+        //$exhibitor = Company::find($exhibitorId);
 
         $validator = Validator::make($request->all(), [
             'file' => 'required|image|mimes:jpg,jpeg,png',
+            'type' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -451,28 +446,56 @@ public function uploadExhibitorFiles(Request $request, $exhibitorId)
                 'errors'  => $validator->errors()->first(),
             ], 422);
         }
+        
+        if($request->type == "exhibitor" || $request->type == "sponsor") {  
 
-        if ($request->file("file")) {
-            $fileRecord = $this->imageUpload(
-                $request->file("file"),
-                'companies',
-                $exhibitor->id,
-                'companies',
-                'private_docs'
-            );
-         
+            if ($request->file("file")) {
+                $fileRecord = $this->imageUpload(
+                    $request->file("file"),
+                    'companies',
+                    $detailsID,
+                    'companies',
+                    'private_docs'
+                );
+             
+            }
+        
+            $exhibitor = Company::where('id', $detailsID)->with(['Docs' => function ($query) {
+                $query->latest()->take(1); 
+             }])->first();
+     
+            return response()->json([
+                'message'   => 'File uploaded successfully.',
+                'file_id'   =>  !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->id : null,
+                'image_url' => !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->file_path : asset('images/default.png'),
+                "type"=>$request->type
+            ]);
+
+        }else{
+            
+            if ($request->file("file")) {
+                $fileRecord = $this->imageUpload(
+                    $request->file("file"),
+                    'users',
+                    $detailsID,
+                    'users',
+                    'private_docs'
+                );
+            }
+
+            $user = User::where('id', $detailsID)->with(['privateDocs' => function ($query) {
+                $query->latest()->take(1); 
+             }])->first();
+
+            return response()->json([
+                'message'   => 'File uploaded successfully.',
+                'file_id'   =>  !empty($user->privateDocs) ? $user->privateDocs[0]->id : null,
+                'image_url' => !empty($user->privateDocs) ? $user->privateDocs[0]->file_path : asset('images/default.png'),
+                "type"=>$request->type
+            ]);
+
         }
-    
-        $exhibitor = Company::where('id', $exhibitor->id)->with(['Docs' => function ($query) {
-            $query->latest()->take(1); 
-         }])->first();
- 
-        return response()->json([
-          
-            'message'   => 'File uploaded successfully.',
-            'file_id'   =>  !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->id : null,
-            'image_url' => !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->file_path : asset('images/default.png'),
-        ]);
+   
 
     } catch (\Exception $e) {
         return response()->json([
@@ -888,7 +911,7 @@ public function getAllExhibitor(Request $request){
                 ], 401);
             }
 
-                $sponsor = Company::with(['contentIconFile', 'Docs'])->where('id', $request->id)->where('is_sponsor', 1)->first();
+                $sponsor = Company::with(['contentIconFile', 'Docs','quickLinkIconFile'])->where('id', $request->id)->where('is_sponsor', 1)->first();
 
                 if (!$sponsor) {
                     return response()->json([
@@ -901,6 +924,7 @@ public function getAllExhibitor(Request $request){
                     "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
                     "avatar" => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
+                    'banner'   => $sponsor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
                     "word_no" => $sponsor->booth ?? '',
                     "location" => $sponsor->booth ?? '',
                     "email" => $sponsor->email ?? '',
