@@ -14,7 +14,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Attendee List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                            <a href="{{route('attendee-users.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
+                            <a href="{{route('attendee-users.export')}}" class="btn btn-outline-primary btn-pill">Export Users</a>
+                            <a href="#" class="btn btn-outline-primary btn-pill" id="importusers" onclick="openImportModal()">Import Users</a>
                             <a href="{{ route('attendee-users.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add Attendee
                             </a>
@@ -166,6 +167,28 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="openImportModal" tabindex="-1" role="dialog" aria-labelledby="ImportModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{route('user_import')}}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mt-3">
+                        <label for="userImportFile">Import Users (CSV, XLSX)</label>
+                        <input type="file" id="userImportFile" class="form-control" name="file" accept=".csv, .xlsx" required>
+                        <small class="form-text text-muted">After the import, an email will be sent to each user.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeImportModal()">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -254,6 +277,14 @@ function closeModal(){
     document.getElementById('notificationTemplate').value=''
     document.getElementById('badge').value=''
 
+}
+
+function openImportModal(actionType) {
+    $('#openImportModal').modal('show');
+}
+
+function closeImportModal(){
+    $('#openImportModal').modal('hide'); 
 }
 </script>
 
