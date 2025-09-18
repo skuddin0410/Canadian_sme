@@ -289,11 +289,11 @@
                                     <button type="button" class="btn btn-outline-secondary" onclick="duplicateCategory()">
                                         <i class="fas fa-copy"></i> Duplicate Category
                                     </button>
-                                      @if($ticketCategory->ticketTypes->count() == 0)
+                                    @if($ticketCategory->ticketTypes->count() == 0)
                                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                         <i class="fas fa-trash"></i> Delete Category
                                        </button>
-                                      @endif
+                                    @endif
 
 
                                 </div>
@@ -475,16 +475,7 @@ function duplicateCategory() {
         window.location.href = '{{ route("admin.ticket-categories.create") }}?duplicate_from={{ $ticketCategory->id }}';
     }
 }
-// function confirmDelete(id) {
-//     if (confirm("Are you sure you want to delete this category?")) {
-//         document.getElementById('delete-form-' + id).submit();
-//     }
-// }
 
-// function confirmDelete() {
-//     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-//     modal.show();
-// }
 
 // Form validation
 document.getElementById('categoryForm').addEventListener('submit', function(e) {

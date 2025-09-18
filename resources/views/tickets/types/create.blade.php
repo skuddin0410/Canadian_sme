@@ -37,6 +37,7 @@
                                                     </option>
                                                 @endforeach
                                             </select>
+                                          
                                             @error('event_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -77,20 +78,22 @@
                                 </div>
                                 </div>
 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="session_id" class="font-weight-bold">
-                                                Session <span class="text-danger">*</span>
-                                            </label>
-                                            <select class="form-control @error('session_id') is-invalid @enderror" 
-                                                    id="session_id" name="session_id" required>
-                                                <option value="">Select Event First</option>
-                                            </select>
-                                            @error('session_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
+                                           <div class="col-md-6">
+    <div class="form-group">
+    <label for="session_id" class="font-weight-bold">
+        Session <span class="text-danger">*</span>
+    </label>
+    <select name="session_id" id="session_id" class="form-control" required>
+        <option value="">Select Session</option>
+    </select>
+    @error('session_id')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+</div>
+
+
                                </div>
 
                                 
@@ -448,189 +451,133 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    // Load sessions when event is selected
-        $('#event_id').change(function() {
-            const eventId = $(this).val();
-            const sessionSelect = $('#session_id');
-            
-            sessionSelect.html('<option value="">Loading sessions...</option>').prop('disabled', true);
-            
-            if (eventId) {
-                $.ajax({
-                    url: `/events/${eventId}/sessions`,
-                    method: 'GET',
-                    success: function(response) {
-                        sessionSelect.html('<option value="">Select Session</option>').prop('disabled', false);
-                     
-                        if (response.sessions && response.sessions.length > 0) {
-                            response.sessions.forEach(function(session) {
-                                sessionSelect.append(`<option value="${session.id}">${session.title}</option>`);
-                            });
-                        } else {
-                            sessionSelect.append('<option value="" disabled>No sessions available</option>');
-                        }
-                    },
-                    error: function() {
-                        sessionSelect.html('<option value="">Error loading sessions</option>').prop('disabled', false);
-                    }
+    const events = @json($events); 
+
+    document.getElementById('event_id').addEventListener('change', function() {
+        const eventId = this.value;
+        const sessionSelect = document.getElementById('session_id');
+
+        // Clear old options
+        sessionSelect.innerHTML = '<option value="">Select Session</option>';
+
+        if (eventId) {
+            const selectedEvent = events.find(e => e.id == eventId);
+            if (selectedEvent && selectedEvent.sessions.length) {
+                selectedEvent.sessions.forEach(session => {
+                    const opt = document.createElement('option');
+                    opt.value = session.id;
+                    opt.textContent = session.title;
+                    sessionSelect.appendChild(opt);
                 });
-            } else {
-                sessionSelect.html('<option value="">Select Event First</option>').prop('disabled', false);
+            }
+        }
+    });
+</script>
+
+<script>
+$(document).ready(function() {
+
+  $('#event_id').on('change', function () {
+    var eventId = $(this).val();
+    if (eventId) {
+        $.ajax({
+            url: '/admin/events/' + eventId + '/sessions',
+            type: 'GET',
+            success: function (data) {
+                $('#session_id').empty().append('<option value="">Select Session</option>');
+                $.each(data, function (key, session) {
+                    $('#session_id').append('<option value="'+ session.id +'">'+ session.title +'</option>');
+                });
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
             }
         });
+    } else {
+        $('#session_id').empty().append('<option value="">Select Session</option>');
+    }
+});
 
-    $('#grouptTicket').hide(); 
-    $('#earlyBird').hide();
 
+    // Initialize toggles based on old input
+    $('#groupSettings').toggle($('#is_group').is(':checked'));
+    $('#earlyBirdSettings').toggle($('#enable_early_bird').is(':checked'));
+
+    // Group ticket toggle
     $('#is_group').change(function() {
-        if ($(this).is(':checked')) {
-            $('#groupSettings').slideDown();
-        } else {
-            $('#groupSettings').slideUp();
-        }
-        
+        $('#groupSettings').slideToggle(this.checked);
     });
 
     // Early bird toggle
     $('#enable_early_bird').change(function() {
-        if ($(this).is(':checked')) {
-            $('#earlyBirdSettings').slideDown();
-        } else {
-            $('#earlyBirdSettings').slideUp();
-        }
-        
+        $('#earlyBirdSettings').slideToggle(this.checked);
     });
-    
+
+    // Category-based visibility
     $('#category_id').change(function() {
-        const category_id = $(this).val();
-        const category_name = $.trim($("#category_id option:selected").text());
+        const categoryName = $.trim($("#category_id option:selected").text());
 
-        if(category_name == 'General' || category_name == 'No Category' || category_name == 'VIP' || category_name == 'Student'){
-           $('#grouptTicket').hide(); 
-           $('#earlyBird').hide();
-        }
+        $('#grouptTicket, #earlyBird').hide();
 
-        if(category_name == 'Early Bird'){
-           $('#grouptTicket').hide(); 
-           $('#earlyBird').show();
-        }
-
-        if(category_name == 'Group'){
-           $('#grouptTicket').show(); 
-           $('#earlyBird').hide();
+        if (categoryName === 'Early Bird') {
+            $('#earlyBird').show();
+        } else if (categoryName === 'Group') {
+            $('#grouptTicket').show();
         }
     });
-    
+
+    // Access permissions toggle
+    const allPermission = $('#perm_all');
+    const otherPermissions = $('input[name="access_permissions[]"]:not(#perm_all)');
+
+    allPermission.change(function() {
+        if (this.checked) otherPermissions.prop('checked', false);
+    });
+
+    otherPermissions.change(function() {
+        if (this.checked) allPermission.prop('checked', false);
+    });
 
 });
-
-
 </script>
+
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Form elements
+document.addEventListener('DOMContentLoaded', function () {
+    const events = @json($events);
     const eventSelect = document.getElementById('event_id');
-    const categorySelect = document.getElementById('category_id');
-    const nameInput = document.getElementById('name');
-    const descriptionInput = document.getElementById('description');
-    const priceInput = document.getElementById('base_price');
-    const quantityInput = document.getElementById('total_quantity');
-    
-    // Preview elements
-    const previewName = document.getElementById('previewName');
-    const previewEvent = document.getElementById('previewEvent');
-    const previewCategory = document.getElementById('previewCategory');
-    const previewDescription = document.getElementById('previewDescription');
-    const previewPrice = document.getElementById('previewPrice');
-    const previewQuantity = document.getElementById('previewQuantity');
-    
-    // Update preview in real-time
-    function updatePreview() {
-        // Name
-        previewName.textContent = nameInput.value || 'Ticket Type Name';
-        
-        // Event
-        const selectedEvent = eventSelect.options[eventSelect.selectedIndex];
-        previewEvent.textContent = selectedEvent.value ? selectedEvent.text : 'Select an event';
-        
-        // Category
-        const selectedCategory = categorySelect.options[categorySelect.selectedIndex];
-        if (selectedCategory.value) {
-            previewCategory.textContent = selectedCategory.text;
-            previewCategory.style.backgroundColor = selectedCategory.dataset.color || '#6c757d';
-            previewCategory.style.display = 'inline-block';
-        } else {
-            previewCategory.style.display = 'none';
-        }
-        
-        // Description
-        previewDescription.textContent = descriptionInput.value || 'Add a description...';
-        
-        // Price
-        const price = parseFloat(priceInput.value) || 0;
-        previewPrice.textContent = '$' + price.toFixed(2);
-        
-        // Quantity
-        const quantity = parseInt(quantityInput.value) || 0;
-        previewQuantity.textContent = quantity.toLocaleString() + ' available';
-    }
-    
-    // Attach event listeners
-    [eventSelect, categorySelect, nameInput, descriptionInput, priceInput, quantityInput].forEach(element => {
-        element.addEventListener('input', updatePreview);
-        element.addEventListener('change', updatePreview);
-    });
-    
-    // Initial preview update
-    updatePreview();
-    
-    // Form validation
-    document.getElementById('ticketTypeForm').addEventListener('submit', function(e) {
-        const maxQuantity = document.getElementById('max_quantity_per_order');
-        const minQuantity = document.getElementById('min_quantity_per_order');
-        
-        if (maxQuantity.value && minQuantity.value) {
-            if (parseInt(maxQuantity.value) < parseInt(minQuantity.value)) {
-                e.preventDefault();
-                alert('Maximum quantity per order cannot be less than minimum quantity per order.');
-                maxQuantity.focus();
-                return false;
-            }
-        }
-        
-        const startDate = document.getElementById('sale_start_date');
-        const endDate = document.getElementById('sale_end_date');
-        
-        if (startDate.value && endDate.value) {
-            if (new Date(startDate.value) >= new Date(endDate.value)) {
-                e.preventDefault();
-                alert('Sale end date must be after sale start date.');
-                endDate.focus();
-                return false;
-            }
-        }
-    });
-    
-    // Access permissions logic
-    const allPermission = document.getElementById('perm_all');
-    const otherPermissions = document.querySelectorAll('input[name="access_permissions[]"]:not(#perm_all)');
-    
-    allPermission.addEventListener('change', function() {
-        if (this.checked) {
-            otherPermissions.forEach(perm => perm.checked = false);
-        }
-    });
-    
-    otherPermissions.forEach(perm => {
-        perm.addEventListener('change', function() {
-            if (this.checked) {
-                allPermission.checked = false;
-            }
-        });
-    });
-});
+    const sessionSelect = document.getElementById('session_id');
 
+    function populateSessions(eventId) {
+        sessionSelect.innerHTML = '<option value="">Select Session</option>';
+        const selectedEvent = events.find(e => e.id == eventId);
+
+        if (selectedEvent && selectedEvent.sessions.length > 0) {
+            selectedEvent.sessions.forEach(session => {
+                const opt = document.createElement('option');
+                opt.value = session.id;
+                opt.textContent = session.title;
+                if (session.id == "{{ old('session_id') }}") {
+                    opt.selected = true;
+                }
+                sessionSelect.appendChild(opt);
+            });
+        }
+    }
+
+    // Load sessions when event changes
+    eventSelect.addEventListener('change', function () {
+        populateSessions(this.value);
+    });
+
+    // Restore sessions if old value exists
+    if (eventSelect.value) {
+        populateSessions(eventSelect.value);
+    }
+});
 </script>
+
+
+
+
 @endsection
