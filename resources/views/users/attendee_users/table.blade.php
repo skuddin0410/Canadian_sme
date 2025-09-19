@@ -78,7 +78,7 @@
   <div class="d-flex gap-2">
     <form action="{{ route('attendee-users.allow-access', $user->id) }}" method="POST" style="display:inline;">
     @csrf
-    @if($user->is_approve ==1)
+    @if($user->is_approve ==0)
         <button type="submit" class="btn btn-sm btn-primary" title="Allow app access">
           Allow App Access
         </button>

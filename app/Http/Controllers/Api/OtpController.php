@@ -130,6 +130,13 @@ public function verify(Request $request)
     $user->assignRole('Attendee');
 
     try {
+
+        if($user->is_approve == 0){
+           return response()->json([
+            'success'    => false,
+            'message'    => 'You have been blocked by the admin. Please contact support for assistance.',
+           ]); 
+        }
        
         $credentials = [
             'email'    => $request->email,

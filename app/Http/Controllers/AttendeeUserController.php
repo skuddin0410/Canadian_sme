@@ -446,6 +446,11 @@ public function bulkAction(Request $request)
             if (strpos($message, '{{qr_code}}') !== false) {
               $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
             }
+
+            if (strpos($message, '{{profile_update_link}}') !== false) {
+              $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
+              $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
+            }
           
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
@@ -457,15 +462,9 @@ public function bulkAction(Request $request)
             
                 if($request->onesignal_userid){
                     OneSignal::sendNotificationToUser(
-                        $message,                     // 👈 body text
-                        $request->onesignal_userid,   // 👈 user/player id
-                        null,                         // URL (optional)
-                        null,                         // data (optional)
-                        null,                         // buttons (optional)
-                        null,                         // schedule (optional)
-                        $subject                      // 👈 title
+                        $message,   // Notification message
+                        $request->onesignal_userids   // OneSignal Player ID
                     );
-
                     notification($user->id, 'bulk_notification',null, $subject, $message);
             }
         }

@@ -801,6 +801,14 @@ public function checkSession(Request $request)
             'message' => 'Unauthorized'
         ], 401);
     }
+    
+    if($user->is_approve == 0){
+       return response()->json([
+        'success'    => false,
+        'message'    => 'You have been blocked by the admin. Please contact support for assistance.',
+       ],401); 
+    }
+       
 
     $session = SessionDate::where('user_id', $user->id)->first();
 
