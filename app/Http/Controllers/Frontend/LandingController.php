@@ -36,8 +36,7 @@ class LandingController extends Controller
         $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
         $attendees = $session->attendees->take(3);
         $schedules = $this->schudled();
-        $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
-        $location = $locationSetting ? $locationSetting->value : null;
+        $location = !empty($event->location) ? $event->location : null;
 
         $googleApiKey = config('services.google_maps.key');
         $mapUrl = $location && $googleApiKey
@@ -269,6 +268,8 @@ public function session(Request $request , $id){
     public function venue(){
     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
     $location = $locationSetting ? $locationSetting->value : null;
+    $event = Event::with(['photo'])->first();
+    $location = $event->location ?? '';
 
     $googleApiKey = config('services.google_maps.key'); 
 
