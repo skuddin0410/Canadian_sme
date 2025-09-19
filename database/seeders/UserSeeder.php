@@ -20,48 +20,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {   
 
-          $categories = [
-        // 🔹 Summit / Conference related
-        [ 'name' => 'Leadership Summit', 'type' => 'event' ],
-        [ 'name' => 'Startup & Investment', 'type' => 'event' ],
-        [ 'name' => 'Digital Marketing', 'type' => 'event' ],
-        [ 'name' => 'Sustainability & Environment', 'type' => 'event' ],
-        [ 'name' => 'Blockchain & FinTech', 'type' => 'event' ],
-        [ 'name' => 'E-commerce & Retail', 'type' => 'event' ],
-        [ 'name' => 'Government & Policy', 'type' => 'event' ],
-        [ 'name' => 'Women in Leadership', 'type' => 'event' ],
-        [ 'name' => 'Event', 'type' => 'tags' ],
-        [ 'name' => 'CloudTrends', 'type' => 'tags' ],
-        [ 'name' => 'DataSecurity', 'type' => 'tags' ],
-        [ 'name' => 'TechnoVation', 'type' => 'tags' ],
-        [ 'name' => 'Gold','type' => 'sponsor', 'color' => '#FFD700' ], 
-        [ 'name' => 'Majlislounge','type' => 'sponsor', 'color' => '#8B0000' ],
-        [ 'name' => 'Platinum','type' => 'sponsor', 'color' => '#E5E4E2' ], 
-        [ 'name' => 'Silver','type' => 'sponsor', 'color' => '#C0C0C0' ], 
-        [ 'name' => 'Innovationpartner', 'type' => 'sponsor', 'color' => '#1E90FF' ],
-        [ 'name' => 'Bronze','type' => 'sponsor', 'color' => '#CD7F32' ], 
-    ];
-
-      foreach ($categories as $category) {
-            Category::create([
-                'name' => $category['name'],
-                'slug' => Str::slug($category['name']),
-                'type' => $category['type']
-            ]);
-        }
-
-        $eventAdmin = User::create([
-            'name' => 'Event',
-            'lastname'=>'Admin',
-            'email' => 'event@admin.com',
-            'mobile' => '123345678',
-            'password' => Hash::make('password'),
-        ]);
         $groups = config('roles.groups');
- 
-        $eventAdmin->assignRole('Admin');
-        notification($eventAdmin->id,'welcome');
-        qrCode($eventAdmin->id);
 
         $exhibitorsNames = [
             ['first_name' => 'Liam',     'last_name' => 'Smith'],
@@ -258,29 +217,5 @@ class UserSeeder extends Seeder
         }
 
        
-
-
-        $SupportStaff = User::create([
-            'name' => 'Support Staff',
-            'lastname'=>'Or Helpdesk',
-            'email' => 'support@staff.com',
-            'mobile' => '12345678',
-            'password' => Hash::make('password'),
-        ]);
-        $SupportStaff->assignRole('Support Staff Or Helpdesk');
-        qrCode($SupportStaff->id); 
-        notification($SupportStaff->id,'welcome');
-
-        $registrationDesk = User::create([
-            'name' => 'Registration',
-            'lastname'=>'Desk',
-            'email' => 'registration@desk.com',
-            'mobile' => '12345678',
-            'password' => Hash::make('password'),
-        ]);
-        $registrationDesk->assignRole('Registration Desk');
-        qrCode($registrationDesk->id);
-        notification($registrationDesk->id,'welcome');
-
     }
 }

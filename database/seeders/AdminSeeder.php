@@ -24,6 +24,40 @@ class AdminSeeder extends Seeder
         $user->password = Hash::make('password');
         $user->save();
         $user->assignRole('Admin');
-        //qrCode($user->id);
+        
+       $eventAdmin = User::create([
+            'name' => 'Event',
+            'lastname'=>'Admin',
+            'email' => 'event@admin.com',
+            'mobile' => '123345678',
+            'password' => Hash::make('password'),
+        ]);
+       
+        $eventAdmin->assignRole('Admin');
+        notification($eventAdmin->id,'welcome');
+        qrCode($eventAdmin->id);
+
+
+        $SupportStaff = User::create([
+            'name' => 'Support Staff',
+            'lastname'=>'Or Helpdesk',
+            'email' => 'support@staff.com',
+            'mobile' => '12345678',
+            'password' => Hash::make('password'),
+        ]);
+        $SupportStaff->assignRole('Support Staff Or Helpdesk');
+        qrCode($SupportStaff->id); 
+        notification($SupportStaff->id,'welcome');
+
+        $registrationDesk = User::create([
+            'name' => 'Registration',
+            'lastname'=>'Desk',
+            'email' => 'registration@desk.com',
+            'mobile' => '12345678',
+            'password' => Hash::make('password'),
+        ]);
+        $registrationDesk->assignRole('Registration Desk');
+        qrCode($registrationDesk->id);
+        notification($registrationDesk->id,'welcome');
     }
 }
