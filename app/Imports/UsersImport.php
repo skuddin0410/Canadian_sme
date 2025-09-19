@@ -25,25 +25,45 @@ class UsersImport implements ToModel,WithStartRow
     public function model(array $row)
     {   
         $import = ImportData::create([
-            'first_name'=> $row[0] ?? '',
-            'last_name'=> $row[1] ?? '',
-            'email'=> $row[2] ?? '',
-            'mobile'=> $row[3] ?? '',
-            'added_by'=> auth()->user()->id
+             "name" =>  $row[0],
+            "lastname" => $row[1],
+            "email" => $row[2] ?? '',
+            "status" => $row[3] ?? '',
+            "gdpr_consent" => $row[4] == 'confirmed' ? 1 : 0,
+            "bio" => $row[5] ?? '',
+            "company" => $row[6] ?? '',
+            "designation" => $row[7] ?? '',
+            "mobile" => $row[8] ?? '',
+            "dob" => $row[9] ?? '',
+            "facebook_url" => $row[10] ?? '',
+            "twitter_url" => $row[11] ?? '',
+            "linkedin_url" => $row[12] ?? '',
+            "instagram_url" => $row[13] ?? '',
         ]);
         
         $contact = User::where('email', $row[2])->first();
         if( empty($contact) ){
-
-            $username = strtolower($row[0]) . rand(10, 1000) . time();
             $user = new User();
             $user->name =  $row[0];
             $user->lastname = $row[1];
-            $user->username = $username;
             $user->email = $row[2] ?? '';
-            $user->mobile = $row[3] ?? '';
+            $user->status =  $row[3] ?? '';
+            $user->gdpr_consent =  ($row[4] == 'confirmed') ? 1 : 0;
+            $user->bio = $row[5] ?? '';
+            $user->company = $row[6] ?? '';
+            $user->designation = $row[7] ?? '';
+            $user->mobile = $row[8] ?? '';
+            $user->dob = $row[9] ?? '';
+            $user->facebook_url = $row[10] ?? '';
+            $user->twitter_url = $row[11] ?? '';
+            $user->linkedin_url = $row[12] ?? '';
+            $user->instagram_url = $row[13] ?? '';
             $user->save();
-            $user->assignRole($this->role);
+            $user->assignRole('Attendee');
+
+            qrCode($user->id);
+            notification($user->id);
+            sendNotification("Welcome Email",$user);
         } 
 
     }
