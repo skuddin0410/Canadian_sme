@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Event;
 use App\Models\TicketType;
 use Illuminate\Support\Str;
@@ -64,7 +65,7 @@ class TicketTypeController extends Controller
     'total_quantity' => 'required|integer|min:1',
     'min_quantity_per_order' => 'required|integer|min:1',
     'max_quantity_per_order' => 'nullable|integer|min:1',
-    'sale_start_date' => 'nullable|date',
+    'sale_start_date' =>['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
     'sale_end_date' => 'nullable|date|after:sale_start_date',
     'requires_approval' => 'boolean',
     'is_active' => 'boolean',
@@ -130,7 +131,7 @@ class TicketTypeController extends Controller
             'total_quantity' => 'required|integer|min:1',
             'min_quantity_per_order' => 'required|integer|min:1',
             'max_quantity_per_order' => 'nullable|integer|min:1',
-            'sale_start_date' => 'nullable|date',
+            'sale_start_date' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
             'sale_end_date' => 'nullable|date|after:sale_start_date',
             'requires_approval' => 'boolean',
             'is_active' => 'boolean',

@@ -196,7 +196,7 @@
                                         <div class="mb-3">
                                             <label for="sale_start_date" class="form-label">Sale Start Date</label>
                                             <input type="datetime-local" class="form-control @error('sale_start_date') is-invalid @enderror id="sale_start_date" name="sale_start_date" 
-                                                   value="{{ old('sale_start_date') }}">
+                                                   value="{{ old('sale_start_date',$ticketType->sale_start_date) }}">
                                             @error('sale_start_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -209,7 +209,7 @@
                                             <label for="sale_end_date" class="form-label">Sale End Date</label>
                                             <input type="datetime-local" class="form-control @error('sale_end_date') is-invalid @enderror" 
                                                    id="sale_end_date" name="sale_end_date" 
-                                                   value="{{ old('sale_end_date') }}">
+                                                   value="{{ old('sale_end_date' , $ticketType->sale_end_date) }}">
                                             @error('sale_end_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
