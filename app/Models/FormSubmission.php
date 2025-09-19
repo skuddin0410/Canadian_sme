@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FormSubmission extends Model
-{
+{   
+    use  Auditable;
+    use AutoHtmlDecode;
     protected $table = 'form_submissions';
      protected $fillable = [
         'form_id',

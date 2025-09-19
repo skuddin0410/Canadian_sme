@@ -28,6 +28,7 @@ use App\Models\MailLog;
 use App\Mail\UserWelcome;
 use App\Models\EmailTemplate;
 use OneSignal;
+use App\Models\Speaker;
 
 
 class AttendeeUserController extends Controller
@@ -100,9 +101,7 @@ class AttendeeUserController extends Controller
      */
     public function create()
     {   
-        $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
-                $q->whereIn("name", ['Speaker']);
-            })->orderBy('created_at', 'DESC')->get();
+        $speakers = Speaker::select('id','name','lastname')->orderBy('created_at', 'DESC')->get();
 
         $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
 
@@ -240,9 +239,7 @@ class AttendeeUserController extends Controller
     {
         
     $user = User::findOrFail($id);
-    $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
-                $q->whereIn("name", ['Speaker']);
-            })->orderBy('created_at', 'DESC')->get();
+    $speakers = Speaker::select('id','name','lastname')->orderBy('created_at', 'DESC')->get();
 
     $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
 

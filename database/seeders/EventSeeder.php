@@ -32,9 +32,9 @@ class EventSeeder extends Seeder
             $end   = (clone $start)->addYears(100);
 
             $events[] = [
-                'title' => "CanadianSME Small Business, ".$start->year,
-                'description' => $faker->paragraph(3),
-                'location' => $faker->address,
+                'title' => "CanadianSME Small Business Summit 2025",
+                'description' => 'Spark your ambition this October at the Metro Toronto Convention Centre, where vision meets action at the CanadianSME Small Business Summit 2025. Under the theme "AI-Driven Innovation: Empowering Canadian SMEs," this summit is your arena to revolutionize business strategies through the transformative power of AI. Explore an exhibition space teeming with cutting-edge solutions and seize unparalleled networking opportunities.',
+                'location' => "North Building, Level 100, 255 Front Street West, Toronto, Ontario, M5V 2W6, Canada",
                 'tags' => implode(',', $faker->randomElements(
                          $categoyName,
                         rand(1, 3)
@@ -46,7 +46,7 @@ class EventSeeder extends Seeder
                 'created_by' => 1,
                 'status' => 'published',
                 'category_id' => $categoryIds[array_rand($categoryIds)],
-                'youtube_link'=> "https://www.youtube.com/watch?v=XTt1my9Hgto"
+                'youtube_link'=> "https://youtu.be/p2WUbF1dXus"
             ];
         }
 
