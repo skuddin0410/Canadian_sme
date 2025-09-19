@@ -57,7 +57,7 @@ class HomeController extends Controller
     // ================= Home Sessions (all sessions from the upcoming session’s event) =================
     $homeSessions = collect();
     if ($upcomingSession && $upcomingSession->event) {
-        $homeSessions = Session::with(['speakers','booth'])
+        $homeSessions = Session::with(['speakers'])
             ->where('is_featured', true)
             ->where('event_id', $upcomingSession->event->id)
             ->orderBy('start_time', 'ASC')
@@ -83,19 +83,15 @@ class HomeController extends Controller
 
    
     // ================= Home Connections (from session_sponsors) =================
- $homeConnections = User::with('photo')
-    ->whereHas("roles", function ($q) {
-        $q->whereIn("name", ['Attendee','Speaker']);
-    })
-    ->limit(3)
-    ->get()
-    ->map(function ($user) {
+    $user = auth()->user();
+    $homeConnections = $user->connections->map(function ($connection) {
         return [
-            "id" => $user->id,
-            "name" => $user->full_name ?? $user->name,
-            "avatarUrl" => $user->photo && $user->photo->file_path ? $user->photo->file_path :asset('images/default.png')
+            "id" => $connection->id,
+            "name" => $connection->full_name ?? $connection->name,
+            "avatarUrl" => $connection->photo && $connection->photo->file_path ? $connection->photo->file_path : asset('images/default.png')
         ];
     });
+
 
 
     // ================= Notifications =================
