@@ -11,6 +11,7 @@ Use App\Models\Company;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Models\Speaker;
 
 class UserSeeder extends Seeder
 {
@@ -48,15 +49,6 @@ class UserSeeder extends Seeder
             ['first_name' => 'Émilie',   'last_name' => 'Gagnon'],
         ];
 
-        $representativeNames = [
-            ['first_name' => 'Oliver',   'last_name' => 'Ouellet'],
-            ['first_name' => 'Zoé',      'last_name' => 'Bouchard'],
-            ['first_name' => 'Nathan',   'last_name' => 'Fortin'],
-            ['first_name' => 'Élodie',   'last_name' => 'Côté'],
-            ['first_name' => 'Thomas',   'last_name' => 'Pelletier'],
-            ['first_name' => 'Julien',   'last_name' => 'Beaulieu'],
-        ];
-
 
         $sponsorsNames = [
             ['first_name' => 'Sarah',    'last_name' => 'Morin'],
@@ -83,6 +75,7 @@ class UserSeeder extends Seeder
         $roles = ['Admin', 'Exhibitor', 'Sponsors', 'Representative', 'Attendee','Speaker'];
         $industries = ['Tech','Healthcare','Education','Finance','Entertainment'];
         $sizes      = ['1-10','11-50','51-200','201-500','500+'];
+        $categoyName = getCategory("tags")->pluck('name')->toArray();
 
         foreach($exhibitorsNames as $exhibitor) {
             $name = $faker->company;
@@ -108,6 +101,28 @@ class UserSeeder extends Seeder
             ];
 
             $company=Company::create($companies); 
+            $companyId = $company->id;
+
+            $user = User::create([
+                'name' => $exhibitor['first_name'],
+                'lastname'=>$exhibitor['last_name'],
+                'company' =>$faker->company,
+                'email' => strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']) . '@example.com',
+                'mobile' => $faker->numerify('##########'),
+                'designation'=>$faker->jobTitle,
+                'bio'=>$faker->paragraph(3),
+                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
+                'access_exhibitor_ids'=> $companyId ,
+                'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
+
+            ]);
+            $user->assignRole(['Attendee', 'Exhibitor']);
+            qrCode($user->id);
+            notification($user->id,'welcome');
         }
 
         foreach ($sponsorsNames as $sponsor) {
@@ -134,61 +149,71 @@ class UserSeeder extends Seeder
                 'type' => Str::lower(collect(config('membership.types'))->random())
             ];
             $company=Company::create($companies); 
+            $companyId = $company->id;
+            $user = User::create([
+                'name' => $sponsor['first_name'],
+                'lastname'=>$sponsor['last_name'],
+                'company' =>$faker->company,
+                'email' => strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']) . '@example.com',
+                'mobile' => $faker->numerify('##########'),
+                'designation'=>$faker->jobTitle,
+                'bio'=>$faker->paragraph(3),
+                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']),
+                'twitter_url'             => "https://twitter.com/" . strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']),
+                'facebook_url'            => "https://facebook.com/" . strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']),
+                'instagram_url'           => "https://instagram.com/" . strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']),
+                'website_url'=>"https://example.com/" . strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']),
+                'access_sponsor_ids'=> $companyId ,
+                'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
+
+            ]);
+            $user->assignRole(['Attendee', 'Sponsors']);
+             qrCode($user->id);
+            notification($user->id,'welcome');
 
         }
 
-        $categoyName = getCategory("tags")->pluck('name')->toArray();
+       
         foreach ($speakers as $speakerVal) {
             $randomThree = collect($groups)->random(3)->toArray();
-            $speaker = User::create([
+            $speaker = Speaker::create([
                 'name' => $speakerVal['first_name'],
                 'lastname'=>$speakerVal['last_name'],
                 'company' =>$faker->company,
                 'email' => strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
-                'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
                 'designation'=>$faker->jobTitle,
                 'bio'=>$faker->paragraph(3),
-                'password' => Hash::make('password'),
-                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'primary_group'=> 'Speaker',
-                'secondary_group'=> implode(',',$randomThree)
+                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'twitter_url'             => "https://twitter.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'facebook_url'            => "https://facebook.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'instagram_url'           => "https://instagram.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'website_url'=>"https://example.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),  
 
             ]);
-            $speaker->assignRole('Speaker');
-            qrCode($speaker->id);
-            notification($speaker->id,'welcome');
+            $speakerId = $speaker->id;
+            $user = User::create([
+                'name' => $speakerVal['first_name'],
+                'lastname'=>$speakerVal['last_name'],
+                'company' =>$faker->company,
+                'email' => strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']) . '@example.com',
+                'mobile' => $faker->numerify('##########'),
+                'designation'=>$faker->jobTitle,
+                'bio'=>$faker->paragraph(3),
+                'linkedin_url'            => "https://www.linkedin.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'twitter_url'             => "https://twitter.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'facebook_url'            => "https://facebook.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'instagram_url'           => "https://instagram.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'website_url'=>"https://example.com/" . strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']),
+                'access_speaker_ids'=>$speakerId,
+                'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
+
+            ]);
+            $user->assignRole(['Attendee', 'Speaker']);
+            qrCode($user->id);
+            notification($user->id,'welcome');
         }
            
-
-        foreach ($representativeNames as $representativeVal) {
-
-        $exhibitorRepresentative = User::create([
-            'name' => $representativeVal['first_name'],
-            'lastname'=>$representativeVal['last_name'],
-            'email' => strtolower($representativeVal['first_name'] . '.' . $representativeVal['last_name']) . '@example.com',
-            'mobile' => $faker->numerify('##########'),
-            'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
-            'designation'=>$faker->jobTitle,
-            'bio'=>$faker->paragraph(3),
-            'password' => Hash::make('password'),
-            'linkedin_url'            => "https://www.linkedin.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'twitter_url'             => "https://twitter.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'facebook_url'            => "https://facebook.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'instagram_url'           => "https://instagram.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']),
-                'website_url'=>"https://example.com/" . strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name'])
-        ]);
-        $exhibitorRepresentative->assignRole('Representative');
-
-        qrCode($exhibitorRepresentative->id);
-        notification($exhibitorRepresentative->id,'welcome');
-
-
-        }
 
         foreach ($attendees as $attendeeVal) {
             $randomThree = collect($groups)->random(3)->toArray();

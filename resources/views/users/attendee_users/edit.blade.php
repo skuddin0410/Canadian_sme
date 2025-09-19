@@ -329,6 +329,7 @@ Admin | Edit Attendee Data
                     @php
                    
                       $selectedSpeakerIds = explode(',',$user->access_speaker_ids) ?? '';
+                      
                     @endphp
                     <div class="col-md-12">
                       <label class="form-label">Speaker</label>

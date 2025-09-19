@@ -10,22 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    {   
+        Schema::dropIfExists('session_speakers');
         Schema::create('session_speakers', function (Blueprint $table) {
         $table->id();
 
-        $table->foreignId('session_id')
-        ->constrained('event_sessions')
-        ->onDelete('cascade');
-
-        $table->foreignId('user_id')
-        ->constrained('users')
-        ->onDelete('cascade');
-
+        $table->unsignedBigInteger('session_id');
+        $table->unsignedBigInteger('speaker_id');
         $table->string('role')->nullable();
         $table->timestamps();
 
-        $table->unique(['session_id', 'user_id']); // prevent duplicates
+        $table->foreign('session_id')->references('id')->on('event_sessions')->onDelete('cascade');
+        //$table->foreign('speaker_id')->references('id')->on('speakers')->onDelete('cascade');
+
         });
 
 

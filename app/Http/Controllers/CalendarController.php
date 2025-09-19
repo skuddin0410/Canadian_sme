@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Session;
 use App\Models\Booth;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
 use App\Models\Track;
 use Illuminate\Support\Facades\DB;
 use App\Models\Company;
+use App\Models\Speaker;
 
 class CalendarController extends Controller
 {
@@ -25,9 +25,7 @@ class CalendarController extends Controller
         
         $booths = Booth::all();
 
-        $speakers = User::select('id','name')->whereHas("roles", function ($q) {
-                    $q->where("name", 'Speaker');
-                })->orderBy('created_at', 'DESC')->get();
+        $speakers = Speaker::select('id','name')->orderBy('created_at', 'DESC')->get();
 
         $exhibitors = Company::select('id','name','email')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
 
@@ -39,9 +37,7 @@ class CalendarController extends Controller
     public function speakers(Request $request)
     {
 
-        $speakers = User::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Speaker']);
-                })->orderBy('created_at', 'DESC')->get();
+        $speakers = Speaker::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
         
     }
@@ -319,6 +315,7 @@ class CalendarController extends Controller
             foreach ($speakerIds as $index => $speakerId) {
                 $session->speakers()->detach($speakerId);
                 $session->speakers()->attach($speakerId);
+
                 notification($speakerId, 'Speaker_Reminder', $session->id);
                 addAgenda($session->id,null,$speakerId);
             }
@@ -329,8 +326,10 @@ class CalendarController extends Controller
             foreach ($exhibitorIds as $index => $exhibitorId) {
                 $session->exhibitors()->detach($exhibitorId);
                 $session->exhibitors()->attach($exhibitorId);
+
                 notification($exhibitorId, 'Exhibitor_Reminder', $session->id);
                 addAgenda($session->id,null,$exhibitorId);
+
             }
         }
 
@@ -339,8 +338,10 @@ class CalendarController extends Controller
             foreach ($sponsorIds as $index => $sponsorId) {
                 $session->sponsors()->detach($sponsorId);
                 $session->sponsors()->attach($sponsorId);
+
                 notification($sponsorId, 'Speaker_Reminder', $session->id);
                 addAgenda($session->id,null,$sponsorId);
+                
             }
         }
       
