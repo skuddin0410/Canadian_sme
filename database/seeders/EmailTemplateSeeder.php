@@ -21,7 +21,17 @@ class EmailTemplateSeeder extends Seeder
             'template_name' => 'Welcome Email',
             'subject' => 'Welcome to {{site_name}}!',
             'type' => 'email',
-            'message' => 'Dear {{name}},<br><br>Welcome to {{site_name}}! We are excited to have you join us.<br>Feel free to explore the site and get started with your first event registration.<br><br>If you have any questions, don’t hesitate to reach out.<br>Your QR code is <br>{{qr_code}}<br>Best regards,<br>{{site_name}} Team',
+            'message' => 'Dear {{name}},
+
+                Welcome to {{site_name}}!  We are excited to have you join us.<br>
+                Feel free to explore the site and get started with your first event registration.<br>
+
+                If you have any questions, don’t hesitate to reach out.<br>
+                Your QR code is 
+                {{qr_code}}<br>
+                Update Your Profile here {{profile_update_link}}<br>
+                Best regards,
+                {{site_name}} Team',
         ]);
 
 

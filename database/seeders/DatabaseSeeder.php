@@ -14,24 +14,33 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            TrackSeeder::class,
+
             RoleSeeder::class, // php artisan db:seed --class=RoleSeeder
             AdminSeeder::class, // php artisan db:seed --class=AdminSeeder
-            UserSeeder::class,
+            TrackSeeder::class,
+            CategorySeeder::class,
+            EventSeeder::class,
+            TicketSeeder::class,
             SettingSeeder::class, // php artisan db:seed --class=SettingSeeder
-            AccountManagerPermissionSeeder::class,
-            TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             PagesSeeder::class, // php artisan db:seed --class=PagesSeeder
+            InsertLocaions::class, // php artisan db:seed --class=InsertLocaions,
             SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
+            EmailTemplateSeeder::class, //php artisan db:seed --class=EmailTemplateSeeder
+            FormsTableSeeder::class, //php artisan db:seed --class=FormsTableSeeder
+
+
+            //AccountManagerPermissionSeeder::class,
+            UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
+            TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             SupportSeeder::class,
             SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
             AddExhibitorUsers::class,
-            InsertLocaions::class, // php artisan db:seed --class=InsertLocaions,
             AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
             UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder
-            EmailTemplateSeeder::class, //php artisan db:seed --class=EmailTemplateSeeder
-            FormsTableSeeder::class //php artisan db:seed --class=FormsTableSeeder
+
+            
+            
         ]);
     }
 }

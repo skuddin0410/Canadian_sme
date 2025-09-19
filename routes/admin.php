@@ -57,7 +57,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/representatives', [UserController::class, 'representativeIndex'])
     ->name('users.representative');
 
-Route::get('/attendees', [UserController::class, 'attendeeIndex'])
+    Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('users.attendee');
     
       Route::resource('usergroup', UserGroupController::class);
