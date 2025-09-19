@@ -196,7 +196,7 @@
                                         <div class="mb-3">
                                             <label for="sale_start_date" class="form-label">Sale Start Date</label>
                                             <input type="datetime-local" class="form-control @error('sale_start_date') is-invalid @enderror id="sale_start_date" name="sale_start_date" 
-                                                   value="{{ old('sale_start_date') }}">
+                                                   value="{{ old('sale_start_date',$ticketType->sale_start_date) }}">
                                             @error('sale_start_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -209,7 +209,7 @@
                                             <label for="sale_end_date" class="form-label">Sale End Date</label>
                                             <input type="datetime-local" class="form-control @error('sale_end_date') is-invalid @enderror" 
                                                    id="sale_end_date" name="sale_end_date" 
-                                                   value="{{ old('sale_end_date') }}">
+                                                   value="{{ old('sale_end_date' , $ticketType->sale_end_date) }}">
                                             @error('sale_end_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -314,15 +314,19 @@
                                 <div id="ticketPreview" class="border rounded p-3">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
-                                            <h6 class="mb-1" id="previewName">Ticket Type Name</h6>
-                                            <small class="text-muted" id="previewEvent">Select an event</small>
+                                            <h6 class="mb-1" id="previewName">Ticket Type Name : {{$ticketType->name}}</h6>
+                                            <small class="text-muted" id="previewEvent">Event : 
+                                            {{ $event->title }}</small>
                                         </div>
                                         <span class="badge" id="previewCategory" style="display: none;"></span>
                                     </div>
-                                    <p class="text-muted small mb-2" id="previewDescription">Add a description...</p>
+                                    <p class="text-muted small mb-2" id="previewDescription">Description : {{$ticketType->description}}</p>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <strong class="text-primary" id="previewPrice">$0.00</strong>
-                                        <small class="text-muted" id="previewQuantity">0 available</small>
+                                        <strong class="text-primary" id="previewPrice">${{$ticketType->base_price}}</strong>
+                                        <small class="text-muted" id="previewQuantity"> Available Quantity: {{ $ticketType->available_quantity }}
+                                                @if($ticketType->total_quantity != $ticketType->available_quantity)
+                                                    | Sold: {{ $ticketType->total_quantity - $ticketType->available_quantity }}
+                                                @endif</small>
                                     </div>
                                 </div>
                             </div>
