@@ -37,7 +37,8 @@ class OtpController extends Controller
                     "henry.roy@example.com",
                     "subhabrata1@example.com",
                     "arafat@example.com",
-                    "debanjan@example.com"
+                    "debanjan@example.com",
+                    "subhamita.dapl@gmail.com"
                 ];
 
                 if (!in_array($request->email, $allowedEmails)) {
@@ -84,7 +85,8 @@ public function verify(Request $request)
             "henry.roy@example.com",
             "subhabrata1@example.com",
             "arafat@example.com",
-            "debanjan@example.com"
+            "debanjan@example.com",
+            "subhamita.dapl@gmail.com"
         ];
 
         if (!in_array($request->email, $allowedEmails)) {

@@ -73,8 +73,8 @@
               <p class="fw-semibold">{{ $speaker->place ?? 'N/A' }}</p>
             </div>
 
-            {{-- Social Section (only visible if gdpr_consent != 1) --}}
-            @if($speaker->gdpr_consent != 1)
+         
+            @if($speaker->gdpr_consent == 1)
               <div class="col-sm-12 mt-3">
                 <h5 class="text-primary"><i class="fas fa-share-alt me-2"></i>Social</h5>
               </div>
