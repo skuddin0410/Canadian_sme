@@ -76,17 +76,17 @@
 
         <div class="col-md-6">
           <label for="tax_name" class="form-label">Tax Name</label>
-          <input type="text" class="form-control" id="tax_name" name="tax_name" value="{{getKeyValue('tax_name')->value}}" placeholder="GST / VAT / CIN" required>
+          <input type="text" class="form-control" id="tax_name" name="tax_name" value="{{getKeyValue('tax_name')->value}}" placeholder="GST / VAT / CIN">
         </div>
 
         <div class="col-md-3">
           <label for="tax_percentage" class="form-label">Tax Percentage (%)</label>
-          <input type="number" step="0.01" min="0" max="100" class="form-control" id="tax_percentage" name="tax_percentage" value="{{getKeyValue('tax_percentage')->value}}" required>
+          <input type="number" step="0.01" min="0" max="100" class="form-control" id="tax_percentage" name="tax_percentage" value="{{getKeyValue('tax_percentage')->value}}">
         </div>
 
         <div class="col-md-3">
           <label for="company_number" class="form-label">Company Number (VAT/CIN/GST)</label>
-          <input type="text" class="form-control" id="company_number" name="company_number" value="{{getKeyValue('company_number')->value}}" required>
+          <input type="text" class="form-control" id="company_number" name="company_number" value="{{getKeyValue('company_number')->value}}">
         </div>
       </div>
     </div>
@@ -125,7 +125,6 @@
     <!-- Thank You Page -->
     <div class="tab-pane fade" id="thankyou" role="tabpanel" aria-labelledby="thankyou-tab" tabindex="0">
       <label for="thank_you_page" class="form-label">Thank You Page Message / HTML</label>
-      <p><a href="{{ config('app.url')}}thank_you_page"/>{{ config('app.url')}}thank_you_page </a></p>
       <textarea class="form-control" id="thank_you_page" name="thank_you_page" rows="8" placeholder="">{{getKeyValue('thank_you_page')->value}}</textarea>
       <div class="form-text"></div>
     </div>

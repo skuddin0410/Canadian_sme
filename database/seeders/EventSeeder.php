@@ -32,7 +32,7 @@ class EventSeeder extends Seeder
             $end   = (clone $start)->addYears(100);
 
             $events[] = [
-                'title' => "Canadian sme Summit ".$start->year,
+                'title' => "CanadianSME Small Business, ".$start->year,
                 'description' => $faker->paragraph(3),
                 'location' => $faker->address,
                 'tags' => implode(',', $faker->randomElements(
@@ -46,6 +46,7 @@ class EventSeeder extends Seeder
                 'created_by' => 1,
                 'status' => 'published',
                 'category_id' => $categoryIds[array_rand($categoryIds)],
+                'youtube_link'=> "https://www.youtube.com/watch?v=XTt1my9Hgto"
             ];
         }
 
