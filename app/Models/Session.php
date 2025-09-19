@@ -37,7 +37,7 @@ class Session extends Model
 
     public function speakers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'session_speakers', 'session_id', 'speaker_id')->withTimestamps();
+        return $this->belongsToMany(Speaker::class, 'session_speakers', 'session_id', 'speaker_id')->withTimestamps();
     }
 
     public function exhibitors(): BelongsToMany
