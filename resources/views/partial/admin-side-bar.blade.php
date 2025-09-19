@@ -1,15 +1,16 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-    <div class="app-brand demo">
-        <a href="" class="app-brand-link">
-            <span class="app-brand-logo">
-                <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="55%">
-            </span>
-        </a>
+<div class="app-brand demo" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+    <a href="" class="app-brand-link">
+        <span class="app-brand-logo">
+            <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="70%">
+        </span>
+    </a>
 
-        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-            <i class="bx bx-chevron-left bx-sm align-middle"></i>
-        </a>
-    </div>
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+        <i class="bx bx-chevron-left bx-sm align-middle"></i>
+    </a>
+</div>
+
 
     <div class="menu-inner-shadow"></div>
 
