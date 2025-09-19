@@ -14,7 +14,6 @@
     <section class="banner position-relative" style="background-image: url({{ $event->photo->file_path }})">
         <div class="container text-center">
             @if($embedUrl)
-                <!-- Play button triggers modal -->
                 <button class="position-absolute top-50 start-50 translate-middle rounded-circle overflow-hidden"
                         data-bs-toggle="modal" data-bs-target="#youtubeModal">
                     <img class="banner-play-btn" src="{{ asset('frontend/images/video-circle.png') }}" alt="Play Video">

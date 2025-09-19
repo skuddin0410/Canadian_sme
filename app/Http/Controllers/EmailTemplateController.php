@@ -87,23 +87,25 @@ class EmailTemplateController extends Controller
             'template' => 'required|exists:email_templates,id',
         ]);
 
-        // $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
         $emailTemplate = EmailTemplate::findOrFail($request->template);
-
-        $user = User::where('email', $request->email)->firstOrFail();  
         $subject = $emailTemplate->subject ?? '';
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
 
-        $qr_code_url = asset($user->qr_code);
+        $qr_code_url = asset("qrcode.png");
         $message = $emailTemplate->message ?? '';
-        $message = str_replace('{{name}}', $user->full_name, $message);
+        $message = str_replace('{{name}}', $request->email, $message);
         $message = str_replace('{{site_name}}', config('app.name'), $message);
         if (strpos($message, '{{qr_code}}') !== false) {
           $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
         }
+
+        if (strpos($message, '{{profile_update_link}}') !== false) {
+              $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
+              $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
+        }
         
-        Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+        Mail::to($request->email)->send(new UserWelcome(null, $subject, $message));
         return back()->with('success', 'Email sent successfully!');
     }
 
