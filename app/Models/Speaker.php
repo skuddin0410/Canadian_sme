@@ -52,4 +52,11 @@ class Speaker extends Model
             ->where('file_type', 'cover_photo')
             ->whereNotNull('file_name');
     }
+    
+    public function getFullNameAttribute()
+    {
+        return $this->name . ' ' . $this->lastname;
+    }
+
+    protected $appends = ['full_name'];
 }
