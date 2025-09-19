@@ -6,7 +6,7 @@ use App\Models\Drive;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\Auditable;
-use App\Traits\AutoHtmlDecode
+use App\Traits\AutoHtmlDecode;
 
 class EventGuide extends Model
 {
