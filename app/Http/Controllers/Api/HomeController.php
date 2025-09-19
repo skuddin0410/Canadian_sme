@@ -97,7 +97,6 @@ class HomeController extends Controller
     // ================= Notifications =================
     $user = auth()->user();
     
-   
     $notificationsQuery = GeneralNotification::where('is_read', 0)
     ->where(function ($q) use ($user) {
         $q->where('user_id', $user->id);
