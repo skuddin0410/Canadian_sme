@@ -574,7 +574,7 @@ public function getSpeaker(Request $request)
      
         $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Speaker');
-        })->whereNotNull('access_speaker_ids')->get();
+        })->whereNotNull('access_speaker_ids')->orderBy('id', 'DESC')->get();
 
         if ($speakers->isEmpty()) {
             return response()->json([
@@ -673,7 +673,7 @@ public function getAttendee(Request $request)
      
         $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Attendee');
-        })->get();
+        })->orderBy('id', 'DESC')->get();
 
         if ($speakers->isEmpty()) {
             return response()->json([
