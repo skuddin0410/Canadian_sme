@@ -15,7 +15,24 @@ class InsertLocaions extends Seeder
     public function run(): void
     { 
 
-        $location = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+        $location = "
+        Where to find us
+
+        Cmarketing Inc  
+        2800 Skymark Avenue, Suite 203  
+        Mississauga, ON. Canada. L4W 5A6
+
+        SK Uddin,  
+        Organizer  
+        sk@canadiansme.ca  
+        647 668 5785
+
+        Maheen Bari  
+        info@canadiansme.ca  
+        416 655 0205 / 647 254 0864
+
+        Monday – Friday : 9:00 am – 5:00 pm
+       ";
         DB::table('settings')->insert([
             [
                 'key' => 'location',
