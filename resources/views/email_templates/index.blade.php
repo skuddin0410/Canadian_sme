@@ -18,9 +18,7 @@
     </button>
 </div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    
 
     <table class="table table-bordered">
         <tr>
@@ -32,7 +30,8 @@
         </tr>
         @foreach ($templates as $template)
             <tr>
-                <td>{{ $template->id }}</td>
+                {{-- <td>{{ $template->id }}</td> --}}
+                <td>{{ $loop->iteration + ($templates->currentPage() - 1) * $templates->perPage() }}</td>
                 <td>{{ $template->template_name }}</td>
                 <td>{{ $template->subject }}</td>
                 <td>{{ $template->type }}</td>

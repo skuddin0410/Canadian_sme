@@ -177,13 +177,8 @@ Admin | Edit Speaker
                         <label class="form-label">User Primary Group {{$user->primary_group}}</label>
                         <select class="form-select mb-3" name="primary_group">
                          
-                          @foreach(($groups ?? []) as $g)
-                         
-                            <option value="{{ $g }}" {{ (old('primary_group', $user->primary_group ?? null) == $g) ? 'selected' : '' }}>
-                              {{ $g }}
+                         <option value="Attendee" {{ (old('primary_group', $user->primary_group ?? null) == "Attendee") ? 'selected' : '' }}>Attendee</option>
                             </option>
-                           
-                          @endforeach
                         </select>
                         @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
@@ -197,11 +192,13 @@ Admin | Edit Speaker
                         @endphp
                         <label class="form-label">User Secondary Group (multiple)</label>
                         <select class="form-select mb-3" name="secondary_group[]" id="secondary_group" multiple>
-                          @foreach(($groups ?? []) as $g)
-                            <option value="{{ $g }}" {{ in_array($g, $selectedSecondary, true) ? 'selected' : '' }}>
-                              {{ $g }}
-                            </option>
-                          @endforeach
+                            @foreach(($groups ?? []) as $g)
+                            @if($g !=="Attendee")
+                              <option value="{{ $g }}" {{ in_array($g, $selectedSecondary, true) ? 'selected' : '' }}>
+                                {{ $g }}
+                              </option>
+                            @endif  
+                            @endforeach
                         </select>
                         <small class="text-muted">Hold <kbd>Ctrl</kbd>/<kbd>⌘</kbd> to select more than one.</small>
                         @error('secondary_group') <div class="text-danger">{{ $message }}</div> @enderror

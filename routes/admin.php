@@ -9,6 +9,7 @@ use App\Http\Controllers\SponsorsController;
 use App\Http\Controllers\UserGroupController;
 use App\Http\Controllers\EventGuideController;
 use App\Http\Controllers\EventTrackController;
+use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\AttendeeUserController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\ExhibitorUserController;
@@ -37,7 +38,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::post('/event-guides/gallery/upload', [EventGuideController::class, 'uploadGallery'])->name('event-guides.uploadGallery');
 
   Route::delete('event-guides/delete-gallery-image', [EventGuideController::class, 'deleteGalleryImage'])->name('event-guides.deleteGalleryImage');
-
+  
 
 
 
@@ -82,18 +83,23 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     ->name('speakers.allow-access');
     Route::post('/speakers/{id}/send-mail', [SpeakerController::class, 'sendMail'])
     ->name('speakers.sendMail');
+    Route::delete('/speaker/private-docs/{id}', [SpeakerController::class, 'deletePrivateDoc'])
+    ->name('speaker.private-docs.delete');
+
     Route::post('/attendee-users/{id}/send-mail', [AttendeeUserController::class, 'sendMail'])
     ->name('attendee-users.sendMail');
     Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
     ->name('attendee-users.bulkAction');
 
 
-
+      Route::get('/events/{event}/sessions', [TicketTypeController::class, 'getByEvent'])->name('events.sessions');
 
     
     Route::resource('speaker', SpeakerController::class);
     Route::resource('booths', BoothController::class);
     Route::resource('supports', SupportController::class);
+    Route::patch('/support/{id}/status', [SupportController::class, 'updateStatus'])
+    ->name('support.updateStatus');
 
 
 

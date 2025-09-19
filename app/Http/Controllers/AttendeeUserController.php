@@ -28,7 +28,6 @@ use App\Models\MailLog;
 use App\Mail\UserWelcome;
 use App\Models\EmailTemplate;
 use OneSignal;
-use Illuminate\Support\Facades\Crypt;
 
 
 class AttendeeUserController extends Controller
@@ -131,7 +130,13 @@ class AttendeeUserController extends Controller
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            'mobile' => 'nullable|string|unique:users,mobile',
+            'mobile' => [
+                 'nullable',
+                 'string',
+                 'regex:/^[0-9]{10}$/',
+                 'unique:users,mobile'
+                ],
+
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -265,7 +270,12 @@ class AttendeeUserController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'nullable|string|unique:users,mobile,' . $user->id,
+            'mobile' => [
+                 'nullable',
+                 'string',
+                 'regex:/^[0-9]{10}$/'
+                 
+                ],
             'bio' => 'required|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
@@ -452,15 +462,9 @@ public function bulkAction(Request $request)
             
                 if($request->onesignal_userid){
                     OneSignal::sendNotificationToUser(
-                        $message,                     // 👈 body text
-                        $request->onesignal_userid,   // 👈 user/player id
-                        null,                         // URL (optional)
-                        null,                         // data (optional)
-                        null,                         // buttons (optional)
-                        null,                         // schedule (optional)
-                        $subject                      // 👈 title
+                        $message,   // Notification message
+                        $request->onesignal_userids   // OneSignal Player ID
                     );
-
                     notification($user->id, 'bulk_notification',null, $subject, $message);
             }
         }

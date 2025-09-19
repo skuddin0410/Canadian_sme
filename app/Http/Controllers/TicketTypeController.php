@@ -1,12 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\TicketType;
-use App\Models\TicketCategory;
 use App\Models\Event;
-use Illuminate\Http\Request;
+use App\Models\TicketType;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\TicketCategory;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 
 class TicketTypeController extends Controller
 {
@@ -31,61 +32,78 @@ class TicketTypeController extends Controller
 
     public function create()
     {
-        $events = Event::whereIn('status',['draft', 'published'])->get();
+        $events = Event::with('sessions')->get();
+
+
+    //    $events = Event::whereIn('status',['draft', 'published'])
+    //     ->with('sessions')
+    //     ->get(); 
         $categories = TicketCategory::active()->ordered()->get();
         
         return view('tickets.types.create', compact('events', 'categories'));
     }
 
-    public function store(Request $request)
-    {   
-        $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'category_id' => 'nullable|exists:ticket_categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'base_price' => 'required|numeric|min:0',
-            'total_quantity' => 'required|integer|min:1',
-            'min_quantity_per_order' => 'required|integer|min:1',
-            'max_quantity_per_order' => 'nullable|integer|min:1',
-            'sale_start_date' => 'nullable|date',
-            'sale_end_date' => 'nullable|date|after:sale_start_date',
-            'requires_approval' => 'boolean',
-            'is_active' => 'boolean',
-            'access_permissions' => 'nullable|array'
-        ]);
+   public function store(Request $request)
+{
+    $request->validate([
+    'event_id' => 'required|exists:events,id',
+    'session_id' => [
+        'required',
+        'integer',
+        function ($attribute, $value, $fail) use ($request) {
+            $event = Event::with('sessions')->find($request->event_id);
+            if (!$event || !$event->sessions->pluck('id')->contains($value)) {
+                $fail('The selected session does not belong to the selected event.');
+            }
+        },
+    ],
+    'category_id' => 'nullable|exists:ticket_categories,id',
+    'name' => 'required|string|max:255',
+    'description' => 'nullable|string',
+    'base_price' => 'required|numeric|min:0',
+    'total_quantity' => 'required|integer|min:1',
+    'min_quantity_per_order' => 'required|integer|min:1',
+    'max_quantity_per_order' => 'nullable|integer|min:1',
+    'sale_start_date' => 'nullable|date',
+    'sale_end_date' => 'nullable|date|after:sale_start_date',
+    'requires_approval' => 'boolean',
+    'is_active' => 'boolean',
+    'access_permissions' => 'nullable|array'
+]);
 
-        $slug = Str::slug($request->name);
-        $eventId = $request->event_id;
-        
-        // Ensure unique slug per event
-        $counter = 1;
-        $originalSlug = $slug;
-        while (TicketType::where('event_id', $eventId)->where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $counter++;
-        }
-
-        $ticketType = TicketType::create([
-            'event_id' => $eventId,
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'slug' => $slug,
-            'description' => $request->description,
-            'base_price' => $request->base_price,
-            'total_quantity' => $request->total_quantity,
-            'available_quantity' => $request->total_quantity,
-            'min_quantity_per_order' => $request->min_quantity_per_order,
-            'max_quantity_per_order' => $request->max_quantity_per_order,
-            'sale_start_date' => $request->sale_start_date,
-            'sale_end_date' => $request->sale_end_date,
-            'requires_approval' => $request->boolean('requires_approval'),
-            'is_active' => $request->boolean('is_active', true),
-            'access_permissions' => $request->access_permissions ?? []
-        ]);
-
-        return redirect()->route('admin.ticket-types.index')
-                        ->with('success', 'Ticket type created successfully.');
+    $slug = Str::slug($request->name);
+    $eventId = $request->event_id;
+    
+    // Ensure unique slug per event
+    $counter = 1;
+    $originalSlug = $slug;
+    while (TicketType::where('event_id', $eventId)->where('slug', $slug)->exists()) {
+        $slug = $originalSlug . '-' . $counter++;
     }
+
+    $ticketType = TicketType::create([
+        'event_id' => $eventId,
+        'session_id' => $request->session_id, 
+        'category_id' => $request->category_id,
+        'name' => $request->name,
+        'slug' => $slug,
+        'description' => $request->description,
+        'base_price' => $request->base_price,
+        'total_quantity' => $request->total_quantity,
+        'available_quantity' => $request->total_quantity,
+        'min_quantity_per_order' => $request->min_quantity_per_order,
+        'max_quantity_per_order' => $request->max_quantity_per_order,
+        'sale_start_date' => $request->sale_start_date,
+        'sale_end_date' => $request->sale_end_date,
+        'requires_approval' => $request->boolean('requires_approval'),
+        'is_active' => $request->boolean('is_active', true),
+        'access_permissions' => $request->access_permissions ?? []
+    ]);
+
+    return redirect()->route('admin.ticket-types.index')
+                    ->with('success', 'Ticket type created successfully.');
+}
+
 
     public function show(TicketType $ticketType)
     {
@@ -191,5 +209,15 @@ class TicketTypeController extends Controller
 
         return redirect()->back()
                         ->with('success', 'Inventory updated successfully.');
+    }
+    public function getByEvent(Event $event): JsonResponse
+    {
+        // $sessions = $event->sessions()->select('id', 'title')->get();
+        $sessions = $event->sessions()->get(['id', 'title']);
+         return response()->json($sessions);
+        // return response()->json([
+        //     'success' => true,
+        //     'sessions' => $sessions,
+        // ]);
     }
 }

@@ -104,4 +104,17 @@ class SupportController extends Controller
     {
         //
     }
+    public function updateStatus(Request $request, $id)
+    {
+    $request->validate([
+        'status' => 'required|in:pending,inprogress,completed',
+    ]);
+
+    $support = Support::findOrFail($id);
+    $support->status = $request->status;
+    $support->save();
+
+    return redirect()->back()->with('success', 'Status updated successfully.');
+    }
+
 }
