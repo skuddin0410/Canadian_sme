@@ -314,15 +314,19 @@
                                 <div id="ticketPreview" class="border rounded p-3">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
-                                            <h6 class="mb-1" id="previewName">Ticket Type Name</h6>
-                                            <small class="text-muted" id="previewEvent">Select an event</small>
+                                            <h6 class="mb-1" id="previewName">Ticket Type Name : {{$ticketType->name}}</h6>
+                                            <small class="text-muted" id="previewEvent">Event : 
+                                            {{ $event->title }}</small>
                                         </div>
                                         <span class="badge" id="previewCategory" style="display: none;"></span>
                                     </div>
-                                    <p class="text-muted small mb-2" id="previewDescription">Add a description...</p>
+                                    <p class="text-muted small mb-2" id="previewDescription">Description : {{$ticketType->description}}</p>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <strong class="text-primary" id="previewPrice">$0.00</strong>
-                                        <small class="text-muted" id="previewQuantity">0 available</small>
+                                        <strong class="text-primary" id="previewPrice">${{$ticketType->base_price}}</strong>
+                                        <small class="text-muted" id="previewQuantity"> Available Quantity: {{ $ticketType->available_quantity }}
+                                                @if($ticketType->total_quantity != $ticketType->available_quantity)
+                                                    | Sold: {{ $ticketType->total_quantity - $ticketType->available_quantity }}
+                                                @endif</small>
                                     </div>
                                 </div>
                             </div>
