@@ -21,28 +21,39 @@ class EmailTemplateController extends Controller
         return view('email_templates.create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'template_name' => 'required|unique:email_templates,template_name',
-            'subject' => 'required',
-            'type' => 'required|in:email,notifications',
-            'message' => [
-                'required',
-                function ($attribute, $value, $fail) use ($request) {
-                    $max = $request->type === 'notifications' ? 150 : 500;
-                    if (strlen($value) > $max) {
-                        $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
-                    }
+  public function store(Request $request)
+{
+    $request->validate([
+        'template_name' => 'required|unique:email_templates,template_name',
+        'subject' => 'required',
+        'type' => 'required|in:email,notifications',
+        'message' => [
+            'required',
+            function ($attribute, $value, $fail) use ($request) {
+                // Strip tags if it's a notification before counting length
+                $textValue = $request->type === 'notifications' ? strip_tags($value) : $value;
+                $max = $request->type === 'notifications' ? 150 : 500;
+
+                if (strlen($textValue) > $max) {
+                    $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
                 }
-            ]
-        ]);
+            }
+        ]
+    ]);
 
-        EmailTemplate::create($request->all());
+    $data = $request->all();
 
-        return redirect()->route('email-templates.index')
-                         ->with('success', 'Email Template created successfully.');
+    // Strip HTML tags for notification before saving
+    if ($request->type === 'notifications') {
+        $data['message'] = strip_tags($data['message']);
     }
+
+    EmailTemplate::create($data);
+
+    return redirect()->route('email-templates.index')
+                     ->with('success', 'Email Template created successfully.');
+}
+
 
     public function edit(EmailTemplate $emailTemplate)
     {
