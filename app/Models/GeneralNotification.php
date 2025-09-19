@@ -9,12 +9,15 @@
 	use App\Models\User;
 	use Illuminate\Database\Eloquent\Relations\MorphTo;
 	use Illuminate\Database\Eloquent\Relations\BelongsTo;
+	use App\Traits\Auditable;
+    use App\Traits\AutoHtmlDecode;
 
 
 	class GeneralNotification extends Model
 	{
 	 use HasFactory;
-
+     use  Auditable;
+     use AutoHtmlDecode;
 
 	protected $fillable = [
 	'user_id','title','body',

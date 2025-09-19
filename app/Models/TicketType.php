@@ -4,10 +4,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class TicketType extends Model
 {
     use HasFactory, SoftDeletes;
+    use  Auditable;
+    use AutoHtmlDecode;
 
     protected $fillable = [
         'event_id', 'category_id', 'name', 'slug', 'description',

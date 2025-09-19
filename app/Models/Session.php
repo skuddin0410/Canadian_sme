@@ -5,9 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class Session extends Model
-{
+{   
+    use  Auditable;
+    use AutoHtmlDecode;
     protected $table = "event_sessions";
     protected $fillable = [
         'event_id', 'booth_id', 'title', 'description',
