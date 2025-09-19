@@ -88,15 +88,15 @@ class TicketSystemSeeder extends Seeder
         }
 
         $sessions = DB::table('event_sessions')->pluck('id')->toArray();
-        $users = DB::table('users')->where('primary_group','Speaker')->pluck('id')->toArray();
+        $speakers = DB::table('speakers')->pluck('id')->toArray();
 
         foreach ($sessions as $sessionId) {
-            $speakers = collect($users)->random(4);
+            $speakers = collect($speakers)->random(4);
 
             foreach ($speakers as $userId) {
                 DB::table('session_speakers')->insert([
                     'session_id' => $sessionId,
-                    'user_id' => $userId,
+                    'speaker_id' => $userId,
                     'role' => collect(['keynote','panelist','moderator'])->random(),
                     'created_at' => now(),
                     'updated_at' => now(),

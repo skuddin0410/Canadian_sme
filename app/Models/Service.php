@@ -8,11 +8,15 @@ use App\Models\ServiceCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class Service extends Model
 {
     //
     use HasFactory, SoftDeletes;
+    use  Auditable;
+    use AutoHtmlDecode;
 
     protected $fillable = [
         'name',

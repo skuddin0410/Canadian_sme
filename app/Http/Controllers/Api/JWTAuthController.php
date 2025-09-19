@@ -574,7 +574,7 @@ public function getSpeaker(Request $request)
      
         $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Speaker');
-        })->get();
+        })->whereNotNull('access_speaker_ids')->get();
 
         if ($speakers->isEmpty()) {
             return response()->json([
@@ -586,7 +586,7 @@ public function getSpeaker(Request $request)
         
        $response = $speakers->map(function ($speaker) {
             return [
-                'id'     => $speaker->id,
+                'id'     => $speaker->access_speaker_ids,
                 'name'     => $speaker->full_name,
                 'company_name'  => $speaker->company ?? '',
                 'role'  => $speaker->designation ?? '',
@@ -617,7 +617,7 @@ public function getSpeakerById(Request $request){
 
         $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Speaker');
-        })->where('id',$request->id)->first();
+        })->where('access_speaker_ids',$request->id)->first();
     
         if (empty($speaker)) {
             return response()->json([
@@ -678,7 +678,7 @@ public function getAttendee(Request $request)
         if ($speakers->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No speakers found!'
+                'message' => 'No Attendee found!'
             ], 404);
         }
 

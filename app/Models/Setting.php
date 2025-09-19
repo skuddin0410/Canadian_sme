@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class Setting extends Model
-{
+{   
+    use  Auditable;
+    use AutoHtmlDecode;
     protected $fillable = [
         'key',
         'value',

@@ -76,8 +76,8 @@
               <p class="text-secondary black-text-18 fw-medium">{{ $attendee->place ?? 'N/A' }}</p>
             </div>
 
-            {{-- Social Section (only visible if gdpr_consent != 1) --}}
-            @if($attendee->gdpr_consent != 1)
+            
+            @if($attendee->gdpr_consent == 1)
               <div class="col-sm-12 mt-4 mb-2">
                 <h5 class="mb-1 small-heading-black fw-medium"><i class="fas fa-share-alt me-2 text-primary"></i>Social</h5>
               </div>

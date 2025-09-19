@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\FormSubmission;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class Form extends Model
 {

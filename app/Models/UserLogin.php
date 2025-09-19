@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class UserLogin extends Model
-{
+{   
+    use  Auditable;
+    use AutoHtmlDecode;
     protected $fillable = [
          'user_id',
          'ip_address',

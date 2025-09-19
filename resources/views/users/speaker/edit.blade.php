@@ -322,66 +322,7 @@ Admin | Edit Speaker
                 </div> {{-- row --}}
               </div> {{-- /basic --}}
 
-              {{-- ACCESS PERMISSIONS --}}
-              <div class="tab-pane fade" id="access" role="tabpanel">
-                <div class="row">
-                
-                    @php
-                   
-                      $selectedSpeakerIds = explode(',',$user->access_speaker_ids) ?? '';
-                    @endphp
-                    <div class="col-md-12">
-                      <label class="form-label">Speaker</label>
-                      <select class="form-select select2" name="access_speaker_ids[]" multiple
-                              data-placeholder="Select speaker(s)" data-allow-clear="true">
-                        @foreach($speakers as $speaker)
-                          <option value="{{ $speaker->id }}"
-                            {{ in_array((string)$speaker->id, $selectedSpeakerIds, true) ? 'selected' : '' }}>
-                            {{ $speaker->full_name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_speaker_ids') <div class="text-danger">{{ $message }}</div> @enderror
-                    </div>
 
-                    {{-- EXHIBITORS --}}
-                    @php
-                      $selectedExhibitorIds = explode(',',$user->access_exhibitor_ids) ?? '';
-                    @endphp
-                    <div class="col-md-12">
-                      <label class="form-label">Exhibitor</label>
-                      <select class="form-select select2" name="access_exhibitor_ids[]" multiple
-                              data-placeholder="Select exhibitor(s)" data-allow-clear="true">
-                        @foreach($exhibitors as $exhibitor)
-                          <option value="{{ $exhibitor->id }}"
-                            {{ in_array((string)$exhibitor->id, $selectedExhibitorIds, true) ? 'selected' : '' }}>
-                            {{ $exhibitor->name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_exhibitor_ids') <div class="text-danger">{{ $message }}</div> @enderror
-                    </div>
-
-                    {{-- SPONSORS --}}
-                    @php
-                      $selectedSponsorIds = explode(',',$user->access_sponsor_ids) ?? '';
-                    @endphp
-                    <div class="col-md-12">
-                      <label class="form-label">Sponsors</label>
-                      <select class="form-select select2" name="access_sponsor_ids[]" multiple
-                              data-placeholder="Select sponsor(s)" data-allow-clear="true">
-                        @foreach($sponsors as $sponsor)
-                          <option value="{{ $sponsor->id }}"
-                            {{ in_array((string)$sponsor->id, $selectedSponsorIds, true) ? 'selected' : '' }}>
-                            {{ $sponsor->name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_sponsor_ids') <div class="text-danger">{{ $message }}</div> @enderror
-                    </div>
-
-                </div>
-              </div>
 
               {{-- PRIVATE DOCS --}}
               <div class="tab-pane fade" id="docs" role="tabpanel">

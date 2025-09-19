@@ -13,10 +13,6 @@ class ImportData extends Model
     protected $table = 'imported_data';
 
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'mobile',
-        'added_by'
+        'name','lastname','email','status','gdpr_consent','bio','company','designation','mobile','dob','facebook_url','twitter_url','linkedin_url','instagram_url'
     ];
 }

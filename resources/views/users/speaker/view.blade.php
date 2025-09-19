@@ -23,50 +23,33 @@ Admin | Speaker Details
                      
                       <a href="{{route("speaker.index")}}" class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14">Back</a>
                 </div>
-                <div class="d-flex pt-3 justify-content-end">
-                     {{-- Block Button for Admin / Admin --}}
-                   @if(Auth::user()->hasAnyRole(['Admin','Admin']) 
-                     && !$user->is_block 
-                        && $user->hasAnyRole(['Admin','Representative','Attendee','Speaker']))
-                   <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST">
-                      @csrf
-                    @method('PATCH')
-                  <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14">
-                    Block User
-                  </button>
-                  </form>
-                  @endif
 
-
-    @if(Auth::user()->hasRole('Support Staff Or Helpdesk') && $user->is_block)
-        <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST">
-            @csrf
-            @method('PATCH')
-            <button type="submit" class="btn btn-success btn-pill btn-streach font-book fs-14">
-                Unblock User
-            </button>
-        </form>
-    @endif
-    </div>
                 <h5 class="pb-2 border-bottom mb-4">Speaker Details</h5>
 
                 <div class="info-container">
                        <div class="row">   
 
-                        <div class="text-left mb-2">
+                        <div class="col-6 text-left mb-2">
                             <label for="profileImageInput">
                               <img id="profileImagePreview" 
                                    src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
-                                   class="rounded-circle border border-2" 
+                                   class=" border border-2" 
                                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
                             </label>
-                        </div>    
+                        </div> 
+
+                        <div class="col-4">
+                                 <img id="profileImagePreview" 
+                                   src="{{!empty($user->coverphoto) ? $user->coverphoto->file_path : ''}}" style="width:100%; object-fit: cover; cursor: pointer;">
+                                 
+                        </div>
+   
                         <div class="col-12 mt-2">
                             <ul class="list-unstyled justify-content-between">
                             <li class="mb-3"><span class="fw-medium me-2">Bio:</span><span>{{$user->bio ?? ''}}</span></li>
                              </ul>
                         </div>  
-                        <div class="col-4">
+                        <div class="col-6">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Name:</span> <span>{{ $user->name }}
                                             {{ $user->lastname }}</span></li>
@@ -89,7 +72,7 @@ Admin | Speaker Details
                                     </li>
                                 </ul>
                             </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <ul class="list-unstyled justify-content-between">
                                     <li class="mb-3"><span class="fw-medium me-2">Website:</span> <span>{{ $user->website_url }}</span></li>
                                    
@@ -99,12 +82,6 @@ Admin | Speaker Details
                                    <li class="mb-3"><span class="fw-medium me-2">Instagram:</span> <span>{{ $user->instagram_url }}</span></li>
                                    <li class="mb-3"><span class="fw-medium me-2">Twitter:</span> <span>{{ $user->twitter_url }}</span></li> 
                                 </ul>
-                            </div>
-
-                            <div class="col-4">
-                                 <img id="profileImagePreview" 
-                                   src="{{asset($user->qr_code)}}" style="width: 250px; height: 250px; object-fit: cover; cursor: pointer;">
-                                 
                             </div>
 
                         </div>
@@ -119,6 +96,4 @@ Admin | Speaker Details
 		</div>
     </div>
 </div>
-
-@include('users.ChangeUserPassword')
 @endsection

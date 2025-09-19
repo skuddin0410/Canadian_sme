@@ -5,11 +5,14 @@ namespace App\Models;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 
 class SessionDate extends Model
 {
-    //
-     protected $fillable = [
+    use  Auditable;
+    use AutoHtmlDecode;
+    protected $fillable = [
         'user_id',
         'token',
         'expires_at',
