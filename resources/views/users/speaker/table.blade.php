@@ -39,7 +39,7 @@
 		<th>Name</th>
 		<th>Email</th>
 		<th>Mobile</th>
-		<th>QR Code</th>
+		<th>Designation</th>
 		<th width="28%">Action</th>
 	</tr>
 </thead>
@@ -49,42 +49,11 @@
     	<th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
-		<th>
-		
-		@if($user->qr_code)
-        <a href="{{ route('speaker.qr.download', $user->id) }}" 
-           class="btn btn-sm btn-primary" 
-           title="Download QR">
-             Download QR
-        </a>
-        @else
-          <span class="text-muted">No QRCode Generated Yet</span>
-        @endif
-		
-	</th>
+	   <th>{{$user->designation ?? ''}}</th>
 		{{-- <th>{{dateFormat($user->created_at) ?? '' }}</th> --}}
 		<th>
     <div class="d-flex gap-1">
-		 <form action="{{ route('speakers.allow-access', $user->id) }}" method="POST" style="display:inline;">
-            @csrf
-            @if($user->is_approve == 0)
-                <button type="submit" class="btn btn-sm btn-primary" title="App access approved">
-                   Allow App Access
-                </button>
-            @else
-                <button type="submit" class="btn btn-sm btn-secondary" title="Reject app access">
-                    Reject App Access
-                </button>
-            @endif
-        </form>
-		
-		  <!--   <button type="button" 
-        class="btn btn-sm btn-primary" 
-        data-bs-toggle="modal" 
-        data-bs-target="#sendMailModal{{ $user->id }}">
-         Send Mail
-        </button>
-         -->
+	
         <a href="{{ route('speaker.show', $user->id) }}" class="btn btn-sm btn-icon btn-primary"  title="View">
             <i class="bx bxs-show"></i>
         </a>

@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\MailLog;
 
+use App\Models\Speaker;
+
 class SpeakerController extends Controller
 {
     /**
@@ -39,16 +41,10 @@ class SpeakerController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-            $users = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ['Speaker']);
-                })->where('primary_group','Speaker')->orderBy('created_at', 'DESC')
-                  ->orWhere('secondary_group', 'Speaker');
-
+            $users = Speaker::orderBy('created_at', 'DESC');
             if ($request->search) {
                 $users = $users->where(function ($query) use ($request) {
                     $query->where('name', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('username', 'LIKE', '%' . $request->search . '%');
                     $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
                     $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
                 });
@@ -65,7 +61,7 @@ class SpeakerController extends Controller
            
 
             $usersCount = clone $users;
-            $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
+            $totalRecords = $usersCount->count(DB::raw('DISTINCT(speakers.id)'));
             $users = $users->offset($offset)->limit($perPage)->get();
             $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
                 'path'  => $request->url(),
@@ -89,16 +85,7 @@ class SpeakerController extends Controller
      */
     public function create()
     {
-        $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
-                $q->whereIn("name", ['Speaker']);
-            })->orderBy('created_at', 'DESC')->get();
-
-        $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
-
-        $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
-
-        $groups = config('roles.groups');
-        return view('users.speaker.create',compact('groups','exhibitors','sponsors','speakers'));
+        return view('users.speaker.create');
     }
 
     /**
@@ -107,39 +94,24 @@ class SpeakerController extends Controller
     public function store(Request $request)
     {  
        $validator = Validator::make($request->all(), [
-         
+        
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'nullable|string|max:255|email|unique:users,email',
             'designation' => 'nullable|string|max:255' ,
-            'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|url',
             'linkedin_url' => 'nullable|url',
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-             'mobile' => [
+            'mobile' => [
                 'nullable',
                 'string',
                 'regex:/^\+?[0-9]{10,15}$/',
                 'unique:users,mobile',
             ],
             'bio' => 'required|string',
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'], 
-            'tags'   => ['nullable','array'],
-            'tags.*' => ['string'], 
-
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'],  
-            'primary_group' => 'required|string', 
-
-          'access_speaker_ids'    => ['nullable','array'],
-          'access_speaker_ids.*'  => ['integer','exists:users,id'],
-          'access_exhibitor_ids'  => ['nullable','array'],
-          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
-          'access_sponsor_ids'    => ['nullable','array'],
-          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],                
+              
         ]);
 
         if ($validator->fails()) {
@@ -147,17 +119,16 @@ class SpeakerController extends Controller
                 ->withErrors($validator);
         }
 
-        $user = new User();
+        $user = new Speaker();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
         $user->email = $request->email;
         $user->company = $request->company;
-        $user->primary_group = $request->primary_group;
-        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
-        $user->status = $request->status;
+       
+
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags =  !empty($request->tags) ? implode(',',$request->tags) : '';
+
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->instagram_url;
@@ -165,52 +136,25 @@ class SpeakerController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
-        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
-        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
-        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
         $user->save();
-        
-        $primaryGroupArray= [];
-        $secondaryGroupArray=[];
-         
-        if(!empty($request->primary_group)) {
-          $primaryGroupArray = explode(',', $request->primary_group);   
-        }
-        if(!empty($request->secondary_group)) {
-          $secondaryGroupArray = $request->secondary_group;
-        } else {
-          $secondaryGroupArray = ['Speaker']; 
-        }
 
-
-       if (!in_array('Speaker', $secondaryGroupArray)) {
-        $secondaryGroupArray[] = 'Speaker';
-       }
-        
-          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
-          $combinedGroups = array_unique($combinedGroups); 
-       
-        if(!empty($combinedGroups)){
-          $user->syncRoles($combinedGroups);  
-        }
-        
 
         if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+          $this->imageUpload($request->file("image"),"speakers",$user->id,'speakers','photo',$user->id);
         }
 
          if ($request->hasFile('cover_image')) {
-          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+          $this->imageUpload($request->file("cover_image"),"speakers",$user->id,'speakers','cover_photo',$user->id);
         }
 
         if (!empty($request->private_docs)) {
 
           foreach($request->private_docs as $img){
-             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
+             $this->imageUpload($img,"speakers",$user->id,'speakers','private_docs'); 
           }  
           
         }
-        qrCode($user->id);
+    
    
 
       return redirect(route('speaker.index'))
@@ -222,7 +166,7 @@ class SpeakerController extends Controller
      */
     public function show($id)
     {
-        $user = User::findOrFail($id); // ensures fresh data
+        $user = Speaker::findOrFail($id); // ensures fresh data
         return view('users.speaker.view', compact('user'));
 
     }
@@ -231,21 +175,10 @@ class SpeakerController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    {
-        
-    $user = User::findOrFail($id);
-
-    $speakers = User::select('id','name','lastname')->with("roles")->whereHas("roles", function ($q) {
-                $q->whereIn("name", ['Speaker']);
-            })->orderBy('created_at', 'DESC')->get();
-
-    $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
-
-    $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
-
+    {    
+    $user = Speaker::findOrFail($id);
     $groups = config('roles.groups');
-
-    return view('users.speaker.edit', compact('user','groups','exhibitors','sponsors','speakers'));
+    return view('users.speaker.edit', compact('user','groups'));
     }
 
     /**
@@ -254,7 +187,7 @@ class SpeakerController extends Controller
     public function update(Request $request, string $id)
     {
         
-    $user = User::findOrFail($id);
+    $user = Speaker::findOrFail($id);
         $validator = Validator::make($request->all(), [
             
             'first_name' => 'required|string|max:255',
@@ -266,21 +199,7 @@ class SpeakerController extends Controller
             'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'nullable|string|unique:users,mobile,' . $user->id,
             'bio' => 'required|string',
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'], 
-            'tags'   => ['nullable','array'],
-            'tags.*' => ['string'], 
-
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'],  
-            'primary_group' => 'required|string', 
-
-         'access_speaker_ids'    => ['nullable','array'],
-          'access_speaker_ids.*'  => ['integer','exists:users,id'],
-          'access_exhibitor_ids'  => ['nullable','array'],
-          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
-          'access_sponsor_ids'    => ['nullable','array'],
-          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],        
+     
         ]);
 
         if ($validator->fails()) {
@@ -291,12 +210,8 @@ class SpeakerController extends Controller
         $user->lastname = $request->last_name;
         $user->email = $request->email;
         $user->company = $request->company;
-        $user->primary_group = $request->primary_group;
-        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
-        $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags = !empty($request->tags) ? implode(',',$request->tags) : '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->linkedin_url;
@@ -304,43 +219,24 @@ class SpeakerController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
-        $user->access_speaker_ids = !empty($request->access_speaker_ids) ? implode(',',$request->access_speaker_ids) : '';
-        $user->access_exhibitor_ids =!empty($request->access_exhibitor_ids) ?  implode(',',$request->access_exhibitor_ids) : '';
-        $user->access_sponsor_ids = !empty($request->access_sponsor_ids) ? implode(',',$request->access_sponsor_ids) : '';
         $user->save();
 
-        $primaryGroupArray= [];
-        $secondaryGroupArray=[];
-         
-        if(!empty($request->primary_group)) {
-          $primaryGroupArray = explode(',', $request->primary_group);   
-        }
-        if(!empty($request->secondary_group)) {
-          $secondaryGroupArray = $request->secondary_group ?? [];
-        }
-          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
-          $combinedGroups = array_unique($combinedGroups); 
-        
-        if(!empty($combinedGroups)){
-          $user->syncRoles($combinedGroups);  
-        }
 
         if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+          $this->imageUpload($request->file("image"),"speakers",$user->id,'speakers','photo',$user->id);
         }
 
          if ($request->hasFile('cover_image')) {
-          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+          $this->imageUpload($request->file("cover_image"),"speakers",$user->id,'speakers','cover_photo',$user->id);
         }
 
         if (!empty($request->private_docs)) {
 
           foreach($request->private_docs as $img){
-             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
+             $this->imageUpload($img,"speakers",$user->id,'speakers','private_docs'); 
           }  
           
         }
-        qrCode($user->id);
 
      return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');
@@ -351,7 +247,7 @@ class SpeakerController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = Speaker::findOrFail($id);
         $user->roles()->detach();
         $user->delete();
 
@@ -359,6 +255,7 @@ class SpeakerController extends Controller
             ->route('speaker.index')
             ->withSuccess('Speaker user deleted successfully.');
     }
+
     public function toggleBlock(User $user)
     {
     $currentUser = auth()->user();
@@ -377,10 +274,9 @@ class SpeakerController extends Controller
 
     }
 
-    
-
     return back()->withErrors('You do not have permission to perform this action.');
 }
+
 public function downloadQr($userid){
     return downloadQrCode($userid);
 }
@@ -391,11 +287,7 @@ public function exportSpeakers()
 
 public function allowAccess(string $id)
 {
-    $user = User::with('roles')
-        ->whereHas('roles', function ($q) {
-            $q->where('name', 'Speaker');
-        })
-        ->findOrFail($id);
+    $user = Speaker::findOrFail($id);
     
     if($user->is_approve == 1){
        $user->is_approve = 0;
@@ -416,7 +308,7 @@ public function sendMail(Request $request, $id)
         'message' => 'required|string',
     ]);
 
-    $user = User::with('roles')
+    $user = Speaker::with('roles')
         ->whereHas('roles', function ($q) {
             $q->where('name', 'Speaker');
         })

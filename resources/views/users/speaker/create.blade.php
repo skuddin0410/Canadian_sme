@@ -158,75 +158,6 @@ Admin | Speaker Add
                         @error('designation') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
 
-                        {{-- NEW: Primary & Secondary Groups --}}
-                      <div class="col-md-6">
-                        <label class="form-label">User Primary Group<span class="text-danger">*</span></label>
-                        <select class="form-select mb-3" name="primary_group">
-                           <option value="Attendee">Attendee</option>
-                        </select>
-                        @error('primary_group') <div class="text-danger">{{ $message }}</div> @enderror
-                      </div>
-
-                      <div class="col-md-6">
-                        <label class="form-label">User Other Group</label>
-                    @php
-                       $rawSelected = old('secondary_group', $user->secondary_group ?? []);
-                       $selectedSecondary = is_array($rawSelected)
-                    ? $rawSelected
-                     : (strlen((string) $rawSelected) ? explode(',', (string) $rawSelected) : []);
-
-  
-                    if (empty($selectedSecondary)) {
-                      $selectedSecondary = ['Speaker'];
-                    }
-                    @endphp
-
-                  <label class="form-label">User Secondary Group (multiple)</label>
-                  <select class="form-select mb-3" name="secondary_group[]" id="secondary_group" multiple>
-                    @foreach(($groups ?? []) as $g)
-                    @if($g !=="Attendee")
-                      <option value="{{ $g }}" {{ in_array($g, $selectedSecondary, true) ? 'selected' : '' }}>
-                        {{ $g }}
-                      </option>
-                    @endif  
-                    @endforeach
-                  </select>
-                   <small class="text-muted">Hold <kbd>Ctrl</kbd>/<kbd>⌘</kbd> to select more than one.</small>
-                       @error('secondary_group') <div class="text-danger">{{ $message }}</div> @enderror
-
-                        @error('secondary_group') <div class="text-danger">{{ $message }}</div> @enderror
-                      </div>
-
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label class="form-label">User Interest</label>
-                          <div class="d-flex flex-wrap gap-2">
-                            @if(!empty(getCategory('tags,connections')))
-                            @foreach(getCategory('tags,connections') as $tag)
-                            <input type="checkbox" class="btn-check" id="{{$tag->slug}}{{$tag->id}}" name="tags[]" value="{{$tag->name}}"
-                              {{ in_array($tag->name, old('tags', $user->tags ?? [])) ? 'checked' : '' }}>
-                            <label class="btn btn-outline-primary" for="{{$tag->slug}}{{$tag->id}}">{{$tag->name}}</label>
-                            @endforeach 
-                            @endif
-                          </div>
-                          @error('tags')
-                            <div class="text-danger">{{ $message }}</div>
-                          @enderror
-                        </div>
-
-                      </div>
-
-                      <div class="col-md-6">
-                        <label class="form-label">Status</label>
-                        <select class="form-select mb-3" name="status">
-                          @php $status = old('status', $user->status ?? 'confirmed'); @endphp
-                          <option value="confirmed" {{ $status==='confirmed'?'selected':'' }}>Confirmed</option>
-                          <option value="waitlist" {{ $status==='waitlist'?'selected':'' }}>Waitlist</option>
-                          <option value="inactive" {{ $status==='inactive'?'selected':'' }}>Inactive</option>
-                        </select>
-                        @error('status') <div class="text-danger">{{ $message }}</div> @enderror
-                      </div>
-
 
                       <div class="col-12">
                         <label class="form-label">Bio <span class="text-danger">*</span></label>
@@ -239,12 +170,6 @@ Admin | Speaker Add
                         <div class="row">
                           <div class="col-md-12">
                             <div class="form-check mb-2">
-                              <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1" {{ old('send_email', $user->send_email ?? false) ? 'checked' : '' }}>
-                              <label class="form-check-label" for="send_email">Would you like to send email?</label>
-                            </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="form-check mb-2">
                               <input class="form-check-input" type="checkbox" id="gdpr_consent" name="gdpr_consent" value="1" {{ old('gdpr_consent', $user->gdpr_consent ?? false) ? 'checked' : '' }}>
                               <label class="form-check-label" for="gdpr_consent">Networking / GDPR Consent (share profile & content with other users)</label>
                             </div>
@@ -255,11 +180,6 @@ Admin | Speaker Add
                 </div>
 
                 <div class="col-lg-4">
-                  
-                   {{--  <div class="d-flex align-items-center">
-                      <i class="bx bx-share-alt fs-4 me-2"></i><span class="fw-semibold">Social Links</span>
-                    </div> --}}
-                  
                       <div class="mb-3">
                         <label class="form-label">Website</label>
                         <div class="input-group input-group-merge">
@@ -309,55 +229,6 @@ Admin | Speaker Add
               </div>
               </div>
 
-              {{-- ACCESS PERMISSIONS --}}
-              <div class="tab-pane fade" id="access" role="tabpanel">
-                <div class="row">
-                
-                    
-                    <div class="col-md-12">
-                      <label class="form-label">Speaker</label>
-                      <select class="form-select select2" name="access_speaker_ids[]" multiple
-                              data-placeholder="Select speaker(s)" data-allow-clear="true">
-                        @foreach($speakers as $speaker)
-                          <option value="{{ $speaker->id }}">
-                            {{ $speaker->full_name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_speaker_ids') <div class="text-danger">{{ $message }}</div> @enderror
-                    </div>
-
-                    {{-- EXHIBITORS --}}
-                   
-                    <div class="col-md-12">
-                      <label class="form-label">Exhibitor</label>
-                      <select class="form-select select2" name="access_exhibitor_ids[]" multiple
-                              data-placeholder="Select exhibitor(s)" data-allow-clear="true">
-                        @foreach($exhibitors as $exhibitor)
-                          <option value="{{ $exhibitor->id }}">
-                            {{ $exhibitor->name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_exhibitor_ids') <div class="text-danger">{{ $message }}</div> @enderror
-                    </div>
-
-      
-                    <div class="col-md-12">
-                      <label class="form-label">Sponsors</label>
-                      <select class="form-select select2" name="access_sponsor_ids[]" multiple
-                              data-placeholder="Select sponsor(s)" data-allow-clear="true">
-                        @foreach($sponsors as $sponsor)
-                          <option value="{{ $sponsor->id }}">
-                            {{ $sponsor->name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_sponsor_ids') <div class="text-danger">{{ $message }}</div> @enderror
-                    </div>
-
-                </div>
-              </div>
 
               {{-- PRIVATE DOCS --}}
               <div class="tab-pane fade" id="docs" role="tabpanel">
