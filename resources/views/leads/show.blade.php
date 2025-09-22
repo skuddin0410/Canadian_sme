@@ -13,7 +13,6 @@
 <div class="container flex-grow-1 container-p-y pt-0">
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <div>
-            {{dd($lead)}}
             <h1 class="h4 fw-bold text-dark">Lead Details</h1>
             <p class="text-muted">Information about <strong>{{ $lead->first_name }} {{ $lead->last_name }}</strong></p>
         </div>
