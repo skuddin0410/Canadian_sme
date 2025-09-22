@@ -23,7 +23,7 @@ Route::get('/exhibitor/{slug}', [LandingController::class, 'exhibitor'])->name('
 Route::get('/profile', [LandingController::class, 'profile'])->name('profile');
 Route::get('/profile', [LandingController::class, 'attendeeIndex'])->name('profile-index');
 Route::get('/sponsor', [LandingController::class, 'sponsorIndex'])->name('sponsor-index');
-Route::get('/sponsor/{id}', [LandingController::class, 'sponsor'])->name('sponsor');
+Route::get('/sponsor/{slug}', [LandingController::class, 'sponsor'])->name('sponsor');
 Route::get('/speaker/{slug}', [LandingController::class, 'speaker'])->name('speaker');
 
 Route::get('/venue', [LandingController::class, 'venue'])->name('venue');

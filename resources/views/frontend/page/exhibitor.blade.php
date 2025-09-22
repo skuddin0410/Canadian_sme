@@ -50,7 +50,7 @@
                     </div>
                     <div>
                         <a class="view-more position-relative d-flex
-                        align-items-center gap-2" href="{{route('exhibitor',$exhibitor->id)}}">
+                        align-items-center gap-2" href="{{route('exhibitor',$exhibitor->slug)}}">
                             View More
                         </a>
                     </div>
