@@ -160,6 +160,15 @@ class AttendeeUserController extends Controller
                 ->withErrors($validator);
         }
         
+        if (!empty($request->access_speaker_ids)) {
+            $existingUser = User::where('access_speaker_ids', $request->access_speaker_ids)->exists();
+
+            if ($existingUser) {
+                return redirect(route('attendee-users.create'))->withInput()
+                ->withErrors('One or more of the selected speaker IDs are already assigned to another user.');
+            }
+        }
+
         $user = new User();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
@@ -205,7 +214,7 @@ class AttendeeUserController extends Controller
           $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
         }
 
-         if ($request->hasFile('cover_image')) {
+        if ($request->hasFile('cover_image')) {
           $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
         }
 
@@ -287,6 +296,16 @@ class AttendeeUserController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
+        }
+        
+         if (!empty($request->access_speaker_ids)) {
+            $existingUser = User::where('access_speaker_ids', $request->access_speaker_ids)->exists();
+
+            if ($existingUser) {
+                
+                return redirect(route('attendee-users.create'))->withInput()
+                ->withErrors('One or more of the selected speaker IDs are already assigned to another user.');
+            }
         }
 
         $user->name = $request->first_name;
