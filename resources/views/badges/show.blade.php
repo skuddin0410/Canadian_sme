@@ -22,9 +22,43 @@
                         <div class="mt-4">
                         <h5>Selected Fields:</h5>
                         <ul class="list-unstyled">
-                            @foreach($badge->selected_fields as $field)
-                                <li><i class="fas fa-check text-success me-2"></i>{{ ucwords(str_replace('_', ' ', $field)) }}</li>
-                            @endforeach
+                                @php
+                                    $raw = $badge->selected_fields ?? [];
+
+                                    if ($raw instanceof \Illuminate\Support\Collection) {
+                                        $fields = $raw->all();
+                                    } elseif (is_array($raw)) {
+                                        $fields = $raw;
+                                    } elseif (is_string($raw)) {
+                                        // Try JSON first
+                                        $decoded = json_decode($raw, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $fields = $decoded;
+                                        } else {
+                                            // Fallback: comma-separated or bracketed string
+                                            $clean  = trim($raw, "[] \t\n\r\0\x0B\"'");
+                                            $fields = $clean === ''
+                                                ? []
+                                                : array_filter(array_map(
+                                                    fn ($v) => trim($v, " \t\n\r\0\x0B\"'"),
+                                                    explode(',', $clean)
+                                                ));
+                                        }
+                                    } else {
+                                        $fields = [];
+                                    }
+                                @endphp
+
+                                @if(!empty($fields))
+                                    @foreach($fields as $field)
+                                        <li>
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            {{ ucwords(str_replace('_', ' ', $field)) }}
+                                        </li>
+                                    @endforeach
+                                @endif
+
+
                         </ul>
                         </div>
                     </div>

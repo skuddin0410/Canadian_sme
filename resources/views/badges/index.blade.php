@@ -29,7 +29,40 @@
                                 </h5>
                                 <p class="card-text">
                                     <small class="text-muted">
-                                        Fields: {{ implode(', ', $badge->selected_fields) }}
+                                        Fields:                                 @php
+                                    $raw = $badge->selected_fields ?? [];
+
+                                    if ($raw instanceof \Illuminate\Support\Collection) {
+                                        $fields = $raw->all();
+                                    } elseif (is_array($raw)) {
+                                        $fields = $raw;
+                                    } elseif (is_string($raw)) {
+                                        // Try JSON first
+                                        $decoded = json_decode($raw, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $fields = $decoded;
+                                        } else {
+                                            // Fallback: comma-separated or bracketed string
+                                            $clean  = trim($raw, "[] \t\n\r\0\x0B\"'");
+                                            $fields = $clean === ''
+                                                ? []
+                                                : array_filter(array_map(
+                                                    fn ($v) => trim($v, " \t\n\r\0\x0B\"'"),
+                                                    explode(',', $clean)
+                                                ));
+                                        }
+                                    } else {
+                                        $fields = [];
+                                    }
+                                @endphp
+
+                                @if(!empty($fields))
+                                    @foreach($fields as $field)
+                              
+                                            {{ ucwords(str_replace('_', ' ', $field)) }}
+                                        
+                                    @endforeach
+                                @endif
                                     </small>
                                 </p>
                                 <div class="btn-group w-100">
