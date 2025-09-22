@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\UserWelcome;
 use App\Models\Badge;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 
 if (!function_exists('getCategory')) {
@@ -67,40 +68,103 @@ if (!function_exists('userDateFormat')) {
     }
 }
 
-if (!function_exists('createSlug')) {
-  function createSlug($str, $delimiter = '-')
-  {
-    
-      if ($str != '') {
-        $unwanted_array = [
-          'ś' => 's',
-          'ą' => 'a',
-          'ć' => 'c',
-          'ç' => 'c',
-          'ę' => 'e',
-          'ł' => 'l',
-          'ń' => 'n',
-          'ó' => 'o',
-          'ź' => 'z',
-          'ż' => 'z',
-          'Ś' => 's',
-          'Ą' => 'a',
-          'Ć' => 'c',
-          'Ç' => 'c',
-          'Ę' => 'e',
-          'Ł' => 'l',
-          'Ń' => 'n',
-          'Ó' => 'o',
-          'Ź' => 'z',
-          'Ż' => 'z'
-        ]; // Polish letters for example
-        $str = strtr($str, $unwanted_array);
-        $slug = strtolower(trim(preg_replace('/[\s-]+/', $delimiter, preg_replace('/[^A-Za-z0-9-]+/', $delimiter, preg_replace('/[&]/', 'and', preg_replace('/[\']/', '', iconv('utf-8', 'us-ascii//IGNORE', $str))))), $delimiter));
+
+if (!function_exists('createSlugBase')) {
+    /**
+     * Create the base slug string from a title (with custom transliteration).
+     */
+    function createSlugBase(string $str, string $delimiter = '-'): string
+    {
+        if ($str === '') return '';
+
+        // Custom mapping (your original list; extend as needed)
+        $unwanted = [
+            'ś' => 's','ą' => 'a','ć' => 'c','ç' => 'c','ę' => 'e','ł' => 'l','ń' => 'n','ó' => 'o','ź' => 'z','ż' => 'z',
+            'Ś' => 's','Ą' => 'a','Ć' => 'c','Ç' => 'c','Ę' => 'e','Ł' => 'l','Ń' => 'n','Ó' => 'o','Ź' => 'z','Ż' => 'z',
+        ];
+
+        $str = strtr($str, $unwanted);
+
+        // Best-effort ASCII fallback (iconv can return false; guard it)
+        $ascii = @iconv('UTF-8', 'US-ASCII//IGNORE', $str);
+        if ($ascii === false) $ascii = $str;
+
+        // Normalize: replace & with 'and', drop apostrophes, keep alnum and dashes
+        $ascii = preg_replace('/&/u', 'and', $ascii);
+        $ascii = preg_replace('/[\']/u', '', $ascii);
+        $slug  = preg_replace('/[^A-Za-z0-9-]+/u', $delimiter, $ascii);
+        $slug  = preg_replace('/[\s-]+/u', $delimiter, $slug);
+        $slug  = strtolower(trim($slug, $delimiter));
+
         return $slug;
-      }
-  }
+    }
 }
 
+
+if (!function_exists('createUniqueSlug')) {
+    /**
+     * Create a unique slug for a given table (and column), optionally ignoring a row ID.
+     *
+     * @param  string      $table       Table name (e.g. 'posts')
+     * @param  string      $title       Source text to slugify
+     * @param  string      $column      Column name that stores the slug (default 'slug')
+     * @param  int|null    $ignoreId    Existing row ID to exclude (useful on update)
+     * @param  string      $delimiter   Slug delimiter (default '-')
+     * @return string
+     * createUniqueSlug('posts', $request->title); Create (table: posts, column: slug)
+     * createUniqueSlug('posts', $request->title, 'slug', 15);         // e.g., keeps "hello-world" unless another row has it
+     */
+    function createUniqueSlug(
+        string $table,
+        string $title,
+        string $column = 'slug',
+        ?int $ignoreId = null,
+        string $delimiter = '-'
+    ): string {
+        $base = createSlugBase($title, $delimiter);
+
+        // If the base becomes empty (e.g., only symbols), fall back to a short token
+        if ($base === '') {
+            $base = 'item';
+        }
+
+        // If no collision, return early
+        $existsQuery = DB::table($table)->where($column, $base);
+        if ($ignoreId !== null) {
+            $existsQuery->where('id', '!=', $ignoreId);
+        }
+        if (!$existsQuery->exists()) {
+            return $base;
+        }
+
+        // Pull all conflicting slugs that start with the base (e.g., 'post-title', 'post-title-2', 'post-title-10')
+        $like = $base . '%';
+        $candidates = DB::table($table)
+            ->select($column)
+            ->when($ignoreId !== null, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->where($column, 'like', $like)
+            ->pluck($column)
+            ->all();
+
+        // Find the highest numeric suffix currently used
+        $max = 1; // start at "-2" (since base exists)
+        $pattern = '/^' . preg_quote($base, '/') . $delimiter . '(\d+)$/';
+
+        foreach ($candidates as $slug) {
+            if ($slug === $base) {
+                // base taken; ensure we'll return at least "-2"
+                $max = max($max, 1);
+                continue;
+            }
+            if (preg_match($pattern, $slug, $m)) {
+                $num = (int) $m[1];
+                $max = max($max, $num);
+            }
+        }
+
+        return $base . $delimiter . ($max + 1);
+    }
+}
 
 
 if (!function_exists('getKeyValue')) {
