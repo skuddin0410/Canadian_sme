@@ -29,6 +29,7 @@ use App\Mail\UserWelcome;
 use App\Models\EmailTemplate;
 use OneSignal;
 use App\Models\Speaker;
+use Illuminate\Support\Facades\Crypt;
 
 
 class AttendeeUserController extends Controller
