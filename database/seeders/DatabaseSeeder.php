@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             SupportSeeder::class,
             SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
             AddExhibitorUsers::class,
+            UpdateSlugsSeeder::class, //php artisan db:seed --class=UpdateSlugsSeeder
             AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             //AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
             UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder

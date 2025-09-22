@@ -26,6 +26,7 @@ class Speaker extends Model
         'mobile',
         'bio',
         'gdpr_consent',
+        'slug'
 
     ];
 

@@ -69,7 +69,8 @@ class User extends Authenticatable implements JWTSubject
         'access_sponsor_ids',
         'title',
         'onesignal_userid',
-        'jwt_token'
+        'jwt_token',
+        'slug'
     ];
 
     /**
