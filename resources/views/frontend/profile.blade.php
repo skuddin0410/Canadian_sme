@@ -9,17 +9,17 @@
     <div class="col-lg-8">
       <div class="card shadow-sm rounded-4">
         <div class="card-body p-3 p-sm-4">
-          <div class="d-flex flex-column d-sm-grid gap-2 gap-sm-4 align-items-center mb-4" style="grid-template-columns: 120px auto;">
-           <div class="text-left mb-2 rounded-circle overflow-hidden border" 
-           style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;">
+          <div class="d-flex flex-column d-sm-grid gap-2 gap-sm-4 align-items-center mb-4" style="grid-template-columns: 150px auto;">
+           <div class="text-left mb-2 overflow-hidden border" 
+           style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
     <label for="profileImageInput">
         @if(!empty($attendee->photo) && !empty($attendee->photo->file_path))
             <img id="profileImagePreview"
                  src="{{ $attendee->photo->file_path }}"
                  class="border border-2"
-                 style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;">
+                 style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
         @else
-            <div style="width: 120px; height: 120px; display: flex; 
+            <div style="width: 150px; height: 150px; display: flex; 
                         align-items: center; justify-content: center; 
                         cursor: pointer;">
                 <span class="small-heading-blue mb-0" style="font-size: 48px;">

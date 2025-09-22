@@ -187,10 +187,12 @@ public function schedules()
     return $schedules;
 }
 
-public function profile($id)
+public function profile($slug)
 {
    
-    $attendee = User::with(['photo'])->findOrFail($id);
+    $attendee = User::with(['photo'])
+     ->where('slug', $slug)
+     ->firstOrFail();
 
    
     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
@@ -202,26 +204,30 @@ public function profile($id)
 
     return view('frontend.profile', compact('attendee', 'session', 'event'));
 }
-   public function speaker($id)
-  {
-   
-    $speaker = User::with(['photo','coverphoto' ])->findOrFail($id);
+public function speaker($slug)
+{
+    
+    $speaker = User::with(['photo', 'coverphoto'])
+        ->where('slug', $slug)
+        ->firstOrFail();
 
-   
+    
     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
         ->where('start_time', '>=', now())
         ->orderBy('start_time', 'ASC')
         ->first();
 
+   
     $event = Event::with('photo')->first();
 
     return view('frontend.speaker', compact('speaker', 'session', 'event'));
 }
 
-public function exhibitor( Request $request,$id){ 
+
+public function exhibitor( Request $request,$slug){ 
 
     $company = Company::with(['contentIconFile','quickLinkIconFile','user','Docs' ])
-        ->where('id', $id)
+        ->where('slug', $slug)
         ->firstOrFail();
     $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
         ->where('start_time', '>=', now())
@@ -234,10 +240,10 @@ public function exhibitor( Request $request,$id){
     return view('frontend.company',compact('company' , 'sessions'));
 }
 
-public function sponsor( Request $request,$id){ 
+public function sponsor( Request $request,$slug){ 
 
     $company = Company::with(['logo','banner' ])
-        ->where('id', $id)
+        ->where('slug', $slug)
         ->where('is_sponsor', 1)  
         ->firstOrFail();
     $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
@@ -253,15 +259,19 @@ public function sponsor( Request $request,$id){
 
     
 
-public function session(Request $request , $id){
-    $speaker = User::with(['photo'])->findOrFail($id);
+ public function session(Request $request, $slug)
+{
+    
+    $session = Session::with(['speakers'])->where('slug', $slug)->firstOrFail();
 
-   
-    $session = Session::with(['speakers'])->findOrFail($id);
-        
+    
+    $speaker = $session->speakers->first();
+
     $event = Event::with('photo')->first();
-       return view('frontend.session',compact('session','event','speaker'));
-    }
+
+    return view('frontend.session', compact('session', 'event', 'speaker'));
+}
+
     
     
     

@@ -46,7 +46,7 @@
                             </div>
                             <div>
                                 <a class="view-more position-relative d-flex
-                                align-items-center gap-2" href="{{route('profile', $attendee->id)}}">
+                                align-items-center gap-2" href="{{route('profile', $attendee->slug)}}">
                                     View More
                                 </a>
                             </div>
@@ -57,7 +57,7 @@
             <div class="d-flex justify-content-center mt-4 d-xl-none">
                 <a class="heroBtn btn-long" href="{{route('profile-index')}}">
                          View More
-                    </a>
+                </a>
             </div>
         </div>
     </section>

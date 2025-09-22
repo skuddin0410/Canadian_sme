@@ -26,7 +26,7 @@
                             @if(!empty($sponsors))
                              @foreach($sponsors as $sponsor)
                             <div class="swiper-slide">
-                                 <a href="{{ route('sponsor', $sponsor->id) }}" class="text-decoration-none">
+                                 <a href="{{ route('sponsor', $sponsor->slug) }}" class="text-decoration-none">
                                 <div class="swiper-img-box">
                                      @if($sponsor->logo)
                                       <img src="{{$sponsor->logo->file_path}}" alt="">

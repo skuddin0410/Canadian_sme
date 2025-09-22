@@ -22,7 +22,7 @@
                             @foreach($speakers as $speaker)
                             
                             <div class="swiper-slide">
-                                <a href="{{ route('speaker', $speaker->id) }}" class="text-decoration-none">
+                                <a href="{{ route('speaker', $speaker->slug) }}" class="text-decoration-none">
                                 <div class="swiper-img-box">
                                     @if(!empty($speaker->photo))
                                      <img src="{{ $speaker->photo->file_path}}" alt="">
