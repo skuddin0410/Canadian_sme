@@ -124,10 +124,11 @@ class Lead extends Model
     }
 
 
-// public function userActivities()
-// {
-//     return $this->hasMany(UserActivity::class, 'email', 'email');
-// }
+public function userActivities()
+{
+     return $this->hasMany(UserActivity::class, 'email', 'email');
+}
+
 public function recentActivities($days = 30)
 {
     return $this->userActivities()->recent($days);

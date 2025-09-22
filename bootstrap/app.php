@@ -23,8 +23,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'webauth' => \App\Http\Middleware\RedirectIfNotAuthenticated::class,
             'company.exists' => \App\Http\Middleware\EnsureCompanyExists::class,
         ]);
-    })
-    ->withExceptions(function (Exceptions $exceptions) {
+    })->withMiddleware(function (Middleware $middleware) {
+        $middleware
+        ->web(append: [
+            \App\Http\Middleware\TrackPageViews::class,
+        ])
+        ->api(append: [
+            \App\Http\Middleware\TrackPageViews::class,
+        ]);    
+    })->withExceptions(function (Exceptions $exceptions) {
         // Customize when to render JSON response
         $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
             return $request->is('api/*') || $request->expectsJson();

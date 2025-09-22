@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{config('app.name')}}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -48,11 +47,12 @@
           
           <!-- Header -->
           <tr>
-  <td align="left" bgcolor="#002364" style="padding:20px; display: flex; align-items: center; color: white;">
-    <img src="{{ asset('images/footer-logo.png') }}" alt="Company Logo" width="120" style="display:block; max-width:120px; width:100%; height:auto; margin-right: 15px;">
+           <td align="left" bgcolor="#002364" style="padding:20px; display: flex; align-items: center; color: white;">
+    <img src="{{asset('images/footer-logo.png')}}" alt="Company Logo" width="180" height="61"
+  style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:180px !important;height:61px !important;max-width:100%;margin-right:15px;margin-top:23px;">
     <div style="color:white;text-decoration: none;">
-      <p>{{ getKeyValue('company_name')->value }}</p>
-      <p>{{ getKeyValue('company_address')->value }}</p>
+      <p style="font-size: 15px;">{{ getKeyValue('company_name')->value }}</p>
+      <p style="font-size: 15px;">{{ getKeyValue('company_address')->value }}</p>
     </div>
   </td>
 </tr>
