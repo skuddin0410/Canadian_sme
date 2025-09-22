@@ -44,7 +44,7 @@ class UserActivity extends Model
     const TYPE_EMAIL_OPEN = 'email_open';
     const TYPE_DOWNLOAD = 'download';
     const TYPE_FORM_SUBMISSION = 'form_submission';
-    const TYPE_PROPERTY_INQUIRY = 'property_inquiry';
+    const TYPE_SESSION_INQUIRY = 'session_inquiry';
     const TYPE_NEWSLETTER_SIGNUP = 'newsletter_signup';
     const TYPE_PHONE_CALL = 'phone_call';
     const TYPE_CHAT_MESSAGE = 'chat_message';
@@ -59,7 +59,7 @@ class UserActivity extends Model
             self::TYPE_EMAIL_OPEN => 'Email Open',
             self::TYPE_DOWNLOAD => 'Download',
             self::TYPE_FORM_SUBMISSION => 'Form Submission',
-            self::TYPE_PROPERTY_INQUIRY => 'Property Inquiry',
+            self::TYPE_SESSION_INQUIRY => 'Session Inquiry',
             self::TYPE_NEWSLETTER_SIGNUP => 'Newsletter Signup',
             self::TYPE_PHONE_CALL => 'Phone Call',
             self::TYPE_CHAT_MESSAGE => 'Chat Message',
@@ -86,7 +86,7 @@ class UserActivity extends Model
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class, 'property_id', 'id')
-                    ->when($this->activity_type === self::TYPE_PROPERTY_INQUIRY, function ($query) {
+                    ->when($this->activity_type === self::TYPE_SESSION_INQUIRY, function ($query) {
                         return $query->whereJsonContains('metadata->property_id', $this->getPropertyIdFromMetadata());
                     });
     }
@@ -135,9 +135,9 @@ class UserActivity extends Model
         return $query->where('activity_type', self::TYPE_FORM_SUBMISSION);
     }
 
-    public function scopePropertyInquiries(Builder $query): Builder
+    public function scopeSessionInquiries(Builder $query): Builder
     {
-        return $query->where('activity_type', self::TYPE_PROPERTY_INQUIRY);
+        return $query->where('activity_type', self::TYPE_SESSION_INQUIRY);
     }
 
     public function scopeToday(Builder $query): Builder
@@ -240,7 +240,7 @@ class UserActivity extends Model
     {
         return in_array($this->activity_type, [
             self::TYPE_FORM_SUBMISSION,
-            self::TYPE_PROPERTY_INQUIRY,
+            self::TYPE_SESSION_INQUIRY,
             self::TYPE_DOWNLOAD,
             self::TYPE_PHONE_CALL,
             self::TYPE_CHAT_MESSAGE
@@ -250,7 +250,7 @@ class UserActivity extends Model
     public function isHighValue(): bool
     {
         return in_array($this->activity_type, [
-            self::TYPE_PROPERTY_INQUIRY,
+            self::TYPE_SESSION_INQUIRY,
             self::TYPE_PHONE_CALL,
             self::TYPE_FORM_SUBMISSION
         ]) || ($this->activity_type === self::TYPE_PAGE_VIEW && $this->time_spent > 300); // 5+ minutes
@@ -273,7 +273,7 @@ class UserActivity extends Model
             'email_opens' => $activities->where('activity_type', self::TYPE_EMAIL_OPEN)->count(),
             'downloads' => $activities->where('activity_type', self::TYPE_DOWNLOAD)->count(),
             'form_submissions' => $activities->where('activity_type', self::TYPE_FORM_SUBMISSION)->count(),
-            'property_inquiries' => $activities->where('activity_type', self::TYPE_PROPERTY_INQUIRY)->count(),
+            'property_inquiries' => $activities->where('activity_type', self::TYPE_SESSION_INQUIRY)->count(),
             'engagement_score' => self::calculateEngagementScore($activities),
             'last_activity' => $activities->max('activity_at'),
             'first_activity' => $activities->min('activity_at'),
@@ -303,7 +303,7 @@ class UserActivity extends Model
                 case self::TYPE_FORM_SUBMISSION:
                     $score += 10;
                     break;
-                case self::TYPE_PROPERTY_INQUIRY:
+                case self::TYPE_SESSION_INQUIRY:
                     $score += 15;
                     break;
                 case self::TYPE_PHONE_CALL:
@@ -398,7 +398,7 @@ class UserActivity extends Model
     public static function createPropertyInquiry(array $data): self
     {
         return self::create(array_merge($data, [
-            'activity_type' => self::TYPE_PROPERTY_INQUIRY,
+            'activity_type' => self::TYPE_SESSION_INQUIRY,
             'activity_at' => now()
         ]));
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use App\Models\User;
 use App\Models\Event;
+use App\Models\Session;
 use Illuminate\Http\Request;
 use App\Exports\LeadsExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -93,8 +94,23 @@ public function index(Request $request)
     public function show(Lead $lead)
     {
         //
-         $lead->load(['assignedAgent', 'matchedEvent', ]);
-         return view('leads.show', compact('lead'));
+         $lead->updateEngagementMetrics();
+         $counts = $lead->sessionInquiries()   
+                ->pluck('metadata')
+                ->map(function ($json) {
+                    $m = json_decode($json, true);
+                    return data_get($m, 'event_session_id');
+                })
+                ->filter()        
+                ->countBy();    
+                $session =[]; 
+                $uniqueIds   = $counts?->keys()?->values(); 
+                if(!empty($uniqueIds)){
+                  $session = Session::whereIn('id',$uniqueIds)->get(); 
+                } 
+                $uniqueCount = $counts?->count();  
+
+         return view('leads.show', compact('lead','uniqueIds','uniqueCount','session'));
     }
 
     /**

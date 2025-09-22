@@ -82,6 +82,13 @@
                 <p class="text-muted">No tags assigned</p>
             @endif
 
+            <h5 class="fw-bold mb-3">Lead Interest</h5>
+            @if(!empty($session))
+               @foreach($session as $value)
+                {{$value->title}}
+               @endforeach
+
+            @endif
         </div>
     </div>
 </div>
