@@ -12,8 +12,7 @@ return new class extends Migration
             // Add the column if it doesn't already exist
             if (!Schema::hasColumn('leads', 'session_inquiries')) {
                 $table->unsignedInteger('session_inquiries')
-                      ->default(0)
-                      ->after('form_submissions'); // adjust position as needed
+                      ->default(0); // adjust position as needed
             }
         });
     }
