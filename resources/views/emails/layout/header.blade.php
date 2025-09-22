@@ -48,7 +48,7 @@
           <!-- Header -->
           <tr>
            <td align="left" bgcolor="#002364" style="padding:20px; display: flex; align-items: center; color: white;">
-    <img src="images/footer-logo.png" alt="Company Logo" width="180" style="display:block; max-width:180px; width:100%; height:auto; margin-right: 15px;">
+    <img src="{{asset('images/footer-logo.png')}}" alt="Company Logo" width="180" style="display:block; max-width:180px; width:100%; height:auto; margin-right: 15px;">
     <div style="color:white;text-decoration: none;">
       <p style="font-size: 15px;">{{ getKeyValue('company_name')->value }}</p>
       <p style="font-size: 15px;">{{ getKeyValue('company_address')->value }}</p>
