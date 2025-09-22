@@ -111,8 +111,6 @@
                     <tr>
                         <th>Lead</th>
                         <th>Contact</th>
-                        <th>Interest</th>
-
                         <th>Status</th>
                         <th>Source</th>
                         <th>Date</th>
@@ -140,12 +138,6 @@
                             <td>
                                 <div>{{ $lead->email }}</div>
                                 <div class="text-muted small">{{ $lead->phone }}</div>
-                            </td>
-
-                            <!-- Interest -->
-                            <td>
-                                <div>{{ $lead->desired_bedrooms ? $lead->desired_bedrooms . 'BR Apartment' : 'Unspecified' }}</div>
-                                <div class="text-muted small">{{ $lead->move_in_date ? 'Move-in: ' . $lead->move_in_date->format('M j, Y') : 'Flexible' }}</div>
                             </td>
 
                             <!-- Status -->

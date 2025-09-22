@@ -143,9 +143,9 @@ public function formSubmissions()
     return $this->userActivities()->formSubmissions();
 }
 
-public function propertyInquiries()
+public function sessionInquiries()
 {
-    return $this->userActivities()->propertyInquiries();
+    return $this->userActivities()->sessionInquiries();
 }
 
     public function getDetailedEngagementSummary()
