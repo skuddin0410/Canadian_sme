@@ -33,6 +33,7 @@ class ActivityTrackingService
             'page_title'   => $pageTitle,
             'ip_address'   => Request::ip(),
             'user_agent'   => Request::userAgent(),
+            'source'=>'website',
             'activity_at'  => now(),
         ]);
 
@@ -99,6 +100,7 @@ class ActivityTrackingService
             'ip_address'   => Request::ip(),
             'user_agent'   => Request::userAgent(),
             'time_spent'   => $delta,
+            'source'=>'website',
             'activity_at'  => now(),
         ]);
     }
@@ -136,6 +138,7 @@ class ActivityTrackingService
             'metadata'     => json_encode(['file_name' => $fileName]),
             'ip_address'   => Request::ip(),
             'user_agent'   => Request::userAgent(),
+            'source'=>'website',
             'activity_at'  => now(),
         ]);
 
@@ -185,6 +188,7 @@ class ActivityTrackingService
             ]),
             'ip_address'   => Request::ip(),
             'user_agent'   => Request::userAgent(),
+            'source'=>'website',
             'activity_at'  => now(),
         ]);
 
@@ -271,7 +275,7 @@ class ActivityTrackingService
             'session_id'   => $sessionId,
             'user_id'      => $userId,
             'email'        => $email,
-            'activity_type'=> 'api_hit',
+            'activity_type'=> 'page_view',
             'page_url'     => $endpoint,
             'metadata'     => json_encode([
                 'method' => $method,

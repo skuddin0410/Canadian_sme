@@ -85,23 +85,12 @@ class Lead extends Model
         );
     }
 
-    // public function activities()
-    // {
-    //     return $this->hasMany(LeadActivity::class);
-    // }
-
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
     }
 
-    // public function getBudgetRangeAttribute()
-    // {
-    //     if ($this->budget_min && $this->budget_max) {
-    //         return "$" . number_format($this->budget_min) . " - $" . number_format($this->budget_max);
-    //     }
-    //     return 'Not specified';
-    // }
+
 
     public function getInitialsAttribute()
     {
@@ -159,10 +148,10 @@ public function propertyInquiries()
     return $this->userActivities()->propertyInquiries();
 }
 
-// public function getDetailedEngagementSummary()
-// {
-//     return UserActivity::getEngagementSummary($this->email);
-// }
+    public function getDetailedEngagementSummary()
+    {
+         return UserActivity::getEngagementSummary($this->email);
+    }
 
     public function updateEngagementMetrics()
     {
@@ -179,21 +168,4 @@ public function propertyInquiries()
         ]);
     }
 
-
-    // public function interactions()
-    // {
-    //     return $this->hasMany(LeadInteraction::class);
-    // }
-
-    // public function scoreHistories()
-    // {
-    //     return $this->hasMany(LeadScoreHistory::class);
-    // }
-
-    // protected static function booted()
-    // {
-    //     static::saving(function (self $lead) {
-    //         $lead->lead_score = $lead->ai_score ?? 0;
-    //     });
-    // }
 }

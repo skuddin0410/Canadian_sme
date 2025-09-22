@@ -93,7 +93,7 @@ public function index(Request $request)
     public function show(Lead $lead)
     {
         //
-         $lead->load(['assignedAgent', 'matchedEvent', ]);
+         $lead->updateEngagementMetrics();
          return view('leads.show', compact('lead'));
     }
 
