@@ -6,64 +6,115 @@ use App\Models\UserActivity;
 use App\Models\Lead;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ActivityTrackingService
 {   
+    private const INACTIVITY_WINDOW_SECONDS = 300;
+
+    private static function lastSeenKey(string $sessionId, string $pageUrl): string
+    {
+        return 'ua:last_seen:' . $sessionId . ':' . sha1($pageUrl);
+    }
+
     public static function trackPageView($pageUrl, $pageTitle = null, $email = null)
     {
         $sessionId = session()->getId();
-        $userId = Auth::id();
-        $email = $email ?? (Auth::user()->email ?? null);
+        $user      = Auth::user();
+        $userId    = $user?->getAuthIdentifier();
+        $email     = $email ?? $user?->email;
 
-        // Record the activity
         UserActivity::create([
-            'session_id' => $sessionId,
-            'user_id' => $userId,
-            'email' => $email,
-            'activity_type' => 'page_view',
-            'page_url' => $pageUrl,
-            'page_title' => $pageTitle,
-            'ip_address' => Request::ip(),
-            'user_agent' => Request::userAgent(),
-            'activity_at' => now()
+            'session_id'   => $sessionId,
+            'user_id'      => $userId,
+            'email'        => $email,
+            'activity_type'=> 'page_view',
+            'page_url'     => $pageUrl,
+            'page_title'   => $pageTitle,
+            'ip_address'   => Request::ip(),
+            'user_agent'   => Request::userAgent(),
+            'activity_at'  => now(),
         ]);
 
-        // Update lead metrics if email exists
         if ($email) {
             self::updateLeadMetrics($email, 'page_views');
         }
     }
 
-    public static function trackTimeOnSite($timeSpent, $pageUrl, $email = null)
-    {
-        $sessionId = session()->getId();
-        $userId = Auth::id();
-        $email = $email ?? (Auth::user()->email ?? null);
+    /**
+     * Add time spent (in seconds) to the most recent activity for this URL.
+     * Will attach to last 'page_view' or fall back to last 'api_hit'.
+     */
+  public static function trackTimeOnSite($timeSpent, $pageUrl, $email = null): void
+{
+    $sessionId = session()->getId();
+    $user      = Auth::user();
+    $userId    = $user?->getAuthIdentifier();
+    $email     = $email ?? $user?->email;
 
-        // Find the most recent page view for this session/page
-        $activity = UserActivity::where('session_id', $sessionId)
-            ->where('page_url', $pageUrl)
-            ->where('activity_type', 'page_view')
-            ->latest('activity_at')
-            ->first();
+    // --- Auto-calc delta when $timeSpent is null ---
+    $delta = null;
+    if ($timeSpent === null) {
+        $nowTs = now()->timestamp;
+        $key   = self::lastSeenKey($sessionId, $pageUrl);
+        $last  = Cache::get($key);
 
-        if ($activity) {
-            $activity->update(['time_spent' => $timeSpent]);
+        $delta = $last ? ($nowTs - (int)$last) : 0;
+
+        // Cap: ignore long gaps beyond inactivity window (treat as new session)
+        if ($delta < 0 || $delta > self::INACTIVITY_WINDOW_SECONDS) {
+            $delta = 0;
         }
 
-        // Update lead metrics
-        if ($email) {
-            self::updateLeadTimeOnSite($email, $timeSpent);
-        }
+        // Update last-seen timestamp (keep for 24h)
+        Cache::put($key, $nowTs, now()->addDay());
+    } else {
+        $delta = (int) max(0, round($timeSpent));
     }
+
+    if ($delta === 0) {
+        return; // nothing to add
+    }
+
+    // Prefer the latest page_view; else fall back to latest api_hit for this URL
+    $activity = UserActivity::where('session_id', $sessionId)
+        ->where('page_url', $pageUrl)
+        ->whereIn('activity_type', ['page_view', 'api_hit'])
+        ->latest('activity_at')
+        ->first();
+
+    if ($activity) {
+        // Increment time_spent (seconds)
+        $activity->increment('time_spent', $delta);
+        // Optionally, update activity_at so the "latest" reflects this touch:
+        // $activity->update(['activity_at' => now()]);
+    } else {
+        // No prior record: create a minimal page_view as a container for time
+        UserActivity::create([
+            'session_id'   => $sessionId,
+            'user_id'      => $userId,
+            'email'        => $email,
+            'activity_type'=> 'page_view',
+            'page_url'     => $pageUrl,
+            'ip_address'   => Request::ip(),
+            'user_agent'   => Request::userAgent(),
+            'time_spent'   => $delta,
+            'activity_at'  => now(),
+        ]);
+    }
+
+    if ($email) {
+        self::updateLeadTimeOnSite($email, $delta); // converts to minutes inside
+    }
+}
 
     public static function trackEmailOpen($email, $campaignId = null)
     {
         UserActivity::create([
-            'email' => $email,
+            'email'         => $email,
             'activity_type' => 'email_open',
-            'metadata' => json_encode(['campaign_id' => $campaignId]),
-            'activity_at' => now()
+            'metadata'      => json_encode(['campaign_id' => $campaignId]),
+            'activity_at'   => now(),
         ]);
 
         self::updateLeadMetrics($email, 'email_opens');
@@ -72,18 +123,20 @@ class ActivityTrackingService
     public static function trackDownload($fileName, $fileUrl, $email = null)
     {
         $sessionId = session()->getId();
-        $userId = Auth::id();
-        $email = $email ?? (Auth::user()->email ?? null);
+        $user      = Auth::user();
+        $userId    = $user?->getAuthIdentifier();
+        $email     = $email ?? $user?->email;
 
         UserActivity::create([
-            'session_id' => $sessionId,
-            'user_id' => $userId,
-            'email' => $email,
-            'activity_type' => 'download',
-            'page_url' => $fileUrl,
-            'metadata' => json_encode(['file_name' => $fileName]),
-            'ip_address' => Request::ip(),
-            'activity_at' => now()
+            'session_id'   => $sessionId,
+            'user_id'      => $userId,
+            'email'        => $email,
+            'activity_type'=> 'download',
+            'page_url'     => $fileUrl,
+            'metadata'     => json_encode(['file_name' => $fileName]),
+            'ip_address'   => Request::ip(),
+            'user_agent'   => Request::userAgent(),
+            'activity_at'  => now(),
         ]);
 
         if ($email) {
@@ -94,84 +147,93 @@ class ActivityTrackingService
     public static function trackFormSubmission($formType, $email, $formData = [])
     {
         $sessionId = session()->getId();
-        $userId = Auth::id();
+        $user      = Auth::user();
+        $userId    = $user?->getAuthIdentifier();
 
         UserActivity::create([
-            'session_id' => $sessionId,
-            'user_id' => $userId,
-            'email' => $email,
-            'activity_type' => 'form_submission',
-            'metadata' => json_encode([
+            'session_id'   => $sessionId,
+            'user_id'      => $userId,
+            'email'        => $email,
+            'activity_type'=> 'form_submission',
+            'metadata'     => json_encode([
                 'form_type' => $formType,
-                'form_data' => $formData
+                'form_data' => $formData,
             ]),
-            'ip_address' => Request::ip(),
-            'activity_at' => now()
+            'ip_address'   => Request::ip(),
+            'user_agent'   => Request::userAgent(),
+            'activity_at'  => now(),
         ]);
 
         self::updateLeadMetrics($email, 'form_submissions');
     }
 
-    public static function trackPropertyInquiry($propertyId, $email, $inquiryType = 'general')
+    // Avoid parameter shadowing; use $eventSessionId as the entity you're inquiring about
+    public static function trackSessionInquiry($eventSessionId, $email, $inquiryType = 'general')
     {
         $sessionId = session()->getId();
-        $userId = Auth::id();
+        $user      = Auth::user();
+        $userId    = $user?->getAuthIdentifier();
 
         UserActivity::create([
-            'session_id' => $sessionId,
-            'user_id' => $userId,
-            'email' => $email,
-            'activity_type' => 'property_inquiry',
-            'metadata' => json_encode([
-                'property_id' => $propertyId,
-                'inquiry_type' => $inquiryType
+            'session_id'   => $sessionId,
+            'user_id'      => $userId,
+            'email'        => $email,
+            'activity_type'=> 'session_inquiry',
+            'metadata'     => json_encode([
+                'event_session_id' => $eventSessionId,
+                'inquiry_type'     => $inquiryType,
             ]),
-            'ip_address' => Request::ip(),
-            'activity_at' => now()
+            'ip_address'   => Request::ip(),
+            'user_agent'   => Request::userAgent(),
+            'activity_at'  => now(),
         ]);
 
-        self::updateLeadMetrics($email, 'property_inquiries');
+        // rename metric key if your leads table uses something else
+        self::updateLeadMetrics($email, 'session_inquiries');
     }
 
     private static function updateLeadMetrics($email, $metricType)
-    {   
-        if(!empty($email)){
+    {
+        if (empty($email)) return;
+
+        $user = Auth::user();
+
         $lead = Lead::where('email', $email)->first();
-            if ($lead) {
-                $lead->increment($metricType);
-                $lead->update(['last_activity_at' => now()]);
-            } else {
-                // Create lead if doesn't exist
-              $lead =  Lead::create([
-                   "first_name" => Auth::user()->name ?? '', 
-                   "last_name"=> Auth::user()->lastname ?? '',
-                   "email"=> $email,
-                   "phone"=> Auth::user()->mobile ?? "",
-                   $metricType => 1,
-                  'last_activity_at' => now()
-                ]);
-            } 
+        if ($lead) {
+            // make sure column exists in DB, or guard elsewhere
+            $lead->increment($metricType);
+            $lead->update(['last_activity_at' => now()]);
+        } else {
+            $lead = Lead::create([
+                'first_name'       => $user?->name ?? '',
+                'last_name'        => $user?->lastname ?? ($user?->last_name ?? ''),
+                'email'            => $email,
+                'phone'            => $user->mobile ?? '',
+                $metricType        => 1,
+                'last_activity_at' => now(),
+            ]);
         }
     }
 
-    private static function updateLeadTimeOnSite($email, $timeSpent)
+    private static function updateLeadTimeOnSite($email, $timeSpentSeconds)
     {
         $lead = Lead::where('email', $email)->first();
-        
-        if ($lead) {
-            // Convert seconds to minutes and add to existing time
-            $additionalMinutes = ceil($timeSpent / 60);
-            $lead->increment('time_on_site', $additionalMinutes);
-            $lead->update(['last_activity_at' => now()]);
-        }else{
+        $minutes = max(0, (int) ceil($timeSpentSeconds / 60));
 
-          $lead =  Lead::create([
-               "first_name" => Auth::user()->name, 
-               "last_name"=> Auth::user()->lastname ?? '',
-               "email"=> Auth::user()->email,
-               "phone"=> Auth::user()->mobile ?? '',
-               $metricType => 1,
-              'last_activity_at' => now()
+        if ($lead) {
+            if ($minutes > 0) {
+                $lead->increment('time_on_site', $minutes);
+            }
+            $lead->update(['last_activity_at' => now()]);
+        } else {
+            $user = Auth::user();
+            $lead = Lead::create([
+                'first_name'       => $user?->name ?? '',
+                'last_name'        => $user?->lastname ?? ($user?->last_name ?? ''),
+                'email'            => $email ?? $user?->email,
+                'phone'            => $user->mobile ?? '',
+                'time_on_site'     => $minutes,
+                'last_activity_at' => now(),
             ]);
         }
     }
@@ -180,26 +242,29 @@ class ActivityTrackingService
     public static function getLeadMetrics($email)
     {
         $activities = UserActivity::where('email', $email)->get();
-        
+
         return [
-            'page_views' => $activities->where('activity_type', 'page_view')->count(),
-            'total_time_on_site' => $activities->where('activity_type', 'page_view')->sum('time_spent'),
-            'email_opens' => $activities->where('activity_type', 'email_open')->count(),
-            'downloads' => $activities->where('activity_type', 'download')->count(),
-            'form_submissions' => $activities->where('activity_type', 'form_submission')->count(),
-            'property_inquiries' => $activities->where('activity_type', 'property_inquiry')->count(),
+            'page_views'           => $activities->where('activity_type', 'page_view')->count(),
+            // Sum time from both web and api activities
+            'total_time_on_site'   => $activities
+                                        ->whereIn('activity_type', ['page_view', 'api_hit'])
+                                        ->sum('time_spent'),
+            'email_opens'          => $activities->where('activity_type', 'email_open')->count(),
+            'downloads'            => $activities->where('activity_type', 'download')->count(),
+            'form_submissions'     => $activities->where('activity_type', 'form_submission')->count(),
+            'session_inquiries'    => $activities->where('activity_type', 'session_inquiry')->count(),
             'unique_pages_visited' => $activities->where('activity_type', 'page_view')->pluck('page_url')->unique()->count(),
-            'last_activity' => $activities->max('activity_at')
+            'last_activity'        => $activities->max('activity_at'),
         ];
     }
 
     public static function trackApiHit(string $endpoint, array $input = [], ?string $email = null, ?int $status = null, string $method = 'GET'): void
     {
         $sessionId = session()->getId();
-        $userId    = Auth::id();
-        $email     = $email ?? optional(Auth::user())->email;
+        $user      = Auth::user();
+        $userId    = $user?->getAuthIdentifier();
+        $email     = $email ?? $user?->email;
 
-        // Scrub sensitive fields
         $scrubbed = self::scrubSensitive($input);
 
         UserActivity::create([
@@ -207,7 +272,7 @@ class ActivityTrackingService
             'user_id'      => $userId,
             'email'        => $email,
             'activity_type'=> 'api_hit',
-            'page_url'     => $endpoint,                 // reuse page_url column for URL
+            'page_url'     => $endpoint,
             'metadata'     => json_encode([
                 'method' => $method,
                 'status' => $status,
@@ -218,16 +283,13 @@ class ActivityTrackingService
             'activity_at'  => now(),
         ]);
 
-        // If you want API hits to also influence lead scoring, opt-in here:
-        if ($email) {
-            self::updateLeadMetrics($email, 'api_hits'); // make sure 'api_hits' exists in leads table if you use this
-        }
+        // Optional: maintain an 'api_hits' counter column on leads if you added it
+        // if ($email) self::updateLeadMetrics($email, 'api_hits');
     }
-
 
     protected static function scrubSensitive(array $data): array
     {
-        $keys = ['password', 'password_confirmation', 'token', 'access_token', 'refresh_token', 'authorization', 'secret', 'api_key'];
+        $keys  = ['password','password_confirmation','token','access_token','refresh_token','authorization','secret','api_key','otp'];
         $lower = array_change_key_case($data, CASE_LOWER);
         foreach ($keys as $k) {
             if (array_key_exists($k, $lower)) {
@@ -236,5 +298,4 @@ class ActivityTrackingService
         }
         return $lower;
     }
-
 }

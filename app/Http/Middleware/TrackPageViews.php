@@ -32,9 +32,11 @@ class TrackPageViews
                         status: $response->getStatusCode(),
                         method: $request->getMethod(),
                     );
+                    ActivityTrackingService::trackTimeOnSite(null, $pageUrl, optional(auth()->user())->email);
                 } else {
                     $pageTitle = $this->extractPageTitle($response->getContent());
                     ActivityTrackingService::trackPageView($pageUrl, $pageTitle);
+                    ActivityTrackingService::trackTimeOnSite(null, $pageUrl, optional(auth()->user())->email);
                 }
             }
 

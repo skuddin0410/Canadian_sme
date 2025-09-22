@@ -18,6 +18,7 @@ use OneSignal;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\UserWelcome;
 use Illuminate\Support\Facades\Mail;
+use App\Services\ActivityTrackingService;
 
 class HomeController extends Controller
 {
@@ -274,6 +275,8 @@ public function getSession($sessionId)
             $status = 'Completed';
         }
 
+        ActivityTrackingService::trackSessionInquiry($sessionId, $user->email);
+
         $sessionData = [
             "id"          => $session->id,
             "title"       => $session->title,
@@ -423,9 +426,16 @@ public function getConnectionsDetails(Request $request)
 
 public function addSessionToFavourite(Request $request){
 
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        } 
+
     if(!isFavorite($request->sessionId)){
           addFavorite($request->sessionId);
-        
+          ActivityTrackingService::trackSessionInquiry($request->sessionId, $user->email);
           return response()->json(["message"=> "Session added as favourite"]);
         }else{
           removeFavorite($request->sessionId);
@@ -499,7 +509,7 @@ public function createAgenda(Request $request){
             "isInAgenda" => isAgenda($request->sessionId)
            ]);  
         }
-        
+         ActivityTrackingService::trackSessionInquiry($request->sessionId, $user->email);
 
     } catch (\Exception $e) {
         return response()->json(["message" => $e->getMessage()]);
