@@ -143,10 +143,10 @@ class ActivityTrackingService
             } else {
                 // Create lead if doesn't exist
               $lead =  Lead::create([
-                   "first_name" => Auth::user()->name ?? 'Unknow', 
-                   "last_name"=> Auth::user()->last_name ?? 'Unknown',
+                   "first_name" => Auth::user()->name ?? '', 
+                   "last_name"=> Auth::user()->lastname ?? '',
                    "email"=> $email,
-                   "phone"=> Auth::user()->mobile ?? "Unknown",
+                   "phone"=> Auth::user()->mobile ?? "",
                    $metricType => 1,
                   'last_activity_at' => now()
                 ]);
@@ -167,9 +167,9 @@ class ActivityTrackingService
 
           $lead =  Lead::create([
                "first_name" => Auth::user()->name, 
-               "last_name"=> Auth::user()->last_name ?? '-',
+               "last_name"=> Auth::user()->lastname ?? '',
                "email"=> Auth::user()->email,
-               "phone"=> Auth::user()->mobile ?? 'Unknown',
+               "phone"=> Auth::user()->mobile ?? '',
                $metricType => 1,
               'last_activity_at' => now()
             ]);
