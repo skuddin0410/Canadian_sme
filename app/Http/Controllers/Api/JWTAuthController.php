@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use App\Models\Speaker;
 
 class JWTAuthController extends Controller
 {
@@ -88,6 +89,7 @@ public function updateUser(Request $request)
         }
         
         // Custom validation with error handling
+        
         $validator = Validator::make($request->all(), [
             'first_name'        => 'required|string|max:255',
             'last_name'    => 'required|string|max:255',
@@ -124,6 +126,24 @@ public function updateUser(Request $request)
         
         if(!empty($user->access_exhibitor_ids)){
           Company::where('id', $user->access_exhibitor_ids)->update(["name"=>$request->company_name, "website"=>$request->company_website]);
+        }
+
+        if(!empty($user->access_sponsor_ids)){
+          Company::where('id', $user->access_sponsor_ids)->update(["name"=>$request->company_name, "website"=>$request->company_website]);
+        }
+
+        if(!empty($user->access_speaker_ids)){
+          Speaker::where('id', $user->access_speaker_ids)->update(
+            [
+                 "name"=>$request->first_name, 
+                 "lastname"=>$request->last_name,
+                 "email"=>$request->email,
+                 "company"=>$request->company_name ?? '',
+                 "designation"=>$request->designation ?? '',
+                 "mobile"=>$request->phone ?? '',
+                 "bio"=>$request->bio ?? '',
+                 "website_url"=>$request->company_website ?? ''
+            ]);
         }
 
         return response()->json([
@@ -166,8 +186,12 @@ public function updateUserImage(Request $request)
         }
         
 
-       if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+        if ($request->hasFile('image')) {
+            $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+            
+            if(!empty($user->access_speaker_ids)){
+              $this->imageUpload($request->file("image"),"speakers",$user->access_speaker_ids,'speakers','photo',$user->access_speaker_ids);
+            }
         }
 
         return response()->json([

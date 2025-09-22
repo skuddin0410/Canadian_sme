@@ -94,11 +94,13 @@ Admin | Edit Attendee Data
                   Access Permissions
                 </button>
               </li>
+              @if( empty($user->access_speaker_ids) && empty($user->access_exhibitor_ids) && empty($user->access_sponsor_ids) )
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="docs-tab" data-bs-toggle="tab" data-bs-target="#docs" type="button" role="tab">
                   Private Docs
                 </button>
               </li>
+              @endif
             </ul>
           </div>
 
