@@ -59,7 +59,7 @@ class HomeController extends Controller
     $homeSessions = collect();
     if ($upcomingSession && $upcomingSession->event) {
         $homeSessions = Session::with(['speakers'])
-            ->where('is_featured', true)
+            ->where('start_time', '>=', now())
             ->where('event_id', $upcomingSession->event->id)
             ->orderBy('start_time', 'ASC')
             ->get()
@@ -145,7 +145,6 @@ public function getNotifications(Request $request)
         ], 401);
     }
 
-    
     $isSpeaker = $user->hasRole('Speaker');
     $photo = $user->photo;
     $userPhoto = !empty($user->photo) ? $user->photo->file_path : asset('images/default.png');

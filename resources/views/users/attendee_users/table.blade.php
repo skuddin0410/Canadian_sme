@@ -54,8 +54,33 @@
     <tr>
       <td>
             <input type="checkbox" name="selected_users[]" value="{{ $user->id }}" class="user-checkbox">
-        </td>
-    <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
+      </td>
+    <th>
+      {{$user->name ?? ''}} {{$user->lastname ?? ''}}
+
+{!! $user->access_speaker_ids 
+    ? '<a href="' . route("speaker.edit", $user->access_speaker_ids) . '" class="text-decoration-none" target="_blank">'
+        . '<span class="badge border border-primary text-primary rounded-pill badge-sm">As Speaker</span>'
+      . '</a>' 
+    : '' 
+!!}
+
+{!! $user->access_exhibitor_ids 
+    ? '<a href="' . route("exhibitor-users.edit", $user->access_exhibitor_ids) . '" class="text-decoration-none me-1" target="_blank">'
+        . '<span class="badge border border-primary text-primary rounded-pill badge-sm">As Exhibitor</span>'
+      . '</a>' 
+    : '' 
+!!}
+
+{!! $user->access_sponsor_ids 
+    ? '<a href="' . route("sponsors.edit", $user->access_sponsor_ids) . '" class="text-decoration-none me-1" target="_blank">'
+        . '<span class="badge border border-primary text-primary rounded-pill badge-sm">As Sponsor</span>'
+      . '</a>' 
+    : '' 
+!!} 
+
+
+    </th>
 		<th>{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
     <th>{{dateFormat($user->created_at) ?? '' }}</th>
@@ -270,3 +295,10 @@ function submitBadgeAction(actionType) {
     form.submit();
 }
 </script>
+<style>
+  .badge-sm {
+    font-size: 0.5rem;     /* smaller text */
+    padding: 0.22em 0.5em; /* smaller padding */
+}
+
+</style>

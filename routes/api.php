@@ -29,10 +29,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     });
 
 
-    Route::delete('/exhibitors/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
-    Route::delete('/sponsors/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
-    
-    Route::delete('/connections/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
+    Route::delete('/{detailsID}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
 
 
     Route::post('/{detailsID}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'uploadExhibitorFiles']);

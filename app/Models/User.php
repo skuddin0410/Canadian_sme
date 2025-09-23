@@ -155,12 +155,6 @@ class User extends Authenticatable implements JWTSubject
     }
     
 
-    public function sponsoredSessions()
-    {
-    return $this->belongsToMany(Session::class, 'session_sponsors', 'user_id', 'session_id');
-    }
-
-
     public function bank()
     {
         return $this->hasOne(Bank::class, 'user_id', 'id')
