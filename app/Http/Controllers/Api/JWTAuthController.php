@@ -963,7 +963,7 @@ public function getAllExhibitor(Request $request){
                 ], 401);
             }
 
-                $sponsor = Company::with(['contentIconFile', 'Docs','quickLinkIconFile'])->where('id', $request->id)->where('is_sponsor', 1)->first();
+                $sponsor = Company::with(['logo', 'Docs','banner'])->where('id', $request->id)->where('is_sponsor', 1)->first();
 
                 if (!$sponsor) {
                     return response()->json([
@@ -975,8 +975,8 @@ public function getAllExhibitor(Request $request){
                 $data = [
                     "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
-                    "avatar" => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
-                    'banner'   => $sponsor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
+                    "avatar" => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
+                    'banner'   => $sponsor->banner?->file_path ?? asset('images/default.png'),
                     "word_no" => $sponsor->booth ?? '',
                     "location" => $sponsor->booth ?? '',
                     "email" => $sponsor->email ?? '',
