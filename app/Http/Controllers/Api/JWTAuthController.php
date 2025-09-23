@@ -173,7 +173,7 @@ public function updateUserImage(Request $request)
 
        
         $validator = Validator::make($request->all(), [
-         'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', 
+         'image' => 'required|image|mimes:jpeg,png,jpg|max:5048', 
         ]);
         
 
