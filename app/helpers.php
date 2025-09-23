@@ -310,7 +310,9 @@ function groups($user)
          $arr = explode(',', $user->secondary_group);
         }
         array_push($arr, $user->primary_group);
-
+        if(!empty($arr)){
+           return $user->roles?->pluck('name')->toArray() ?? [];
+        }
         return array_unique($arr);
     }
 }

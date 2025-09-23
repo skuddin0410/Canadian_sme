@@ -628,7 +628,8 @@ public function getSpeaker(Request $request)
         
        $response = $speakers->map(function ($speaker) {
             return [
-                'id'     => $speaker->access_speaker_ids,
+                'id'     => $speaker->id,
+                'access_speaker_ids'=>$speaker->access_speaker_ids,
                 'name'     => $speaker->full_name,
                 'company_name'  => $speaker->company ?? '',
                 'role'  => $speaker->designation ?? '',
@@ -659,7 +660,7 @@ public function getSpeakerById(Request $request){
 
         $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Speaker');
-        })->where('access_speaker_ids',$request->id)->first();
+        })->where('id',$request->id)->first();
     
         if (empty($speaker)) {
             return response()->json([
