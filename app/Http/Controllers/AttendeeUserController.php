@@ -30,6 +30,7 @@ use App\Models\EmailTemplate;
 use OneSignal;
 use App\Models\Speaker;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 
 
 class AttendeeUserController extends Controller
@@ -449,7 +450,7 @@ public function bulkAction(Request $request)
     $userIds = json_decode($request->user_ids, true);
     $type = $request->query('type'); // email or notification
     $users = User::whereIn('id', $userIds)->get();
-   
+
     $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
     $subject = $emailTemplate->subject ?? '';
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -471,19 +472,29 @@ public function bulkAction(Request $request)
           
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
-    } else if (!empty($emailTemplate) && $emailTemplate->type === 'notifications') {
+    } else if (!empty($emailTemplate) && $emailTemplate->type == 'notification') {
          foreach ($users as $user) {
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
             $message = str_replace('{{site_name}}', config('app.name'), $message);
-            
-                if($request->onesignal_userid){
-                    OneSignal::sendNotificationToUser(
+                if(!empty($user->onesignal_userid)){
+                    /*OneSignal::sendNotificationToUser(
                         $message,   // Notification message
-                        $request->onesignal_userids   // OneSignal Player ID
-                    );
+                        $user->onesignal_userids   // OneSignal Player ID
+                    );*/
+
+                    Http::withHeaders([
+                        'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
+                        'Content-Type' => 'application/json'
+                    ])->post('https://api.onesignal.com/notifications', [
+                        'app_id' => env('ONESIGNAL_APP_ID'),
+                        'include_player_ids' => [$user->onesignal_userid], // must be a valid player_id
+                        'headings' => ['en' => 'Hi '. $user->full_name ?? ''],
+                        'contents' => ['en' => $message],
+                    ]);
+
                     notification($user->id, 'bulk_notification',null, $subject, $message);
-            }
+                }
         }
     }
 
