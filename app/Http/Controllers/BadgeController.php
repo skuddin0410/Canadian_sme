@@ -24,11 +24,13 @@ class BadgeController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {  
         $request->validate([
             'selected_fields' => 'required|array|min:1',
             'selected_fields.*' => 'in:name,company_name,designation,logo,qr_code',
-            'badge_name' => 'required|string|max:255'
+            'badge_name' => 'required|string|max:255',
+            'width'=> 'required|numeric|between:0,999.99|regex:/^\d+(\.\d{1,2})?$/',
+            'height'=> 'required|numeric|between:0,999.99|regex:/^\d+(\.\d{1,2})?$/',
         ]);
 
         $badge = new Badge();
@@ -57,6 +59,8 @@ class BadgeController extends Controller
         if (in_array('qr_code', $request->selected_fields)) {
             $badge->qr_code_data = 1;
         }
+        $badge->width =$request->width ;
+        $badge->height =$request->height ;
 
         $badge->save();
 
@@ -212,8 +216,10 @@ class BadgeController extends Controller
                 'name' => $name,
                 'company_name' => $company_name ,
                 'logo' => $logo, 
-                 'qr_code' => $qr_code,
-                 'designation'=>$designation
+                'qr_code' => $qr_code,
+                'designation'=>$designation,
+                'width'=>$badge->width ?? '8.56',
+                'height'=>$badge->height ?? '5.40'
             ]
         );
            

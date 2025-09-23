@@ -30,6 +30,10 @@
     >
       @foreach($badges as $badge)
         <!-- Card wrapper: spacing + avoid splitting across pages -->
+          @php
+             $width_mm  = isset($badge['width'])  ? $badge['width'] * 10  : 85.6;
+             $height_mm = isset($badge['height']) ? $badge['height'] * 10 : 54;
+          @endphp
         <div
           style="
             box-sizing:border-box;
@@ -44,8 +48,8 @@
           <!-- Badge: fixed CR80 size, no split -->
           <div
             style="
-              width:85.6mm;
-              height:54mm;
+              width:{{$width_mm}}mm;
+              height:{{$height_mm}}mm;
               border:2px solid #333;
               border-radius:10px;
               padding:15px;

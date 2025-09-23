@@ -29,7 +29,7 @@
                                 </h5>
                                 <p class="card-text">
                                     <small class="text-muted">
-                                        Fields:                                 @php
+                                        Fields:@php
                                     $raw = $badge->selected_fields ?? [];
 
                                     if ($raw instanceof \Illuminate\Support\Collection) {

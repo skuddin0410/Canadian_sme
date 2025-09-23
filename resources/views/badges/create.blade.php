@@ -32,18 +32,25 @@
                                             <i class="fas fa-user me-1"></i>Name
                                         </label>
                                     </div>
-                                    <div class="form-check mb-2 d-none" >
+                                    <div class="form-check mb-2" >
                                         <input class="form-check-input" type="checkbox" name="selected_fields[]" value="company_name" id="field_company">
                                         <label class="form-check-label" for="field_company">
                                             <i class="fas fa-building me-1"></i>Company Name
                                         </label>
                                     </div>
-                                    <div class="form-check mb-2">
+                                    <div class="form-check mb-2 d-none">
                                         <input class="form-check-input" type="checkbox" name="selected_fields[]" value="designation" id="field_designation">
                                         <label class="form-check-label" for="field_designation">
-                                            <i class="fas fa-briefcase me-1"></i>Company
+                                            <i class="fas fa-briefcase me-1"></i>Designation
                                         </label>
                                     </div>
+                                      <div class="mb-3">
+                                      <label for="width" class="form-label">
+                                        <i class="fas fa-arrows-alt-h me-1"></i> Width (cm)
+                                      </label>
+                                      <input type="text" class="form-control" name="width" id="width"  placeholder="Enter width in cm" value="8.56">
+                                    </div>
+
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-check mb-2">
@@ -58,6 +65,14 @@
                                             <i class="fas fa-qrcode me-1"></i>QR Code
                                         </label>
                                     </div>
+
+                                    <div class="mb-3">
+                                      <label for="height" class="form-label">
+                                        <i class="fas fa-arrows-alt-v me-1"></i> Height (cm)
+                                      </label>
+                                      <input type="text" class="form-control" name="height" id="height"  placeholder="Enter height in cm" value="5.40">
+                                    </div>
+
                                 </div>
                             </div>
                             @error('selected_fields')
@@ -156,7 +171,7 @@
                             </div>
 
                             <!-- Company Name Section -->
-                            <div class="preview-section d-none" id="preview_company_section" style="text-align: center; margin-bottom: 8px;">
+                            <div class="preview-section d-none" id="preview_company_name_section" style="text-align: center; margin-bottom: 8px;">
                                 <p id="preview_company_name" style="margin: 0; color: #666; font-size: 1rem;">Company Name</p>
                             </div>
                  
@@ -214,7 +229,10 @@
 
 
             </div>
+
         </div>
+    </div>
+
     </div>
 </div>
 
@@ -272,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fieldValue = checkbox.value;
         const fieldElement = document.getElementById(fieldValue + '_field');
         const previewSection = document.getElementById('preview_' + fieldValue.replace('_', '_') + '_section');
-        
+        console.log(previewSection,fieldValue)
         if (checkbox.checked) {
             // Show form field
            // fieldElement.classList.remove('d-none');
@@ -350,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update designation
         if (document.getElementById('field_designation').checked) {
-            document.getElementById('preview_designation').textContent = '{'+'{'+'company'+'}'+'}';
+            document.getElementById('preview_designation').textContent = '{'+'{'+'designation'+'}'+'}';
         }
         
         // Update QR code

@@ -22,7 +22,9 @@ class Badge extends Model
         'qr_code_path',
         'badge_path',
         'selected_fields',
-        'badge_name'
+        'badge_name',
+        'width',
+        'height'
     ];
 
     protected $casts = [
