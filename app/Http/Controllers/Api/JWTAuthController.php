@@ -925,7 +925,7 @@ public function getAllExhibitor(Request $request){
                     'message' => 'Unauthorized'
                 ], 401);
             }
-          $sponsors = Company::with(['contentIconFile'])->where('is_sponsor', 1)->orderBy('id', 'DESC')->get();
+          $sponsors = Company::with(['logo'])->where('is_sponsor', 1)->orderBy('id', 'DESC')->get();
 
             if ($sponsors->isEmpty()) {
                 return response()->json([
@@ -937,7 +937,7 @@ public function getAllExhibitor(Request $request){
                 return [
                     'id'          => $sponsor->id,
                     'name'        => $sponsor->name,
-                    'image_url'   => $sponsor->contentIconFile ? $sponsor->contentIconFile->file_path : asset('images/default.png'),
+                    'image_url'   => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
                     'level'    => ucfirst($sponsor->type) ?? '',
                 ];
             });
