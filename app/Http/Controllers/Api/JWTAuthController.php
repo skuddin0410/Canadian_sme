@@ -426,6 +426,7 @@ public function getExhibitor($exhibitorId)
                 ['name' => 'twitter',   'url' => $exhibitor->twitter   ?? '']
             ],
             'bio'         => $exhibitor->description ?? '',
+            "company_details"=>$sponsor->description ?? '',
             "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
                            "file_id"=> $sp->id,
                            "name"=> $sp->file_name,
@@ -673,7 +674,7 @@ public function getSpeakerById(Request $request){
             'id'     => $speaker->id,
             'name'     => $speaker->full_name,
             'company_name'  => $speaker->company ?? '',
-            "company_details"=>"Microsoft Corporation is an American multinational technology corporation which produces computer software",
+            "company_details"=>$speaker->bio ?? '',
             "bio"=> $speaker->bio ?? '',
             'role'  => $speaker->designation ?? '',
             'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
@@ -772,7 +773,7 @@ public function getAttendeeById(Request $request){
             'id'     => $speaker->id,
             'name'     => $speaker->full_name,
             'company_name'  => $speaker->company ?? '',
-            "company_details"=>"Microsoft Corporation is an American multinational technology corporation which produces computer software",
+            "company_details"=>$speaker->bio ?? '',
             "bio"=> $speaker->bio ?? '',
             'role'  => $speaker->designation ?? '',
             'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
@@ -1000,6 +1001,7 @@ public function getAllExhibitor(Request $request){
                         ],
                     ],
                     "bio" => $sponsor->description,
+                    "company_details"=>$sponsor->description ?? '',
                     "uploaded_files" => $sponsor->Docs->map(fn ($sp) => [
                            "name"=> $sp->file_name,
                            "url"=> $sp->file_path
