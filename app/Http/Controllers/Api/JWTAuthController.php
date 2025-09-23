@@ -529,7 +529,7 @@ public function uploadExhibitorFiles(Request $request, $detailsID)
     }
 }
 
-public function deleteExhibitorFiles($exhibitorId, $fileId)
+public function deleteExhibitorFiles(Request $request, $exhibitorId)
 {
     try {
         if (! $user = JWTAuth::parseToken()->authenticate()) {
@@ -539,40 +539,58 @@ public function deleteExhibitorFiles($exhibitorId, $fileId)
             ], 404);
         }
 
-        $exhibitor = Company::find($exhibitorId);
+        if($request->type == 'exhibitor' || $request->type == 'sponsor'){
 
-        if (! $exhibitor) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Exhibitor not found!',
-            ], 404);
+            $exhibitor = Company::find($exhibitorId);
+           
+            if (! $exhibitor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Exhibitor not found!',
+                ], 404);
+            }
+
+            // Fetch file record from Drive table
+            $file = Drive::where('id', $request->fileId)
+                ->where('table_id', $exhibitor->id)
+                ->where('table_type', 'companies')
+                ->where('file_type', 'private_docs')
+                ->first();
+
+            if (! $file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File not found!',
+                ], 404);
+            }
+
+            // Delete record from DB
+             $file->delete();
         }
 
-        // Fetch file record from Drive table
-        $file = Drive::where('id', $fileId)
-            ->where('table_id', $exhibitor->id)
+        if($request->type == 'connection'){
+            $user = User::find($exhibitorId);
+            $file = Drive::where('id', $request->fileId)
+            ->where('table_id', $user->id)
+            ->where('table_type', 'users')
+            ->where('file_type', 'private_docs')
             ->first();
 
-        if (! $file) {
-            return response()->json([
-                'success' => false,
-                'message' => 'File not found!',
-            ], 404);
+            if (! $file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File not found!',
+                ], 404);
+            }
+            $file->delete();
         }
-
-        // Delete from storage
-        if (\Storage::disk('public')->exists($file->file_path)) {
-            \Storage::disk('public')->delete($file->file_path);
-        }
-
-        // Delete record from DB
-        $file->delete();
 
         return response()->json([
-            // 'success' => true,
-            'message' => 'Exhibitor file deleted successfully.',
-            'file_id' => $fileId,
+            'message' => 'File deleted successfully.',
+            'file_id' => $request->fileId,
         ]);
+
+
 
     } catch (\Exception $e) {
         return response()->json([

@@ -25,8 +25,15 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::prefix('exhibitors')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAllExhibitor']);
         Route::get('/{exhibitorId}', [App\Http\Controllers\Api\JWTAuthController::class, 'getExhibitor']);
-        Route::put('/{exhibitorId}/files/{fileId}', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
+        //Route::put('/{exhibitorId}/files/{fileId}', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
     });
+
+
+    Route::delete('/exhibitors/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
+    Route::delete('/sponsors/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
+    
+    Route::delete('/connections/{exhibitorId}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
+
 
     Route::post('/{detailsID}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'uploadExhibitorFiles']);
     

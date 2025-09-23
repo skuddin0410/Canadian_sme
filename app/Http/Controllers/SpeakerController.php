@@ -108,7 +108,7 @@ class SpeakerController extends Controller
                 'nullable',
                 'string',
                 'regex:/^\+?[0-9]{10,15}$/',
-                'unique:users,mobile',
+                'unique:speakers,mobile',
             ],
             'bio' => 'required|string',
               
@@ -192,12 +192,12 @@ class SpeakerController extends Controller
             
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|string|max:255|email|unique:users,email,' . $user->id,
+            'email' => 'nullable|string|max:255|email|unique:speakers,email,' . $user->id,
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'nullable|string|unique:users,mobile,' . $user->id,
+            'mobile' => 'nullable|string|unique:speakers,mobile,' . $user->id,
             'bio' => 'required|string',
      
         ]);
