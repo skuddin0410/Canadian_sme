@@ -57,7 +57,10 @@
                                         </li>
                                     @endforeach
                                 @endif
-
+                            <li>
+                                <i class="fas fa-arrows-alt-h text-success me-2"></i><i class="fas fa-arrows-alt-v text-success"></i>
+                                            {{  $badge->width }}*{{  $badge->height }} (in CM)
+                            </li>
 
                         </ul>
                         </div>
@@ -67,8 +70,12 @@
                          <div class="preview-badge" id="badgePreview"></div>
 
                             <div class="card-body">
-                                <div class="badge-preview-container" style="border: 2px solid #333; border-radius: 10px; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 300px; position: relative;">
-                                    
+                                    @php
+                                       $width_mm  = isset($badge['width'])  ? $badge['width'] * 10  : 85.6;
+                                       $height_mm = isset($badge['height']) ? $badge['height'] * 10 : 54;
+                                    @endphp
+                                <div class="badge-preview-container" style="border: 2px solid #333; border-radius: 10px; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); position: relative;width: {{ $width_mm }}mm;height: {{ $height_mm }}mm;">
+                                  
                                    <div class="row">
                                     <div class="col-md-6 mt-2">
 
