@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Storage;
 use Carbon;
 use DB;
+use Intervention\Image\Laravel\Facades\Image;
 
 class Controller extends BaseController
 {
@@ -22,7 +23,34 @@ class Controller extends BaseController
            try {
                 $filename = now()->format('Y-m-d').'-'.abs(crc32(uniqid())).'-'.Carbon\Carbon::now()->timestamp . '.' . $file->getClientOriginalExtension();
                 $file_path = $uploadPath;
-                $url = $file->storeAs($file_path,$filename,'public');
+                $image = '';
+                if($table_type=='companies' && ($file_type =='content_icon' || $file_type =='logo')){
+                  $image = Image::read($file)->resize(408, 480);
+                }
+
+                if($table_type=='companies' && ($file_type =='banner' || $file_type =='quick_link_icon')){
+                  $image = Image::read($file)->resize(1920, 1081);
+                }
+
+                if($table_type=='speakers' && $file_type =='photo'){
+                  $image = Image::read($file)->resize(490, 559);
+                }
+
+                
+                if($table_type=='users' && ($file_type =='photo')){
+                  $image = Image::read($file)->resize(408, 480);
+                }
+
+                if($table_type=='users' && ($file_type =='cover_photo')){
+                  $image = Image::read($file)->resize(1920, 1081);
+                }
+                
+                if(!empty($image)){
+                 Storage::disk('public')->put($file_path.'/'.$filename,$image->encodeByExtension($file->getClientOriginalExtension(), quality: 70));
+                }else{
+                    $url = $file->storeAs($file_path,$filename,'public');
+                }
+
                 static::saveImageDataIntoDrive($filename,$file_type,$table_id,$table_type,$idForUpdate);
                 return $filename;
             } catch (\Exception $e) {
@@ -48,6 +76,17 @@ class Controller extends BaseController
            $drive->file_type = $file_type;
            $drive->save();
     }
+
+    public static function generateMobileImage($file,$file_path,$filename){
+        $mobile = Image::read($file)->fit(300, 300);
+        $mask = Image::canvas(300, 300);
+        $mask->circle(300, 150, 150, function ($draw) {
+            $draw->background('#fff'); // white circle area
+        });
+        $mobile->mask($mask, true);
+        $mobile->encode('png');
+        Storage::disk('public')->put($file_path.'/mobile/'.$filename,$mobile->encodeByExtension($file->getClientOriginalExtension(), quality: 70));
+     }   
 
     public static function deleteFile($table_id,$table_type,$file_type='photo'){
         $drive = Drive::where('table_type',$table_type)

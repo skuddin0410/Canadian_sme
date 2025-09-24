@@ -52,7 +52,7 @@
                                       }   
                                     @endphp
 
-                                    <span class="sponsors-name">{{$sponsor->name ? truncateString($sponsor->name, 20) : ''}}</span>
+                                    <span class="sponsors-name">{{$sponsor->name ? truncateString($sponsor->name, 15) : ''}}</span>
                                     <span class="sponsors-title {{$typeColors}}" style="{{'background-color:'.$typeColors}}">{{ $sponsor?->category?->name}}</span>
 
                                 </div>
