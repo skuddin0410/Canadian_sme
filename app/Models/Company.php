@@ -32,33 +32,27 @@ class Company extends Model
     {
     return $this->belongsTo(User::class);
     }
-    public function certificationFile()
-    {
-        return $this->hasOne(Drive::class, 'table_id', 'id')
-            ->where('table_type', 'companies')
-            ->where('file_type', 'certifications')
-            ->whereNotNull('file_name');
-    }
-    public function contentIconFile()
+
+    public function contentIconFile() //used on exhibitor
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'companies')
             ->where('file_type', 'content_icon');
     }
 
-    public function quickLinkIconFile()
+    public function quickLinkIconFile() //used on exhibitor
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'companies')
             ->where('file_type', 'quick_link_icon');
     }
-    public function logo()
+    public function logo() //used on sponsor
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'companies')
             ->where('file_type', 'logo');
     }
-    public function banner()
+    public function banner() //used on sponsor
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'companies')

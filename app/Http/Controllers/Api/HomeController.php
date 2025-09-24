@@ -361,7 +361,6 @@ public function getConnectionsDetails(Request $request)
 
         
         $user = auth()->user();
-
         // merge both sides
         $connecteduser = UserConnection::with('connection')->where('connection_id', $request->connectionId)
                      ->where('user_id', $user->id)
@@ -375,11 +374,11 @@ public function getConnectionsDetails(Request $request)
         }
         
        
-        $connecteduser = UserConnection::with('connection', 'connection.photo', 'connection.visitingcard')
+        $connecteduser = UserConnection::with('connection', 'connection.photo', 'connection.visitingcard','connection.privateDocs')
         ->where('connection_id', $request->connectionId)
         ->where('user_id', $user->id)
         ->first();
-
+     
         $connectionDetails = [
             "id"              => $connecteduser && $connecteduser->connection ? $connecteduser->connection->id : '',
             "rep_name"        => $connecteduser && $connecteduser->connection 
@@ -403,12 +402,24 @@ public function getConnectionsDetails(Request $request)
             "visitingCardUrl" => $connecteduser && $connecteduser->connection && $connecteduser->connection->visitingcard 
                                     ? $connecteduser->connection->visitingcard->file_path 
                                     : asset('images/default.png'),
+            "visiting_card_file_id"=>   $connecteduser && $connecteduser->connection && $connecteduser->connection->visitingcard 
+                                    ? $connecteduser->connection->visitingcard->id 
+                                    : '',                     
 
             "note"            => $connecteduser->note ?? '',
             "avatarUrl"       => $connecteduser && $connecteduser->connection && $connecteduser->connection->photo 
                                     ? $connecteduser->connection->photo->file_path 
                                     : asset('images/default.png'),
             "status"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->status ?? null : null,
+            "address"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->street ?? null : null,
+
+            "uploaded_files" => $connecteduser && $connecteduser->connection && $connecteduser->connection->privateDocs 
+                            ? $connecteduser->connection->privateDocs->map(fn ($doc) => [
+                                "fileID" => $doc->id,
+                                "name"   => $doc->file_name,
+                                "url"    => $doc->file_path,
+                              ])->values()->toArray()
+                            : []
         ];
 
 
@@ -542,9 +553,9 @@ public function scanDetails(Request $request){
              "message"=> "Connection not found"
            ]);
         } 
+
         $data->load('connection.photo','connection.visitingcard');
       
-     
         return response()->json([
             "message"=> "Connection found!",
             "id"=>  !empty($data->connection) ? $data->connection->id: '',
@@ -558,10 +569,13 @@ public function scanDetails(Request $request){
             "visiting_card_image" => !empty($data->connection) && !empty($data->connection->visitingcard) ? $data->connection->visitingcard->file_path: asset('images/default.png'),
             "tags"=> !empty($data->connection) ? $data->connection->tags: '' ,
             "rating"=> !empty($data->rating) ? $data->rating: '' ,
-            "address"=> !empty($data->connection) ? $data->connection->address: '' ,
+            "address"=> !empty($data->connection) ? $data->connection->street: '' ,
             "bio"=> !empty($data->connection) ? $data->connection->bio: '' ,
             "note"=> !empty($data->note) ? $data->note: '' ,
         ]);
+
+
+        
     
 
     } catch (\Exception $e) {
@@ -643,7 +657,6 @@ public function createConnection(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
-        
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',

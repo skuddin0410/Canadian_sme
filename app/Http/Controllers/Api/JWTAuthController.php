@@ -428,7 +428,7 @@ public function getExhibitor($exhibitorId)
             'bio'         => $exhibitor->description ?? '',
             "company_details"=>$sponsor->description ?? '',
             "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
-                           "file_id"=> $sp->id,
+                           "fileID"=>$sp->id,
                            "name"=> $sp->file_name,
                            "url"=> $sp->file_path
                 ])->values()
@@ -1003,8 +1003,10 @@ public function getAllExhibitor(Request $request){
                     "bio" => $sponsor->description,
                     "company_details"=>$sponsor->description ?? '',
                     "uploaded_files" => $sponsor->Docs->map(fn ($sp) => [
+                           "fileID"=> $sp->id,
                            "name"=> $sp->file_name,
-                           "url"=> $sp->file_path
+                           "url"=> $sp->file_path,
+                           "fileID"=>$sp->id
                     ])->values(),
                 ];
 
