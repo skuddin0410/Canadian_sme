@@ -122,6 +122,7 @@ class SpeakerController extends Controller
         $user = new Speaker();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
+        $user->slug = createUniqueSlug('speakers', $request->first_name.'_'.$request->last_name);
         $user->email = $request->email;
         $user->company = $request->company;
        
@@ -208,6 +209,7 @@ class SpeakerController extends Controller
 
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
+        $user->slug = createUniqueSlug('speakers', $request->first_name.'_'.$request->last_name,'slug',$user->id);
         $user->email = $request->email;
         $user->company = $request->company;
         $user->gdpr_consent = $request->gdpr_consent;

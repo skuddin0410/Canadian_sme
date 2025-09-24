@@ -98,7 +98,7 @@ public function index(Request $request)
                 'nullable',
                 'string',
                 'regex:/^\+?[0-9]{10,15}$/',
-                'unique:companies,company_phone',
+                'unique:companies,phone',
             ],
             'company_description'   => 'nullable|string',
             'website'       => 'nullable|url',
@@ -119,6 +119,7 @@ public function index(Request $request)
        try {
         $company = Company::create([
             'name'        => $request->company_name,
+            'slug'=> createUniqueSlug('companies', $request->company_name),
             'email'       => $request->company_email,
             'is_sponsor' => true,
             'phone'       => $request->company_phone,
@@ -223,6 +224,7 @@ public function index(Request $request)
         if ($company) {
         $company->update([
             'name'        => $request->company_name,
+            'slug' => createUniqueSlug('companies',$request->company_name,'slug',$company->id),
             'email'       => $request->company_email,
             'phone'       => $request->company_phone,
             'description' => $request->company_description,

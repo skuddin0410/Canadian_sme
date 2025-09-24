@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\User; 
 use App\Models\Company;
 use App\Models\Session;
+use App\Models\Speaker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
@@ -27,14 +28,11 @@ class LandingController extends Controller
 
         $shareUrl = $event ? route('events.show', $event->id) : url()->current();
         
-        $speakers = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["Speaker"]);
-                })->orderBy('created_at', 'DESC')->take(4)->get();
+        $speakers = Speaker::orderBy('created_at', 'DESC')->take(6)->get();
 
-        $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(3)->get();
+        $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(6)->get();
         $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
-        $attendees = $session->attendees->take(3);
+        $attendees = $session?->attendees->take(3);
         $schedules = $this->schudled();
         $location = !empty($event->location) ? $event->location : null;
 
