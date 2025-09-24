@@ -362,9 +362,7 @@ public function getConnectionsDetails(Request $request)
         
         $user = auth()->user();
         // merge both sides
-        $connecteduser = UserConnection::with('connection')->where('connection_id', $request->connectionId)
-                     ->where('user_id', $user->id)
-                     ->first();
+        $connecteduser = UserConnection::with('connection')->where('connection_id', $request->connectionId)->where('user_id', $user->id)->first();
 
         if (!$connecteduser) {
             return response()->json([
@@ -549,9 +547,15 @@ public function scanDetails(Request $request){
         $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
        
         if(!$data){
-           return response()->json([
-             "message"=> "Connection not found"
-           ]);
+
+            $newconnection = User::where('id',$request->qrData)->first();
+            if(!$newconnection){
+               return response()->json([
+                 "message"=> "Scan failed!"
+               ]);
+            }
+            userConnection($user->id,$newconnection->id);
+            $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first(); 
         } 
 
         $data->load('connection.photo','connection.visitingcard');
@@ -575,7 +579,7 @@ public function scanDetails(Request $request){
         ]);
 
 
-        
+
     
 
     } catch (\Exception $e) {
@@ -657,10 +661,12 @@ public function createConnection(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
+
+
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
+            'email' => 'required|string|max:255|email',
             'designation' => 'nullable|string|max:255' ,
             'tags' => 'nullable|string|max:255'  ,
             'mobile' => 'nullable|string|unique:users,mobile',
@@ -670,25 +676,32 @@ public function createConnection(Request $request){
         if ($validator->fails()) {
             return response()->json(["message" => $validator->errors()->first()]);
         }
-        $tagsString = is_array($request->tag)? implode(',', array_map('trim', $request->tag)) : trim((string) $request->tag);
-        $connection = new User();
-        $connection->title = $request->title;
-        $connection->name = $request->first_name;
-        $connection->lastname = $request->last_name;
-        $connection->email = $request->email;
-        $connection->company = $request->company_name;
-        $connection->designation = $request->job_title;
-        $connection->tags =  $tagsString;
-        $connection->mobile = $request->phone;
-        $connection->street = $request->address;
-        $connection->is_approve = true;
-        $connection->save();
-        $connection->assignRole('Attendee');
-        
-        qrCode($connection->id);
-        notification($connection->id);
-        Mail::to($connection->email)->send(new UserWelcome($connection));
 
+        $tagsString = is_array($request->tag)? implode(',', array_map('trim', $request->tag)) : trim((string) $request->tag);
+        $connection = User::where('email',$request->email)->first();
+       
+        if($connection){
+          $connection->tags =  $tagsString;
+          $connection->street = $request->address;
+          $connection->save();
+        }else{ 
+            $connection = new User();
+            $connection->title = $request->title;
+            $connection->name = $request->first_name;
+            $connection->lastname = $request->last_name;
+            $connection->email = $request->email;
+            $connection->company = $request->company_name;
+            $connection->designation = $request->job_title;
+            $connection->tags =  $tagsString;
+            $connection->mobile = $request->phone;
+            $connection->street = $request->address;
+            $connection->is_approve = true;
+            $connection->save();
+            $connection->assignRole('Attendee');
+            qrCode($connection->id);
+            notification($connection->id);
+        }
+        
         userConnection($user->id, $connection->id);
         $connetionUpdate = UserConnection::where('connection_id',$connection->id)->where('user_id',$user->id)->first();
         $connetionUpdate->rating = $request->rating ?? '';

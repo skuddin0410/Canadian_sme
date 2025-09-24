@@ -399,18 +399,16 @@ if (! function_exists('isFavorite')) {
 if (! function_exists('userConnection')) {
     function userConnection($senderId,$receiverId)
     {   
-        if (UserConnection::alreadyConnected($senderId, $receiverId)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Already connected or request pending'
-            ], 400);
-        }
 
-        UserConnection::create([
-            'user_id' => $senderId,
-            'connection_id' => $receiverId,
-            'status' => 'accepted'
-        ]);
+        UserConnection::updateOrCreate(
+            [
+                'user_id'       => $senderId,
+                'connection_id' => $receiverId,
+            ],
+            [
+                'status'        => 'accepted',
+            ]
+        );
     }
 }
 
