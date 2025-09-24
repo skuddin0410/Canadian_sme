@@ -201,7 +201,7 @@ public function profile($slug)
     $event = Event::with('photo')->first();
 
 
-    return view('frontend.profile', compact('attendee', 'session', 'event'));
+    return view('frontend.profile', compact('attendee', 'sessions', 'event'));
 }
 public function speaker($slug)
 {
