@@ -24,25 +24,40 @@ class Controller extends BaseController
                 $filename = now()->format('Y-m-d').'-'.abs(crc32(uniqid())).'-'.Carbon\Carbon::now()->timestamp . '.' . $file->getClientOriginalExtension();
                 $file_path = $uploadPath;
                 $image = '';
+
+                $size = getimagesize($file);
+                $width = $size[0];
+                $height = $size[1];
+
                 if($table_type=='companies' && ($file_type =='content_icon' || $file_type =='logo')){
-                  $image = Image::read($file)->resize(408, 480);
+                   if($width > 408 ||  $height > 480){
+                     $image = Image::read($file)->resize(408, 480);
+                   }
                 }
 
                 if($table_type=='companies' && ($file_type =='banner' || $file_type =='quick_link_icon')){
-                  $image = Image::read($file)->resize(1920, 1081);
+                   if($width > 1920 ||  $height > 1081){  
+                    $image = Image::read($file)->resize(1920, 1081);
+                   }
                 }
 
                 if($table_type=='speakers' && $file_type =='photo'){
-                  $image = Image::read($file)->resize(490, 559);
+                  if($width > 490 ||  $height > 559){  
+                    $image = Image::read($file)->resize(490, 559);
+                  }
                 }
 
                 
                 if($table_type=='users' && ($file_type =='photo')){
-                  $image = Image::read($file)->resize(408, 480);
+                  if($width > 408 ||  $height > 480){   
+                   $image = Image::read($file)->resize(408, 480);
+                  }
                 }
 
                 if($table_type=='users' && ($file_type =='cover_photo')){
-                  $image = Image::read($file)->resize(1920, 1081);
+                  if($width > 1920 ||  $height > 1081){   
+                    $image = Image::read($file)->resize(1920, 1081);
+                  }
                 }
                 
                 if(!empty($image)){
