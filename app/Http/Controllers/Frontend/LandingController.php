@@ -193,12 +193,13 @@ public function profile($slug)
      ->firstOrFail();
 
    
-    $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-        ->where('start_time', '>=', now())
-        ->orderBy('start_time', 'ASC')
-        ->first();
-
+   $sessions = Session::where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
+   
     $event = Event::with('photo')->first();
+
 
     return view('frontend.profile', compact('attendee', 'session', 'event'));
 }
