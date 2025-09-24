@@ -279,7 +279,13 @@ public function sponsor( Request $request,$slug){
         ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
         : null;
 
-    return view('frontend.venue', compact('location', 'mapUrl'));
+    $sessions = Session::where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
+
+    $event = Event::with('photo')->first();
+    return view('frontend.venue', compact('location', 'mapUrl','sessions','event'));
     }
 
 
