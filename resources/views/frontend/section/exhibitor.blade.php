@@ -37,10 +37,12 @@
                         <span class="blue-text-18 mb-2">Booth Number</span>
                         <span class="small-heading-black fw-semibold">{{$exhibitor->booth ?? 'NA'}}</span>
                     </div>
+                   
                     <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
-                        <span class="small-heading-black fw-semibold">{{$session->title ? truncateString($session->title, 40) : 'NA'}}</span>
+                        <span class="small-heading-black fw-semibold">{{$session?->title ? truncateString($session->title, 40) : 'NA'}}</span>
                     </div>
+                   
                     <div>
                         <a class="view-more position-relative d-flex
                         align-items-center gap-2" href="{{route('exhibitor',$exhibitor->slug)}}">

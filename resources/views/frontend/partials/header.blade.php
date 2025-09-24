@@ -11,10 +11,11 @@
                     </button>
                     <ul class="navbar-nav mb-2 mb-mg-0 gap-3 gap-md-5">
                         <li class="nav-item">
-                            <a class="nav-link p-0 active" aria-current="page" href="{{route('front.landing')}}">Home</a>
+                            <a class="nav-link p-0  {{ request()->is('/') ? 'active' : '' }}" aria-current="page" href="{{route('front.landing')}}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0" href="{{route('venue')}}">Venue Information</a>
+                            
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{route('venue')}}">Venue Information</a>
                         </li>
                     </ul>
                 </div>

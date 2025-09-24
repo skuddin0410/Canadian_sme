@@ -19,7 +19,7 @@ class Company extends Model
     use AutoHtmlDecode;
     protected $fillable = [
         'user_id','name', 'industry', 'size', 'booth_id', 'location', 'email', 'phone',
-        'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image','is_sponsor','booth','type'
+        'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image','is_sponsor','booth','type','slug'
     ];
     protected $casts = [
         'is_sponsor' => 'boolean',

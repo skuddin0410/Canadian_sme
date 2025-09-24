@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\User; 
 use App\Models\Company;
 use App\Models\Session;
+use App\Models\Speaker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
@@ -27,14 +28,11 @@ class LandingController extends Controller
 
         $shareUrl = $event ? route('events.show', $event->id) : url()->current();
         
-        $speakers = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["Speaker"]);
-                })->orderBy('created_at', 'DESC')->take(4)->get();
+        $speakers = Speaker::orderBy('created_at', 'DESC')->take(6)->get();
 
-        $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(3)->get();
+        $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(6)->get();
         $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
-        $attendees = $session->attendees->take(3);
+        $attendees = $session?->attendees->take(3);
         $schedules = $this->schudled();
         $location = !empty($event->location) ? $event->location : null;
 
@@ -206,38 +204,33 @@ public function profile($slug)
 }
 public function speaker($slug)
 {
-    
-    $speaker = User::with(['photo', 'coverphoto'])
+    $speaker = Speaker::with(['photo', 'coverphoto'])
         ->where('slug', $slug)
         ->firstOrFail();
-
     
-    $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-        ->where('start_time', '>=', now())
-        ->orderBy('start_time', 'ASC')
-        ->first();
-
+   $sessions = Session::where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
    
     $event = Event::with('photo')->first();
 
-    return view('frontend.speaker', compact('speaker', 'session', 'event'));
+    return view('frontend.speaker', compact('speaker', 'sessions', 'event'));
 }
 
 
 public function exhibitor( Request $request,$slug){ 
 
-    $company = Company::with(['contentIconFile','quickLinkIconFile','user','Docs' ])
-        ->where('slug', $slug)
+    $company = Company::where('slug', $slug)
         ->firstOrFail();
-    $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
-        ->where('start_time', '>=', now())
+    $sessions = Session::where('start_time', '>=', now())
         ->inRandomOrder()
         ->take(2)
         ->get();
 
-    
+    $event = Event::with('photo')->first();
 
-    return view('frontend.company',compact('company' , 'sessions'));
+    return view('frontend.company',compact('company' , 'sessions','event'));
 }
 
 public function sponsor( Request $request,$slug){ 
@@ -246,15 +239,14 @@ public function sponsor( Request $request,$slug){
         ->where('slug', $slug)
         ->where('is_sponsor', 1)  
         ->firstOrFail();
-    $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
-        ->where('start_time', '>=', now())
+    $sessions = Session::where('start_time', '>=', now())
         ->inRandomOrder()
         ->take(2)
         ->get();
 
-    
+    $event = Event::with('photo')->first();
 
-    return view('frontend.sponsor',compact('company' , 'sessions'));
+    return view('frontend.sponsor',compact('company' , 'sessions', 'event'));
 }
 
     
@@ -287,7 +279,13 @@ public function sponsor( Request $request,$slug){
         ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
         : null;
 
-    return view('frontend.venue', compact('location', 'mapUrl'));
+    $sessions = Session::where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
+
+    $event = Event::with('photo')->first();
+    return view('frontend.venue', compact('location', 'mapUrl','sessions','event'));
     }
 
 

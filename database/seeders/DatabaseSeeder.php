@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             EmailTemplateSeeder::class, //php artisan db:seed --class=EmailTemplateSeeder
             FormsTableSeeder::class, //php artisan db:seed --class=FormsTableSeeder
 
-
+            //**********
             //AccountManagerPermissionSeeder::class,
             UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
             TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             //AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
             UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder
-
+            //*****
             
             
         ]);

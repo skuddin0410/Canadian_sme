@@ -160,19 +160,11 @@ class AttendeeUserController extends Controller
             return redirect(route('attendee-users.create'))->withInput()
                 ->withErrors($validator);
         }
-        
-        if (!empty($request->access_speaker_ids)) {
-            $existingUser = User::where('access_speaker_ids', $request->access_speaker_ids)->exists();
-
-            if ($existingUser) {
-                return redirect(route('attendee-users.create'))->withInput()
-                ->withErrors('One or more of the selected speaker IDs are already assigned to another user.');
-            }
-        }
 
         $user = new User();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
+        $user->slug = createUniqueSlug('users', $request->first_name.'_'.$request->last_name);
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
@@ -194,7 +186,7 @@ class AttendeeUserController extends Controller
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
-
+      
         $primaryGroupArray= [];
         $secondaryGroupArray=[];
          
@@ -298,19 +290,11 @@ class AttendeeUserController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
-        
-         if (!empty($request->access_speaker_ids)) {
-            $existingUser = User::where('access_speaker_ids', $request->access_speaker_ids)->exists();
 
-            if ($existingUser) {
-                
-                return redirect(route('attendee-users.create'))->withInput()
-                ->withErrors('One or more of the selected speaker IDs are already assigned to another user.');
-            }
-        }
 
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
+        $user->slug = createUniqueSlug('users', $request->first_name.'_'.$request->last_name,'slug',$user->id);
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
