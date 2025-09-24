@@ -204,38 +204,33 @@ public function profile($slug)
 }
 public function speaker($slug)
 {
-    
-    $speaker = User::with(['photo', 'coverphoto'])
+    $speaker = Speaker::with(['photo', 'coverphoto'])
         ->where('slug', $slug)
         ->firstOrFail();
-
     
-    $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-        ->where('start_time', '>=', now())
-        ->orderBy('start_time', 'ASC')
-        ->first();
-
+   $sessions = Session::where('start_time', '>=', now())
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
    
     $event = Event::with('photo')->first();
 
-    return view('frontend.speaker', compact('speaker', 'session', 'event'));
+    return view('frontend.speaker', compact('speaker', 'sessions', 'event'));
 }
 
 
 public function exhibitor( Request $request,$slug){ 
 
-    $company = Company::with(['contentIconFile','quickLinkIconFile','user','Docs' ])
-        ->where('slug', $slug)
+    $company = Company::where('slug', $slug)
         ->firstOrFail();
-    $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
-        ->where('start_time', '>=', now())
+    $sessions = Session::where('start_time', '>=', now())
         ->inRandomOrder()
         ->take(2)
         ->get();
 
-    
+    $event = Event::with('photo')->first();
 
-    return view('frontend.company',compact('company' , 'sessions'));
+    return view('frontend.company',compact('company' , 'sessions','event'));
 }
 
 public function sponsor( Request $request,$slug){ 
@@ -244,15 +239,14 @@ public function sponsor( Request $request,$slug){
         ->where('slug', $slug)
         ->where('is_sponsor', 1)  
         ->firstOrFail();
-    $sessions = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
-        ->where('start_time', '>=', now())
+    $sessions = Session::where('start_time', '>=', now())
         ->inRandomOrder()
         ->take(2)
         ->get();
 
-    
+    $event = Event::with('photo')->first();
 
-    return view('frontend.sponsor',compact('company' , 'sessions'));
+    return view('frontend.sponsor',compact('company' , 'sessions', 'event'));
 }
 
     
