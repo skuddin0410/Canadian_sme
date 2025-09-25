@@ -6,11 +6,18 @@
                 <h2 class="h2-black">
                     Meeting Attendee List with Designations Included
                 </h2>
+                @if(request()->is('/'))
                 <div class="d-none d-xl-block">
                     <a class="heroBtn btn-long" href="{{ route('profile-index') }}">
                         View More
                     </a>
                 </div>
+                @endif
+                @if(request()->is('profile*'))
+                <div class="d-flex justify-content-end mb-2">
+                  <a href="javascript:history.back()" class="heroBtn ms-md-5">Back</a>
+                </div>
+                @endif
             </div>
 
             <div class="attendee-box mt-4 mt-lg-5 d-flex flex-column">
@@ -48,16 +55,16 @@
                                 <span class="small-heading-black fw-semibold">{{ $attendee->email ?? '' }}</span>
                             </div>
                             <div>
+                                @if (!empty($attendee->slug))
                                 <a class="view-more position-relative d-flex align-items-center gap-2"
-                                    @if ($attendee->slug) href="{{ route('profile', ['slug' => $attendee->slug]) }}"
-                    @else
-           href="#" @endif>
+                                     href="{{ route('profile', ['slug' => $attendee->slug]) }}">
                                     View More
                                 </a>
+                                @endif
                             </div>
 
                         </div>
-            </div>
+            
             @endforeach
             @endif
         </div>
