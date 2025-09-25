@@ -30,34 +30,40 @@ class Controller extends BaseController
                 $height = $size[1];
 
                 if($table_type=='companies' && ($file_type =='content_icon' || $file_type =='logo')){
-                   if($width > 408 ||  $height > 480){
-                     $image = Image::read($file)->resize(408, 480);
-                   }
+                    $image = Image::read($file)->resize(408, 480, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
                 }
 
                 if($table_type=='companies' && ($file_type =='banner' || $file_type =='quick_link_icon')){
-                   if($width > 1920 ||  $height > 1081){  
-                    $image = Image::read($file)->resize(1920, 1081);
-                   }
+
+                   $image = Image::read($file)->resize(1920, 1081, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
                 }
 
                 if($table_type=='speakers' && $file_type =='photo'){
-                  if($width > 490 ||  $height > 559){  
-                    $image = Image::read($file)->resize(490, 559);
-                  }
+                   $image = Image::read($file)->resize(490, 559, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
                 }
 
                 
                 if($table_type=='users' && ($file_type =='photo')){
-                  if($width > 408 ||  $height > 480){   
-                   $image = Image::read($file)->resize(408, 480);
-                  }
+                   $image = Image::read($file)->resize(408, 480, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
                 }
 
                 if($table_type=='users' && ($file_type =='cover_photo')){
-                  if($width > 1920 ||  $height > 1081){   
-                    $image = Image::read($file)->resize(1920, 1081);
-                  }
+                   $image = Image::read($file)->resize(1920, 1081, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
                 }
                 
                 if(!empty($image)){
