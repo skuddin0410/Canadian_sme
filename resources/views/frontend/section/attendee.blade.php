@@ -7,58 +7,65 @@
                     Meeting Attendee List with Designations Included
                 </h2>
                 <div class="d-none d-xl-block">
-                    <a class="heroBtn btn-long" href="{{route('profile-index')}}">
-                         View More
+                    <a class="heroBtn btn-long" href="{{ route('profile-index') }}">
+                        View More
                     </a>
                 </div>
             </div>
 
             <div class="attendee-box mt-4 mt-lg-5 d-flex flex-column">
-                @if(!empty($attendees))
-                    @foreach($attendees as $attendee)
+                @if (!empty($attendees))
+                    @foreach ($attendees as $attendee)
                         <div class="attendee-card shadow">
                             <div class="attendee-card-box">
                                 <div class="attendee-profile">
-                                        @if(!empty($attendee->photo) && !empty($attendee->photo->file_path))
-                                            <img src="{{ $attendee->photo->file_path }}" alt="">
-                                        @else
-                                            <span class="small-heading-blue mb-0">{{ shortenName($attendee->name) }}</span>
-                                        @endif
+                                    @if (!empty($attendee->photo) && !empty($attendee->photo->file_path))
+                                        <img src="{{ $attendee->photo->file_path }}" alt="">
+                                    @else
+                                        <span class="small-heading-blue mb-0">{{ shortenName($attendee->name) }}</span>
+                                    @endif
                                 </div>
 
-                                
+
                                 <div class="abc">
                                     <span class="blue-text-18 mb-2">Full Name</span>
-                                    <span class="small-heading-black fw-semibold">{{$attendee->full_name ? truncateString($attendee->full_name, 13) : ''}}</span>
+                                    <span
+                                        class="small-heading-black fw-semibold">{{ $attendee->full_name ? truncateString($attendee->full_name, 13) : '' }}</span>
                                 </div>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Company</span>
-                                <span class="small-heading-black fw-semibold">{{$attendee->company ? truncateString($attendee->company, 25) : ''}}</span>
+                                <span
+                                    class="small-heading-black fw-semibold">{{ $attendee->company ? truncateString($attendee->company, 25) : '' }}</span>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Job Title</span>
-                                <span class="small-heading-black fw-semibold">{{$attendee->designation ? truncateString($attendee->designation, 20) : ''}}</span>
+                                <span
+                                    class="small-heading-black fw-semibold">{{ $attendee->designation ? truncateString($attendee->designation, 20) : '' }}</span>
                             </div>
                             <div class="">
                                 <span class="blue-text-18 mb-2">Email ID</span>
-                                <span class="small-heading-black fw-semibold">{{$attendee->email ?? ''}}</span>
+                                <span class="small-heading-black fw-semibold">{{ $attendee->email ?? '' }}</span>
                             </div>
                             <div>
-                                <a class="view-more position-relative d-flex
-                                align-items-center gap-2" href="{{route('profile', $attendee->slug)}}">
+                                <a class="view-more position-relative d-flex align-items-center gap-2"
+                                    @if ($attendee->slug) href="{{ route('profile', ['slug' => $attendee->slug]) }}"
+                    @else
+           href="#" @endif>
                                     View More
                                 </a>
                             </div>
+
                         </div>
-                    @endforeach
-                @endif
             </div>
-            <div class="d-flex justify-content-center mt-4 d-xl-none">
-                <a class="heroBtn btn-long" href="{{route('profile-index')}}">
-                         View More
-                </a>
-            </div>
+            @endforeach
+            @endif
+        </div>
+        <div class="d-flex justify-content-center mt-4 d-xl-none">
+            <a class="heroBtn btn-long" href="{{ route('profile-index') }}">
+                View More
+            </a>
+        </div>
         </div>
     </section>
     <!-- attendee end -->

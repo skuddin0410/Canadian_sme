@@ -6,15 +6,28 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Models\Drive;
+// use Intervention\Image\ImageManager;
+// use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Facades\Image;
+
 use Illuminate\Support\Facades\File;
 use Storage;
 use Carbon;
 use DB;
-use Intervention\Image\Laravel\Facades\Image;
+// use Intervention\Image\Laravel\Facades\Image;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+        /**
+     * Generate a circular 300x300 "mobile" image and store it under public/{file_path}/mobile/{filename}
+     *
+     * @param \Illuminate\Http\UploadedFile|string $file      Uploaded file object or path
+     * @param string                              $file_path Destination folder (relative to storage disk)
+     * @param string                              $filename  Filename to save (e.g. 'img.png')
+     * @return string Path (relative) of stored file
+     * @throws \Exception
+     */
 
     public static function imageUpload(object $file , string $uploadPath=null,$table_id,$table_type,$file_type,$idForUpdate=null) : ?string
     {
@@ -67,6 +80,7 @@ class Controller extends BaseController
                 }
 
                 static::saveImageDataIntoDrive($filename,$file_type,$table_id,$table_type,$idForUpdate);
+                static::generateMobileImage($file,$file_path,$filename);
                 return $filename;
             } catch (\Exception $e) {
                 return "null";
@@ -91,18 +105,49 @@ class Controller extends BaseController
            $drive->file_type = $file_type;
            $drive->save();
     }
+        public static function generateMobileImage($file, string $file_path, string $filename): string
+{
+    // Ensure "mobile" folder exists
+    $mobileFolder = rtrim($file_path, '/') . '/mobile';
+    if (!Storage::disk('public')->exists($mobileFolder)) {
+        Storage::disk('public')->makeDirectory($mobileFolder);
+    }
 
-    public static function generateMobileImage($file,$file_path,$filename){
-        $mobile = Image::read($file)->fit(300, 300);
-        $mask = Image::canvas(300, 300);
-        $mask->circle(300, 150, 150, function ($draw) {
-            $draw->background('#fff'); // white circle area
-        });
-        $mobile->mask($mask, true);
-        $mobile->encode('png');
-        Storage::disk('public')->put($file_path.'/mobile/'.$filename,$mobile->encodeByExtension($file->getClientOriginalExtension(), quality: 70));
-     }   
+    // Load image
+    $image = Image::make($file);
 
+    // Crop to square and resize
+    $size = min($image->width(), $image->height());
+    $image->crop($size, $size, intval(($image->width() - $size) / 2), intval(($image->height() - $size) / 2));
+    $image->resize(300, 300);
+
+    // Create circular mask using Intervention
+    $mask = Image::canvas(300, 300);
+    $mask->circle(300, 150, 150, function ($draw) {
+        $draw->background('#000'); // black circle for mask
+    });
+
+    $image->mask($mask, true); // apply mask
+
+    // Determine extension
+    $extension = strtolower(
+        method_exists($file, 'getClientOriginalExtension') 
+            ? $file->getClientOriginalExtension() 
+            : pathinfo($filename, PATHINFO_EXTENSION)
+    );
+    if (!in_array($extension, ['jpg','jpeg','png','webp'])) {
+        $extension = 'png';
+    }
+
+    // Save into public/mobile
+    $dest = $mobileFolder . '/' . $filename;
+    Storage::disk('public')->put($dest, (string) $image->encode($extension, 70));
+
+    return $dest;
+}
+
+
+       
     public static function deleteFile($table_id,$table_type,$file_type='photo'){
         $drive = Drive::where('table_type',$table_type)
                ->where('file_type',$file_type)
