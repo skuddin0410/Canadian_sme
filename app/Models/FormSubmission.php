@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\Form;
+use App\Traits\Auditable;
+use App\Traits\AutoHtmlDecode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
