@@ -6,15 +6,11 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Models\Drive;
-// use Intervention\Image\ImageManager;
-// use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Facades\Image;
-
 use Illuminate\Support\Facades\File;
 use Storage;
 use Carbon;
 use DB;
-// use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 
 class Controller extends BaseController
 {
@@ -86,7 +82,6 @@ class Controller extends BaseController
                 }
 
                 static::saveImageDataIntoDrive($filename,$file_type,$table_id,$table_type,$idForUpdate);
-                static::generateMobileImage($file,$file_path,$filename);
                 return $filename;
             } catch (\Exception $e) {
                 return "null";
