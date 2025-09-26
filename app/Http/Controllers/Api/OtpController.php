@@ -41,21 +41,9 @@ class OtpController extends Controller
                 ], 422);
             }
         
-         /*$allowedEmails = [
+           /*$allowedEmails = [
                 "henry.roy@example.com",
-                "subhabrata1@example.com",
-                "arafat@example.com",
-                "debanjan@example.com",
-                "subhamita.dapl@gmail.com",
-
-                "aiden.lemieux@example.com",
-                "hannah.carrier@example.com",
-
-                "liam.smith@example.com",
-                "olivia.johnson@example.com",
-
-                "victoria.desjardins@example.com",
-                "samuel.charbonneau@example.com"
+                "subhabrata1@example.com"
             ];
 
             if (!in_array($request->email, $allowedEmails)) {
@@ -106,30 +94,12 @@ public function verify(Request $request)
             ], 403); 
         }
     
-       /* $allowedEmails = [
+        $allowedEmails = [
             "henry.roy@example.com",
-            "subhabrata1@example.com",
-            "arafat@example.com",
-            "debanjan@example.com",
-            "subhamita.dapl@gmail.com",
-
-            "aiden.lemieux@example.com",
-            "hannah.carrier@example.com",
-
-            "liam.smith@example.com",
-            "olivia.johnson@example.com",
-
-            "victoria.desjardins@example.com",
-            "samuel.charbonneau@example.com"
+            "subhabrata1@example.com"
         ];
 
-        if (!in_array($request->email, $allowedEmails)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please use test account',
-            ]);
-        }
-        */
+        
 
     if ($validator->fails()) {
         return response()->json([
@@ -139,20 +109,20 @@ public function verify(Request $request)
     }
 
     // Find OTP
-   // if($request->otp != 1234){
-        $otp = Otp::where('email', $request->email)
-            ->where('otp', $request->otp)
-            ->where('expired_at', '>=', now())
-            ->first();
+        if (!in_array($request->email, $allowedEmails)) {
+            $otp = Otp::where('email', $request->email)
+                ->where('otp', $request->otp)
+                ->where('expired_at', '>=', now())
+                ->first();
 
-        if (!$otp) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired OTP',
-            ], 400);
-        }
-   // }
-
+            if (!$otp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired OTP',
+                ], 400);
+            }
+   
+       }
    
     $user = User::firstOrCreate(
         ['email' => $request->email],
