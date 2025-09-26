@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\FormBuilderController;
+use App\Http\Controllers\Frontend\SupportController;
 
 Route::get('/', [LandingController::class, 'index'])->name('front.landing');
 
@@ -34,4 +35,11 @@ Route::put('/update-user/{userId}', [LandingController::class, 'updateUserDetail
 
 Route::prefix('cms')->group(function () {
     Route::get('/{slug}', [PageController::class, 'appContent']);
+});
+
+Route::post('/supports/submit', [SupportController::class, 'store'])->name('support.submit');
+Route::get('/supports', [SupportController::class, 'index'])->name('support.form');
+
+Route::get('/support', function () {
+    return view('frontend.support'); // This will load the support.blade.php view
 });
