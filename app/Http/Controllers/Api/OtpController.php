@@ -25,37 +25,46 @@ class OtpController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|nullable|string|max:255|email',
-                // 'mobile' => 'sometimes|nullable|string',
             ]);
+
+
+            if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your account is inactive. Please contact support for assistance.',
+                ], 403); 
+            }
+
             if ($validator->fails()) {
                 return response()->json([
                     'error' => "Invalid email format",
                 ], 422);
             }
-            
-                $allowedEmails = [
-                    "henry.roy@example.com",
-                    "subhabrata1@example.com",
-                    "arafat@example.com",
-                    "debanjan@example.com",
-                    "subhamita.dapl@gmail.com",
+        
+         /*$allowedEmails = [
+                "henry.roy@example.com",
+                "subhabrata1@example.com",
+                "arafat@example.com",
+                "debanjan@example.com",
+                "subhamita.dapl@gmail.com",
 
-                    "aiden.lemieux@example.com",
-                    "hannah.carrier@example.com",
+                "aiden.lemieux@example.com",
+                "hannah.carrier@example.com",
 
-                    "liam.smith@example.com",
-                    "olivia.johnson@example.com",
+                "liam.smith@example.com",
+                "olivia.johnson@example.com",
 
-                    "victoria.desjardins@example.com",
-                    "samuel.charbonneau@example.com"
-                ];
+                "victoria.desjardins@example.com",
+                "samuel.charbonneau@example.com"
+            ];
 
-                if (!in_array($request->email, $allowedEmails)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Please use test account',
-                    ]);
-                }
+            if (!in_array($request->email, $allowedEmails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please use test account',
+                ]);
+            }*/
+
             $code = rand(1000, 9999);
             $currentDateTime = Carbon::now();
 
@@ -89,8 +98,15 @@ public function verify(Request $request)
         'email' => 'required|string|email|max:255',
         'otp'   => 'required|digits:4',
     ]);
+
+        if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is inactive. Please contact support for assistance.',
+            ], 403); 
+        }
     
-        $allowedEmails = [
+       /* $allowedEmails = [
             "henry.roy@example.com",
             "subhabrata1@example.com",
             "arafat@example.com",
@@ -113,6 +129,7 @@ public function verify(Request $request)
                 'message' => 'Please use test account',
             ]);
         }
+        */
 
     if ($validator->fails()) {
         return response()->json([
@@ -122,7 +139,7 @@ public function verify(Request $request)
     }
 
     // Find OTP
-    if($request->otp != 1234){
+   // if($request->otp != 1234){
         $otp = Otp::where('email', $request->email)
             ->where('otp', $request->otp)
             ->where('expired_at', '>=', now())
@@ -134,7 +151,7 @@ public function verify(Request $request)
                 'message' => 'Invalid or expired OTP',
             ], 400);
         }
-    }
+   // }
 
    
     $user = User::firstOrCreate(
@@ -154,7 +171,7 @@ public function verify(Request $request)
         if($user->is_approve == 0){
            return response()->json([
             'success'    => false,
-            'message'    => 'You have been blocked by the admin. Please contact support for assistance.',
+            'message'    => 'Your account is inactive. Please contact support for assistance.',
            ]); 
         }
        

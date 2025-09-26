@@ -849,7 +849,7 @@ public function checkSession(Request $request)
     if($user->is_approve == 0){
        return response()->json([
         'success'    => false,
-        'message'    => 'You have been blocked by the admin. Please contact support for assistance.',
+        'message'    => 'Your account is inactive. Please contact support for assistance.',
        ],401); 
     }
        
