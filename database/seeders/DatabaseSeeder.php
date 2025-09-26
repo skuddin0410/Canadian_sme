@@ -28,14 +28,14 @@ class DatabaseSeeder extends Seeder
             EmailTemplateSeeder::class, //php artisan db:seed --class=EmailTemplateSeeder
             FormsTableSeeder::class, //php artisan db:seed --class=FormsTableSeeder
             GuestUserSeeder::class,  //php artisan db:seed --class=GuestUserSeeder
+            UpdateSlugsSeeder::class, //php artisan db:seed --class=UpdateSlugsSeeder
             //**********
             //AccountManagerPermissionSeeder::class,
-            UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
+            //UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
             //TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             //SupportSeeder::class,
             //SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
             //AddExhibitorUsers::class,
-            //UpdateSlugsSeeder::class, //php artisan db:seed --class=UpdateSlugsSeeder
             //AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             //AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
             //UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder
