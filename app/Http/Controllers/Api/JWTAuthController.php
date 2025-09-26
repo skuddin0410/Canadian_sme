@@ -1022,5 +1022,26 @@ public function getAllExhibitor(Request $request){
 
     }
 
+    public function deleteAccount(){
+      try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+            User::where('id',$user->id)->update(['is_approve'=>0]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Account deleted successfully ',
+            ], 200);
 
+         } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to get data! ',
+            ], 500);
+        }    
+    }
 }

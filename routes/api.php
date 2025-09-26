@@ -15,6 +15,7 @@ Route::prefix('password')->group(function () {
 });
 
 Route::middleware(['auth:api', 'jwtauth'])->group(function () {
+
        Route::prefix('profile')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getUser']);
         Route::put('/', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUser']);
@@ -89,6 +90,9 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::get('/logout', [App\Http\Controllers\Api\JWTAuthController::class, 'logout']);
     
     Route::post('/onesignal', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotification']);
+    
+    Route::get('/delete-account', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteAccount']);
+
 
 });
 
