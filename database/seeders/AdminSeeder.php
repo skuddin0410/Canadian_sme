@@ -21,6 +21,7 @@ class AdminSeeder extends Seeder
         $user->email = 'admin@admin.com';
         $user->mobile = '12345678';
         $user->username = 'admin';
+        $user->primary_group='Admin';
         $user->password = Hash::make('password');
         $user->save();
         $user->assignRole('Admin');
@@ -28,6 +29,7 @@ class AdminSeeder extends Seeder
        $eventAdmin = User::create([
             'name' => 'Event',
             'lastname'=>'Admin',
+            'primary_group'=>'Admin',
             'email' => 'event@admin.com',
             'mobile' => '123345678',
             'password' => Hash::make('password'),
@@ -43,6 +45,7 @@ class AdminSeeder extends Seeder
             'lastname'=>'Or Helpdesk',
             'email' => 'support@staff.com',
             'mobile' => '12345678',
+            'primary_group'=>'Support Staff Or Helpdesk',
             'password' => Hash::make('password'),
         ]);
         $SupportStaff->assignRole('Support Staff Or Helpdesk');
@@ -54,6 +57,7 @@ class AdminSeeder extends Seeder
             'lastname'=>'Desk',
             'email' => 'registration@desk.com',
             'mobile' => '12345678',
+            'primary_group'=>'Registration Desk',
             'password' => Hash::make('password'),
         ]);
         $registrationDesk->assignRole('Registration Desk');

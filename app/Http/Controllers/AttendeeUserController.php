@@ -48,7 +48,7 @@ class AttendeeUserController extends Controller
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
         $users = User::with("roles")->whereHas("roles", function ($q) {
-             $q->whereIn("name", ['Attendee', 'Exhibitor', 'Speaker','Sponsors','Admin']);
+             $q->whereIn("name", ['Attendee', 'Exhibitor', 'Speaker','Sponsors']);
         })->orderBy('created_at', 'DESC');
 
  
