@@ -47,8 +47,8 @@ class AttendeeUserController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-        $users = User::with("roles")->whereHas("roles", function ($q) {
-             $q->whereIn("name", ['Attendee', 'Exhibitor', 'Speaker','Sponsors','Admin']);
+        $users = User::with("roles")->where('primary_group','Attendee')->whereHas("roles", function ($q) {
+             $q->whereIn("name", ['Attendee']);
         })->orderBy('created_at', 'DESC');
 
  
@@ -200,7 +200,7 @@ class AttendeeUserController extends Controller
           $combinedGroups = array_unique($combinedGroups); 
         
         if(!empty($combinedGroups)){
-          $user->syncRoles($combinedGroups);  
+          $user->syncRoles($request->primary_group);  
         }
 
         if ($request->hasFile('image')) {
@@ -331,7 +331,7 @@ class AttendeeUserController extends Controller
           $combinedGroups = array_unique($combinedGroups); 
         
         if(!empty($combinedGroups)){
-          $user->syncRoles($combinedGroups);  
+          $user->syncRoles($request->primary_group);  
         }
 
         if ($request->hasFile('image')) {

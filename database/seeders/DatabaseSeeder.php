@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-
+          
             RoleSeeder::class, // php artisan db:seed --class=RoleSeeder
             AdminSeeder::class, // php artisan db:seed --class=AdminSeeder
             TrackSeeder::class,
@@ -27,10 +27,10 @@ class DatabaseSeeder extends Seeder
             SettingsTableSeeder::class,// php artisan db:seed --class=SettingsTableSeeder
             EmailTemplateSeeder::class, //php artisan db:seed --class=EmailTemplateSeeder
             FormsTableSeeder::class, //php artisan db:seed --class=FormsTableSeeder
-
+            GuestUserSeeder::class,  //php artisan db:seed --class=GuestUserSeeder
             //**********
             //AccountManagerPermissionSeeder::class,
-            //UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
+            UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
             //TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             //SupportSeeder::class,
             //SessionAttendee::class,// php artisan db:seed --class=SessionAttendee

@@ -107,6 +107,7 @@ class UserSeeder extends Seeder
                 'name' => $exhibitor['first_name'],
                 'lastname'=>$exhibitor['last_name'],
                 'company' =>$faker->company,
+                'primary_group'=>'Attendee',
                 'email' => strtolower($exhibitor['first_name'] . '.' . $exhibitor['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
                 'designation'=>$faker->jobTitle,
@@ -120,7 +121,7 @@ class UserSeeder extends Seeder
                 'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
 
             ]);
-            $user->assignRole(['Attendee', 'Exhibitor']);
+            $user->assignRole(['Attendee']);
             qrCode($user->id);
             notification($user->id,'welcome');
         }
@@ -154,6 +155,7 @@ class UserSeeder extends Seeder
                 'name' => $sponsor['first_name'],
                 'lastname'=>$sponsor['last_name'],
                 'company' =>$faker->company,
+                'primary_group'=>'Attendee',
                 'email' => strtolower($sponsor['first_name'] . '.' . $sponsor['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
                 'designation'=>$faker->jobTitle,
@@ -167,7 +169,7 @@ class UserSeeder extends Seeder
                 'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
 
             ]);
-            $user->assignRole(['Attendee', 'Sponsors']);
+            $user->assignRole(['Attendee']);
              qrCode($user->id);
             notification($user->id,'welcome');
 
@@ -195,6 +197,7 @@ class UserSeeder extends Seeder
             $user = User::create([
                 'name' => $speakerVal['first_name'],
                 'lastname'=>$speakerVal['last_name'],
+                'primary_group'=>'Attendee',
                 'company' =>$faker->company,
                 'email' => strtolower($speakerVal['first_name'] . '.' . $speakerVal['last_name']) . '@example.com',
                 'mobile' => $faker->numerify('##########'),
@@ -209,7 +212,7 @@ class UserSeeder extends Seeder
                 'tags'=>implode(',', $faker->randomElements($categoyName, rand(2, 3))),
 
             ]);
-            $user->assignRole(['Attendee', 'Speaker']);
+            $user->assignRole(['Attendee']);
             qrCode($user->id);
             notification($user->id,'welcome');
         }
