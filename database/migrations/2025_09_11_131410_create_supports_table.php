@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('supports', function (Blueprint $table) {
             $table->id();
-            $table->string('subject');
-            $table->string('description');
+            $table->string('email')->nullable();
+            $table->string('subject')->nullable();
+            $table->text('description')->nullable();
             $table->foreignId('added_by')
+              ->nullable()
              ->constrained('users')
              ->onDelete('cascade');
             $table->enum('status', ['pending', 'inprogress', 'completed'])
