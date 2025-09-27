@@ -172,14 +172,29 @@ class CalendarController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
-            'start_time' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
+            'start_time' => ['required','date'],
             'end_time' => 'required|date|after:start_time',
             'track' => 'required',
             'description' => 'nullable|string',
             'speaker_ids' => 'required|array',
             'speaker_ids.*' => 'exists:users,id'
+        ], [
+            'event_id.required' => 'Please select an event.',
+            'event_id.exists' => 'Selected event does not exist.',
+            'title.required' => 'Please enter the title.',
+            'title.string' => 'Title must be a valid string.',
+            'title.max' => 'Title cannot exceed 255 characters.',
+            'start_time.required' => 'Start time is required.',
+            'start_time.date' => 'Start time must be a valid date.',
+            'end_time.required' => 'End time is required.',
+            'end_time.date' => 'End time must be a valid date.',
+            'end_time.after' => 'End time must be after start time.',
+            'track.required' => 'Please select a track.',
+            'description.string' => 'Description must be a valid string.',
+            'speaker_ids.required' => 'Please select at least one speaker.',
+            'speaker_ids.array' => 'Speakers must be an array.',
+            'speaker_ids.*.exists' => 'One or more selected speakers do not exist.'
         ]);
-
         // Check for venue conflicts
         if ($request->booth_id) {
             $conflicts = Session::where('booth_id', $request->booth_id)
@@ -265,16 +280,32 @@ class CalendarController extends Controller
          'sponsor_ids'=>   $sponsorIds,
         ]);
 
-        $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'title' => 'required|string|max:255',
-            'start_time' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
-            'end_time' => 'required|date|after:start_time',
-            'track' => 'required',
-            'description' => 'nullable|string',
-            'speaker_ids' => 'required|array',
-            'speaker_ids.*' => 'exists:users,id'
-        ]);
+    $request->validate([
+    'event_id' => 'required|exists:events,id',
+    'title' => 'required|string|max:255',
+    'start_time' => ['required','date'],
+    'end_time' => 'required|date|after:start_time',
+    'track' => 'required',
+    'description' => 'nullable|string',
+    'speaker_ids' => 'required|array',
+    'speaker_ids.*' => 'exists:users,id'
+], [
+    'event_id.required' => 'Please select an event.',
+    'event_id.exists' => 'Selected event does not exist.',
+    'title.required' => 'Please enter the title.',
+    'title.string' => 'Title must be a valid string.',
+    'title.max' => 'Title cannot exceed 255 characters.',
+    'start_time.required' => 'Start time is required.',
+    'start_time.date' => 'Start time must be a valid date.',
+    'end_time.required' => 'End time is required.',
+    'end_time.date' => 'End time must be a valid date.',
+    'end_time.after' => 'End time must be after start time.',
+    'track.required' => 'Please select a track.',
+    'description.string' => 'Description must be a valid string.',
+    'speaker_ids.required' => 'Please select at least one speaker.',
+    'speaker_ids.array' => 'Speakers must be an array.',
+    'speaker_ids.*.exists' => 'One or more selected speakers do not exist.'
+]);
 
       
         if (( $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
