@@ -46,9 +46,9 @@
                                     </div>
                                       <div class="mb-3">
                                       <label for="width" class="form-label">
-                                        <i class="fas fa-arrows-alt-h me-1"></i> Width (cm)
+                                        <i class="fas fa-arrows-alt-h me-1"></i> Width (in)
                                       </label>
-                                      <input type="text" class="form-control" name="width" id="width"  placeholder="Enter width in cm" value="8.56">
+                                      <input type="text" class="form-control" name="width" id="width"  placeholder="Enter width in cm" value="3">
                                     </div>
 
                                 </div>
@@ -68,9 +68,9 @@
 
                                     <div class="mb-3">
                                       <label for="height" class="form-label">
-                                        <i class="fas fa-arrows-alt-v me-1"></i> Height (cm)
+                                        <i class="fas fa-arrows-alt-v me-1"></i> Height (in)
                                       </label>
-                                      <input type="text" class="form-control" name="height" id="height"  placeholder="Enter height in cm" value="5.40">
+                                      <input type="text" class="form-control" name="height" id="height"  placeholder="Enter height in cm" value="2.2">
                                     </div>
 
                                 </div>
