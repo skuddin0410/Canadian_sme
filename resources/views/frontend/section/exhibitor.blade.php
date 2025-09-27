@@ -33,7 +33,7 @@
                             @endif
                         </div>
                         <div class="abc">
-                            <span class="blue-text-18 mb-2">Exhibitor 123</span>
+                            <span class="blue-text-18 mb-2">Exhibitor</span>
                             <span class="small-heading-black fw-semibold">{{$exhibitor->name ? truncateString($exhibitor->name, 30) : ''}}</span>
                         </div>
                     </div>

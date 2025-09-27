@@ -110,14 +110,17 @@ public function sponsorIndex()
 
     $sponsors = Company::with('logo')
         ->where('is_sponsor', 1)   
-        ->get();
+        ->orderby('created_at','DESC')->get();
 
     return view('frontend.page.sponsor', compact('event', 'sponsors'));
 }
 
 public function attendeeIndex()
 {
-    $attendees = User::with('photo')->get(); // all attendees
+    $attendees = User::with('photo')->with("roles")
+                ->whereHas("roles", function ($q) {
+                    $q->whereIn("name", ["Attendee"]);
+                })->where('primary_group','Attendee')->orderBy('created_at','DESC')->get(); 
     
     $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
         ->where('start_time', '>=', now())
