@@ -27,7 +27,7 @@
                             <div class="attendee-card-box">
                                 <div class="attendee-profile">
                                     @if (!empty($attendee->photo) && !empty($attendee->photo->file_path))
-                                        <img src="{{ $attendee->photo->file_path }}" alt="">
+                                        <img src="{{ $attendee->photo->file_path }}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
                                     @else
                                         <span class="small-heading-blue mb-0">{{ shortenName($attendee->name) }}</span>
                                     @endif
