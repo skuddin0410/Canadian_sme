@@ -23,13 +23,17 @@
                     <div class="exhibitor-card-box">
                         <div class="exhibitor-profile">
                             @if(!empty($exhibitor->contentIconFile))
-                              <img src="{{$exhibitor->contentIconFile->file_path}}" alt="">
+                              
+  <img src="{{ $exhibitor->contentIconFile->file_path }}" 
+       alt="Exhibitor Icon"
+       style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+
                             @else
                               <span class="small-heading-blue mb-0">{{shortenName($exhibitor->name)}}</span>
                             @endif
                         </div>
                         <div class="abc">
-                            <span class="blue-text-18 mb-2">Exhibitor</span>
+                            <span class="blue-text-18 mb-2">Exhibitor 123</span>
                             <span class="small-heading-black fw-semibold">{{$exhibitor->name ? truncateString($exhibitor->name, 30) : ''}}</span>
                         </div>
                     </div>
