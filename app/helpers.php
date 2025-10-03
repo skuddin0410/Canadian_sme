@@ -217,24 +217,14 @@ if (!function_exists('qrCode')) {
             $fileName = 'qrcodes/'.$folder.'_'. $timestamp . '.png';
         }
 
-        if($folder == 'company'){
-           $company = Company::where('id',$id)->findOrFail();
-           $data = json_encode([
-                'id' => $company->id,
-                'name' => $company->name ?? '',
-                'email' => $company->email ?? '',
-            ]);
-            $fileName = 'qrcodes/'.$folder.'_'. $timestamp . '.png';
-            
-        }
-
-        
-        
         $filePath = public_path($fileName);
 
-        // if (file_exists($filePath)) {
-        //     unlink($filePath);
-        // }
+        if(!empty($user->qr_code)){
+        $oldFilePath = public_path($user->qr_code);
+            if (file_exists($oldFilePath)) {
+               unlink($oldFilePath);
+            }
+        }
 
         // Use GDLibRenderer
         //  $renderer = new ImageRenderer(
