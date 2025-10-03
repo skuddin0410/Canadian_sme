@@ -57,9 +57,9 @@ class JWTAuthController extends Controller
             'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile, 
             'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : $user->website_url, 
             'roles'     => groups($user),
-            'is_speaker_id'=>  $user->access_speaker_ids ?? 0,
-            'is_exhibitor_id'=> $user->access_exhibitor_ids ?? 0,
-            'is_sponsor_id'=> $user->access_sponsor_ids ?? 0
+            'is_speaker_id'   => (int) ($user->access_speaker_ids ?? 0),
+            'is_exhibitor_id' => (int) ($user->access_exhibitor_ids ?? 0),
+            'is_sponsor_id'   => (int) ($user->access_sponsor_ids ?? 0),
             
         ]);
 
