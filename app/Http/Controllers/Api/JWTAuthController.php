@@ -982,6 +982,7 @@ public function getAllExhibitor(Request $request){
                     "email" => $sponsor->email ?? '',
                     "phone" => $sponsor->phone ?? '',
                     "website" => $sponsor->website ?? '',
+                    'level'    => ucfirst($sponsor->type) ?? '',
                     "social_links" => [
                         [
                             "name" => "facebook",
