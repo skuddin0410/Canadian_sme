@@ -32,7 +32,6 @@ class JWTAuthController extends Controller
         }
 
         $token = request()->bearerToken() ?? JWTAuth::refresh();
-        $roles = $user->getRoleNames();
         $user->load(['photo', 'usercompany']);
         return response()->json([
             'success' => true,
@@ -57,8 +56,10 @@ class JWTAuthController extends Controller
             'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : $user->email, 
             'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile, 
             'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : $user->website_url, 
-
-            'roles'     => $user->getRoleNames(),
+            'roles'     => groups($user),
+            'is_speaker_id'=>  $user->access_speaker_ids ?? '',
+            'is_exhibitor_id'=> $user->access_exhibitor_ids ?? '',
+            'is_sponsor_id'=> $user->access_sponsor_ids ?? ''
             
         ]);
 

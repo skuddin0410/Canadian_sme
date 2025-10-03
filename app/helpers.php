@@ -236,10 +236,11 @@ if (!function_exists('qrCode')) {
         // }
 
         // Use GDLibRenderer
-         $renderer = new ImageRenderer(
-            new RendererStyle(300, 14), // 300px QR, 4 module quiet zone
-            new ImagickImageBackEnd()  // or GD if you prefer
-        );
+        //  $renderer = new ImageRenderer(
+        //     new RendererStyle(300, 14), // 300px QR, 4 module quiet zone
+        //     new ImagickImageBackEnd()  // or GD if you prefer
+        // );
+        $renderer = new GDLibRenderer(300);
         $writer = new Writer($renderer);
         $writer->writeFile($data, $filePath);
         $user->qr_code = 'qrcodes/' . $folder . '_' . $timestamp. '.png';
