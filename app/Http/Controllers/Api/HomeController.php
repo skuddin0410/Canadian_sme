@@ -547,17 +547,11 @@ public function scanDetails(Request $request){
         $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
        
         if(!$data){
-
-            $newconnection = User::where('id',$request->qrData)->first();
-            if(!$newconnection){
-               return response()->json([
-                 "message"=> "Scan failed!"
-               ]);
-            }
-            userConnection($user->id,$newconnection->id);
-            $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first(); 
-        } 
-
+           return response()->json([
+             "message"=> "Scan failed!"
+           ]);
+        }
+    
         $data->load('connection.photo','connection.visitingcard');
       
         return response()->json([
@@ -578,18 +572,13 @@ public function scanDetails(Request $request){
             "note"=> !empty($data->note) ? $data->note: '' ,
         ]);
 
-
-
-    
-
     } catch (\Exception $e) {
         return response()->json(["message" => 'Scan failed!']);
     }
 }
 
 public function scanDetailsUpdate(Request $request){
-
-     try {
+    try {
         if (!$user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
                 'success' => false,
