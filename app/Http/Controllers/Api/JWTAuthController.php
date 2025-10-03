@@ -660,9 +660,9 @@ public function getSpeakerById(Request $request){
         }
 
         $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
-         $q->where('name', 'Speaker');
-        })->where('id',$request->id)->first();
-    
+            $q->where('name', 'Speaker');
+        })->where('id', $request->id)->first();
+
         if (empty($speaker)) {
             return response()->json([
                 'success' => false,
@@ -670,30 +670,38 @@ public function getSpeakerById(Request $request){
             ], 404);
         }
 
-        $response =  [
-            'id'     => $speaker->id,
-            'name'     => $speaker->full_name,
-            'company_name'  => $speaker->company ?? '',
-            "company_details"=>$speaker->bio ?? '',
-            "bio"=> $speaker->bio ?? '',
-            'role'  => $speaker->designation ?? '',
-            'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
-            'roles' => groups($speaker),
-            "contact_details"=>[
-               "email"=> $speaker->email,
-               "phone"=> $speaker->mobile ?? '',
-                "social_media_links"=>[
-                  "linkedin"=> $speaker->linkedin_url,
-                  "facebook"=> $speaker->facebook_url,
-                  "instagram"=> $speaker->instagram_url,
-                  "twitter"=> $speaker->twitter_url
-
-                ]
-
-            ]
+        // Prepare contact details
+        $contactDetails = [
+            "email" => $speaker->email,
+            "phone" => $speaker->mobile ?? ''
         ];
-    
+
+        // Only add social_media_links if any link exists
+        $socialLinks = array_filter([
+            "linkedin"  => $speaker->linkedin_url,
+            "facebook"  => $speaker->facebook_url,
+            "instagram" => $speaker->instagram_url,
+            "twitter"   => $speaker->twitter_url
+        ]);
+
+        if (!empty($socialLinks)) {
+            $contactDetails['social_media_links'] = $socialLinks;
+        }
+
+        $response = [
+            'id'             => $speaker->id,
+            'name'           => $speaker->full_name,
+            'company_name'   => $speaker->company ?? '',
+            'company_details'=> $speaker->bio ?? '',
+            'bio'            => $speaker->bio ?? '',
+            'role'           => $speaker->designation ?? '',
+            'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
+            'roles'          => groups($speaker),
+            'contact_details'=> $contactDetails
+        ];
+
         return response()->json([$response]);
+
 
     } catch (\Exception $e) {
         return response()->json([
@@ -759,40 +767,48 @@ public function getAttendeeById(Request $request){
         }
 
         $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
-         $q->where('name', 'Attendee');
-        })->where('id',$request->id)->first();
-    
+            $q->where('name', 'Attendee');
+        })->where('id', $request->id)->first();
+
         if (empty($speaker)) {
             return response()->json([
                 'success' => false,
-                'message' => 'No speakers found!'
+                'message' => 'No attendees found!'
             ], 404);
         }
 
-        $response =  [
-            'id'     => $speaker->id,
-            'name'     => $speaker->full_name,
-            'company_name'  => $speaker->company ?? '',
-            "company_details"=>$speaker->bio ?? '',
-            "bio"=> $speaker->bio ?? '',
-            'role'  => $speaker->designation ?? '',
-            'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
-            'roles' => groups($speaker),
-            "contact_details"=>[
-               "email"=> $speaker->email,
-               "phone"=> $speaker->mobile ?? '',
-                "social_media_links"=>[
-                  "linkedin"=> $speaker->linkedin_url,
-                  "facebook"=> $speaker->facebook_url,
-                  "instagram"=> $speaker->instagram_url,
-                  "twitter"=> $speaker->twitter_url
-
-                ]
-
-            ]
+        // Prepare contact details
+        $contactDetails = [
+            "email" => $speaker->email,
+            "phone" => $speaker->mobile ?? ''
         ];
-    
+
+        // Only add social_media_links if any link exists
+        $socialLinks = array_filter([
+            "linkedin"  => $speaker->linkedin_url,
+            "facebook"  => $speaker->facebook_url,
+            "instagram" => $speaker->instagram_url,
+            "twitter"   => $speaker->twitter_url
+        ]);
+
+        if (!empty($socialLinks)) {
+            $contactDetails['social_media_links'] = $socialLinks;
+        }
+
+        $response = [
+            'id'             => $speaker->id,
+            'name'           => $speaker->full_name,
+            'company_name'   => $speaker->company ?? '',
+            'company_details'=> $speaker->bio ?? '',
+            'bio'            => $speaker->bio ?? '',
+            'role'           => $speaker->designation ?? '',
+            'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
+            'roles'          => groups($speaker),
+            'contact_details'=> $contactDetails
+        ];
+
         return response()->json([$response]);
+
 
     } catch (\Exception $e) {
         return response()->json([
