@@ -170,9 +170,7 @@ public function submitForm(Request $request, $id)
     ]);
     $user->assignRole('Attendee');
     qrCode($user->id);
-    sleep(5);
     notification($user->id);
-    sleep(5);
     sendNotification("Welcome Email",$user);
     return redirect()
         ->back()

@@ -212,6 +212,7 @@ if (!function_exists('qrCode')) {
                 'id' => $user->id,
                 'name' => $user->full_name ?? '',
                 'email' => $user->email ?? '',
+                'app' => 'com.canadianSME.app'
             ]);
             $fileName = 'qrcodes/'.$folder.'_'. $timestamp . '.png';
         }
@@ -473,7 +474,6 @@ if (!function_exists('sendNotification')) {
               $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
               $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
             }
-
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
  
         } elseif (!empty($emailTemplate) && $emailTemplate->type == 'notification') {
