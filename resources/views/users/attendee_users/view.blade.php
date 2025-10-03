@@ -19,7 +19,7 @@ Admin | Attendee Details
 
                     <div class="d-flex justify-content-end">
                         
-                        @if($user->is_block ==1)
+                   <!--      @if($user->is_block ==1)
                         <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('PATCH')
@@ -35,7 +35,7 @@ Admin | Attendee Details
                                 Block User
                             </button>
                         </form>
-                        @endif
+                        @endif -->
 
                         <form action="{{ route('attendee-users.index') }}" method="GET" class="d-inline">
                             @csrf
