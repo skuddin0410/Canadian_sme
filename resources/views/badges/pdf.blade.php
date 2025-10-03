@@ -46,8 +46,8 @@
       text-align: left;
     }
     .left img {
-      max-height: 40px;
-      max-width: 40px;
+      max-height: 90px;
+      max-width: 90px;
       object-fit: contain;
       border-radius: 4px;
       margin-bottom: 2px;
@@ -55,6 +55,7 @@
     .left p {
       margin: 0;
       line-height: 1.2;
+      font-size: 18px;
     }
     .qr {
       width: 40%;
@@ -94,10 +95,10 @@
             @endif
 
             @if (!empty($badge['name']))
-              <p style="font-weight:bold;">{{$badge['name']}}</p>
+              <p style="font-weight:bold;">{{ strlen($badge['name']) > 16 ? substr($badge['name'], 0, 14) . '..' : $badge['name'] }}</p>
             @endif
             @if (!empty($badge['company_name']))
-              <p style="color:#555;">{{$badge['company_name']}}</p>
+              <p style="color:#555;">{{ strlen($badge['company_name']) > 16 ? substr($badge['company_name'], 0, 12) . '..' : $badge['company_name'] }}</p>
             @endif
             @if (!empty($badge['designation']))
               <p style="color:#888; font-style:italic;">{{$badge['designation']}}</p>
