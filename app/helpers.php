@@ -187,15 +187,20 @@ if (!function_exists('downloadQrCode')) {
         }
 
         $filePath = public_path($user->qr_code);
-       
         if (!file_exists($filePath)) {
             abort(404, 'QR code not found.');
         }
-        return response()->download($filePath, 'qrcodes' . $user->id . '.png', [
+
+        if (ob_get_level()) {
+         ob_end_clean();
+        }
+        // Force file download
+        return response()->download($filePath, $user->name.'_qrcode_' . $user->id . '.png', [
             'Content-Type' => 'image/png',
-        ])->deleteFileAfterSend(false); // keep file in public/qrcodes
+        ]);
     }
 }
+
 
 
 
