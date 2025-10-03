@@ -157,21 +157,22 @@ public function submitForm(Request $request, $id)
     ]);
 
     // Create user with role "attendee"
-    $user = User::create([
-        'name'        => $data['first_name'],
-        'lastname'        => $data['last_name'],
-        'email'       => $data['email'],
-        // 'password'    => Hash::make('password'), // default or generate random
-        'mobile'       => $data['mobile'] ?? null,
-        'designation' => $data['designation'] ?? null,
-        'company'     => $data['company'] ?? null,
-        'bio'     => $data['bio'] ?? null,
-       
-    ]);
+    $user = new User();
+    $user->name        = $data['first_name'];
+    $user->lastname    = $data['last_name'];
+    $user->email       = $data['email'];
+    // $user->password = Hash::make('password'); // default or random if needed
+    $user->mobile      = $data['mobile'] ?? null;
+    $user->designation = $data['designation'] ?? null;
+    $user->company     = $data['company'] ?? null;
+    $user->bio         = $data['bio'] ?? null;
+    $user->save();
     $user->assignRole('Attendee');
-    qrCode($user->id);
     notification($user->id);
-    sendNotification("Welcome Email",$user);
+    if(qrCode($user->id)){
+     $user = User::where('id',$user->id)->first();   
+     sendNotification("Welcome Email",$user);
+    }
     return redirect()
         ->back()
         ->with('success', 'Form submitted successfully and attendee created!');

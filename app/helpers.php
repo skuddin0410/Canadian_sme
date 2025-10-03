@@ -245,9 +245,9 @@ if (!function_exists('qrCode')) {
         $writer = new Writer($renderer);
         $writer->writeFile($data, $filePath);
         $user->qr_code = 'qrcodes/' . $folder . '_' . $timestamp. '.png';
-
-
         $user->save();
+
+        return true;
   }
 }
 
@@ -460,12 +460,11 @@ if (!function_exists('sendNotification')) {
             $subject = $emailTemplate->subject ?? '';
             $subject = str_replace('{{site_name}}', config('app.name'), $subject);
             $subject = str_replace('{{site_name}}', config('app.name'), $subject);
-
             $qr_code_url = asset($user->qr_code);
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
             $message = str_replace('{{site_name}}', config('app.name'), $message);
-
+           
             if (strpos($message, '{{qr_code}}') !== false) {
               $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
             }
