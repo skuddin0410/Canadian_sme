@@ -205,9 +205,17 @@ if (!function_exists('qrCode')) {
         if (!file_exists(public_path('qrcodes'))) {
             mkdir(public_path('qrcodes'), 0755, true);
         }
+        
         $timestamp= Carbon\Carbon::now()->timestamp;
         if($folder == 'user'){
             $user = User::findOrFail($id);
+            if(!empty($user->qr_code)){
+               $oldFilePath = public_path($user->qr_code);
+                if (file_exists($oldFilePath)) {
+                   unlink($oldFilePath);
+                }
+            }
+
             $data = json_encode([
                 'id' => $user->id,
                 'name' => $user->full_name ?? '',
@@ -218,14 +226,6 @@ if (!function_exists('qrCode')) {
         }
 
         $filePath = public_path($fileName);
-
-        if(!empty($user->qr_code)){
-        $oldFilePath = public_path($user->qr_code);
-            if (file_exists($oldFilePath)) {
-               unlink($oldFilePath);
-            }
-        }
-
         // Use GDLibRenderer
         //  $renderer = new ImageRenderer(
         //     new RendererStyle(300, 14), // 300px QR, 4 module quiet zone
