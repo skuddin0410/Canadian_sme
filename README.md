@@ -1,4 +1,4 @@
-# cricwin-backend
+# canadian-sme
 
 # Laravel SetUp
 composer install
