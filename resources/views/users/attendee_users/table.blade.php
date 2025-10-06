@@ -81,7 +81,7 @@
 
 
     </th>
-		<th>{{$user->email ?? ''}}</th>
+		<th style="text-transform: lowercase;">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
     <th>{{dateFormat($user->created_at) ?? '' }}</th>
     <th>

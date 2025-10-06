@@ -87,7 +87,7 @@ Admin | Attendee Details
                                             {{ $user->lastname }}</span></li>
                                    
                                     <li class="mb-3"><span class="fw-medium me-2">Email:</span>
-                                        <span>{{ $user->email }}</span></li>
+                                        <span style="text-transform: lowercase;">{{ $user->email }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Designation:</span>
                                         <span>{{ $user->designation ?? '-' }}</span></li>
                                     <li class="mb-3"><span class="fw-medium me-2">Mobile:</span>
