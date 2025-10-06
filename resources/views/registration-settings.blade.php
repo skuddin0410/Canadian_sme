@@ -35,11 +35,11 @@
       </button>
     </li>
 
-    <li class="nav-item" role="presentation">
+    <!--<li class="nav-item" role="presentation">
       <button class="nav-link" id="location-tab" data-bs-toggle="tab" data-bs-target="#location" type="button" role="tab" aria-controls="location" aria-selected="false">
        Location
       </button>
-    </li>
+    </li>-->
 
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="support-tab" data-bs-toggle="tab" data-bs-target="#support" type="button" role="tab" aria-controls="support" aria-selected="false">
