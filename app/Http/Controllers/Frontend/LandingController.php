@@ -333,5 +333,19 @@ public function sponsor( Request $request,$slug){
         }
     }
 
+    public function getVenuInfoForApp(){
+
+        $event = Event::with(['photo'])->first();
+        $location = $event->location ?? '';
+        $googleApiKey = config('services.google_maps.key'); 
+
+        $mapUrl = $location && $googleApiKey
+            ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
+            : null;
+       
+        return view('frontend.venue_app', compact('location', 'mapUrl'));
+        
+    }
+
 
 }
