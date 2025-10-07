@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
             GuestUserSeeder::class,  //php artisan db:seed --class=GuestUserSeeder
             //**********
             //AccountManagerPermissionSeeder::class,
-            UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
+            //UserSeeder::class, // Need to disabled php artisan db:seed --class=UserSeeder
             //TicketSystemSeeder::class, // php artisan db:seed --class=TicketSystemSeeder
             //SupportSeeder::class,
             //SessionAttendee::class,// php artisan db:seed --class=SessionAttendee
