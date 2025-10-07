@@ -53,7 +53,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p class="black-text-18 text-light text-center">© {{ date('Y') }} 1
+            <p class="black-text-18 text-light text-center">© {{ date('Y') }}
                 <a class="text-light" href="{{ url('/') }}">{{ config('app.name') }}</a>
             </p>
         </div>
