@@ -124,11 +124,6 @@ class SettingsTableSeeder extends Seeder
 
 <h2>External Links</h2>
 <p>The official organizer of the Small Business Summit 2025 is Cmarketing Inc. (www.smesummit.ca). Please note that there might be links to third-party entities on our website. Cmarketing Inc. does not, in any way, vouch for the authenticity, relevance or reliability of facts/opinions/stats present in such external resources.</p>
-
-<h2>Contact Information</h2>
-<p>Cmarketing Inc</p>
-<p>2800 Skymark Avenue, Suite 203</p>
-<p>Mississauga, ON. Canada. L4W 5A6</p>
 ";
         DB::table('settings')->insert([
             [
