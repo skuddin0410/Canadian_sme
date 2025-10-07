@@ -167,7 +167,7 @@ public function verify(Request $request)
         );
         qrCode($user->id);
         notification($user->id);
-        //sendNotification("Welcome Email",$user);
+        sendNotification("Welcome Email",$user);
 
         return response()->json([
             'success'    => true,
