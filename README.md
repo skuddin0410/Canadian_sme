@@ -1,5 +1,5 @@
 # canadian-sme
-
+# Event-App
 # Laravel SetUp
 composer install
 php artisan migrate:fresh --seed
