@@ -214,12 +214,12 @@ if (!function_exists('qrCode')) {
         $timestamp= Carbon\Carbon::now()->timestamp;
         if($folder == 'user'){
             $user = User::findOrFail($id);
-            if(!empty($user->qr_code)){
+            /*if(!empty($user->qr_code)){
                $oldFilePath = public_path($user->qr_code);
                 if (file_exists($oldFilePath)) {
                    unlink($oldFilePath);
                 }
-            }
+            }*/
 
             $data = json_encode([
                 'id' => $user->id,
