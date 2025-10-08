@@ -10,27 +10,33 @@
   <div class="row justify-content-center">
     <!-- Profile Info -->
     <div class="col-md-8">
+
       <div class="card shadow-sm rounded-4">
+         <div style="width: 100%; height: 300px; overflow: hidden; border-radius: 8px;">
+              <img src="{{ !empty($speaker->coverphoto) ? $speaker->coverphoto->file_path : asset('frontend/images/default-cover.jpg') }}" 
+                   class="border" 
+                   style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" />
+          </div>
+          
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-4">
-            <div class="text-left mb-2">
-                
+            <div class="text-left mb-2 me-3">
               <label for="profileImageInput">
                  @if(!empty($speaker->photo))
                 <img id="profileImagePreview" 
                      src="{{ !empty($speaker->photo) ? $speaker->photo->file_path : '' }}" 
-                     class="border border-2" 
-                     style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                     class="border" 
+                     style="height: 200px; object-fit: cover; cursor: pointer;">
                      @else
                        <img src="{{asset('frontend/images/speaker-1.png')}}"  class="border border-2" 
-                     style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                     style="height: 200px; object-fit: cover; cursor: pointer;">
                     @endif
               </label>
 
               
             </div>
             <div>
-              <h4 class="mb-1">{{ $speaker->full_name ?? 'N/A' }}</h4>
+              <h4 class="mb-1 ml-2">{{ $speaker->full_name ?? 'N/A' }}</h4>
               <span class="badge bg-success">
                 Speaker
               </span>
@@ -63,7 +69,7 @@
               @if(!empty($speaker->website_url))
                 <p>
                   <a href="{{ $speaker->website_url }}" target="_blank" class="text-dark">
-                    <i class="fas fa-globe me-1"></i> {{ $speaker->website_url }}
+                    {{ $speaker->website_url }}
                   </a>
                 </p>
               @endif
