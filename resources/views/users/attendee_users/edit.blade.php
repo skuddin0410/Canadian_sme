@@ -240,7 +240,7 @@ Admin | Edit Attendee Data
                       </div>
 
                       <div class="col-12">
-                        <label class="form-label">Bio <span class="text-danger">*</span></label>
+                        <label class="form-label">Bio </label>
                         <textarea name="bio" id="bio" class="form-control mb-3" rows="6" placeholder="Speaker Bio">{{ $user->bio ?? old('bio') }}</textarea>
                         @error('bio') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>

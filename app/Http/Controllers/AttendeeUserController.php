@@ -138,7 +138,7 @@ class AttendeeUserController extends Controller
                  'unique:users,mobile'
                 ],
 
-            'bio' => 'required|string',
+            'bio' => 'nullable|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
             'tags'   => ['nullable','array'],
@@ -179,7 +179,7 @@ class AttendeeUserController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
-        $user->bio = $request->bio;
+        $user->bio = $request->bio ?? null;
         $user->is_approve = true;
         $user->access_speaker_ids = $request->access_speaker_ids ?? '';
         $user->access_exhibitor_ids =$request->access_exhibitor_ids??  '';
@@ -276,7 +276,7 @@ class AttendeeUserController extends Controller
                  'regex:/^[0-9]{10}$/'
                  
                 ],
-            'bio' => 'required|string',
+            'bio' => 'nullable|string',
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'], 
             'tags'   => ['nullable','array'],
@@ -309,7 +309,7 @@ class AttendeeUserController extends Controller
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
-        $user->bio = $request->bio;
+        $user->bio = $request->bio ?? '';
         $user->is_approve = true;
 
         $user->access_speaker_ids = $request->access_speaker_ids ?? '';
