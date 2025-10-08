@@ -6,7 +6,7 @@
   <style>
   @page {
   size: 3in 2.2in;   /* slightly bigger sheet */
-  margin: 0.05in;    /* safe space on all sides */
+  margin: 0.15in;    /* safe space on all sides */
 }
  body {
   margin: 0;
@@ -46,8 +46,8 @@
       text-align: left;
     }
     .left img {
-      max-height: 90px;
-      max-width: 90px;
+      max-height: 80px;
+      max-width: 80px;
       object-fit: contain;
       border-radius: 4px;
       margin-bottom: 2px;
@@ -64,8 +64,8 @@
       align-items: center;
     }
     .qr img {
-      width: 95px;
-      height: 95px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
       display: block;
     }
