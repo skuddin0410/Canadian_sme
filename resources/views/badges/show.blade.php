@@ -97,7 +97,7 @@
                                         @if($badge->company_name == 1)
                                         <!-- Company Name Section -->
                                         <div class="preview-section" id="preview_company_section" style="text-align: center; margin-bottom: 8px;">
-                                            <p id="preview_company_name" style="margin: 0; color: #666; font-size: 1rem;">{{'company_name'}}</p>
+                                            <p id="preview_company_name" style="margin: 0; color: #666; font-size: .9rem;">{{'company_name'}}</p>
                                         </div>
                                         @endif
                                         

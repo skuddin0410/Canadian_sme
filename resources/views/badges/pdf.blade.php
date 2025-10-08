@@ -6,7 +6,7 @@
   <style>
   @page {
   size: 3in 2.2in;   /* slightly bigger sheet */
-  margin: 0.15in;    /* safe space on all sides */
+  margin: 0.05in;    /* safe space on all sides */
 }
  body {
   margin: 0;
@@ -64,8 +64,8 @@
       align-items: center;
     }
     .qr img {
-      width: 90px;
-      height: 90px;
+      width: 95px;
+      height: 95px;
       object-fit: contain;
       display: block;
     }
