@@ -12,7 +12,7 @@
     <div class="col-md-8">
 
       <div class="card shadow-sm rounded-4">
-         <div style="width: 100%; height: 300px; overflow: hidden; border-radius: 8px;">
+         <div style="width: 100%; height: 400px; overflow: hidden; border-radius: 8px;">
               <img src="{{ !empty($speaker->coverphoto) ? $speaker->coverphoto->file_path : asset('frontend/images/default-cover.jpg') }}" 
                    class="border" 
                    style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" />

@@ -248,10 +248,13 @@ public function exhibitor( Request $request,$slug){
 
     $company = Company::where('slug', $slug)
         ->firstOrFail();
-    $sessions = Session::where('start_time', '>=', now())
-        ->inRandomOrder()
-        ->take(2)
-        ->get();
+    $sessions = DB::table('event_sessions as es')
+        ->join('session_exhibitors as ss', 'es.id', '=', 'ss.session_id')
+        ->where('ss.company_id', $company->id) 
+        ->where('es.start_time', '>', now()) 
+        ->orderBy('es.start_time', 'asc')
+        ->select('es.*')
+        ->get();    
 
     $event = Event::with('photo')->first();
 
@@ -264,10 +267,13 @@ public function sponsor( Request $request,$slug){
         ->where('slug', $slug)
         ->where('is_sponsor', 1)  
         ->firstOrFail();
-    $sessions = Session::where('start_time', '>=', now())
-        ->inRandomOrder()
-        ->take(2)
-        ->get();
+   $sessions = DB::table('event_sessions as es')
+        ->join('session_sponsors as ss', 'es.id', '=', 'ss.session_id')
+        ->where('ss.company_id', $company->id) 
+        ->where('es.start_time', '>', now()) 
+        ->orderBy('es.start_time', 'asc')
+        ->select('es.*')
+        ->get();    
 
     $event = Event::with('photo')->first();
 

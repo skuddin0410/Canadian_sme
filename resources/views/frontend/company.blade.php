@@ -11,6 +11,15 @@
     <!-- Company Info -->
     <div class="col-lg-8">
       <div class="card shadow-sm rounded-4">
+        
+        @if($company->quickLinkIconFile && $company->quickLinkIconFile->file_path)
+        <div style="width: 100%; height: 400px; overflow: hidden; border-radius: 8px;">
+              <img src="{{ !empty($company->quickLinkIconFile) ? $company->quickLinkIconFile->file_path :'' }}" 
+                   class="border" 
+                   style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" />
+        </div>
+        @endif
+
         <div class="card-body p-3 p-sm-4">
           <div class="d-flex align-items-center mb-4">
           @if(!empty($company->contentIconFile) && !empty($company->contentIconFile->file_path))
