@@ -12,6 +12,7 @@ use App\Models\Speaker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
+use DB;
 
 class LandingController extends Controller
 {
@@ -212,10 +213,30 @@ public function speaker($slug)
         ->where('slug', $slug)
         ->firstOrFail();
     
-   $sessions = Session::where('start_time', '>=', now())
-        ->inRandomOrder()
-        ->take(2)
+    $sessions = DB::table('event_sessions as es')
+        ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
+        ->where('ss.speaker_id', $speaker->id) 
+        ->where('es.start_time', '>', now()) 
+        ->orderBy('es.start_time', 'asc')
+        ->select('es.*')
+        ->get();           
+
+    $sponsor = DB::table('event_sessions as es')
+        ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
+        ->where('ss.speaker_id', $speaker->id) 
+        ->where('es.start_time', '>', now()) 
+        ->orderBy('es.start_time', 'asc')
+        ->select('es.*')
         ->get();
+
+    $upcomingSessions = DB::table('event_sessions as es')
+        ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
+        ->where('ss.speaker_id', $speaker->id) 
+        ->where('es.start_time', '>', now()) 
+        ->orderBy('es.start_time', 'asc')
+        ->select('es.*')
+        ->get(); 
+
    
     $event = Event::with('photo')->first();
 

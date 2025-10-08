@@ -17,7 +17,7 @@
                    class="border" 
                    style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" />
           </div>
-          
+
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-4">
             <div class="text-left mb-2 me-3">
@@ -38,7 +38,7 @@
             <div>
               <h4 class="mb-1 ml-2">{{ $speaker->full_name ?? 'N/A' }}</h4>
               <span class="badge bg-success">
-                Speaker
+                {{$speaker->designation ?? ''}}
               </span>
             </div>
           </div>
