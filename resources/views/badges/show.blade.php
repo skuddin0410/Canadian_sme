@@ -71,8 +71,8 @@
 
                             <div class="card-body">
                                     @php
-                                       $width_mm  = isset($badge['width'])  ? $badge['width'] * 10  : 85.6;
-                                       $height_mm = isset($badge['height']) ? $badge['height'] * 10 : 54;
+                                       $width_mm  = isset($badge['width'])  ? $badge['width'] * 25.4  : 85.6;
+                                       $height_mm = isset($badge['height']) ? $badge['height'] * 25.4 : 54;
                                     @endphp
                                 <div class="badge-preview-container" style="border: 2px solid #333; border-radius: 10px; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); position: relative;width: {{ $width_mm }}mm;height: {{ $height_mm }}mm;">
                                   
