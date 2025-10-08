@@ -282,16 +282,11 @@ public function sponsor( Request $request,$slug){
 
     
 
- public function session(Request $request, $slug)
+public function session(Request $request, $slug)
 {
-    
-    $session = Session::with(['speakers'])->where('slug', $slug)->firstOrFail();
-
-    
+    $session = Session::with(['speakers','exhibitors','sponsors'])->where('slug', $slug)->firstOrFail();
     $speaker = $session->speakers->first();
-
     $event = Event::with('photo')->first();
-
     return view('frontend.session', compact('session', 'event', 'speaker'));
 }
 
