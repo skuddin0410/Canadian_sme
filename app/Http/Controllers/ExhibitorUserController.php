@@ -127,7 +127,7 @@ public function index(Request $request)
                 'email'       => $request->company_email,
                 'phone'       => $request->company_phone,
                 'description' => $request->company_description,
-                'industry' => $request -> industry,
+                'industry'    => $request->industry,
                 'website'     => $request->website,
                 'linkedin'    => $request->linkedin,
                 'twitter'     => $request->twitter,
@@ -234,8 +234,10 @@ public function show(User $exhibitor_user, Request $request){
                     'linkedin'    => $request->linkedin,
                     'twitter'     => $request->twitter,
                     'facebook'    => $request->facebook,
-                    'instagram'    => $request->instagram,
-                    'booth'=> $request->booth
+                    'instagram'   => $request->instagram,
+                    'booth'       => $request->booth,
+                    'industry'    => $request->industry
+
                 ]); 
             }
          
