@@ -109,8 +109,8 @@ public function index(Request $request)
             'linkedin'      => 'nullable|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
-            'content_icon'    => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
-            'quick_link_icon' => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
+            'content_icon'    => 'nullable|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'quick_link_icon' => 'nullable|mimes:jpg,jpeg,png,svg,webp|max:2048',
 
 
         ]);
@@ -214,8 +214,8 @@ public function show(User $exhibitor_user, Request $request){
             'linkedin'            => 'nullable|url',
             'twitter'             => 'nullable|url',
             'facebook'            => 'nullable|url',
-            'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-            'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'company_id'       => 'required|string',
         ]);
 

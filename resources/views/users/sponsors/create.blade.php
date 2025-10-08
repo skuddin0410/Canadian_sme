@@ -160,7 +160,7 @@ Admin | Add Sponsors
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-phone"></i></span>
                     <input type="text" name="company_phone" class="form-control"
-                           value="{{ old('company_phone') }}" placeholder="Sponsor Phone" required>
+                           value="{{ old('company_phone') }}" placeholder="Sponsor Phone">
                   </div>
                 </div>
               </div>

@@ -105,8 +105,8 @@ public function index(Request $request)
             'linkedin'      => 'nullable|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
-            'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-            'banner'     => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'banner'     => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
 
 
         ]);
@@ -207,8 +207,8 @@ public function index(Request $request)
         'linkedin'            => 'nullable|url',
         'twitter'             => 'nullable|url',
         'facebook'            => 'nullable|url',
-        'logo'                => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-        'banner'              => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+        'logo'                => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
+        'banner'              => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
         'sponsor_id'=>'required'
     ]);
 
