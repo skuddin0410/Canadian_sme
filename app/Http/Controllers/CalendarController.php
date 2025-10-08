@@ -160,7 +160,9 @@ class CalendarController extends Controller
         ->filter(fn($value, $key) => str_starts_with($key, 'sponsor_ids['))
         ->values()
         ->all();
-         $calendarColors = config('calendar.colors');
+
+        $calendarColors = config('calendar.colors');
+
         $request->merge([
          'speaker_ids' =>  $speakerIds,
          'exhibitor_ids'=> $exhibitorIds,
@@ -218,7 +220,8 @@ class CalendarController extends Controller
         }
 
         $session = Session::create($request->except(['speaker_ids','exhibitor_ids','sponsor_ids']));
-
+        $session->slug = createUniqueSlug('event_sessions', $session->title,'slug', $session->id);
+        $session->save();
        
         if($request->session_image){
           $this->imageBase64Upload($request->session_image,'event_sessions',$session->id,'event_sessions','photo',$session->id); 
