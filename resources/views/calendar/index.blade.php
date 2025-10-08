@@ -157,7 +157,7 @@
                           <input type="file" id="profileImageInput" name="image" accept="image/*" value="" class="d-none">
                         </div>
 
-                         <p class="text-muted mt-2">JPG/PNG recommended. Square works best.</p>
+                         <p class="text-muted mt-2">JPG/PNG recommended. Square works best.(<span class="text-danger">1920px (width) x 1081px (height)</span>)</p>
                     </div>
 
                         <div class="col-6">

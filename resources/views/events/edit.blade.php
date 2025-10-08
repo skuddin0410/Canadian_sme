@@ -54,7 +54,7 @@
                     <label class="form-label">
                       Image 
                       <span class="text-danger">
-                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
+                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }}) (<span class="text-danger">1920px (width) x 800px (height)</span>)
                       </span>
                     </label>
 
