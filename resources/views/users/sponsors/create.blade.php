@@ -25,7 +25,7 @@ Admin | Add Sponsors
   <div class="row">
   <div class="col-md-6">
     <div class="mb-3">
-      <label class="form-label">Logo</label>
+      <label class="form-label">Logo (<span class="text-danger">600px (width) x 600px (height)</span>)</label>
 
       @php
         $logoFile = !empty($company?->logoFile) && !empty($company->logoFile->file_path);
@@ -78,7 +78,7 @@ Admin | Add Sponsors
   {{-- Icon --}}
   <div class="col-md-6">
     <div class="mb-3">
-      <label class="form-label">Banner</label>
+      <label class="form-label">Banner (<span class="text-danger">1920px (width) x 1081px (height)</span>)</label>
 
       @php
         $bannerFile = !empty($company?->bannerFile) && !empty($company->bannerFile->file_path);

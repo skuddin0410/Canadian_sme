@@ -46,7 +46,7 @@ Admin | Edit Speaker
           </div>
      
           <div class="col-md-8">
-            <label class="form-label fw-semibold mb-2">Cover Photo (<span class="text-danger">1920px (width) x 1081px (height)</label>
+            <label class="form-label fw-semibold mb-2">Cover Photo (<span class="text-danger">1920px (width) x 1081px (height) </span>)</label>
             <div id="coverDropZone" class="cover-drop-zone rounded border border-2 d-flex align-items-center justify-content-center">
               <input type="file" id="coverImageInput" accept="image/*" class="d-none form-control">
 
