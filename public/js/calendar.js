@@ -86,7 +86,6 @@ class LaravelEventCalendar {
             },
             
             eventDidMount: (info) => {
-                console.log(info.event.extendedProps)
                 // Add custom styling based on session type
                 const sessionType = info.event.extendedProps.type;
                 const track = info.event.extendedProps.track
@@ -270,6 +269,8 @@ class LaravelEventCalendar {
                 title: session.title,
                 start: session.start,
                 end: session.end,
+                start_time: session.start,
+                end_time: session.end,
                 backgroundColor: session.backgroundColor,
                 borderColor: session.borderColor,
                 textColor: session.textColor, // better contrast
@@ -343,8 +344,9 @@ class LaravelEventCalendar {
 
         // Group events by day
         const eventsByDay = {};
+        console.log(this.events)
         this.events.forEach(session => {
-            const day = moment(session.start_time).format('YYYY-MM-DD');
+            const day = moment(session.start).format('YYYY-MM-DD');
             if (!eventsByDay[day]) {
                 eventsByDay[day] = [];
             }
@@ -354,7 +356,7 @@ class LaravelEventCalendar {
         let gridHTML = '';
         Object.keys(eventsByDay).sort().forEach(day => {
             const sessions = eventsByDay[day].sort((a, b) => 
-                moment(a.start_time).diff(moment(b.start_time))
+                moment(a.start).diff(moment(b.start))
             );
 
             gridHTML += `
@@ -367,7 +369,7 @@ class LaravelEventCalendar {
             `;
 
             sessions.forEach(session => {
-                console.log(session)
+            
                 const statusBadge = this.getStatusBadge(session.status);
                 const typeBadge = this.getTypeBadge(session.track);
                 const keyBadge = this.getTypeBadge(session.keynote);
@@ -385,7 +387,7 @@ class LaravelEventCalendar {
                                 ${typeBadge} 
                             </div>
                             <div class="text-muted small mb-2">
-                                <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</div>
+                                <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start).format('HH:mm')} - ${moment(session.end).format('HH:mm')}</div>
                                 ${session.location ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} (${session.booth})</div>` : ''}
                                 ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
@@ -442,9 +444,9 @@ class LaravelEventCalendar {
             list.innerHTML = '<div class="text-center py-5 text-muted">No sessions found</div>';
             return;
         }
-
+        
         const sortedSessions = [...this.events].sort((a, b) => 
-            moment(a.start_time).diff(moment(b.start_time))
+            moment(a.start).diff(moment(b.start))
         );
 
             let listHTML = '<div class="list-group">';
@@ -452,8 +454,6 @@ class LaravelEventCalendar {
             sortedSessions.forEach(session => {
             const statusBadge = this.getStatusBadge(session.status);
             const typeBadge = this.getTypeBadge(session.track);
-
-
            
             const description = session.description 
             ? `<p class="mb-1 mt-2 small text-truncate" style="max-width: 100%;">${session.description.substring(0, 100)}${session.description.length > 100 ? '...' : ''}</p>` 
@@ -467,9 +467,9 @@ class LaravelEventCalendar {
                     ${typeBadge} ${statusBadge}
                 </div>
                 <div class="small text-muted mb-1">
-                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${moment(session.start_time).format('MMM D, YYYY')}</span>
-                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start_time).format('HH:mm')} - ${moment(session.end_time).format('HH:mm')}</span>
-                    ${session.location ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''} (${session.booth})</span>` : ''}
+                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${moment(session.start).format('MMM D, YYYY')}</span>
+                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start).format('HH:mm')} - ${moment(session.end).format('HH:mm')}</span>
+                    ${session.location ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''}</span>` : ''}
                 </div>
                  
                <div class="mb-2" style="color: ${session.textColor};">
@@ -482,9 +482,7 @@ class LaravelEventCalendar {
                   <i class="fas fa-book me-1" title="Demoes"></i>Demoes:  ${session.demoes} 
                 </div>
 
-                  <div class="mb-2" style="color: ${session.textColor};">
-                  <i class="fas fa-pen-square me-1" title="Description"></i>Demoes:  ${session.description} 
-                </div>
+       
                 
                     <div class="mt-2">
                         ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
@@ -507,7 +505,7 @@ class LaravelEventCalendar {
 
 
             <div class="text-end ms-3">
-                <div class="small text-muted" style="color: ${session.textColor};">${this.calculateDuration(session.start_time, session.end_time)} min</div>
+                <div class="small text-muted" style="color: ${session.textColor};">${this.calculateDuration(session.start, session.end)} min</div>
             </div>       
             </button>
             `;
@@ -534,7 +532,7 @@ class LaravelEventCalendar {
 
         // Populate form if editing
         if (eventData.id) {
-            console.log(eventData.extendedProps?.img)
+
             document.getElementById('sessionId').value = eventData.id;
             document.getElementById('sessionTitle').value = eventData.title || '';
             document.getElementById('description2').value = eventData.extendedProps?.description || '';
@@ -987,7 +985,7 @@ class LaravelEventCalendar {
     }
 
     populateExhibitorSelect() {
-        console.log(this.exibitors);
+      
         const select = document.getElementById('exhibitorSelect');
         if (!select) return;
 

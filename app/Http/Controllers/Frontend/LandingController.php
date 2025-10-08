@@ -211,23 +211,6 @@ public function speaker($slug)
         ->orderBy('es.start_time', 'asc')
         ->select('es.*')
         ->get();           
-
-    $sponsor = DB::table('event_sessions as es')
-        ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
-        ->where('ss.speaker_id', $speaker->id) 
-        ->where('es.start_time', '>', now()) 
-        ->orderBy('es.start_time', 'asc')
-        ->select('es.*')
-        ->get();
-
-    $upcomingSessions = DB::table('event_sessions as es')
-        ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
-        ->where('ss.speaker_id', $speaker->id) 
-        ->where('es.start_time', '>', now()) 
-        ->orderBy('es.start_time', 'asc')
-        ->select('es.*')
-        ->get(); 
-
    
     $event = Event::with('photo')->first();
 
