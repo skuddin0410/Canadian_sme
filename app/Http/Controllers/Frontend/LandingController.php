@@ -34,7 +34,7 @@ class LandingController extends Controller
         $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(6)->get();
         $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
         $attendees = $session?->attendees->take(3);
-        $schedules = $this->schudled();
+        $schedules = Session::where('start_time', '>=', now())->orderBy('start_time', 'ASC')->take(6)->get();
         $location = !empty($event->location) ? $event->location : null;
 
         $googleApiKey = config('services.google_maps.key');
@@ -56,11 +56,6 @@ class LandingController extends Controller
 
         $base = Session::with(['speakers']);
 
-        /**
-         * 1) Try: today’s sessions that are still relevant
-         *    - If you have `end_time`: include sessions whose end_time >= now (ongoing/upcoming)
-         *    - If a session has no end_time, treat it as upcoming only if start_time >= now
-         */
         $schedules = (clone $base)
             ->whereBetween('start_time', [$startToday, $endToday])
             ->where(function ($q) use ($now) {
@@ -73,10 +68,6 @@ class LandingController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        /**
-         * 2) If today is over (no matching sessions),
-         *    find the earliest future session and then fetch ALL sessions on that date.
-         */
         if ($schedules->isEmpty()) {
                 $firstFuture = (clone $base)
                 ->where('start_time', '>', $endToday)

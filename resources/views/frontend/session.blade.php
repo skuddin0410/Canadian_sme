@@ -64,23 +64,23 @@
           </ul>
 
           <!-- Description -->
-          <h5 class="mb-2 small-heading-black fw-bold">About this Session</h5>
+          <h5 class="mb-2 small-heading-black fw-bold">About this Session: </h5>
           <p class="text-secondary">
-            {{ $session->description ?? 'No description available.' }}
+            {{ $session->description ?? '' }}
           </p>
 
 
-          <h5 class="mb-2 small-heading-black fw-bold">Key Note</h5>
+          <h5 class="mb-2 small-heading-black fw-bold">Key Note: </h5>
           <p class="text-secondary">
             {{ $session->keynote ?? '' }}
           </p>
 
-          <h5 class="mb-2 small-heading-black fw-bold">Demoes</h5>
+          <h5 class="mb-2 small-heading-black fw-bold">Demoes: </h5>
           <p class="text-secondary">
             {{ $session->demoes ?? '' }}
           </p>
 
-          <h5 class="mb-2 small-heading-black fw-bold">Panels</h5>
+          <h5 class="mb-2 small-heading-black fw-bold">Panels: </h5>
           <p class="text-secondary">
             {{ $session->panels ?? '' }}
           </p>
