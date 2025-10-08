@@ -10,6 +10,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{asset('images/favicon.png')}}" type="image/x-icon" />
 
     <meta
       name="viewport"
@@ -19,8 +20,6 @@
 
       <meta name="description" content="" />
 
-      <!-- Favicon -->
-      <link rel="icon" type="image/x-icon" href="{{asset('backend/assets/img/favicon/favicon.ico')}}" />
       <!-- Lightbox2 CSS -->
       <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
