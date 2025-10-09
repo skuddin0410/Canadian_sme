@@ -262,7 +262,6 @@
                                  <div id="selectedSponsors"></div>
                             </div>
                         </div>
-
                         <div class="col-12">
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" id="description2" name="description" rows="3" maxlength="1000"></textarea>
