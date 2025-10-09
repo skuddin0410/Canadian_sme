@@ -181,16 +181,13 @@ class BadgeController extends Controller
         $badge = Badge::where('badge_name',$request->template_name)->first();
         $badges = [];
         $userIds = json_decode($request->user_ids, true);
-        dd($userIds);
         $users = User::whereIn('id', $userIds)->get();
         
         foreach($users as $user){
-
         $name=''; 
         if($badge->name == 1){
             $name = $user->full_name ?? '';
         } 
-
         $company_name='';
         if($badge->company_name == 1){
             $company_name = $user->company ?? '';
@@ -219,7 +216,8 @@ class BadgeController extends Controller
                 'qr_code' => $qr_code,
                 'designation'=>$designation,
                 'width'=>$badge->width ?? '8.56',
-                'height'=>$badge->height ?? '5.40'
+                'height'=>$badge->height ?? '5.40',
+                'user_id' => $user->id ??''
             ]
         );
            

@@ -36,10 +36,10 @@
     }
 
     .badge {
-      width: 2.95in;
+      width: 2.99in;
       height: 2in;
       border-radius: 8px;
-      padding: 0.25in;
+      padding: 0.12in;
       box-sizing: border-box;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       display: flex;
@@ -145,9 +145,9 @@
       }
 
       .badge {
-        width: 2.95in;
+        width: 2.99in;
         height: 2in;
-        padding: 0.25in;
+        padding: 0.12in;
         margin: 0 auto;
       }
 
@@ -175,7 +175,7 @@
 
     @foreach($badges as $badge)
       <div class="badge-wrapper">
-        <div class="badge">
+        <div class="badge"  data-company-name="{{ $badge['company_name'] ?? '' }}" data-badge-user-id="{{ $badge['user_id'] ?? '' }}" data-badge-name="{{ $badge['name'] ?? '' }}">
           <div class="left">
             @if (isset($badge['logo']) && !empty($badge['logo']))
               <img src="{{ asset('sme-logo.png') }}">
