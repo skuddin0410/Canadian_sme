@@ -39,13 +39,13 @@
       width: 2.95in;
       height: 2in;
       border-radius: 8px;
-      padding: 0.25in; /* Slightly reduced padding */
+      padding: 0.25in;
       box-sizing: border-box;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 1rem; /* Reduced font size */
+      font-size: 1rem;
     }
 
     .left {
@@ -56,17 +56,23 @@
     }
 
     .left img {
-      max-height: 100px; /* Slightly reduced image size */
+      max-height: 100px;
       max-width: 100px;
       object-fit: contain;
       border-radius: 4px;
-      margin-bottom: 4px; /* Reduced margin */
+      margin-bottom: 4px;
     }
 
     .left p {
       margin: 0;
-      line-height: 1.4; /* Slightly reduced line height */
-      font-size: 22px; /* Reduced font size */
+      line-height: 1.4;
+      font-size: 22px; /* Name font size */
+    }
+
+    .designation {
+      color: #888;
+      font-style: italic;
+      font-size: 10px; /* Designation font size */
     }
 
     .qr {
@@ -77,8 +83,8 @@
     }
 
     .qr img {
-      width: 120px; /* Slightly reduced QR code size */
-      height: 120px;
+      width: 1in; /* QR code size */
+      height: 1in; 
       object-fit: contain;
       display: block;
     }
@@ -144,6 +150,19 @@
         padding: 0.25in;
         margin: 0 auto;
       }
+
+      .left p {
+        font-size: 22px !important; /* Name font size for print */
+      }
+
+      .designation {
+        font-size: 10px !important; /* Designation font size for print */
+      }
+
+      .qr img {
+        width: 1in !important; /* QR code size for print */
+        height: 1in !important;
+      }
     }
   </style>
 </head>
@@ -164,18 +183,18 @@
 
             @if (!empty($badge['name']))
               <p style="font-weight:bold;">
-                {{ strlen($badge['name']) > 16 ? substr($badge['name'], 0, 14) . '..' : $badge['name'] }}
+                {{ $badge['name'] }}
               </p>
             @endif
 
             @if (!empty($badge['company_name']))
               <p style="color:#555;">
-                {{ strlen($badge['company_name']) > 16 ? substr($badge['company_name'], 0, 12) . '..' : $badge['company_name'] }}
+                {{$badge['company_name'] }}
               </p>
             @endif
 
             @if (!empty($badge['designation']))
-              <p style="color:#888; font-style:italic;">{{ $badge['designation'] }}</p>
+              <p class="designation">{{ $badge['designation'] }}</p>
             @endif
           </div>
           <div class="qr">
