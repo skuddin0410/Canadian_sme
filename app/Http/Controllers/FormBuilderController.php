@@ -135,7 +135,7 @@ public function submitForm(Request $request, $id)
         'mobile' => 'null|string|max:20',
         'designation'  => 'nullable|string|max:255',
         'company'      => 'nullable|string|max:255',
-        'bio'      => 'required|string|max:500',
+        'bio'      => 'nullable|string|max:500',
     ];
 
     $validator = Validator::make($data, $rules);

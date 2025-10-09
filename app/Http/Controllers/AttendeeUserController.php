@@ -186,7 +186,9 @@ class AttendeeUserController extends Controller
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
-      
+
+        qrCode($user->id);
+
         $primaryGroupArray= [];
         $secondaryGroupArray=[];
          
@@ -218,7 +220,12 @@ class AttendeeUserController extends Controller
           }  
           
         }
-        qrCode($user->id);
+        
+        $user = User::where('id',$user->id)->first(); 
+        
+        if($user){  
+          sendNotification("Welcome Email",$user);
+        }
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
     }

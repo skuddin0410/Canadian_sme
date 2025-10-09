@@ -36,8 +36,8 @@
     }
 
     .badge {
-      width: 2.70in;
-      height: 1.7in;
+      width: 2.95in;
+      height: 2in;
       border-radius: 8px;
       padding: 0.15in;
       box-sizing: border-box;
