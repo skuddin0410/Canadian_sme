@@ -547,9 +547,8 @@ public function scanDetails(Request $request){
         $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
        
         if(!$data){
-           return response()->json([
-             "message"=> "Scan failed!"
-           ]);
+          userConnection($user->id, $request->qrData);
+          $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
         }
     
         $data->load('connection.photo','connection.visitingcard');
