@@ -250,7 +250,6 @@ class SpeakerController extends Controller
     public function destroy(string $id)
     {
         $user = Speaker::findOrFail($id);
-        $user->roles()->detach();
         $user->delete();
 
         return redirect()

@@ -361,9 +361,20 @@ public function deleteDoc($id)
         }
         return back()->withErrors('You do not have permission to perform this action.');
     }
+
     public function exportExhibitors()
-{
+    {
     return Excel::download(new ExhibitorsExport, 'exhibitors.xlsx');
-}
+    }
+
+
+   public function destroy($exhibitor_id)
+    {   
+        $company = Company::findOrFail($exhibitor_id); 
+        $company->delete();
+
+        return back()->withErrors('Exhibitor deleted successfully.');
+    }
+
 
 }

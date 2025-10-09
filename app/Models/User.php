@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -25,7 +26,7 @@ class User extends Authenticatable implements JWTSubject
      * Define the default guard for this model.
      */
     protected $guard_name = 'web'; // Set the default guard (e.g., 'api' or 'web')
-
+    protected $dates = ['deleted_at']; 
     /**
      * The attributes that are mass assignable.
      *

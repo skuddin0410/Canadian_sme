@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Speaker extends Model
 {       
 
     use  Auditable;
     use AutoHtmlDecode;
-
+    use SoftDeletes;
+    protected $dates = ['deleted_at']; 
     protected $fillable = [
         'name',
         'lastname',

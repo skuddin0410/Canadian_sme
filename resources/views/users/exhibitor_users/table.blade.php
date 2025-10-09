@@ -88,7 +88,7 @@
 			</a>
 
 			{{-- Delete button --}}
-	{{-- 		<form action="{{ route('exhibitor-users.destroy', $user->id) }}" 
+			<form action="{{ route('exhibitor-users.destroy', $user->id) }}" 
 			      method="POST" 
 			      onsubmit="return confirm('Are you sure you want to delete this Exhibitor?');">
 				@csrf
@@ -96,7 +96,7 @@
 				<button type="submit" class="btn btn-sm btn-icon btn-danger" title="Delete">
 					<i class="bx bxs-trash"></i>
 				</button>
-			</form> --}}
+			</form>
 		</div>
 	</td>
 </tr>

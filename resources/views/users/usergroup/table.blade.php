@@ -42,7 +42,7 @@
     <tbody>
         @foreach($roles as $role)
             @php
-                $restrictedRoles = ["Admin", "Exhibitor", "Attendee","Sponsors","Representative", "Speaker", "Support Staff Or Helpdesk", "Registration Desk"];
+                $restrictedRoles = ["Admin", "Exhibitor", "Attendee","Sponsors","Representative", "Speaker", "Support Staff Or Helpdesk", "Registration Desk","Guest"];
                 $isRestricted = in_array($role->name, $restrictedRoles);
             @endphp
 
@@ -68,7 +68,7 @@
                         </a>
 
                         {{-- Delete --}}
-                        <form action="{{ route('usergroup.destroy', $role->id) }}" method="POST" 
+                        {{-- <form action="{{ route('usergroup.destroy', $role->id) }}" method="POST" 
                               onsubmit="return confirm('Are you sure you want to delete this role?');"
                               class="d-inline">
                             @csrf
@@ -77,7 +77,7 @@
                                     {{ $isRestricted ? 'disabled' : '' }}>
                                 <i class="bx bx-trash"></i>
                             </button>
-                        </form>
+                        </form> --}}
                     </div>
                 </td>
             </tr>

@@ -11,12 +11,16 @@ use App\Traits\Auditable;
 use App\Models\CompanyContact;
 use App\Traits\AutoHtmlDecode;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
 {
     
     use  Auditable;
     use AutoHtmlDecode;
+    use SoftDeletes;
+    protected $dates = ['deleted_at']; 
+    
     protected $fillable = [
         'user_id','name', 'industry', 'size', 'booth_id', 'location', 'email', 'phone',
         'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image','is_sponsor','booth','type','slug'

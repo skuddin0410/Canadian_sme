@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EventGuide extends Model
 {
     use HasFactory;
     use  Auditable;
     use AutoHtmlDecode;
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'category',
