@@ -44,7 +44,7 @@
 </div>
 
 {{-- TinyMCE --}}
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/g5uikhrm5sqmr752tl583kxgkjacajfjzfjhxsuuft3uo7ex/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const typeSelect = document.getElementById('templateType');

@@ -5,6 +5,12 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
     <h2>Edit Email Template</h2>
+
+        @php
+            $emailTemplateList = ["Event Reminder", "Welcome Email", "Event Reminder Notification","Welcome Notification","Event Cancellation Notification"];
+            $isRestricted = in_array($emailTemplate->template_name, $emailTemplateList);
+            
+        @endphp
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
@@ -19,7 +25,7 @@
                             <label>Template Name</label>
                             <input type="text" name="template_name" 
                                    value="{{ $emailTemplate->template_name }}" 
-                                   class="form-control" required>
+                                   class="form-control" required {{ $isRestricted ? 'readonly' : '' }}>
                         </div>
 
                         <div class="mb-3">
@@ -31,9 +37,9 @@
 
                         <div class="mb-3">
                             <label>Type</label>
-                            <select name="type" id="templateType" class="form-control" required>
+                            <select name="type" id="templateType" class="form-control" required {{ $isRestricted ? 'disabled' : '' }}>
                                 <option value="email" {{ $emailTemplate->type == 'email' ? 'selected' : '' }}>Email</option>
-                                <option value="notification" {{ $emailTemplate->type == 'notification' ? 'selected' : '' }}>Notification</option>
+                                <option value="notification" {{ $emailTemplate->type == 'notifications' ? 'selected' : '' }}>Notification</option>
                             </select>
                         </div>
 
@@ -59,7 +65,7 @@
 </div>
 
 {{-- TinyMCE --}}
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/g5uikhrm5sqmr752tl583kxgkjacajfjzfjhxsuuft3uo7ex/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const typeSelect = document.getElementById('templateType');

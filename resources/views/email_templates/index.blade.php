@@ -18,7 +18,7 @@
     </button>
 </div>
 
-    
+        
 
     <table class="table table-bordered">
         <tr>
@@ -29,6 +29,13 @@
             <th>Actions</th>
         </tr>
         @foreach ($templates as $template)
+
+        @php
+            $emailTemplate = ["Event Reminder", "Welcome Email", "Event Reminder Notification","Welcome Notification","Event Cancellation Notification"];
+            $isRestricted = in_array($template->template_name, $emailTemplate);
+            
+        @endphp
+
             <tr>
                 {{-- <td>{{ $template->id }}</td> --}}
                 <td>{{ $loop->iteration + ($templates->currentPage() - 1) * $templates->perPage() }}</td>
@@ -39,7 +46,7 @@
                     <a href="{{ route('email-templates.edit', $template->id) }}" class="btn btn-sm btn-warning">Edit</a>
                     <form action="{{ route('email-templates.destroy', $template->id) }}" method="POST" style="display:inline;">
                         @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')" {{ $isRestricted ? 'disabled' : '' }}>Delete</button>
                     </form>
                 </td>
             </tr>
