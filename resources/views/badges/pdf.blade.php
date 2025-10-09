@@ -39,34 +39,34 @@
       width: 2.95in;
       height: 2in;
       border-radius: 8px;
-      padding: 0.15in;
+      padding: 0.25in; /* Slightly reduced padding */
       box-sizing: border-box;
-      /*background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);*/
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.75rem;
+      font-size: 1rem; /* Reduced font size */
     }
 
     .left {
       display: flex;
       flex-direction: column;
-      width: 60%;
+      width: 55%;
       text-align: left;
     }
 
     .left img {
-      max-height: 80px;
-      max-width: 80px;
+      max-height: 100px; /* Slightly reduced image size */
+      max-width: 100px;
       object-fit: contain;
       border-radius: 4px;
-      margin-bottom: 2px;
+      margin-bottom: 4px; /* Reduced margin */
     }
 
     .left p {
       margin: 0;
-      line-height: 1.2;
-      font-size: 18px;
+      line-height: 1.4; /* Slightly reduced line height */
+      font-size: 22px; /* Reduced font size */
     }
 
     .qr {
@@ -77,18 +77,18 @@
     }
 
     .qr img {
-      width: 90px;
-      height: 90px;
+      width: 120px; /* Slightly reduced QR code size */
+      height: 120px;
       object-fit: contain;
       display: block;
     }
 
     a, button {
-      margin-bottom: 10px;
-      padding: 6px 12px;
+      margin-bottom: 12px;
+      padding: 8px 16px;
       border-radius: 4px;
       text-decoration: none;
-      font-size: 14px;
+      font-size: 16px;
     }
 
     a {
@@ -141,7 +141,7 @@
       .badge {
         width: 2.95in;
         height: 2in;
-        padding: 0.15in;
+        padding: 0.25in;
         margin: 0 auto;
       }
     }
