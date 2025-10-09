@@ -181,9 +181,9 @@ class BadgeController extends Controller
         $badge = Badge::where('badge_name',$request->template_name)->first();
         $badges = [];
         $userIds = json_decode($request->user_ids, true);
-
+        dd($userIds);
         $users = User::whereIn('id', $userIds)->get();
-       
+        
         foreach($users as $user){
 
         $name=''; 

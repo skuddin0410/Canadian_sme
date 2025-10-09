@@ -227,7 +227,7 @@ if (!function_exists('qrCode')) {
                 'email' => $user->email ?? '',
                 'app' => 'com.canadianSME.app'
             ]);
-            $fileName = 'qrcodes/'.$folder.'_'. $timestamp . '.png';
+            $fileName = 'qrcodes/'.$folder.'_'. $timestamp.'_'.$user->id. '.png';
         }
 
         $filePath = public_path($fileName);
@@ -239,7 +239,7 @@ if (!function_exists('qrCode')) {
         $renderer = new GDLibRenderer(300);
         $writer = new Writer($renderer);
         $writer->writeFile($data, $filePath);
-        $user->qr_code = 'qrcodes/' . $folder . '_' . $timestamp. '.png';
+        $user->qr_code = 'qrcodes/' . $folder . '_' . $timestamp.'_'.$user->id.'.png';
         $user->save();
 
         return true;
