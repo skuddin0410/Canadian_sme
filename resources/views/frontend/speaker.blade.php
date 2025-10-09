@@ -12,12 +12,13 @@
     <div class="col-md-8">
 
       <div class="card shadow-sm rounded-4">
+        @if(!empty($speaker->coverphoto) && $speaker->coverphoto->file_path)
          <div style="width: 100%; height: 400px; overflow: hidden; border-radius: 8px;">
-              <img src="{{ !empty($speaker->coverphoto) ? $speaker->coverphoto->file_path : asset('frontend/images/default-cover.jpg') }}" 
+              <img src="{{ !empty($speaker->coverphoto) ? $speaker->coverphoto->file_path : '' }}" 
                    class="border" 
                    style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" />
           </div>
-
+        @endif 
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-4">
             <div class="text-left mb-2 me-3">
