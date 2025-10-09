@@ -324,7 +324,7 @@ class AttendeeUserController extends Controller
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
-
+    
         $primaryGroupArray= [];
         $secondaryGroupArray=[];
          
@@ -356,7 +356,7 @@ class AttendeeUserController extends Controller
           }  
           
         }
-        qrCode($user->id);
+        
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');   
     
 
