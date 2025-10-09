@@ -522,9 +522,9 @@ class LaravelEventCalendar {
             document.getElementById('venueSelect').value = eventData.extendedProps?.location || '';
             document.getElementById('status').value = eventData.extendedProps?.status || 'draft';
 
-            document.getElementById('keynote2').value = eventData.extendedProps?.keynote || '';
-            document.getElementById('panels2').value = eventData.extendedProps?.demoes || '';
-            document.getElementById('demoes2').value = eventData.extendedProps?.panels || '';
+            //document.getElementById('keynote2').value = eventData.extendedProps?.keynote || '';
+            //document.getElementById('panels2').value = eventData.extendedProps?.demoes || '';
+            //document.getElementById('demoes2').value = eventData.extendedProps?.panels || '';
 
             document.getElementById('profileImagePreview').src = eventData.extendedProps?.img || '';
             document.getElementById('dz-remove').setAttribute('data-photoid', eventData.extendedProps?.img_id);
