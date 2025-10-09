@@ -317,6 +317,18 @@ function groups($user)
     }
 }
 
+if (!function_exists('speakerGroups')) {
+function speakerGroups($speaker)
+    {  
+        $arr =['Speaker'];
+        if(!empty($speaker->secondary_group)){
+         $arr = explode(',', $speaker->secondary_group);
+        }
+        array_push($arr, $speaker->primary_group);
+        return array_unique($arr);
+    }
+}
+
 if (! function_exists('shortenName')) {
     function shortenName($firstName, $lastName='')
     {

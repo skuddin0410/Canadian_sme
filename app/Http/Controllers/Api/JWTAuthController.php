@@ -616,9 +616,11 @@ public function getSpeaker(Request $request)
         }
 
      
-        $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+        /*$speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Speaker');
-        })->whereNotNull('access_speaker_ids')->orderBy('id', 'DESC')->get();
+        })->whereNotNull('access_speaker_ids')->orderBy('id', 'DESC')->get();*/
+
+        $speakers = Speaker::with('photo')->orderBy('id', 'DESC')->get();
 
         if ($speakers->isEmpty()) {
             return response()->json([
@@ -636,7 +638,7 @@ public function getSpeaker(Request $request)
                 'company_name'  => $speaker->company ?? '',
                 'role'  => $speaker->designation ?? '',
                 'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
-                'roles' => groups($speaker)
+                'roles' => speakerGroups($speaker)
             ];
         });
 
@@ -660,9 +662,10 @@ public function getSpeakerById(Request $request){
             ], 401);
         }
 
-        $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
+        /*$speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
             $q->where('name', 'Speaker');
-        })->where('id', $request->id)->first();
+        })->where('id', $request->id)->first();*/
+        $speakers = Speaker::with('photo')->where('id', $request->id)->first();
 
         if (empty($speaker)) {
             return response()->json([
@@ -697,7 +700,7 @@ public function getSpeakerById(Request $request){
             'bio'            => $speaker->bio ?? '',
             'role'           => $speaker->designation ?? '',
             'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
-            'roles'          => groups($speaker),
+            'roles'          => speakerGroups($speaker),
             'contact_details'=> $contactDetails
         ];
 
