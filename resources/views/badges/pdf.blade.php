@@ -4,47 +4,57 @@
   <meta charset="UTF-8" />
   <title>Badges</title>
   <style>
-  @page {
-  size: 3in 2.2in;   /* slightly bigger sheet */
-  margin: 0.15in;    /* safe space on all sides */
-}
- body {
-  margin: 0;
-  padding: 0;
-  background: white;
-}
+    @page {
+      size: 3in 2.2in;
+      margin: 0;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: white;
+    }
+
     .container {
       width: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center; /* center badges horizontally */
+      align-items: center;
       justify-content: center;
-      padding: 10px;
       box-sizing: border-box;
     }
- .badge-wrapper {
-  page-break-inside: avoid;
-  margin: 0 auto; /* center horizontally */
-}
-.badge {
-  width: 2.70in;
-  height: 1.7in;
-  border-radius: 8px;
-  padding: 10px;       /* inner padding for text/QR */
-  box-sizing: border-box;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  margin: 0 auto;      /* ensure centered inside page */
-}
+
+    .badge-wrapper {
+      page-break-inside: avoid;
+      page-break-after: always;
+      width: 3in;
+      height: 2.2in;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .badge {
+      width: 2.70in;
+      height: 1.7in;
+      border-radius: 8px;
+      padding: 0.15in;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
     .left {
       display: flex;
       flex-direction: column;
       width: 60%;
       text-align: left;
     }
+
     .left img {
       max-height: 80px;
       max-width: 80px;
@@ -52,37 +62,95 @@
       border-radius: 4px;
       margin-bottom: 2px;
     }
+
     .left p {
       margin: 0;
       line-height: 1.2;
       font-size: 18px;
     }
+
     .qr {
       width: 40%;
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
     .qr img {
       width: 90px;
       height: 90px;
       object-fit: contain;
       display: block;
     }
+
+    a, button {
+      margin-bottom: 10px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    a {
+      background: #555;
+      color: #fff;
+    }
+
+    button {
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
     @media print {
-      a, button { display: none !important; }
-      body { background: none; }
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      @page {
+        size: 3in 2.2in;
+        margin: 0;
+      }
+
+      html, body {
+        width: 3in;
+        height: 2.2in;
+        margin: 0;
+        padding: 0;
+        background: none;
+      }
+
+      a, button {
+        display: none !important;
+      }
+
+      .container {
+        padding: 0 !important;
+      }
+
+      .badge-wrapper {
+        page-break-inside: avoid;
+        page-break-after: always;
+        width: 3in;
+        height: 2.2in;
+        margin: 0 auto;
+      }
+
+      .badge {
+        width: 2.70in;
+        height: 1.70in;
+        padding: 0.15in;
+        margin: 0 auto;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <a href="{{ route('attendee-users.index') }}" 
-       style="margin-bottom:10px; padding:6px 12px; background:#555; color:#fff; border-radius:4px; text-decoration:none;">
-       Back
-    </a>
-    <button onclick="this.style.display='none'; window.print(); setTimeout(()=>{ this.style.display='inline-block'; }, 0)"
-            style="margin-bottom:10px; padding:6px 12px; background:#4CAF50; color:#fff; border:none; border-radius:4px; cursor:pointer;">
+    <a href="{{ route('attendee-users.index') }}">Back</a>
+    <button onclick="this.style.display='none'; window.print(); setTimeout(()=>{ this.style.display='inline-block'; }, 0)">
       Print Badges
     </button>
 
@@ -95,13 +163,19 @@
             @endif
 
             @if (!empty($badge['name']))
-              <p style="font-weight:bold;">{{ strlen($badge['name']) > 16 ? substr($badge['name'], 0, 14) . '..' : $badge['name'] }}</p>
+              <p style="font-weight:bold;">
+                {{ strlen($badge['name']) > 16 ? substr($badge['name'], 0, 14) . '..' : $badge['name'] }}
+              </p>
             @endif
+
             @if (!empty($badge['company_name']))
-              <p style="color:#555;">{{ strlen($badge['company_name']) > 16 ? substr($badge['company_name'], 0, 12) . '..' : $badge['company_name'] }}</p>
+              <p style="color:#555;">
+                {{ strlen($badge['company_name']) > 16 ? substr($badge['company_name'], 0, 12) . '..' : $badge['company_name'] }}
+              </p>
             @endif
+
             @if (!empty($badge['designation']))
-              <p style="color:#888; font-style:italic;">{{$badge['designation']}}</p>
+              <p style="color:#888; font-style:italic;">{{ $badge['designation'] }}</p>
             @endif
           </div>
           <div class="qr">
