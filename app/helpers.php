@@ -324,7 +324,10 @@ function speakerGroups($speaker)
         if(!empty($speaker->secondary_group)){
          $arr = explode(',', $speaker->secondary_group);
         }
-        array_push($arr, $speaker->primary_group);
+
+        if(!empty($speaker->primary_group)){
+          array_push($arr, $speaker->primary_group);
+        }
         return array_unique($arr);
     }
 }
