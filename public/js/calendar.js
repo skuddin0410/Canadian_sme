@@ -392,18 +392,10 @@ class LaravelEventCalendar {
                                 ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
 
-                            <div class="mb-2" style="color: ${session.textColor};">
-                              <i class="fas fa-sticky-note me-1" title="Key Note"></i>Key Note:  ${session.keynote} 
-                            </div>
-                             <div class="mb-2" style="color: ${session.textColor};">
-                              <i class="fas fa-clipboard me-1" title="Panels"></i>Panels:  ${session.panels} 
-                            </div>
-                             <div class="mb-2" style="color: ${session.textColor};">
-                              <i class="fas fa-book me-1" title="Demoes"></i>Demoes:  ${session.demoes} 
-                            </div>
+                    
 
                               <div class="mb-2" style="color: ${session.textColor};">
-                              <i class="fas fa-pen-square me-1" title="Description"></i>Demoes:  ${session.description} 
+                              <i class="fas fa-pen-square me-1" title="Description"></i>Description:  ${session.description} 
                             </div>   
                             <div class="mt-auto">
                                 ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
@@ -471,18 +463,7 @@ class LaravelEventCalendar {
                     <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start).format('HH:mm')} - ${moment(session.end).format('HH:mm')}</span>
                     ${session.location ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''}</span>` : ''}
                 </div>
-                 
-               <div class="mb-2" style="color: ${session.textColor};">
-                  <i class="fas fa-sticky-note me-1" title="Key Note"></i>Key Note:  ${session.keynote} 
-                </div>
-                 <div class="mb-2" style="color: ${session.textColor};">
-                  <i class="fas fa-clipboard me-1" title="Panels"></i>Panels:  ${session.panels} 
-                </div>
-                 <div class="mb-2" style="color: ${session.textColor};">
-                  <i class="fas fa-book me-1" title="Demoes"></i>Demoes:  ${session.demoes} 
-                </div>
 
-       
                 
                     <div class="mt-2">
                         ${session.extendedProps.speakers && session.extendedProps.speakers.length ? session.extendedProps.speakers.map(s => `
@@ -647,27 +628,6 @@ class LaravelEventCalendar {
         </div>
     ` : ''}
 
-
-     ${event.extendedProps?.keynote ? `
-        <div class="mt-3">
-            <div class="fw-bold">Keynote</div>
-            <div class="mt-2">${event.extendedProps.keynote}</div>
-        </div>
-    ` : ''}
-
-     ${event.extendedProps?.demoes ? `
-        <div class="mt-3">
-            <div class="fw-bold">Demoes</div>
-            <div class="mt-2">${event.extendedProps.demoes}</div>
-        </div>
-    ` : ''}
-
-      ${event.extendedProps?.panels ? `
-        <div class="mt-3">
-            <div class="fw-bold">Panels</div>
-            <div class="mt-2">${event.extendedProps.panels}</div>
-        </div>
-    ` : ''}
 
     <div class="mt-3">
         <div class="fw-bold">Speakers</div>

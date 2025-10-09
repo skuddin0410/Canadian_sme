@@ -71,7 +71,7 @@
               @include('partial.nav-bar')
 
 
-          <div class="content-wrapper">
+          <div>
             @include('partial.error')
             @yield('content')
     

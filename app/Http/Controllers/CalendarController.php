@@ -230,24 +230,18 @@ class CalendarController extends Controller
         if ($speakerIds) {
             foreach ($speakerIds as $index => $speakerId) {
                 $session->speakers()->attach($speakerId);
-                notification($speakerId, 'Speaker_Reminder', $session->id);
-                addAgenda($session->id,null,$speakerId);
             }
         }
 
         if ($exhibitorIds) {
             foreach ($exhibitorIds as $index => $exhibitorId) {
                 $session->exhibitors()->attach($exhibitorId);
-                notification($exhibitorId, 'Exhibitor_Reminder', $session->id);
-                addAgenda($session->id,null,$exhibitorId);
             }
         }
 
         if ($sponsorIds) {
             foreach ($sponsorIds as $index => $sponsorId) {
                 $session->sponsors()->attach($sponsorId);
-                notification($sponsorId, 'Speaker_Reminder', $session->id);
-               addAgenda($session->id,null,$sponsorId);
             }
         }
 
@@ -349,9 +343,6 @@ class CalendarController extends Controller
             foreach ($speakerIds as $index => $speakerId) {
                 $session->speakers()->detach($speakerId);
                 $session->speakers()->attach($speakerId);
-
-                notification($speakerId, 'Speaker_Reminder', $session->id);
-                addAgenda($session->id,null,$speakerId);
             }
         }
 
@@ -361,9 +352,6 @@ class CalendarController extends Controller
                 $session->exhibitors()->detach($exhibitorId);
                 $session->exhibitors()->attach($exhibitorId);
 
-                notification($exhibitorId, 'Exhibitor_Reminder', $session->id);
-                addAgenda($session->id,null,$exhibitorId);
-
             }
         }
 
@@ -372,9 +360,6 @@ class CalendarController extends Controller
             foreach ($sponsorIds as $index => $sponsorId) {
                 $session->sponsors()->detach($sponsorId);
                 $session->sponsors()->attach($sponsorId);
-
-                notification($sponsorId, 'Speaker_Reminder', $session->id);
-                addAgenda($session->id,null,$sponsorId);
                 
             }
         }
