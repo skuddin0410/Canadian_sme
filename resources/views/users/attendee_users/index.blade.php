@@ -176,15 +176,18 @@
                 <div class="modal-body">
                     <div class="mt-3">
                         <label for="userImportFile">Import Users (CSV, XLSX)</label>
-                        <input type="file" id="userImportFile" class="form-control" name="file" accept=".csv, .xlsx" required>
+                        <input type="file" id="userImportFile" class="form-control" name="file" accept=".csv" required>
                         <small class="form-text text-muted">After the import, an email will be sent to each user.</small>
                     </div>
+                    <div id="rowCount"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeImportModal()">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none;">Submit</button>
                 </div>
             </form>
+
+            
         </div>
     </div>
 </div>
@@ -192,6 +195,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     // Function to load users via AJAX
@@ -288,5 +292,30 @@ function closeImportModal(){
 }
 </script>
 
+ <script>
+    // Event listener for file input change
+    document.getElementById('userImportFile').addEventListener('change', function (event) {
+      const file = event.target.files[0];
 
+      if (!file) {
+        alert('Please select a CSV file');
+        return;
+      }
+
+      // Parse the selected CSV file
+      Papa.parse(file, {
+        complete: function(results) {
+          // Get the number of rows
+          const numRows = results.data.length;
+
+          // Show the row count
+          document.getElementById('rowCount').innerText = `Number of rows in CSV: ${numRows}`;
+          document.getElementById('submitBtn').style.display = 'inline-block';
+  
+        },
+        header: true, // Assuming the first row is a header
+        skipEmptyLines: true // Skip any empty lines in the CSV
+      });
+    });
+  </script>
 @endsection
