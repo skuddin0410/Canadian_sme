@@ -41,7 +41,7 @@
       border-radius: 8px;
       padding: 0.15in;
       box-sizing: border-box;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      /*background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);*/
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -139,8 +139,8 @@
       }
 
       .badge {
-        width: 2.70in;
-        height: 1.70in;
+        width: 2.95in;
+        height: 2in;
         padding: 0.15in;
         margin: 0 auto;
       }
