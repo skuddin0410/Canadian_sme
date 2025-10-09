@@ -665,7 +665,7 @@ public function getSpeakerById(Request $request){
         /*$speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
             $q->where('name', 'Speaker');
         })->where('id', $request->id)->first();*/
-        $speakers = Speaker::with('photo')->where('id', $request->id)->first();
+        $speaker = Speaker::with('photo')->where('id', $request->id)->first();
 
         if (empty($speaker)) {
             return response()->json([
