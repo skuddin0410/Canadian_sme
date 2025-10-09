@@ -72,7 +72,7 @@
     .designation {
       color: #888;
       font-style: italic;
-      font-size: 10px; /* Designation font size */
+      font-size: 10px !important; /* Added !important for the font size */
     }
 
     .qr {
@@ -188,8 +188,8 @@
             @endif
 
             @if (!empty($badge['company_name']))
-              <p style="color:#555;">
-                {{$badge['company_name'] }}
+              <p style="color:#555;font-size:10px !important">
+                {{$badge['company_name'] }} 
               </p>
             @endif
 
