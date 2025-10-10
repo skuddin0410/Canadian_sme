@@ -136,6 +136,7 @@ public function verify(Request $request)
 
     $user->assignRole('Attendee');
 
+   
     try {
 
         if($user->is_approve == 0){
@@ -144,7 +145,7 @@ public function verify(Request $request)
             'message'    => 'Your account is inactive. Please contact support for assistance.',
            ]); 
         }
-       
+        
         $credentials = [
             'email'    => $request->email,
             'password' => $request->otp, 
@@ -157,6 +158,10 @@ public function verify(Request $request)
             ], 401);
         }
         
+        if(empty($user->qr_code)){
+          qrCode($user->id);
+        }
+
         $user->update([
           'jwt_token' => $token
         ]);
@@ -165,7 +170,7 @@ public function verify(Request $request)
             ['user_id' => $user->id], 
             ['expires_at' => now()->addMonths(2)] 
         );
-        qrCode($user->id);
+        
         notification($user->id);
         sendNotification("Welcome Email",$user);
 
