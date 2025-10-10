@@ -121,7 +121,7 @@ public function verify(Request $request)
                     'message' => 'Invalid or expired OTP',
                 ], 400);
             }
-   
+            $otp->delete();
        }
    
     $user = User::firstOrCreate(
@@ -129,13 +129,8 @@ public function verify(Request $request)
         ['password' => Hash::make($request->otp)]
     );
 
- 
-    $user->update([
-        'password' => Hash::make($request->otp)
-    ]);
-
     $user->assignRole('Attendee');
-
+    
    
     try {
 
