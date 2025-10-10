@@ -121,7 +121,7 @@ public function verify(Request $request)
                     'message' => 'Invalid or expired OTP',
                 ], 400);
             }
-            $otp->delete();
+            //$otp->delete();
        }
    
     $user = User::firstOrCreate(
