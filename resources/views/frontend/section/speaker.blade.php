@@ -34,7 +34,15 @@
                                 <div class="swiper-img-text">
                                     <span class="speakers-name">{{$speaker->full_name ? truncateString($speaker->full_name, 18) : ''}}</span>
                                     <span class="speakers-title">{{$speaker->designation ?? ''}}</span>
+
+                                    <div class="d-flex justify-content-center mt-2">
+                                     <a class="heroBtn btn-long" href="{{ route('speaker', $speaker->slug) }}">
+                                             View More
+                                        </a>
                                 </div>
+                                </div>
+
+
                             </div>
                             @endforeach
                             @endif
