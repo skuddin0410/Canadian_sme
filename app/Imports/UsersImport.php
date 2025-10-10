@@ -11,11 +11,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class UsersImport implements ToModel,WithStartRow
 {   
-    protected $role;
-    public function __construct($role)
-    {
-        $this->role = $role;
-    }
 
     public function startRow(): int
     {  
@@ -62,8 +57,8 @@ class UsersImport implements ToModel,WithStartRow
             $user->assignRole('Attendee');
 
             qrCode($user->id);
-            notification($user->id);
-            sendNotification("Welcome Email",$user);
+            //notification($user->id);
+            //sendNotification("Welcome Email",$user);
         } 
 
     }

@@ -237,11 +237,30 @@ class UserController extends Controller
     }
 
     public function importUser(Request $request){
-        $request->validate([
-          'file' => 'required|file|mimes:csv,xls,xlsx'
-        ]);
-        Excel::import(new UsersImport($request->role), $request->file('file'));
+
+      if ($request->hasFile('file')) {
+        $file = $request->file('file');
+
+        if (!$file->isValid()) {
+         return back()->withErrors(['file' => 'Uploaded file is not valid']);
+        }
+        
+        // Get original extension
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        // Allowed extensions
+        $allowedExtensions = ['csv', 'xls', 'xlsx'];
+
+        if (!in_array($extension, $allowedExtensions)) {
+            return back()->withErrors(['file' => 'Only CSV, XLS, or XLSX files are allowed.']);
+        }
+
+        Excel::import(new UsersImport, $request->file('file'));
         return back();
+
+      } else {
+       return back()->withErrors(['file' => 'No file uploaded.']);
+      }
     }
     public function representativeIndex()
 {

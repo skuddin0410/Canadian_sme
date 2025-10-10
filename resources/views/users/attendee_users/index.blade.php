@@ -177,7 +177,7 @@
                     <div class="mt-3">
                         <label for="userImportFile">Import Users (CSV, XLSX)</label>
                         <input type="file" id="userImportFile" class="form-control" name="file" accept=".csv" required>
-                        <small class="form-text text-muted">After the import, an email will be sent to each user.</small>
+                        <!-- <small class="form-text text-muted">After the import, an email will be sent to each user.</small> -->
                     </div>
                     <div id="rowCount"></div>
                 </div>
