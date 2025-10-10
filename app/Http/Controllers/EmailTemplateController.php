@@ -7,6 +7,7 @@ use App\Mail\UserWelcome;
 use Illuminate\Http\Request;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
+use Mews\Purifier\Facades\Purifier;
 
 class EmailTemplateController extends Controller
 {
@@ -115,7 +116,7 @@ class EmailTemplateController extends Controller
               $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
               $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
         }
-        
+        $message = Purifier::clean($message, 'default');
         Mail::to($request->email)->send(new UserWelcome(null, $subject, $message));
         return back()->with('success', 'Email sent successfully!');
     }

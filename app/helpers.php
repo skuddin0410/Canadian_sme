@@ -23,6 +23,7 @@ use App\Mail\UserWelcome;
 use App\Models\Badge;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Mews\Purifier\Facades\Purifier;
 
 
 if (!function_exists('getCategory')) {
@@ -483,6 +484,8 @@ if (!function_exists('sendNotification')) {
               $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
               $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
             }
+
+            $message = Purifier::clean($message, 'default');
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
  
         } elseif (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
