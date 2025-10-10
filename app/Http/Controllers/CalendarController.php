@@ -179,7 +179,7 @@ class CalendarController extends Controller
             'track' => 'required',
             'description' => 'nullable|string',
             'speaker_ids' => 'required|array',
-            'speaker_ids.*' => 'exists:users,id'
+            'speaker_ids.*' => 'exists:speakers,id'
         ], [
             'event_id.required' => 'Please select an event.',
             'event_id.exists' => 'Selected event does not exist.',
@@ -285,7 +285,7 @@ class CalendarController extends Controller
     'track' => 'required',
     'description' => 'nullable|string',
     'speaker_ids' => 'required|array',
-    'speaker_ids.*' => 'exists:users,id'
+    'speaker_ids.*' => 'exists:speakers,id'
 ], [
     'event_id.required' => 'Please select an event.',
     'event_id.exists' => 'Selected event does not exist.',

@@ -26,7 +26,7 @@
                             <label>Type</label>
                             <select name="type" id="templateType" class="form-control" required>
                                 <option value="email">Email</option>
-                                <option value="notification">Notification</option>
+                                <option value="notifications">Notification</option>
                             </select>
                         </div>
 

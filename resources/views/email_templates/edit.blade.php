@@ -39,7 +39,7 @@
                             <label>Type</label>
                             <select name="type" id="templateType" class="form-control" required {{ $isRestricted ? 'disabled' : '' }}>
                                 <option value="email" {{ $emailTemplate->type == 'email' ? 'selected' : '' }}>Email</option>
-                                <option value="notification" {{ $emailTemplate->type == 'notifications' ? 'selected' : '' }}>Notification</option>
+                                <option value="notifications" {{ $emailTemplate->type == 'notifications' ? 'selected' : '' }}>Notification</option>
                             </select>
                         </div>
 
