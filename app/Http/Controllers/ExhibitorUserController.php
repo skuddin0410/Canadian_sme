@@ -100,7 +100,7 @@ public function index(Request $request)
            
             'company_description'   => 'nullable|string',
             'industry'      => 'nullable|string',
-            'website'       => 'required|url',
+            'website'       => 'nullable|url',
             'linkedin'      => 'nullable|url',
             'twitter'       => 'nullable|url',
             'facebook'      => 'nullable|url',
@@ -167,10 +167,10 @@ public function index(Request $request)
 
 
 
-public function show(User $exhibitor_user, Request $request){ 
+public function show($exhibitor_user, Request $request){ 
 
     $company = Company::with(['boothUsers.booth','contentIconFile','quickLinkIconFile','user','Docs'])
-        ->where('id', $exhibitor_user->id)
+        ->where('id', $exhibitor_user)
         ->firstOrFail();
 
     $booths = Booth::all(); 
@@ -188,13 +188,13 @@ public function show(User $exhibitor_user, Request $request){
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $exhibitor_user){    
+    public function edit($exhibitor_user){    
+       $user = Company::with(['contentIconFile','quickLinkIconFile'])->where('id', $exhibitor_user)->firstOrFail();
 
-       $user = Company::with(['contentIconFile','quickLinkIconFile'])->where('id', $exhibitor_user->id)->firstOrFail();
         return view('users.exhibitor_users.edit', ['user' => $user]);
     }
 
-    public function update(Request $request, User $exhibitor_user){
+    public function update(Request $request, $exhibitor_user){
         try {
             
            $company = Company::find($request->company_id);

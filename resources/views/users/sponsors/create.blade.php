@@ -168,11 +168,11 @@ Admin | Add Sponsors
                {{-- Website --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Website <span class="text-danger">*</span></label>
+                  <label class="form-label">Website</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-link"></i></span>
                     <input type="url" name="website" class="form-control"
-                           value="{{ old('website') }}" placeholder="https://example.com" required>
+                           value="{{ old('website') }}" placeholder="https://example.com">
                   </div>
                 </div>
               </div>
