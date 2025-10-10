@@ -224,7 +224,7 @@ if (!function_exists('qrCode')) {
 
             $data = json_encode([
                 'id' => $user->id,
-                'name' => $user->full_name ?? '',
+                'name' => $user->name ? $user->full_name : '',
                 'email' => $user->email ?? '',
                 'app' => 'com.canadianSME.app'
             ]);

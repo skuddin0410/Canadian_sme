@@ -153,10 +153,6 @@ public function verify(Request $request)
             ], 401);
         }
         
-        if(empty($user->qr_code)){
-          qrCode($user->id);
-        }
-
         $user->update([
           'jwt_token' => $token
         ]);
@@ -168,6 +164,9 @@ public function verify(Request $request)
         
         notification($user->id);
         $user = User::where('id',$user->id)->first();
+        if(empty($user->qr_code)){
+          qrCode($user->id);
+        }
         if($user){
             sendNotification("Welcome Email",$user);
         }
