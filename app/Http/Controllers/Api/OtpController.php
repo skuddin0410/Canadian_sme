@@ -59,7 +59,7 @@ class OtpController extends Controller
           
                 $otp = Otp::firstOrNew(['email' => $request->email]);
                 $otp->otp = $code;
-                $otp->expired_at = $currentDateTime->addMinutes(5);
+                $otp->expired_at = $currentDateTime->addMinutes(60);
                 $otp->save();
 
                 Mail::to($request->email)->send(new OtpMail($code));
