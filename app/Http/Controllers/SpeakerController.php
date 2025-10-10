@@ -104,12 +104,7 @@ class SpeakerController extends Controller
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            'mobile' => [
-                'nullable',
-                'string',
-                'regex:/^\+?[0-9]{10,15}$/',
-                'unique:speakers,mobile',
-            ],
+            'mobile' => 'nullable|string',
             'bio' => 'required|string',
               
         ]);
@@ -198,7 +193,7 @@ class SpeakerController extends Controller
             'tags' => 'nullable|string|max:255'  ,
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
-            'mobile' => 'nullable|string|unique:speakers,mobile,' . $user->id,
+            'mobile' => 'nullable|string',
             'bio' => 'required|string',
      
         ]);

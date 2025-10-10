@@ -96,12 +96,7 @@ public function index(Request $request)
           
             'company_name'          => 'required|string|max:255',
             'company_email'         => 'required|email|max:255',
-            'company_phone' => [
-                'nullable',
-                'string',
-                'regex:/^\+?[0-9]{10,15}$/',
-                'unique:companies,company_phone',
-            ],
+            'company_phone' => 'nullable|string',
            
             'company_description'   => 'nullable|string',
             'industry'      => 'nullable|string',
@@ -208,7 +203,7 @@ public function show(User $exhibitor_user, Request $request){
             'company_name'        => 'required|string|max:255',
              'slug' => createUniqueSlug('companies',$request->company_name,'slug',$company->id),
             'company_email'       => 'required|email|max:255|unique:companies,email,'.$company->id,
-            'company_phone'       => 'nullable|string|max:20',
+            'company_phone'       => 'nullable|string',
             'company_description' => 'nullable|string',
             'website'             => 'nullable|url',
             'linkedin'            => 'nullable|url',
