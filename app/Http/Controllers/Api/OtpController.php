@@ -172,7 +172,11 @@ public function verify(Request $request)
         );
         
         notification($user->id);
-        sendNotification("Welcome Email",$user);
+        $user = User::where('id',$user->id)->first();
+        if($user){
+            sendNotification("Welcome Email",$user);
+        }
+        
 
         return response()->json([
             'success'    => true,
