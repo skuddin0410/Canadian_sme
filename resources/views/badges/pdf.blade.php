@@ -51,7 +51,7 @@
     .left {
       display: flex;
       flex-direction: column;
-      width: 55%;
+      width: 50%;
       text-align: left;
     }
 
@@ -72,19 +72,19 @@
     .designation {
       color: #888;
       font-style: italic;
-      font-size: 10px !important; /* Added !important for the font size */
+      font-size: 17px !important; /* Added !important for the font size */
     }
 
     .qr {
-      width: 40%;
+      width: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
     .qr img {
-      width: 1in; /* QR code size */
-      height: 1in; 
+      width: 1.4in; /* QR code size */
+      height: 1.4in; 
       object-fit: contain;
       display: block;
     }
@@ -156,12 +156,12 @@
       }
 
       .designation {
-        font-size: 10px !important; /* Designation font size for print */
+        font-size: 17px !important; /* Designation font size for print */
       }
 
       .qr img {
-        width: 1in !important; /* QR code size for print */
-        height: 1in !important;
+        width: 1.4in !important; /* QR code size for print */
+        height: 1.4in !important;
       }
     }
   </style>
@@ -188,7 +188,7 @@
             @endif
 
             @if (!empty($badge['company_name']))
-              <p style="color:#555;font-size:10px !important">
+              <p style="color:#555;font-size:17px !important">
                 {{$badge['company_name'] }} 
               </p>
             @endif

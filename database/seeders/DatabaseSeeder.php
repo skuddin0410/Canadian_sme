@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             //AgendaSeeder::class, // php artisan db:seed --class=AgendaSeeder,
             //AccessPemissionSeeder::class, // php artisan db:seed --class=AccessPemissionSeeder
             //UserConnectionSeeder::class ,// php artisan db:seed --class=UserConnectionSeeder
+            //UpdateUserQrCode:class  php artisan db:seed --class=UpdateUserQrCode
             //*****
 
             UpdateSlugsSeeder::class, //php artisan db:seed --class=UpdateSlugsSeeder
