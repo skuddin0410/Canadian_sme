@@ -303,7 +303,7 @@ class LaravelEventCalendar {
         });
 
         
-
+        console.log(events);
         this.calendar.addEventSource(events); 
     }
 

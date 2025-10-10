@@ -17,11 +17,11 @@
 
               <div class="venue-location my-4">
                 @if(!empty($location))
-                  <p class="mb-2" style="font-size:28px">{{ $location }}</p>
+                  <p class="mb-2" style="font-size:34px">{{ $location }}</p>
 
                   <!-- Use the mapUrl returned by the controller in an iframe -->
                 @if(!empty($mapUrl))
-                <div class="ratio ratio-16x9" style="height:400px;">
+                <div class="ratio ratio-16x9">
                  <!--  <iframe
                     src="{{ $mapUrl }}"
                     width="100%"
