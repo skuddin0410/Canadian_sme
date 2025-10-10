@@ -31,7 +31,7 @@
                     loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"></iframe>
 
-                      <div id="map"></div>
+                     
                 </div>
               @else
                 <p class="text-muted">Map not available.</p>
