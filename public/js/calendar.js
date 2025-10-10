@@ -46,7 +46,7 @@ class LaravelEventCalendar {
                 right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
             },
             height: 'auto',
-            slotMinTime: '06:00:00',
+            slotMinTime: '02:00:00',
             slotMaxTime: '23:59:00',
             slotDuration: '00:15:00',
             snapDuration: '00:15:00',
@@ -99,7 +99,7 @@ class LaravelEventCalendar {
                         <div>
                             <div><strong>${info.event.title}</strong></div>
                             ${info.event.extendedProps.track ? `<div>Track: ${info.event.extendedProps.track}</div>` : ''}
-                            ${info.event.extendedProps.location ? `<div>Location: ${info.event.extendedProps.location}(${info.event.extendedProps.booth})</div>` : ''}
+                            ${info.event.extendedProps.location ? `<div>Location: ${info.event.extendedProps.location}</div>` : ''}
                             ${info.event.extendedProps.keynote ? `<div>Key Note: ${info.event.extendedProps.keynote}</div>` : ''}
                         </div>
                     `;
@@ -388,7 +388,7 @@ class LaravelEventCalendar {
                             </div>
                             <div class="text-muted small mb-2">
                                 <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start).format('HH:mm')} - ${moment(session.end).format('HH:mm')}</div>
-                                ${session.location ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} (${session.booth})</div>` : ''}
+                                ${session.location ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} </div>` : ''}
                                 ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
 
@@ -454,8 +454,8 @@ class LaravelEventCalendar {
             listHTML += `
             <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start mt-2" style="background-color: ${session.backgroundColor}; color: ${session.textColor};" onclick="eventCalendar.showSessionDetailsById('${session.id}')">
             <div class="flex-grow-1">
-                <h6 class="mb-1" style="color: ${session.textColor};">${session.title}</h6>
-                <div class="mb-2" style="color: ${session.textColor};">
+                <h6 class="mb-1 mb-2" style="color: ${session.textColor};">${session.title}</h6>
+                <div class="mb-2 mt-2" style="color: ${session.textColor};">
                     ${typeBadge} ${statusBadge}
                 </div>
                 <div class="small text-muted mb-1">
@@ -471,6 +471,12 @@ class LaravelEventCalendar {
                         `).join('') : '<span class="text-muted" style="color: ${session.textColor};">No speakers assigned</span>'}
                     </div>
 
+                    ${session.description ? `
+                      <div class="mt-2" style="color: ${session.textColor};">
+                        <i class="fas fa-pen-square me-1" title="Description"></i>
+                        Description: ${session.description} 
+                      </div>
+                    ` : ''}
                     <!--<div class="mt-2">
                         ${session.extendedProps.exhibitors && session.extendedProps.exhibitors.length ? session.extendedProps.exhibitors.map(s => `
                             <span class="badge rounded-pill bg-primary me-1 mb-1 small" style="color: ${session.textColor};">${s.name} (${s.pivot?.role || 'Exhibitor'})</span>
