@@ -51,7 +51,27 @@
   </div>
 </div>
 @php
- $zones = [];
+ $zones = [
+        [
+            'name' => 'Zone A',
+            'color' => '#FF0000',
+            'paths' => [
+                ['lat' => 43.6435, 'lng' => -79.3950],
+                ['lat' => 43.6440, 'lng' => -79.3940],
+                ['lat' => 43.6450, 'lng' => -79.3955],
+            ],
+        ],
+        [
+            'name' => 'Zone B',
+            'color' => '#0000FF',
+            'paths' => [
+                ['lat' => 43.6455, 'lng' => -79.3965],
+                ['lat' => 43.6460, 'lng' => -79.3950],
+                ['lat' => 43.6470, 'lng' => -79.3970],
+            ],
+        ],
+    ];
+
 @endphp
 
 <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}"></script>
