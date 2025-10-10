@@ -455,7 +455,7 @@ if (!function_exists('fetchEmailTemplates')) {
 if (!function_exists('fetchNotificationTemplates')) {
     function fetchNotificationTemplates()
     {  
-       $emailTemplate = EmailTemplate::where('type','notification')->orderBy("created_at","DESC")->get();
+       $emailTemplate = EmailTemplate::where('type','notifications')->orderBy("created_at","DESC")->get();
        return $emailTemplate;
     }
 }
@@ -485,7 +485,7 @@ if (!function_exists('sendNotification')) {
             }
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
  
-        } elseif (!empty($emailTemplate) && $emailTemplate->type == 'notification') {
+        } elseif (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
             foreach ($users as $user) {
                 //$user->notify(new AppNotification("Bulk Notification", "This is a bulk notification."));
             }

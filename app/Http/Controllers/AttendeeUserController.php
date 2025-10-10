@@ -463,7 +463,7 @@ public function bulkAction(Request $request)
           
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
-    } else if (!empty($emailTemplate) && $emailTemplate->type == 'notification') {
+    } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
          foreach ($users as $user) {
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
