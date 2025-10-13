@@ -52,6 +52,7 @@ public function index(Request $request)
    
     $users = $query->paginate($perPage, ["*"], "page", $pageNo);
     $users->appends($request->all());
+    $users->setPath(route('exhibitor-users.index'));
     $offset = ($users->currentPage() - 1) * $perPage;
     if ($request->ajax() && $request->ajax_request == true) {
         $html = view("users.exhibitor_users.table", compact("users", "perPage"))

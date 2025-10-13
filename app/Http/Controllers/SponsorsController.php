@@ -55,6 +55,7 @@ public function index(Request $request)
     
     $companies = $query->paginate($perPage, ["*"], "page", $pageNo);
     $companies->appends($request->all());
+    $companies->setPath(route('sponsors.index'));
     $offset = ($companies->currentPage() - 1) * $perPage;
    
     if ($request->ajax() && $request->ajax_request == true) {
