@@ -37,23 +37,10 @@
                                 </a>
                                 <div class="swiper-img-text">
 
-                                    @php
-                                     if(!$sponsor?->category?->color) {
-                                        $typeColors = match(strtolower($sponsor->type ?? 'general')) {
-                                        'gold' => 'gold',
-                                        'silver' => 'silver',
-                                        'bronze' => 'bronze',
-                                        'platinum' => 'platinum',
-                                        'majlislounge' => 'majlislounge',
-                                        default => 'general'
-                                       };
-                                      }else{
-                                        $typeColors = $sponsor->category->color;
-                                      }   
-                                    @endphp
+                                 
 
                                     <span class="sponsors-name">{{$sponsor->name ? truncateString($sponsor->name, 15) : ''}}</span>
-                                    <span class="sponsors-title {{$typeColors}}" style="{{'background-color:'.$typeColors}}">{{ $sponsor?->category?->name}}</span>
+                                    <span class="sponsors-title {{typeColor($sponsor->type)}}" style="{{'background-color:'.typeColor($sponsor->type)}}">{{ $sponsor?->category?->name}}</span>
 
                                 </div>
                             </div>

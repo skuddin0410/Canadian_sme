@@ -529,3 +529,16 @@ if (!function_exists('truncateString')) {
         return $string;
     }
 }
+
+if (!function_exists('typeColor')) {
+
+    function typeColor($type) {
+       $category = Category::where('slug',$type)->first();
+       if($category){
+        return $category->color ?? '';
+        }else{
+            return '';  
+        }
+    }
+
+}

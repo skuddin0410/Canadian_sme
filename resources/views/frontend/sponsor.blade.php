@@ -40,27 +40,12 @@
   
   <!-- Badges -->
   <div class="d-flex flex-wrap gap-2">
-    <span class="btn btn-success">Sponsors</span>
-    
+  
     @if($company->is_sponsor == 1 && !empty($company->type))
-      {{-- <span class="badge bg-warning text-dark">
-        {{ $company->type }}
-      </span> --}}
-       @php
-        $typeColors = match(strtolower($company->type ?? 'general')) {
-            'gold' => ['bg'=>'#FFD700','border'=>'#E6C200','text'=>'#8B4513'],
-            'silver' => ['bg'=>'#C0C0C0','border'=>'#A8A8A8','text'=>'#495057'],
-            'bronze' => ['bg'=>'#CD7F32','border'=>'#B8722C','text'=>'#FFFFFF'],
-            'platinum' => ['bg'=>'#E5E4E2','border'=>'#D4D4D4','text'=>'#2C3E50'],
-            'majlislounge' => ['bg'=>'#8B4513','border'=>'#6B3410','text'=>'#FFFFFF'],
-            default => ['bg'=>'#f0f0f0','border'=>'#dee2e6','text'=>'#495057']
-        };
-        $displayType = $company->type ? ucfirst(strtolower($company->type)) : 'General';
-        if(strtolower($company->type ?? '') === 'majlislounge') $displayType = 'Majlis Lounge';
-    @endphp
 
-    <span class="company-type-badge btn btn-warning">
-        {{ $displayType }}
+    <span class="badge rounded-pill px-3 py-2 text-white fs-6" 
+  style="background-color: {{ typeColor($company->type) }};">
+       {{ ucfirst(str_replace('-', ' ', $company->type)) }}
     </span>
     
     @endif
@@ -209,33 +194,5 @@
     </div>
   </div>
 </div>
- <style>
-        .company-type-badge {
-            display: inline-block;
-            /* padding: 0.35rem 0.9rem; */
-            /* font-size: 0.85rem; */
-            font-weight: 600;
-            text-transform: uppercase;
-            border-radius: 6px;
-            border: 2px solid {{ $typeColors['border'] }};
-            background-color: {{ $typeColors['bg'] }};
-            color: {{ $typeColors['text'] }};
-            min-width: 120px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
 
-        .company-type-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        @media (max-width: 768px) {
-            .company-type-badge { min-width: 100px; }
-        }
-
-        @media (max-width: 480px) {
-            .company-type-badge { min-width: 90px; }
-        }
-    </style>
 @endsection
