@@ -161,11 +161,12 @@
                 <i class="fas fa-clock me-1 text-primary"></i>
                 {{ \Carbon\Carbon::parse($session->start_time)->format('M d, Y h:i A') }}
               </small>
-            </div>
-            <small class="text-secondary d-block mt-2">
+               <small class="text-secondary d-block mt-2">
                 <i class="fas fa-location me-1 text-primary"></i>
                 {{ $session->location ?? '' }}
               </small>
+            </div>
+              
           </div>
         @empty
           <div class="list-group-item text-muted">No sessions available</div>
