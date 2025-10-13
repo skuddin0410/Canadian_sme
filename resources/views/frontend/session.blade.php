@@ -24,13 +24,17 @@
 
           <!-- Title + Badge -->
           <div class="d-sm-flex justify-content-between align-items-center mb-3">
-            <h3 class="mb-0">{{ $session->title ?? 'Session Title' }}</h3>
+            <h3 class="mb-0">{{ $session->title ?? '' }}</h3>
             
           </div>
-          <div class="badge bg-success px-2 mt-2 mb-2 mt-sm-0">{{ $session->location ??'' }}</div>
+          <div class="badge bg-success px-2 mt-2 mb-2 mt-sm-0"></div>
 
           <!-- Meta Info -->
           <ul class="list-unstyled mb-4">
+              <li class="mb-3 text-secondary black-text-18 fw-medium">
+                {{ $session->location ??'' }}
+            </li>
+
             <li class="mb-3 text-secondary black-text-18 fw-medium">
               <i class="fas fa-user me-2 text-primary"></i>
               <strong class="black-text-18 fw-medium">Speakers:</strong> 

@@ -341,6 +341,11 @@ public function session(Request $request, $slug)
         return view('frontend.venue_app', compact('location', 'mapUrl'));
         
     }
-
+    
+    public function speakerIndex()
+    {
+        $speakers = Speaker::orderBy('created_at','DESC')->paginate(10); 
+        return view('frontend.page.speaker', compact('speakers'));
+    } 
 
 }

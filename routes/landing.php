@@ -44,3 +44,5 @@ Route::get('/supports', [SupportController::class, 'index'])->name('support.form
 Route::get('/support', function () {
     return view('frontend.support'); // This will load the support.blade.php view
 });
+
+Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');

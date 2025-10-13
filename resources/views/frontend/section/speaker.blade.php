@@ -13,7 +13,7 @@
                     </div>
 
                     <div class="d-flex justify-content-center">
-                      <a href="#" class="btn btn-outline-light px-4 py-2 fw-semibold">
+                      <a href="{{ route('speaker-index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold">
                         View More
                       </a>
                     </div>
