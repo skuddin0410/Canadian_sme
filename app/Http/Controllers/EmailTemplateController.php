@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 use Mews\Purifier\Facades\Purifier;
+use Illuminate\Support\Facades\Crypt;
 
 class EmailTemplateController extends Controller
 {
@@ -113,7 +114,7 @@ class EmailTemplateController extends Controller
         }
 
         if (strpos($message, '{{profile_update_link}}') !== false) {
-              $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
+              $updateUrl = route('update-user',  Crypt::encryptString($request->email));  
               $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
         }
         $message = Purifier::clean($message, 'default');
