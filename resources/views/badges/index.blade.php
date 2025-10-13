@@ -66,12 +66,16 @@
                                     </small>
                                 </p>
                                 <div class="btn-group w-100">
-                                    <a href="{{ route('badges.show', $badge) }}" class="btn btn-outline-primary">
+                                    <a href="{{ route('badges.show', $badge) }}" class="btn btn-outline-primary me-2">
                                         <i class="fas fa-eye"></i> View
                                     </a>
-                                 {{--    <a href="{{ route('badges.download', $badge) }}" class="btn btn-outline-success">
-                                        <i class="fas fa-download"></i> Download
-                                    </a> --}}
+                                <form action="{{ route('badges.destroy', $badge->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this badge?');">
+                                      @csrf
+                                      @method('DELETE')
+                                      <button class="btn btn-outline-danger" type="submit" title="Delete">
+                                        <i class="bx bx-trash"></i> Delete
+                                      </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

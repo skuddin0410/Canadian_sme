@@ -225,4 +225,10 @@ class BadgeController extends Controller
  
     return view('badges.pdf',compact('badges'));          
   }
+
+    public function destroy(Badge $badge)
+    {   
+        $badge->delete();
+        return redirect()->route('badges.index')->with('success', 'Badge deleted.');
+    }
 }
