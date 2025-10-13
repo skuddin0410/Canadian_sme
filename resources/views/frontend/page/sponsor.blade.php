@@ -129,11 +129,13 @@
                             </div>
                         </div>
                     @endforeach
-                @endif
-            </div>
 
-            <div class="d-flex justify-content-center mt-4 d-xl-none">
-                <button class="heroBtn btn-long">View More</button>
+                    <div class="d-flex justify-content-center mt-4 ">
+                         <div class="mt-4">
+                        {{ $sponsors->links() }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </section>

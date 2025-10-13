@@ -102,7 +102,7 @@ public function sponsorIndex()
 
     $sponsors = Company::with('logo')
         ->where('is_sponsor', 1)   
-        ->orderby('created_at','DESC')->get();
+        ->orderby('created_at','DESC')->paginate(10);
 
     return view('frontend.page.sponsor', compact('event', 'sponsors'));
 }
