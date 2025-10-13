@@ -180,9 +180,10 @@
                 {{ \Carbon\Carbon::parse($session->start_time)->format('M d, Y h:i A') }}
               </small>
             </div>
-            <span class="badge bg-primary rounded-pill align-self-center px-2 mt-2 mt-sm-0 mt-lg-2 mt-xxl-0">
-              {{ $session->location ?? 'Hall' }}
-            </span>
+            <small class="text-secondary d-block mt-2">
+                <i class="fas fa-location me-1 text-primary"></i>
+                {{ $session->location ?? '' }}
+              </small>
           </div>
         @empty
           <div class="list-group-item text-muted">No sessions available</div>

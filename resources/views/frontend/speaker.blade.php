@@ -152,15 +152,19 @@
         @forelse($sessions as $session)
           <div class="list-group-item list-group-item-action d-xxl-flex justify-content-between align-items-start">
             <div class="me-auto">
-              <div class="black-text-18 fw-medium">{{ $session->title ?? 'Untitled Session' }}</div>
+              <div class="black-text-18 fw-medium">{{ $session->title ?? '' }}</div>
+              
+
               <small class="text-secondary d-block mt-2">
                 <i class="fas fa-clock me-1 text-primary"></i>
                 {{ \Carbon\Carbon::parse($session->start_time)->format('M d, Y h:i A') }}
               </small>
+               <small class="text-secondary d-block mt-2">
+                <i class="fas fa-location me-1 text-primary"></i>
+                {{ $session->location ?? '' }}
+              </small>
             </div>
-            <span class="badge bg-primary rounded-pill align-self-center px-2 mt-0 mt-xxl-0">
-              {{ $session->location ?? 'Hall' }}
-            </span>
+           
           </div>
         @empty
           <div class="list-group-item text-muted">No sessions available</div>

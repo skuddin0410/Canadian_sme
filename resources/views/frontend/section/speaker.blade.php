@@ -11,7 +11,13 @@
                             including game changing ideas.</span>
                         </span>
                     </div>
-                    
+
+                    <div class="d-flex justify-content-center">
+                      <a href="#" class="btn btn-outline-light px-4 py-2 fw-semibold">
+                        View More
+                      </a>
+                    </div>
+
                 </div>
                 
                 <div class="col-xl-8 p-0">
@@ -52,6 +58,8 @@
                     </div>
 
                 </div>
+
+
             </div>
         </div>
     </section>
