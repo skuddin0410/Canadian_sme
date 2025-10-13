@@ -26,7 +26,7 @@
                                 </div>
                             </div>
                             <div>
-                                <span class="black-text-18 mb-2">Agenda</span>
+                                <span class="black-text-18 mb-2">{{ $schedule->track ?? '' }}</span>
                                 <span class="small-heading-black fw-semibold">{{ $schedule->title ?? '' }}</span>
                             </div>
                             <div>

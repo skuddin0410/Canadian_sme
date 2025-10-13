@@ -140,15 +140,15 @@ public function scheduleIndex()
 
 public function schedules()
 {
-    $now        = now();
-    $startToday = $now->copy()->startOfYear();
-    $endToday   = $now->copy()->endOfYear();
+    $now = now();
+    $startOfYear = $now->copy()->startOfYear();
+    $endOfYear   = $now->copy()->endOfYear();
 
-    $base = Session::with(['speakers']);
+    $baseQuery = Session::with(['speakers']);
 
-    // Today’s sessions (ongoing or upcoming)
-    $schedules = (clone $base)
-        ->whereBetween('start_time', [$startToday, $endToday])
+    // Try to fetch sessions within the current year (ongoing or upcoming)
+    $schedules = (clone $baseQuery)
+        ->whereBetween('start_time', [$startOfYear, $endOfYear])
         ->where(function ($q) use ($now) {
             $q->where('end_time', '>=', $now)
               ->orWhere(function ($q) use ($now) {
@@ -157,23 +157,22 @@ public function schedules()
               });
         })
         ->orderBy('start_time')
-        ->get();
+        ->paginate(10);
 
-    // If no sessions today, pick the next date’s sessions
+    // If no sessions found, fetch from next available date
     if ($schedules->isEmpty()) {
-        $firstFuture = (clone $base)
-            ->where('start_time', '>', $endToday)
+        $nextSession = (clone $baseQuery)
+            ->where('start_time', '>', $endOfYear)
             ->orderBy('start_time')
             ->first();
 
-        if ($firstFuture) {
-            $targetDate = $firstFuture->start_time->toDateString();
-            $schedules = (clone $base)
+        if ($nextSession) {
+            $targetDate = Carbon::parse($nextSession->start_time)->toDateString();
+
+            $schedules = (clone $baseQuery)
                 ->whereDate('start_time', $targetDate)
                 ->orderBy('start_time')
-                ->get();
-        } else {
-            $schedules = collect();
+                ->paginate(10);
         }
     }
 

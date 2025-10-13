@@ -56,9 +56,11 @@
                     </div>
                 </div>
                 @endforeach
-                <div class="mt-4">
+                <div class="d-flex justify-content-center mt-4">
+                 <div class="mt-4">
                 {{ $exhibitors->links() }}
                 </div>
+            </div>
                 @endif
             </div>
             <div class="d-flex justify-content-center mt-4 d-xl-none">
