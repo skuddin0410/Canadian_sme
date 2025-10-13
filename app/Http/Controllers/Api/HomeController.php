@@ -213,7 +213,7 @@ public function getAllSession()
                             "panels"      => $session->panels ?? '',
                             "start_time"  => $session->start_time ?? '',
                             "end_time"    => $session->end_time ?? '',
-                            "workshop_no" => "Workshop NO : " . str_pad($session->id, 2, '0', STR_PAD_LEFT),
+                            "workshop_no" => $session->track ?? '',
                             "location"    => $session->location ?? '',
                             "status"      => $status,
                             "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
