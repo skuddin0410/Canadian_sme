@@ -165,12 +165,12 @@ public function verify(Request $request)
         notification($user->id);
         $user = User::where('id',$user->id)->first();
         if(empty($user->qr_code)){
-          qrCode($user->id);
+            $qrGenerated = qrCode($user->id);
+            $user->refresh();
+            if (!empty($user->qr_code) && $qrGenerated) {
+                sendNotification("Welcome Email", $user);
+            }
         }
-        if($user){
-            sendNotification("Welcome Email",$user);
-        }
-        
 
         return response()->json([
             'success'    => true,
