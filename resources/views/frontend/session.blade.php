@@ -25,8 +25,9 @@
           <!-- Title + Badge -->
           <div class="d-sm-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0">{{ $session->title ?? 'Session Title' }}</h3>
-            <span class="badge bg-success px-2 mt-2 mt-sm-0">{{ $session->location ?? 'TBD' }}</span>
+            
           </div>
+          <div class="badge bg-success px-2 mt-2 mb-2 mt-sm-0">{{ $session->location ??'' }}</div>
 
           <!-- Meta Info -->
           <ul class="list-unstyled mb-4">
@@ -70,12 +71,8 @@
           </p>
         </div>
       </div>
-
-    </div>
-
-    <div class="col-lg-4">
-
-      <!-- Speakers -->
+         
+               <!-- Speakers -->
       @if($session->speakers && $session->speakers->count())
         <div class="card shadow-sm rounded-4 mb-4">
           <div class="card-header bg-white mb-2 small-heading-black fw-bold">
@@ -93,7 +90,7 @@
                      width="40" height="40"></a>
                 @endif
                 <div>
-                  <strong class="black-text-18 fw-medium">{{ $speaker->full_name ?? 'N/A' }}</strong><br>
+                  <strong class="black-text-18 fw-medium"> <a href="{{ route('speaker', $speaker->slug) }}" class="text-decoration-none">{{ $speaker->full_name ?? 'N/A' }}</a></strong><br>
                   <small class="text-secondary">{{ $speaker->designation ?? '' }}</small>
                 </div>
               </li>
@@ -151,6 +148,9 @@
           </ul>
         </div>
       @endif
+    </div>
+
+    <div class="col-lg-4">
 
       <!-- Event Info -->
        @if($event)
