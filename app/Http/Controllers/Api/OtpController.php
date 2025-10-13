@@ -108,30 +108,28 @@ public function verify(Request $request)
         ], 422);
     }
 
-    // Find OTP
+
         if (!in_array($request->email, $allowedEmails)) {
             $otp = Otp::where('email', $request->email)
                 ->where('otp', $request->otp)
                 ->where('expired_at', '>', Carbon::now())
                 ->first();
-
+           
             if (!$otp) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid or expired OTP',
                 ], 400);
             }
-            //$otp->delete();
        }
    
     $user = User::firstOrCreate(
         ['email' => $request->email],
         ['password' => Hash::make($request->otp)]
     );
-
+    $user->update(['password' => Hash::make($request->otp)]); 
     $user->assignRole('Attendee');
     
-   
     try {
 
         if($user->is_approve == 0){
@@ -146,7 +144,9 @@ public function verify(Request $request)
             'password' => $request->otp, 
         ];
 
-        if (! $token = JWTAuth::attempt($credentials)) {
+        $token = JWTAuth::attempt($credentials);
+      
+        if (! $token ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid OTP.',
