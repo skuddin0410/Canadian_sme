@@ -153,11 +153,11 @@
               {{-- Company Email --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Company Email <span class="text-danger">*</span></label>
+                  <label class="form-label">Company Email</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="bx bx-envelope"></i></span>
                     <input type="email" name="company_email" class="form-control"
-                           value="{{ old('company_email') }}" placeholder="Company Email" required>
+                           value="{{ old('company_email') }}" placeholder="Company Email">
                   </div>
                 </div>
               </div>

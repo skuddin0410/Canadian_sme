@@ -128,7 +128,7 @@
 
               {{-- Company Email --}}
               <div class="col-md-6 mb-3">
-                <label class="form-label">Company Email <span class="text-danger">*</span></label>
+                <label class="form-label">Company Email</label>
                 <input type="email" class="form-control" name="company_email"
                        value="{{ old('company_email', $company->email) }}" placeholder="Sponsor Email">
                 @error('company_email') <span class="text-danger">{{ $message }}</span> @enderror

@@ -59,7 +59,7 @@ class OtpController extends Controller
           
                 $otp = Otp::firstOrNew(['email' => $request->email]);
                 $otp->otp = $code;
-                $otp->expired_at = $currentDateTime->addMinutes(60);
+                $otp->expired_at = $currentDateTime->copy()->addMinutes(60);
                 $otp->save();
 
                 Mail::to($request->email)->send(new OtpMail($code));
@@ -112,7 +112,7 @@ public function verify(Request $request)
         if (!in_array($request->email, $allowedEmails)) {
             $otp = Otp::where('email', $request->email)
                 ->where('otp', $request->otp)
-                ->where('expired_at', '>=', now())
+                ->where('expired_at', '>', Carbon::now())
                 ->first();
 
             if (!$otp) {

@@ -51,8 +51,8 @@
                                       class="form-control {{ $emailTemplate->type === 'email' ? 'description-cls' : '' }}" 
                                       rows="20" required>
                                 {{ $emailTemplate->type === 'email' 
-                                    ? strip_tags($emailTemplate->message)  {{-- show without HTML tags --}}
-                                    : $emailTemplate->message }}
+                                    ? $emailTemplate->message {{-- show without HTML tags --}}
+                                    : strip_tags($emailTemplate->message) }}
                             </textarea>
                         </div>
 

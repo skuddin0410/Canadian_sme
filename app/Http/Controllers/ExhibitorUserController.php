@@ -95,7 +95,7 @@ public function index(Request $request)
          $validator = Validator::make($request->all(), [
           
             'company_name'          => 'required|string|max:255',
-            'company_email'         => 'required|email|max:255',
+            'company_email'         => 'nullable|email|max:255',
             'company_phone' => 'nullable|string',
            
             'company_description'   => 'nullable|string',
@@ -202,7 +202,7 @@ public function show($exhibitor_user, Request $request){
             $validator = Validator::make($request->all(), [
             'company_name'        => 'required|string|max:255',
              'slug' => createUniqueSlug('companies',$request->company_name,'slug',$company->id),
-            'company_email'       => 'required|email|max:255|unique:companies,email,'.$company->id,
+            'company_email'       => 'nullable|email|max:255',
             'company_phone'       => 'nullable|string',
             'company_description' => 'nullable|string',
             'website'             => 'nullable|url',

@@ -141,12 +141,12 @@
               {{-- Company Email --}}
               <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Company Email <span class="text-danger">*</span></label>
+                  <label class="form-label">Company Email</label>
                   <input type="email" 
                          class="form-control" 
                          name="company_email" 
                          value="{{ old('company_email', $user->email) }}" 
-                         placeholder="Company Email" required>
+                         placeholder="Company Email">
                   @error('company_email') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
               </div>
