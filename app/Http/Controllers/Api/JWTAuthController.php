@@ -784,16 +784,16 @@ public function getAttendeeById(Request $request){
 
         // Prepare contact details
         $contactDetails = [
-            "email" => $speaker->email,
+            "email" => $speaker->email ?? '',
             "phone" => $speaker->mobile ?? ''
         ];
 
         // Only add social_media_links if any link exists
         $socialLinks = array_filter([
-            "linkedin"  => $speaker->linkedin_url,
-            "facebook"  => $speaker->facebook_url,
-            "instagram" => $speaker->instagram_url,
-            "twitter"   => $speaker->twitter_url
+            "linkedin"  => $speaker->linkedin_url ?? '',
+            "facebook"  => $speaker->facebook_url ?? '',
+            "instagram" => $speaker->instagram_url ?? '',
+            "twitter"   => $speaker->twitter_url ?? ''
         ]);
 
         if (!empty($socialLinks)) {
@@ -809,7 +809,8 @@ public function getAttendeeById(Request $request){
             'role'           => $speaker->designation ?? '',
             'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
             'roles'          => groups($speaker),
-            'contact_details'=> $contactDetails
+            'contact_details'=> $contactDetails,
+            'company_website' => $speaker->website_url ?? ''
         ];
 
         return response()->json([$response]);
