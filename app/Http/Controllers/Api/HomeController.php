@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\UserWelcome;
 use Illuminate\Support\Facades\Mail;
 use App\Services\ActivityTrackingService;
-use App\Mail\UserConnectionsExportMail;
 
 
 class HomeController extends Controller
@@ -758,45 +757,5 @@ public function readAllNotifications(Request $request){
         return response()->json(["message" => $e->getMessage()]);
     }
 }
-
-public function exportConnectionsAndEmail(Request $request){
-        if (!$user = JWTAuth::parseToken()->authenticate()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 401);
-        }
-
-        $connections = UserConnection::with('connection')
-            ->where('user_id', $user->id)
-            ->get();
-
-        if ($connections->isEmpty()) {
-            return back()->with('error', 'No connections found to export.');
-        }
-
-        $filename = "connections_user_{$user->id}_" . now()->format('Ymd_His') . ".csv";
-        $path = storage_path("app/{$filename}");
-
-        $columns = ['Friend Name', 'Email', 'Company', 'Designation'];
-
-        $handle = fopen($path, 'w');
-        fputcsv($handle, $columns);
-
-        foreach ($connections as $connection) {
-            fputcsv($handle, [
-                $connection->connection->name ?? 'N/A',
-                $connection->connection->email ?? 'N/A',
-                $connection->connection->company ?? 'N/A',
-                $connection->connection->designation ?? 'N/A',
-            ]);
-        }
-
-        fclose($handle);
-        Mail::to($user->email)->send(new UserConnectionsExportMail($user, $path));
-        if (file_exists($path)) {
-            unlink($path);
-        }
-    }
 
 }

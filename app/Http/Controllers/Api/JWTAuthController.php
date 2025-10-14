@@ -958,7 +958,8 @@ public function getAllExhibitor(Request $request){
                     'id'          => $sponsor->id,
                     'name'        => $sponsor->name,
                     'image_url'   => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
-                    'level'    => ucfirst($sponsor->type) ?? '',
+                    'level'    =>  ucfirst(str_replace('-', ' ', $sponsor->type)) ?? '',
+                    'color_code'    => typeColor($sponsor->type) ?? '',
                 ];
             });
             return response()->json($response);
