@@ -285,7 +285,7 @@ public function getSession($sessionId)
             "panels"      => $session->panels,
             "start_time"  => $session->start_time,
             "end_time"    => $session->end_time,
-            "workshop_no" => "Workshop NO :" . $session->id,
+            "workshop_no" => $session->track ?? '',
             "location"    => $session->location,
             "status"      => $status,
             "speakers"    => $session->speakers->map(fn ($sp) => [

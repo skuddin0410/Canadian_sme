@@ -415,7 +415,7 @@ public function getExhibitor($exhibitorId)
             'name'     => $exhibitor->name ?? '',
             'word_no'  => $exhibitor->booth ?? '-',
             'avatar'   => $exhibitor->contentIconFile?->file_path ?? asset('images/default.png'),
-            'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/default.png'),
+            'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg'),
             'location' => $exhibitor->booth ?? '-',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->phone ?? '',
@@ -740,14 +740,17 @@ public function getAttendee(Request $request)
 
         
        $response = $speakers->map(function ($speaker) {
-            return [
-                'id'     => $speaker->id,
-                'name'     => $speaker->full_name,
-                'company_name'  => $speaker->company ?? '',
-                'role'  => $speaker->designation ?? '',
-                'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
-                'roles' => groups($speaker)
-            ];
+
+            if($speaker->name){
+                return [
+                    'id'     => $speaker->id,
+                    'name'     => $speaker->full_name,
+                    'company_name'  => $speaker->company ?? '',
+                    'role'  => $speaker->designation ?? '',
+                    'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                    'roles' => groups($speaker)
+                ];
+            }   
         });
 
         return response()->json($response);
@@ -996,7 +999,7 @@ public function getAllExhibitor(Request $request){
                     "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
                     "avatar" => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
-                    'banner'   => $sponsor->banner?->file_path ?? asset('images/default.png'),
+                    'banner'   => $sponsor->banner?->file_path ?? asset('images/eventify-banner.jpg'),
                     "word_no" => $sponsor->booth ?? '',
                     "location" => $sponsor->booth ?? '',
                     "email" => $sponsor->email ?? '',
