@@ -958,8 +958,8 @@ public function getAllExhibitor(Request $request){
                     'id'          => $sponsor->id,
                     'name'        => $sponsor->name,
                     'image_url'   => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
-                    'level'    =>  ucfirst(str_replace('-', ' ', $sponsor->type)) ?? '',
-                    'color_code'    => typeColor($sponsor->type) ?? '',
+                    'level'    =>  $sponsor->type ? ucfirst(str_replace('-', ' ', $sponsor->type)) : '',
+                    'color_code'    => $sponsor->type ?  typeColor($sponsor->type) : '',
                 ];
             });
             return response()->json($response);
@@ -1003,7 +1003,8 @@ public function getAllExhibitor(Request $request){
                     "email" => $sponsor->email ?? '',
                     "phone" => $sponsor->phone ?? '',
                     "website" => $sponsor->website ?? '',
-                    'level'    => ucfirst($sponsor->type) ?? '',
+                    'level'    =>  $sponsor->type ? ucfirst(str_replace('-', ' ', $sponsor->type)) : '',
+                    'color_code'    => $sponsor->type ?  typeColor($sponsor->type) : '',
                     "social_links" => [
                         [
                             "name" => "facebook",
