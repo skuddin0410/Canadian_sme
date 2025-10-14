@@ -20,7 +20,7 @@
             <a href="{{ route('leads.edit', $lead) }}" class="btn btn-primary me-2">
                 <i class="fa fa-edit me-1"></i> Edit
             </a>
-            <a href="{{ route('leads.index') }}" class="btn btn-secondary">
+            <a href="{{ route('leads.index') }}" class="btn btn-primary">
                 <i class="fa fa-arrow-left me-1"></i> Back
             </a>
         </div>

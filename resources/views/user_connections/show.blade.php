@@ -6,12 +6,19 @@
         <div>
             <h3 class="mb-1">Connections for {{ $user->name }}</h3>
             <p class="text-muted mb-0">
-                {{ $user->company ?? 'N/A' }} — {{ $user->designation ?? 'N/A' }}
+                {{ $user->company ?? '' }} — {{ $user->designation ?? '' }}
             </p>
         </div>
-        <a href="{{ route('user-connections.export', $user->id) }}" class="btn btn-success">
-            <i class="bi bi-download"></i> Export CSV
-        </a>
+        
+         <div class="mb-4 d-flex justify-content-between align-items-center">
+
+        <div>
+        <a href="{{ route('user-connections.export', $user->id) }}" class="btn btn-success"><i class="bi bi-download"></i> Export CSV</a>
+
+        <a href="{{ route('user-connections.index') }}" class="btn btn-primary"><i class="fa fa-arrow-left me-1"></i>Back</a>
+
+        </div>
+    </div>
     </div>
 
     <div class="card shadow-sm">
@@ -20,7 +27,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>#</th>
-                        <th>Friend Name</th>
+                        <th>Connection Name</th>
                         <th>Email</th>
                         <th>Company</th>
                         <th>Designation</th>

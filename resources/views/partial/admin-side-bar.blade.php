@@ -193,7 +193,7 @@
             </ul>
         </li>
         
-        <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} ">
+        <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="formbuilder">Settings</div>
@@ -203,6 +203,12 @@
                 <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }}">
                     <a href="{{route('leads.index')}}" class="menu-link">
                             <div data-i18n="Booth Management">Lead Management</div>
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
+                    <a href="{{route('user-connections.index')}}" class="menu-link">
+                            <div data-i18n="Booth Management">Connection Lead</div>
                     </a>
                 </li>
 

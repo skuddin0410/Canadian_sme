@@ -31,7 +31,7 @@
                             <td>{{ $connection->email ?? 'N/A' }}</td>
                             <td>{{ $connection->total_connections }}</td>
                             <td>
-                                <a href="{{ route('user-connections.show', $connection) }}" class="btn btn-sm btn-outline-info">
+                                <a href="{{ route('user-connections.show', $connection->connection_id) }}" class="btn btn-sm btn-outline-info">
                                     View
                                 </a>
                             </td>
