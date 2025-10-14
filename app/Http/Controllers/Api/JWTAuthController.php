@@ -701,6 +701,7 @@ public function getSpeakerById(Request $request){
             'role'           => $speaker->designation ?? '',
             'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
             'roles'          => speakerGroups($speaker),
+            'company_website'=> $speaker->website ?? '',
             'contact_details'=> $contactDetails
         ];
 
