@@ -33,7 +33,19 @@ class LandingController extends Controller
 
         $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(6)->get();
         $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
-        $attendees = $session?->attendees->take(3);
+
+       $attendees = User::with(['photo', 'roles'])
+                    ->whereHas('roles', function ($q) {
+                        $q->where('name', 'Attendee');
+                    })
+                    ->whereNotNull('name')
+                    ->whereNotNull('designation')
+                    ->whereNotNull('company')
+                    ->whereNotNull('slug')
+                    ->orderBy('id', 'DESC')
+                    ->take(3)
+                    ->get();
+
         $schedules = Session::where('start_time', '>=', now())->orderBy('start_time', 'ASC')->take(6)->get();
         $location = !empty($event->location) ? $event->location : null;
 
