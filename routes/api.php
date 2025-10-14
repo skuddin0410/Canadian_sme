@@ -93,7 +93,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     
     Route::get('/delete-account', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteAccount']);
 
-
+    Route::get('/user-connections/export', [HomeController::class, 'exportConnectionsAndEmail']);
 });
 
  
