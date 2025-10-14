@@ -15,8 +15,16 @@ use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
+use App\Http\Controllers\UserConnectionController;
+
+
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+
+     Route::resource('user-connections', UserConnectionController::class);
+     Route::get('/user-connections/{user}/export', [UserConnectionController::class, 'export'])
+    ->name('user-connections.export');
+    
     Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
     Route::resource('pages',   App\Http\Controllers\PageController::class);
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
@@ -162,3 +170,5 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::post('/send-email-template', [EmailTemplateController::class, 'send'])->name('send.email.template');
     
     });
+    
+   
