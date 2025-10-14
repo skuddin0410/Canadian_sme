@@ -26,6 +26,7 @@
               </a>
               
               <h5 class="fw-bold mb-1">{{ $speaker->full_name ? truncateString($speaker->full_name, 18) : '' }}</h5>
+              <span class="speakers-title">{{ $speaker->company ?? '' }} </span>
               <p class="text-muted mb-2">{{ $speaker->designation ?? '' }}</p>
 
               <a href="{{ route('speaker', $speaker->slug) }}" class="btn btn-primary btn-sm px-4 rounded-pill">

@@ -12,8 +12,8 @@
                         </span>
                     </div>
 
-                    <div class="d-flex justify-content-center">
-                      <a href="{{ route('speaker-index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold">
+                    <div class="d-flex justify-content-left">
+                      <a href="{{ route('speaker-index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold btn-long">
                         View More
                       </a>
                     </div>
@@ -39,13 +39,9 @@
                             </a>
                                 <div class="swiper-img-text">
                                     <span class="speakers-name">{{$speaker->full_name ? truncateString($speaker->full_name, 18) : ''}}</span>
-                                    <span class="speakers-title">{{$speaker->designation ?? ''}}</span>
+                                    <span class="speakers-title">{{$speaker->company ?? ''}}</span>
+                                     <small>{{$speaker->designation ?? ''}}</small>
 
-                                    <div class="d-flex justify-content-center mt-2">
-                                     <a class="heroBtn btn-long" href="{{ route('speaker', $speaker->slug) }}">
-                                             View More
-                                        </a>
-                                </div>
                                 </div>
 
 

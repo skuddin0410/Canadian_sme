@@ -37,8 +37,9 @@
               
             </div>
             <div>
-              <h4 class="mb-1 ml-2">{{ $speaker->full_name ?? 'N/A' }}</h4>
-              <span class="badge bg-success">
+              <h4 class="mb-1 ml-2 speakers-name">{{ $speaker->full_name ?? 'N/A' }}</h4>
+               <span class="speakers-title">{{$speaker->company ?? ''}}</span>
+              <span class="mb-1 ml-2">
                 {{$speaker->designation ?? ''}}
               </span>
             </div>

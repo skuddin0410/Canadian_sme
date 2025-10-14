@@ -729,7 +729,7 @@ public function getAttendee(Request $request)
      
         $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
          $q->where('name', 'Attendee');
-        })->orderBy('id', 'DESC')->get();
+        })->whereNotNull('users.name')->orderBy('id', 'DESC')->get();
 
         if ($speakers->isEmpty()) {
             return response()->json([
@@ -740,8 +740,6 @@ public function getAttendee(Request $request)
 
         
        $response = $speakers->map(function ($speaker) {
-
-            if($speaker->name){
                 return [
                     'id'     => $speaker->id,
                     'name'     => $speaker->full_name,
@@ -750,7 +748,6 @@ public function getAttendee(Request $request)
                     'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
                     'roles' => groups($speaker)
                 ];
-            }   
         });
 
         return response()->json($response);
