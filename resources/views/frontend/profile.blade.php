@@ -34,9 +34,14 @@
 </div>
 
             <div class="text-center text-sm-start">
-              <h4 class="mb-1">{{ $attendee->full_name ?? 'N/A' }}</h4>
+              <h4 class="mb-1 ">{{ $attendee->full_name ?? 'N/A' }}</h4>
               <span class="badge bg-success">
                 {{ $attendee->roles->pluck('name')->join(', ') }}
+              </span>
+
+                <span class="speakers-title">{{$attendee->company ?? ''}}</span>
+              <span class="mb-1 ml-2">
+                {{$attendee->designation ?? ''}}
               </span>
             </div>
           </div>

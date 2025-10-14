@@ -519,7 +519,7 @@ class LaravelEventCalendar {
 
         // Populate form if editing
         if (eventData.id) {
-
+        
             document.getElementById('sessionId').value = eventData.id;
             document.getElementById('sessionTitle').value = eventData.title || '';
             document.getElementById('description2').value = eventData.extendedProps?.description || '';
@@ -527,7 +527,7 @@ class LaravelEventCalendar {
             //document.getElementById('capacity').value =  '';
             document.getElementById('venueSelect').value = eventData.extendedProps?.location || '';
             document.getElementById('status').value = eventData.extendedProps?.status || 'draft';
-
+            document.getElementById('tracks').value = eventData.extendedProps?.track || '';
             //document.getElementById('keynote2').value = eventData.extendedProps?.keynote || '';
             //document.getElementById('panels2').value = eventData.extendedProps?.demoes || '';
             //document.getElementById('demoes2').value = eventData.extendedProps?.panels || '';

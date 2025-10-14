@@ -124,16 +124,12 @@ public function attendeeIndex()
     $attendees = User::with('photo')->with("roles")
                 ->whereHas("roles", function ($q) {
                     $q->whereIn("name", ["Attendee"]);
-                })->where('primary_group','Attendee')->orderBy('created_at','DESC')->get(); 
+                })->whereNotNull('name')
+                    ->whereNotNull('slug')
+                    ->orderBy('created_at','DESC')->paginate(10); 
+
     
-    $session = Session::with(['speakers', 'exhibitors', 'sponsors'])
-        ->where('start_time', '>=', now())
-        ->orderBy('start_time', 'ASC')
-        ->first();
-
-    $event = Event::with('photo')->first();
-
-    return view('frontend.page.attendee', compact('attendees', 'session', 'event'));
+    return view('frontend.page.attendee', compact('attendees'));
 }
 public function scheduleIndex()
 {
