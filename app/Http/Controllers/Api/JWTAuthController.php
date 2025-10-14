@@ -676,7 +676,7 @@ public function getSpeakerById(Request $request){
 
         // Prepare contact details
         $contactDetails = [
-            "email" => $speaker->email,
+            "email" => $speaker->email ?? '',
             "phone" => $speaker->mobile ?? ''
         ];
 
