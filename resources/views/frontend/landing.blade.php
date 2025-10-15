@@ -80,7 +80,7 @@
                         </div>
                         <div class="cell">
                             <div>
-                                <img class="h-100 w-100" src="{{asset('frontend/images/Android_QR.jpg')}}?v={{ time() }}" alt="">
+                                <img class="h-100 w-100" src="{{asset('frontend/images/android-img.jpeg')}}?v={{ time() }}" alt="">
                             </div>
                         </div>
                     </div>
