@@ -321,23 +321,31 @@ public function getConnections(Request $request)
         }
 
         
-        $connections = UserConnection::with('connection')  // Eager load the 'connection' relationship
-       ->where('user_id', $user->id)
-       ->get();
+        $user = auth()->user();
+        
+        $allConnections = $user->connections
+            ->unique('id')
+            ->take(400);
+   
+       $connections = [];    
 
-        if ($connections->isNotEmpty()) {
-            $connections = $connections->map(function ($connection) {
-                if ($connection->connection && $connection->connection->full_name) {
+        if ($allConnections->isNotEmpty()) {
+            $connections = $allConnections->map(function ($connection) {
+            
+                if ($connection->full_name) {
                     return [
                         "id"              => (string) $connection->id,
-                        "name"            => $connection->connection->full_name ?? $connection->connection->name,
-                        "connection_role" => $connection->connection->getRoleNames()->implode(', '),
-                        "company_name"    => $connection->connection->company ?? null,
-                        "connection_image"=> $connection->connection->photo ? $connection->connection->photo->file_path : asset('images/default.png'),
-                        "status"          => $connection->status ?? null, 
+                        "name"            => $connection->full_name ?? $connection->name, // fallback to name if full_name is not available
+                        "connection_role" => $connection->getRoleNames()->implode(', '), // Role names if available
+                        "company_name"    => $connection->company ?? null, // Company name if available
+                        "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'), // Image URL or default
+                        "status"          => $connection->pivot->status ?? null, // Status from the pivot table
                     ];
                 }
-            })->filter();  
+
+                // Return null if full_name doesn't exist, this will be filtered out later
+                return null;
+            })->filter(); // Filter out null values that don't have full_name
         }
 
         return response()->json($connections);
