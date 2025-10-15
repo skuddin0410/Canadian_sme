@@ -322,31 +322,27 @@ public function getConnections(Request $request)
 
         
         $user = auth()->user();
-        
-        $allConnections = $user->connections
-            ->unique('id')
-            ->take(400);
-   
-       $connections = [];    
+        $connectionData = UserConnection::where('user_id', $user->id)->pluck('connection_id');
+        $connections = [];
+        if(!empty($connectionData)){
 
-        if ($allConnections->isNotEmpty()) {
-            $connections = $allConnections->map(function ($connection) {
-            
-                if (trim($connection->full_name)) {
-                    return [
+            $connectionIds = $connectionData->toArray();
+            $connectionsData = User::whereIn('id', $connectionIds)->get();
+            foreach($connectionsData as $connection){
+            if($connection->name){    
+                array_push($connections, [
                         "id"              => (string) $connection->id,
-                        "name"            => $connection->full_name ?? $connection->name, // fallback to name if full_name is not available
-                        "connection_role" => $connection->getRoleNames()->implode(', '), // Role names if available
-                        "company_name"    => $connection->company ?? null, // Company name if available
-                        "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'), // Image URL or default
-                        "status"          => $connection->pivot->status ?? null, // Status from the pivot table
-                    ];
+                        "name"            => $connection->full_name ?? $connection->name,
+                        "connection_role" => $connection->getRoleNames()->implode(', '),
+                        "company_name"    => $connection->company ?? null,
+                        "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
+                        "status"          => $connection->pivot->status ?? null, // include status if needed
+                    ]); 
                 }
+            }
 
-                // Return null if full_name doesn't exist, this will be filtered out later
-                return null;
-            })->filter(); // Filter out null values that don't have full_name
         }
+
 
         return response()->json($connections);
 
