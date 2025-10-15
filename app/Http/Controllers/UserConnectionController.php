@@ -43,22 +43,24 @@ class UserConnectionController extends Controller
         "Expires" => "0"
     ];
 
-    $columns = ['Connection Name', 'Email', 'Company', 'Designation', 'tags', 'Rating', 'Note'];
+    $columns = ['Connection Name', 'Email', 'Company', 'Designation', 'Rating', 'Note'];
 
     $callback = function() use ($connections, $columns) {
         $file = fopen('php://output', 'w');
         fputcsv($file, $columns);
 
         foreach ($connections as $connection) {
+
+            if(!empty($connection->connection)){
             fputcsv($file, [
                 $connection->connection->full_name ?? '',
                 $connection->connection->email ?? '',
                 $connection->connection->company ?? '',
                 $connection->connection->designation ?? '',
-                $connection->connection->tags ?? '',
                 $connection->rating ?? '',
                 $connection->note ?? '',
             ]);
+            }
         }
 
         fclose($file);

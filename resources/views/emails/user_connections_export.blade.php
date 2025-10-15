@@ -5,6 +5,6 @@
 
 <p>Please find attached the CSV file containing all your connections.</p>
 
-<p>Thank you,<br>Team</p>
+<p>Thank you</p>
 
 @include('emails.layout.footer')

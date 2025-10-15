@@ -26,7 +26,6 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>#</th>
                         <th>Connection Name</th>
                         <th>Email</th>
                         <th>Company</th>
@@ -35,8 +34,9 @@
                 </thead>
                 <tbody>
                     @forelse ($connections as $index => $connection)
+                        @if($connection->connection)
                         <tr> 
-                            <td>{{  $index + 1 }}</td>
+                           
                             <td>
                                 <div class="fw-semibold">{{ $connection->connection->name ?? 'N/A' }}</div>
                                 <div class="text-muted small">
@@ -47,6 +47,7 @@
                             <td>{{ $connection->connection->company ?? 'N/A' }}</td>
                             <td>{{ $connection->connection->designation ?? 'N/A' }}</td>
                         </tr>
+                        @endif
                     @empty
                         <tr>
                             <td colspan="5" class="text-center py-3 text-muted">

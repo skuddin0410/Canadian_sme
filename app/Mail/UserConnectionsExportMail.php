@@ -10,19 +10,23 @@ class UserConnectionsExportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $csvContent;
+    public $filename;
     public $user;
-    public $filePath;
 
-    public function __construct($user, $filePath)
+    public function __construct($mailData)
     {
-        $this->user = $user;
-        $this->filePath = $filePath;
+        $this->csvContent = $mailData['csvContent'];
+        $this->filename = $mailData['filename'];
+        $this->user = $mailData['user'];
     }
 
     public function build()
     {
-        return $this->subject("Your Connections Export")
+            return $this->subject("Your Connections Export")
                     ->view('emails.user_connections_export')
-                    ->attach($this->filePath);
+                    ->attachData($this->csvContent, $this->filename, [
+                        'mime' => 'text/csv',
+            ]);
     }
 }

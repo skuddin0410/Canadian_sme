@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\UserWelcome;
 use Illuminate\Support\Facades\Mail;
 use App\Services\ActivityTrackingService;
+use App\Mail\UserConnectionsExportMail;
 
 
 class HomeController extends Controller
@@ -292,7 +293,9 @@ public function getSession($sessionId)
             "speakers"    => $session->speakers->map(fn ($sp) => [
                 "id"   => $sp->id,
                 "name" => $sp->name,
-                "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')
+                "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png'),
+                "designation" => $sp->designation ?? '',
+                "company" => $sp->company ?? ''
             ]),
             "isFavorite"  => isFavorite($session->id),
             "isInAgenda"  => isAgenda($session->id),
@@ -328,6 +331,7 @@ public function getConnections(Request $request)
         $connections = [];    
         if($allConnections){
             $connections = $allConnections->map(function ($connection) {
+                if($connection->name){
                 return [
                     "id"              => (string) $connection->id,
                     "name"            => $connection->full_name ?? $connection->name,
@@ -336,6 +340,7 @@ public function getConnections(Request $request)
                     "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
                     "status"          => $connection->pivot->status ?? null, // include status if needed
                 ];
+                }
             });
         }
 
@@ -551,7 +556,11 @@ public function scanDetails(Request $request){
           userConnection($user->id, $request->qrData);
           $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
         }
-    
+        
+        if(empty($data->connection)){
+            return response()->json(['message' => 'Connection is inactive'], 404);  
+        }
+
         $data->load('connection.photo','connection.visitingcard');
       
         return response()->json([
@@ -757,5 +766,88 @@ public function readAllNotifications(Request $request){
         return response()->json(["message" => $e->getMessage()]);
     }
 }
+
+   public function exportConnections(Request $request){
+    try {
+
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+        
+        if($request->qr_code == 'm' ){
+            $connections = UserConnection::with('connection')->where('user_id', $user->id)->get();
+            if(empty($connections)){
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Connection not found'
+                ], 401);
+
+            }
+
+            $filename = 'connections_' . $user->id . '.csv';
+            $columns = ['Connection Name', 'Email', 'Company', 'Designation', 'Rating', 'Note'];
+            $csvContent = '';
+
+            $csvContent .= implode(',', $columns) . "\n"; 
+
+            foreach ($connections as $connection) {
+                if(!empty($connection->connection)){
+                    $csvContent .= implode(',', [
+                        $connection->connection->full_name ?? '',
+                        $connection->connection->email ?? '',
+                        $connection->connection->company ?? '',
+                        $connection->connection->designation ?? '',
+                        $connection->rating ?? '',
+                        $connection->note ?? '',
+                    ]) . "\n";
+                }
+            }
+            
+
+            $mailData = [
+                'csvContent' => $csvContent,
+                'filename' => $filename,
+                'user' => $user
+            ];
+
+            Mail::to($user->email)->send(new UserConnectionsExportMail($mailData));
+            return response()->json(["message" => "The export email has been sent successfully."]);
+            
+        }else{
+
+            $connection = UserConnection::with('connection')->where('connection_id', $request->qr_code)->first();
+
+            if (!$connection) {
+              return response()->json(['message' => 'Connection not found'], 404);
+            }
+
+            if(empty($connection->connection)){
+              return response()->json(['message' => 'Connection not found'], 404);  
+            }
+
+            $responseData = [
+                'name' => $connection->connection->full_name ?? '',
+                'email' => $connection->connection->email ?? '',
+                'company' => $connection->connection->company ?? '',
+                'designation' => $connection->connection->designation ?? '',
+                'tags' => $connection->connection->tags ?? '',
+                'rating' => $connection->rating ?? '',
+                'note' => $connection->note ?? '',
+            ];
+          
+           return response()->json($responseData, 200);
+        }
+       
+
+        } catch (\Exception $e) {
+
+          return response()->json(["message" => $e->getMessage()]);
+
+        }
+   }
 
 }

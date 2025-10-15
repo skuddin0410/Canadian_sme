@@ -27,6 +27,12 @@ class OtpController extends Controller
                 'email' => 'required|nullable|string|max:255|email',
             ]);
 
+              if (User::onlyTrashed()->where('email', $request->email)->first()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your account is deleted or block. Please contact support for assistance.',
+                ], 403); 
+            }
 
             if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
                 return response()->json([
@@ -40,18 +46,6 @@ class OtpController extends Controller
                     'error' => "Invalid email format",
                 ], 422);
             }
-        
-           /*$allowedEmails = [
-                "henry.roy@example.com",
-                "subhabrata1@example.com"
-            ];
-
-            if (!in_array($request->email, $allowedEmails)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please use test account',
-                ]);
-            }*/
 
             $code = rand(1000, 9999);
             $currentDateTime = Carbon::now();
@@ -82,10 +76,18 @@ class OtpController extends Controller
 
 public function verify(Request $request)
 {  
-    $validator = Validator::make($request->all(), [
-        'email' => 'required|string|email|max:255',
-        'otp'   => 'required|digits:4',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+            'otp'   => 'required|digits:4',
+        ]);
+
+             
+        if (User::onlyTrashed()->where('email', $request->email)->first()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is deleted or block. Please contact support for assistance.',
+            ], 403); 
+        }
 
         if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
             return response()->json([
