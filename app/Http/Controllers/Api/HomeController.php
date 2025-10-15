@@ -332,7 +332,7 @@ public function getConnections(Request $request)
         if ($allConnections->isNotEmpty()) {
             $connections = $allConnections->map(function ($connection) {
             
-                if ($connection->full_name) {
+                if ($connection->name) {
                     return [
                         "id"              => (string) $connection->id,
                         "name"            => $connection->full_name ?? $connection->name, // fallback to name if full_name is not available
