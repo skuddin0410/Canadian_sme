@@ -29,12 +29,10 @@
                 <div class="exhibitor-card shadow">
                     <div class="exhibitor-card-box">
                         <div class="exhibitor-profile">
-                            @if(!empty($exhibitor->contentIconFile))
+                            @if( !empty($exhibitor->contentIconFile) )
                               <img src="{{ $exhibitor->contentIconFile->file_path }}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
-
                             @else
                               <span class="small-heading-blue mb-0">{{shortenName($exhibitor->name)}}</span>
-                              <img src="{{ $exhibitor->contentIconFile->file_path }}" style="display: none;">
                             @endif
                         </div>
                         <div class="abc">

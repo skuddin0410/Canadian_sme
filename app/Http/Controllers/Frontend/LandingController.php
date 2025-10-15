@@ -103,7 +103,7 @@ class LandingController extends Controller
 public function exhibitorIndex()
 {
     $event = Event::with(['photo'])->first();
-    $exhibitors = Company::with('contentIconFile')->paginate(10);
+    $exhibitors = Company::with('contentIconFile')->where('is_sponsor',0)->paginate(10);
     
      return view('frontend.page.exhibitor', compact('event', 'exhibitors'));
    
