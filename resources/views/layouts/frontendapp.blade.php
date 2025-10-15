@@ -18,7 +18,7 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="{{asset('frontend/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('frontend/css/style.css')}}?v={{ time() }}">
 
     {{-- Vite (Laravel 10/11 default) --}}
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
