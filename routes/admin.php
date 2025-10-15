@@ -16,6 +16,7 @@ use App\Http\Controllers\ExhibitorUserController;
 use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 use App\Http\Controllers\UserConnectionController;
+use App\Http\Controllers\LandingPageSettingController;
 
 
 
@@ -169,6 +170,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
     Route::post('/send-email-template', [EmailTemplateController::class, 'send'])->name('send.email.template');
     
+    Route::get('/landing-page-settings', [LandingPageSettingController::class, 'index'])->name('landing-page-settings');
+    Route::post('/landing-page-settings', [LandingPageSettingController::class, 'update'])->name('landing-page-settings');
+
     });
     
    

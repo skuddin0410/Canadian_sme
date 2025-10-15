@@ -100,7 +100,7 @@
         </li>
 
 
-         <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active open' : '' }}  {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }}  {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') ? 'active open' : '' }}  {{ request()->is('admin/event-guides.showGallery*') ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active open' : '' }}  {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }}  {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') ? 'active open' : '' }}  {{ request()->is('admin/event-guides.showGallery*') ? 'active open' : '' }}  {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
@@ -149,6 +149,13 @@
                             <div data-i18n="Coupons">Webview</div>
                         </a>
                     </li>
+
+                    <li class="menu-item {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
+                        <a href="{{ route('landing-page-settings') }}" class="menu-link">
+                            <div data-i18n="Coupons">Landing Setting</div>
+                        </a>
+                    </li>
+
                      <li class="menu-item {{ request()->is('admin/event-guides*') ? 'active open' : '' }}">
                         <a href="{{ route('event-guides.index') }}" class="menu-link">
                             <div data-i18n="Coupons">Event Guide</div>

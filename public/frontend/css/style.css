@@ -1084,3 +1084,123 @@ footer {
 }
 
 /* -------------global element end------------ */
+
+
+/* =================langing page============== */
+.landing-page {
+    width: 100%;
+    height: 100vh;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.landing-page .left {
+    flex-basis: 45%;
+    padding: 100px;
+}
+
+
+.landing-page .h2-black::after, .landing-page .h2-white::after {
+    width: 0;
+}
+
+/* .landing-page .h2-white {
+    font-size: 40px;
+} */
+
+.landing-page .white-circle {
+    background-color: #B7D6FF;
+    width: 44px;
+    height: 44px;
+}
+
+.landing-page .left-bottom {
+    background-color: #0e69e3;
+    position: relative;
+    border-top-right-radius: 100px;
+    padding: 50px 50px 0 50px;
+}
+
+.landing-page .left-bottom::after {
+    content: '';
+    height: 100%;
+    position: absolute;
+    width: 2000px;
+    top: 0;
+    left: -2000px;
+    background-color: #0e69e3;
+}
+
+.landing-page .left-bottom::before {
+    content: '';
+    height: 2000px;
+    position: absolute;
+    width: 2000px;
+    bottom: -2000px;
+    right: 0;
+    background-color: #0e69e3;
+}
+
+.landing-page .app-grid {
+    display: grid;
+    grid-template-columns: 200px 200px;
+    gap: 30px;
+}
+
+.landing-page .right {
+    flex-basis: 55%;
+    height: 100%;
+    padding-right: 50px;
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: auto 80%;
+    border-bottom-left-radius: 100px;
+    background-image: url(../images/landing-right-banner.svg);
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+@media(max-width:1799px) {
+    .landing-page .left {
+        padding: 50px;
+    }
+    .landing-page .right .mobile-img {
+        height: 650px;
+    }
+  .landing-page  .h2-black { font-size: 30px; }
+  .landing-page .left-bottom { padding: 20px 20px 0 20px ; }
+  .landing-page .app-grid { grid-template-columns: 120px 120px; }
+  .landing-page .h2-white {font-size: 35px;}
+  .landing-page .small-heading-white { font-size: 16px; }
+
+}
+@media(max-width:1350px){
+    .landing-page .right {
+        display: none;
+    }
+    .roow{
+        display: block !important;
+    }
+}
+@media(max-width:767px){
+        .landing-page .left {
+            padding: 15px;
+        }
+        .landing-page-logo{
+            height: 55px;
+        }
+        
+}
+@media(max-width:525px){
+    .landing-page .left-bottom{
+        padding: 15px 0;
+    }
+    .landing-page .left-bottom {
+        border-top-right-radius: 50px;
+    }
+}
+
+
+
+/* =================langing page end============== */

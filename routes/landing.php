@@ -46,3 +46,7 @@ Route::get('/support', function () {
 });
 
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
+
+Route::get('/app-landing', function () {
+    return view('frontend.landing'); 
+})->name('app-landing');

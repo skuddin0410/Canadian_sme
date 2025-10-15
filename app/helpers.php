@@ -24,6 +24,8 @@ use App\Models\Badge;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Mews\Purifier\Facades\Purifier;
+use App\Models\LandingPageSetting;
+
 
 
 if (!function_exists('getCategory')) {
@@ -539,6 +541,14 @@ if (!function_exists('typeColor')) {
         }else{
             return '';  
         }
+    }
+
+}
+
+if (!function_exists('getLandingPageSettings')) {
+
+    function getLandingPageSettings() {
+       return LandingPageSetting::first();
     }
 
 }
