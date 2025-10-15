@@ -39,9 +39,11 @@
                             <div class="white-circle">
                                 <img src="{{asset('frontend/images/calendar.svg')}}" alt="">
                             </div>
+                            @if(!empty($setting->date))
                             <p class="black-text-18">
                                  {{ \Carbon\Carbon::parse($setting->date)->format('M d, Y') }}
                             </p>
+                            @endif
                         </li>
                         <li class="d-flex align-items-center gap-3">
                             <div class="white-circle">
@@ -61,27 +63,29 @@
                     <div class="app-grid mt-3">
                         <div class="cell">
                             <div>
-                                <img class="h-100 w-100" src="{{asset('frontend/images/apple-store.svg')}}" alt="">
+                              <a href="https://apps.apple.com/us/app/sme-summit-2025/id6753012008">  <img class="h-100 w-100" src="{{asset('frontend/images/apple-store.svg')}}" alt=""></a>
                             </div>
                         </div>
                         <div class="cell">
                             <div>
+                              <a href="https://play.google.com/store/apps/details?id=com.canadianSME.app">
                                 <img class="h-100 w-100" src="{{asset('frontend/images/android-store.svg')}}" alt="">
+                             </a>
                             </div>
                         </div>
                         <div class="cell">
                             <div>
-                                <img class="h-100 w-100" src="{{asset('frontend/images/apple-qr.svg')}}" alt="">
+                                <img class="h-100 w-100" src="{{asset('frontend/images/IMG_0024.jpg')}}?v={{ time() }}" alt="">
                             </div>
                         </div>
                         <div class="cell">
                             <div>
-                                <img class="h-100 w-100" src="{{asset('frontend/images/android-qr.svg')}}" alt="">
+                                <img class="h-100 w-100" src="{{asset('frontend/images/Android_QR.jpg')}}?v={{ time() }}" alt="">
                             </div>
                         </div>
                     </div>
                     <span class="small-heading-white mt-3">
-                        Website - <a class="text-light" href="javascript:void()"> {{$setting->website ?? ''}}</a>
+                        Website - <a class="text-light" href="{{$setting->website ?? ''}}"> {{$setting->website ?? ''}}</a>
                     </span>
                 </div>
             </div>

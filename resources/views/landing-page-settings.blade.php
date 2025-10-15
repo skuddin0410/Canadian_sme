@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Update Landing Page Settings</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Promotional Page Settings</h4>
     <div class="row">
 
         <div class="col-xl">
@@ -21,8 +21,8 @@
                
                <div class="card-body">
 
-    <h2>Update Landing Page Settings</h2>
-    <a href="{{ route('app-landing') }} " target="_blank" class="mb-2"> App Landing: {{ route('app-landing') }} </a>
+    <h2>Promotional Page Settings</h2>
+    <a href="{{ route('app-landing') }} " target="_blank" class="mb-2"> Promotional Page : {{ route('app-landing') }} </a>
     <form action="{{ route('landing-page-settings') }}" method="POST">
         @csrf 
 
@@ -51,7 +51,7 @@
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary">Update Settings</button>
+        <button type="submit" class="btn btn-primary">Update Promotional Page</button>
     </form>
  </div>
             </div>

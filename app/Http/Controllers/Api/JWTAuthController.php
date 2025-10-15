@@ -413,10 +413,10 @@ public function getExhibitor($exhibitorId)
 
         $response = [
             'name'     => $exhibitor->name ?? '',
-            'word_no'  => $exhibitor->booth ?? '-',
+            'word_no'  => $exhibitor->booth ?? '',
             'avatar'   => $exhibitor->contentIconFile?->file_path ?? asset('images/default.png'),
             'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg'),
-            'location' => $exhibitor->booth ?? '-',
+            'location' => $exhibitor->booth ?? '',
             'email'    => $exhibitor->email ?? '',
             'phone'    => $exhibitor->phone ?? '',
             'website'  => $exhibitor->website ?? '',
