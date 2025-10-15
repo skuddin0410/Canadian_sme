@@ -321,27 +321,23 @@ public function getConnections(Request $request)
         }
 
         
-        $user = auth()->user();
-        
-        $allConnections = $user->connections
-            ->union($user->connectedWithMe)
-            ->unique('id')
-            ->take(400);
-   
-        $connections = [];    
-        if($allConnections){
-            $connections = $allConnections->map(function ($connection) {
-                if($connection->name){
-                return [
-                    "id"              => (string) $connection->id,
-                    "name"            => $connection->full_name ?? $connection->name,
-                    "connection_role" => $connection->getRoleNames()->implode(', '),
-                    "company_name"    => $connection->company ?? null,
-                    "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
-                    "status"          => $connection->pivot->status ?? null, // include status if needed
-                ];
+        $connections = UserConnection::with('connection')  // Eager load the 'connection' relationship
+       ->where('user_id', $user->id)
+       ->get();
+
+        if ($connections->isNotEmpty()) {
+            $connections = $connections->map(function ($connection) {
+                if ($connection->connection && $connection->connection->full_name) {
+                    return [
+                        "id"              => (string) $connection->id,
+                        "name"            => $connection->connection->full_name ?? $connection->connection->name,
+                        "connection_role" => $connection->connection->getRoleNames()->implode(', '),
+                        "company_name"    => $connection->connection->company ?? null,
+                        "connection_image"=> $connection->connection->photo ? $connection->connection->photo->file_path : asset('images/default.png'),
+                        "status"          => $connection->status ?? null, 
+                    ];
                 }
-            });
+            })->filter();  
         }
 
         return response()->json($connections);
