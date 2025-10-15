@@ -32,6 +32,15 @@ class Controller extends BaseController
            try {
                 $filename = now()->format('Y-m-d').'-'.abs(crc32(uniqid())).'-'.Carbon\Carbon::now()->timestamp . '.' . $file->getClientOriginalExtension();
                 $file_path = $uploadPath;
+
+                //if not image then upload pdf,doc  etc
+                if(!in_array(strtolower($file->getClientOriginalExtension()), ['png', 'jpg', 'jpeg'])) {
+                    $file->storeAs($file_path,$filename,'public');
+                    static::saveImageDataIntoDrive($filename,$file_type,$table_id,$table_type,$idForUpdate);
+                    return $filename;
+                }  
+                 
+               
                 $image = '';
 
                 $size = getimagesize($file);

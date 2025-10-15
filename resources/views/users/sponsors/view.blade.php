@@ -149,24 +149,27 @@
             </form>
 
             {{-- File Preview --}}
-            @if(Str::endsWith($doc->file_path, ['.png', '.jpg', '.jpeg']))
-                <img src="{{ asset($doc->file_path) }}"
-                     alt="Document"
-                     class="img-fluid rounded mb-2"
-                     style="max-height: 200px; object-fit: contain;">
-            @elseif(Str::endsWith($doc->file_path, '.pdf'))
-                <a href="{{ asset($doc->file_path) }}" target="_blank">
-                    <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 4rem;"></i>
+            <a href="{{ asset($doc->file_path) }}" target="_blank">
+                    @php 
+                        $filePath = strtok($doc->file_path, '?');
+                        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+                      
+                    @endphp
+
+                    @if(in_array(strtolower($extension), ['png', 'jpg', 'jpeg', 'gif']))
+
+                        <img src="{{ asset($doc->file_path) }}" alt="Image" style="max-width: 100px; max-height: 100px;">
+                    @elseif(strtolower($extension) == 'pdf')
+                      
+                        <i class="bi bi-file-earmark-pdf" style="font-size: 4rem;"></i>
+                    @elseif(in_array(strtolower($extension), ['doc', 'docx']))
+                      
+                        <i class="bi bi-file-earmark-word" style="font-size: 4rem;"></i>
+                    @else
+                      
+                        <i class="bi bi-file-earmark" style="font-size: 4rem;"></i>
+                    @endif
                 </a>
-            @elseif(Str::endsWith($doc->file_path, ['.doc', '.docx']))
-                <a href="{{ asset($doc->file_path) }}" target="_blank">
-                    <i class="bi bi-file-earmark-word text-primary" style="font-size: 4rem;"></i>
-                </a>
-            @else
-                <a href="{{ asset($doc->file_path) }}" target="_blank">
-                    <i class="bi bi-file-earmark-text" style="font-size: 4rem;"></i>
-                </a>
-            @endif
 
             <p class="mt-2 text-truncate">{{ $doc->file_name }}</p>
         </div>

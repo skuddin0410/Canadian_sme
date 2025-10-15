@@ -309,12 +309,13 @@ public function show($exhibitor_user, Request $request){
         return redirect()->route('exhibitor-users.show', ['exhibitor_user' => $company->id])->with('success', 'Booth assigned successfully.');
     }
   public function uploadDocs(Request $request, $companyId)
-{
-    $request->validate([
-        'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
-    ]);
+   {
+        $request->validate([
+            'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx'
+        ]);
 
     $company = Company::findOrFail($companyId);
+
 
     if ($request->hasFile('private_docs')) {
         foreach ($request->file('private_docs') as $file) {
