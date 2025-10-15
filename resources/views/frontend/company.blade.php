@@ -13,7 +13,7 @@
       <div class="card shadow-sm rounded-4">
         
         @if($company->quickLinkIconFile && $company->quickLinkIconFile->file_path)
-        <div style="width: 100%; height: 400px; overflow: hidden; border-radius: 8px;">
+        <div style="width: 100%; overflow: hidden; border-radius: 8px;">
               <img src="{{ !empty($company->quickLinkIconFile) ? $company->quickLinkIconFile->file_path :'' }}" 
                    class="border" 
                    style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" />
