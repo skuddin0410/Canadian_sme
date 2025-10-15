@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {   
         \URL::forceScheme('https');
-        Mail::alwaysTo('idev0085@gmail.com');
+        Mail::alwaysTo(['idev0085@gmail.com', 'subhabrata.kayalcse@gmail.com']);
         Paginator::useBootstrap();
         \App\Models\TicketType::observe(\App\Observers\TicketTypeObserver::class);
         Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page') {
