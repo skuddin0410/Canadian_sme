@@ -1110,12 +1110,8 @@ footer {
 
 .landing-page .white-circle {
     background-color: #B7D6FF;
-    width: 35px;
-    height: 35px;
-}
-.landing-page .white-circle img{
-  width: 22px;
-  height: 22px;
+    width: 44px;
+    height: 44px;
 }
 
 .landing-page .left-bottom {
@@ -1147,8 +1143,8 @@ footer {
 
 .landing-page .app-grid {
     display: grid;
-    grid-template-columns: 120px 120px;
-    gap: 20px;
+    grid-template-columns: 200px 200px;
+    gap: 30px;
 }
 
 .landing-page .right {
@@ -1167,22 +1163,16 @@ footer {
 
 @media(max-width:1799px) {
     .landing-page .left {
-        padding: 30px;
+        padding: 50px;
     }
     .landing-page .right .mobile-img {
-        height: 510px;
+        height: 650px;
     }
   .landing-page  .h2-black { font-size: 30px; }
   .landing-page .left-bottom { padding: 20px 20px 0 20px ; }
   .landing-page .app-grid { grid-template-columns: 120px 120px; }
-  /* .landing-page .h2-white {font-size: 35px;} */
-   .landing-page .h2-black, .landing-page .h2-white {
-        font-size: 24px;
-    }
+  .landing-page .h2-white {font-size: 35px;}
   .landing-page .small-heading-white { font-size: 16px; }
-  .landing-page-logo{
-            height: 55px;
-        }
 
 }
 @media(max-width:1350px){
@@ -1197,7 +1187,9 @@ footer {
         .landing-page .left {
             padding: 15px;
         }
-        
+        .landing-page-logo{
+            height: 55px;
+        }
         
 }
 @media(max-width:525px){
