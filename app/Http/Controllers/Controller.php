@@ -205,17 +205,12 @@ class Controller extends BaseController
         }
     }
 
-    public static function imageBase64Upload($file , string $uploadPath=null,$table_id,$table_type,$file_type,$idForUpdate=null) : ?string
-    {
-    
-        if($file  && $uploadPath) {
-           try {
-                $directoryPath = storage_path('app/public/' . $uploadPath);
-
-            // Check if the directory exists, and create it if it does not
-            if (!File::exists($directoryPath)) {
-                File::makeDirectory($directoryPath, 0755, true); // Recursive directory creation
-            }
+public static function imageBase64Upload($file, string $uploadPath = null, $table_id, $table_type, $file_type, $idForUpdate = null): ?string
+{
+    if ($file && $uploadPath) {
+        try {
+            // Set the directory path on S3
+            $directoryPath = $uploadPath; // S3 will handle folders via path, no need for local directories
 
             // Extract the base64 image data by removing the data URI scheme (e.g., "data:image/jpeg;base64,")
             list($type, $imageData) = explode(';', $file); 
@@ -227,26 +222,22 @@ class Controller extends BaseController
             $image = base64_decode($imageData);
 
             // Generate a unique filename using current timestamp and CRC32 of the unique id
-            $filename = now()->format('Y-m-d') . '-' . abs(crc32(uniqid())) . '-' . Carbon\Carbon::now()->timestamp . '.' . $extension;
+            $filename = now()->format('Y-m-d') . '-' . abs(crc32(uniqid())) . '-' . Carbon::now()->timestamp . '.' . $extension;
 
-            // Define the full path where the file will be saved
+            // Define the full path where the file will be saved on S3
             $file_path = $directoryPath . '/' . $filename;
 
-            // Save the file (base64 decoded image data) to the specified file path
-            file_put_contents($file_path, $image);
-
-            //Storage::disk('s3')->put($file_path, $image);
-
+            // Store the file on AWS S3
+            Storage::disk('s3')->put($file_path, $image);
 
             // Call a function to save image data (e.g., store the image filename in a database)
             static::saveImageDataIntoDrive($filename, $file_type, $table_id, $table_type, $idForUpdate);
 
             return $filename;
-            } catch (\Exception $e) {
-                return "null";
-            }
+        } catch (\Exception $e) {
+            // Log the error or return null if there's an issue
+            return "null";
         }
-
     }
 
 }
