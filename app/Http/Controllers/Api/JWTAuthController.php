@@ -124,9 +124,9 @@ public function updateUser(Request $request)
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update profile.',
+                'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors()->first(),
-            ], 422);
+            ], 401);
         }
         
 
