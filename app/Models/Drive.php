@@ -25,11 +25,11 @@ class Drive extends Model
                 return asset('storage/' . $this->file_type . '/' . $this->file_name . '?v=' . time());
             }
         }else{
-           if (Storage::disk('s3')->exists($this->file_type . '/' . $this->file_name)) {
+           if (Storage::disk('s3')->get($this->file_type . '/' . $this->file_name)) {
               return Storage::disk('s3')->url($this->file_type . '/' . $this->file_name);
            }
 
-           if (Storage::disk('s3')->exists($this->table_type . '/' . $this->file_name)) {
+           if (Storage::disk('s3')->get($this->table_type . '/' . $this->file_name)) {
               return Storage::disk('s3')->url($this->table_type . '/' . $this->file_name);
            }
         }
