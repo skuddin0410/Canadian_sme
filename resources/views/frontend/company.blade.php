@@ -145,11 +145,10 @@
             </div>
           </div>
         </div>
-
+ @if($company->Docs && $company->Docs->count() > 0)
 <div class="mt-4">
     <div class="card-header">Documents</div>
     <div class="">
-        @if($company->Docs && $company->Docs->count() > 0)
             <ul class="list-group">
                 @foreach($company->Docs as $doc)
                     <li class="list-group-item d-flex align-items-center">
@@ -176,12 +175,9 @@
                     </li>
                 @endforeach
             </ul>
-        @else
-            <p class="text-muted">No documents uploaded yet.</p>
-        @endif
     </div>
 </div>
-
+ @endif
 
 
 
