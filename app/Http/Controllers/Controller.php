@@ -233,9 +233,9 @@ class Controller extends BaseController
             $file_path = $directoryPath . '/' . $filename;
 
             // Save the file (base64 decoded image data) to the specified file path
-            //file_put_contents($file_path, $image);
+            file_put_contents($file_path, $image);
 
-            Storage::disk('s3')->put($file_path, $image);
+            //Storage::disk('s3')->put($file_path, $image);
 
 
             // Call a function to save image data (e.g., store the image filename in a database)
