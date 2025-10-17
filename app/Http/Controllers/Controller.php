@@ -222,7 +222,7 @@ public static function imageBase64Upload($file, string $uploadPath = null, $tabl
             $image = base64_decode($imageData);
 
             // Generate a unique filename using current timestamp and CRC32 of the unique id
-            $filename = now()->format('Y-m-d') . '-' . abs(crc32(uniqid())) . '-' . Carbon::now()->timestamp . '.' . $extension;
+            $filename = now()->format('Y-m-d') . '-' . abs(crc32(uniqid())) . '-' . Carbon\Carbon::now()->timestamp . '.' . $extension;
 
             // Define the full path where the file will be saved on S3
             $file_path = $directoryPath . '/' . $filename;
