@@ -227,7 +227,7 @@ public function speaker($slug)
 
 public function exhibitor( Request $request,$slug){ 
 
-    $company = Company::where('slug', $slug)
+    $company = Company::with('Docs')->where('slug', $slug)
         ->firstOrFail();
     $sessions = DB::table('event_sessions as es')
         ->join('session_exhibitors as ss', 'es.id', '=', 'ss.session_id')

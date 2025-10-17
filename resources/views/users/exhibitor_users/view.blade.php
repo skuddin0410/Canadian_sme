@@ -121,48 +121,48 @@
         @if($company->Docs && $company->Docs->count() > 0)
             <div class="row g-3">
                @foreach($company->Docs as $doc)
-    <div class="col-md-4 text-center">
-        <div class="card p-2 shadow-sm position-relative doc-card">
+                    <div class="col-md-4 text-center">
+                        <div class="card p-2 shadow-sm position-relative doc-card">
 
-            {{-- Delete Button (hidden by default, visible on hover) --}}
-            <form action="{{ route('exhibitor.deleteDoc', $doc->id) }}" method="POST" 
-                  class="position-absolute top-0 end-0 m-1 delete-form"
-                  onsubmit="return confirm('Are you sure you want to delete this document?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-danger rounded-circle delete-btn">
-                    &times;
-                </button>
-            </form>
+                            {{-- Delete Button (hidden by default, visible on hover) --}}
+                            <form action="{{ route('exhibitor.deleteDoc', $doc->id) }}" method="POST" 
+                                  class="position-absolute top-0 end-0 m-1 delete-form"
+                                  onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger rounded-circle delete-btn">
+                                    &times;
+                                </button>
+                            </form>
 
 
-                <a href="{{ asset($doc->file_path) }}" target="_blank">
-                    @php 
-                        $filePath = strtok($doc->file_path, '?');
-                        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-                      
-                    @endphp
+                                <a href="{{ asset($doc->file_path) }}" target="_blank">
+                                    @php 
+                                        $filePath = strtok($doc->file_path, '?');
+                                        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+                                      
+                                    @endphp
 
-                    @if(in_array(strtolower($extension), ['png', 'jpg', 'jpeg', 'gif']))
+                                    @if(in_array(strtolower($extension), ['png', 'jpg', 'jpeg', 'gif']))
 
-                        <img src="{{ asset($doc->file_path) }}" alt="Image" style="max-width: 200px; max-height: 200px;">
-                    @elseif(strtolower($extension) == 'pdf')
-                      
-                        <i class="bi bi-file-earmark-pdf" style="font-size: 4rem;"></i>
-                    @elseif(in_array(strtolower($extension), ['doc', 'docx']))
-                      
-                        <i class="bi bi-file-earmark-word" style="font-size: 4rem;"></i>
-                    @else
-                      
-                        <i class="bi bi-file-earmark" style="font-size: 4rem;"></i>
-                    @endif
-                </a>
-           
+                                        <img src="{{ asset($doc->file_path) }}" alt="Image" style="max-width: 200px; max-height: 200px;">
+                                    @elseif(strtolower($extension) == 'pdf')
+                                      
+                                        <i class="bi bi-file-earmark-pdf" style="font-size: 4rem;"></i>
+                                    @elseif(in_array(strtolower($extension), ['doc', 'docx']))
+                                      
+                                        <i class="bi bi-file-earmark-word" style="font-size: 4rem;"></i>
+                                    @else
+                                      
+                                        <i class="bi bi-file-earmark" style="font-size: 4rem;"></i>
+                                    @endif
+                                </a>
+                           
 
-            <p class="mt-2 text-truncate">{{ $doc->file_name }}</p>
-        </div>
-    </div>
-@endforeach
+                            <p class="mt-2 text-truncate">{{ $doc->file_name }}</p>
+                        </div>
+                    </div>
+                @endforeach
 
             </div>
         @else
