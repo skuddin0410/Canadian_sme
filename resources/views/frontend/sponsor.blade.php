@@ -148,6 +148,44 @@
             </div>
           </div>
         </div>
+
+        <div class="mt-4">
+    <div class="card-header">Documents</div>
+    <div class="">
+        @if($company->Docs && $company->Docs->count() > 0)
+            <ul class="list-group">
+                @foreach($company->Docs as $doc)
+                    <li class="list-group-item d-flex align-items-center">
+                        <a href="{{ asset($doc->file_path) }}" target="_blank" class="d-flex align-items-center">
+                            @php 
+                                $filePath = strtok($doc->file_path, '?');
+                                $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+                            @endphp
+
+                            <!-- Font Awesome Icon Based on File Extension -->
+                            @if(in_array(strtolower($extension), ['png', 'jpg', 'jpeg', 'gif']))
+                                <i class="fas fa-image me-2 text-primary" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                            @elseif(strtolower($extension) == 'pdf')
+                                <i class="fas fa-file-pdf me-2 text-primary" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                            @elseif(in_array(strtolower($extension), ['doc', 'docx']))
+                                <i class="fas fa-file-word me-2 text-primary" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                            @else
+                                <i class="fas fa-file me-2 text-primary" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                            @endif
+
+                            <!-- File Name -->
+                            <span>{{ $doc->file_name }}</span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <p class="text-muted">No documents uploaded yet.</p>
+        @endif
+    </div>
+</div>
+
+
       </div>
     </div>
 

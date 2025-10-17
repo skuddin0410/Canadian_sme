@@ -228,6 +228,7 @@ public function speaker($slug)
 public function exhibitor( Request $request,$slug){ 
 
     $company = Company::with('Docs')->where('slug', $slug)
+        ->where('is_sponsor', 0)
         ->firstOrFail();
     $sessions = DB::table('event_sessions as es')
         ->join('session_exhibitors as ss', 'es.id', '=', 'ss.session_id')
@@ -244,7 +245,7 @@ public function exhibitor( Request $request,$slug){
 
 public function sponsor( Request $request,$slug){ 
 
-    $company = Company::with(['logo','banner' ])
+    $company = Company::with(['logo','banner','Docs'])
         ->where('slug', $slug)
         ->where('is_sponsor', 1)  
         ->firstOrFail();
