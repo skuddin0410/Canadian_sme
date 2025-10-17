@@ -218,7 +218,7 @@ public function getAllSession()
                             "workshop_no" => $session->track ?? '',
                             "location"    => $session->location ?? '',
                             "status"      => $status,
-                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
+                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
                             "isFavorite"  => isFavorite($session->id),
                             "agenda" => isAgenda($session->id),
                             "my_agenda" => agendaNote($session->id)
@@ -292,7 +292,7 @@ public function getSession($sessionId)
             "status"      => $status,
             "speakers"    => $session->speakers->map(fn ($sp) => [
                 "id"   => $sp->id,
-                "name" => $sp->name,
+                "name" => $sp->full_name,
                 "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png'),
                 "designation" => $sp->designation ?? '',
                 "company" => $sp->company ?? ''
@@ -329,7 +329,7 @@ public function getConnections(Request $request)
             $connectionIds = $connectionData->toArray();
             $connectionsData = User::whereIn('id', $connectionIds)->get();
             foreach($connectionsData as $connection){
-            if($connection->name){    
+            //if($connection->name){    
                 array_push($connections, [
                         "id"              => (string) $connection->id,
                         "name"            => $connection->full_name ?? $connection->name,
@@ -338,7 +338,7 @@ public function getConnections(Request $request)
                         "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
                         "status"          => $connection->pivot->status ?? null, // include status if needed
                     ]); 
-                }
+                //}
             }
 
         }
