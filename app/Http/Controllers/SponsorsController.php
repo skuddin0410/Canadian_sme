@@ -292,7 +292,7 @@ public function index(Request $request)
 {
     return Excel::download(new SponsorExport, 'sponsors.xlsx');
 }
- public function uploadDocs(Request $request, $companyId)
+public function uploadDocs(Request $request, $companyId)
 {
     $request->validate([
         'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'

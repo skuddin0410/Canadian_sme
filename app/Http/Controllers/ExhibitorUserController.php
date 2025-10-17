@@ -311,7 +311,7 @@ public function show($exhibitor_user, Request $request){
   public function uploadDocs(Request $request, $companyId)
    {
         $request->validate([
-            'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx'
+            'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
         ]);
 
     $company = Company::findOrFail($companyId);
