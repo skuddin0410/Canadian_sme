@@ -117,6 +117,7 @@ class Controller extends BaseController
            $drive->table_type = $table_type;
            $drive->file_name = $file_path;
            $drive->file_type = $file_type;
+           $drive->is_local_file = 0;
            $drive->save();
     }
         public static function generateMobileImage($file, string $file_path, string $filename): string
