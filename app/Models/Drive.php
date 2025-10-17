@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Storage;
 class Drive extends Model
 {
     protected $fillable = [
@@ -11,16 +11,27 @@ class Drive extends Model
         'table_type',
         'file_name',
         'file_type',
+        'is_local_file'
     ];
 
     public function getFilePathAttribute()
     {  
-        if (\File::isFile('storage/' . $this->table_type . '/' . $this->file_name)) {
-            return asset('storage/' . $this->table_type . '/' . $this->file_name . '?v=' . time());
-        }
+        if( $this->is_local_file == 1){
+            if (\File::isFile('storage/' . $this->table_type . '/' . $this->file_name)) {
+                return asset('storage/' . $this->table_type . '/' . $this->file_name . '?v=' . time());
+            }
 
-        if (\File::isFile('storage/' . $this->file_type . '/' . $this->file_name)) {
-            return asset('storage/' . $this->file_type . '/' . $this->file_name . '?v=' . time());
+            if (\File::isFile('storage/' . $this->file_type . '/' . $this->file_name)) {
+                return asset('storage/' . $this->file_type . '/' . $this->file_name . '?v=' . time());
+            }
+        }else{
+           if (Storage::disk('s3')->exists($this->file_type . '/' . $this->file_name)) {
+              return Storage::disk('s3')->url($this->file_type . '/' . $this->file_name);
+           }
+
+           if (Storage::disk('s3')->exists($this->table_type . '/' . $this->file_name)) {
+              return Storage::disk('s3')->url($this->table_type . '/' . $this->file_name);
+           }
         }
 
         return asset('images/default.png');

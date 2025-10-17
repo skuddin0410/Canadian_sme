@@ -294,8 +294,12 @@ public function index(Request $request)
 }
 public function uploadDocs(Request $request, $companyId)
 {
+    // $request->validate([
+    //     'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
+    // ]);
+
     $request->validate([
-        'private_docs.*' => 'required|file|mimes:png,jpg,jpeg,pdf,doc,docx|max:2048'
+        'private_docs.*' => 'required|file'
     ]);
 
     $company = Company::findOrFail($companyId);

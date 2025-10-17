@@ -35,7 +35,8 @@ class Controller extends BaseController
 
                 //if not image then upload pdf,doc  etc
                 if(!in_array(strtolower($file->getClientOriginalExtension()), ['png', 'jpg', 'jpeg'])) {
-                    $file->storeAs($file_path,$filename,'public');
+                    //$file->storeAs($file_path,$filename,'public');
+                    $file->storeAs($file_path, $filename, 's3');
                     static::saveImageDataIntoDrive($filename,$file_type,$table_id,$table_type,$idForUpdate);
                     return $filename;
                 }  
@@ -85,11 +86,14 @@ class Controller extends BaseController
                 }
                 
                 if(!empty($image)){
-                 Storage::disk('public')->put($file_path.'/'.$filename,$image->encodeByExtension($file->getClientOriginalExtension(), quality: 70));
-                }else{
-                    $url = $file->storeAs($file_path,$filename,'public');
-                }
+                 //Storage::disk('public')->put($file_path.'/'.$filename,$image->encodeByExtension($file->getClientOriginalExtension(), quality: 70));
 
+                  Storage::disk('s3')->put($file_path . '/' . $filename, $image->encodeByExtension($file->getClientOriginalExtension(), quality: 70));  
+                }else{
+                    //$url = $file->storeAs($file_path,$filename,'public');
+                      $url = $file->storeAs($file_path, $filename, 's3');
+                }
+                 
                 static::saveImageDataIntoDrive($filename,$file_type,$table_id,$table_type,$idForUpdate);
                 return $filename;
             } catch (\Exception $e) {
@@ -229,7 +233,10 @@ class Controller extends BaseController
             $file_path = $directoryPath . '/' . $filename;
 
             // Save the file (base64 decoded image data) to the specified file path
-            file_put_contents($file_path, $image);
+            //file_put_contents($file_path, $image);
+
+            Storage::disk('s3')->put($file_path, $image);
+
 
             // Call a function to save image data (e.g., store the image filename in a database)
             static::saveImageDataIntoDrive($filename, $file_type, $table_id, $table_type, $idForUpdate);
