@@ -1,7 +1,7 @@
 # canadian-sme
 # Event-App
 # Laravel SetUp
-composer install
+composer install command add in yml file 
 php artisan migrate:fresh --seed
 php artisan optimize:clear
 
