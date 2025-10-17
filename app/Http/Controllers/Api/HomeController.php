@@ -78,7 +78,7 @@ class HomeController extends Controller
                     "workshop_no" => $session->track ?? '',
                     "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
-                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->name, "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')]),
+                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name, "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')]),
                     "isFavorite" => isFavorite($session->id)
                 ];
             });
