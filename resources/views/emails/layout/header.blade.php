@@ -52,7 +52,7 @@
   style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:180px !important;height:61px !important;max-width:100%;margin-right:15px;margin-top:23px;">
     <div style="color:white;text-decoration: none;">
       <p style="font-size: 15px;">{{ getKeyValue('company_name')->value }}</p>
-      <p style="font-size: 15px;">{{ getKeyValue('company_address')->value }}</p>
+      {{-- <p style="font-size: 15px;">{{ getKeyValue('company_address')->value }}</p> --}}
     </div>
   </td>
 </tr>
