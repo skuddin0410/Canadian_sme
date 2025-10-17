@@ -91,42 +91,25 @@ public function updateUser(Request $request)
         
         // Custom validation with error handling
         
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'first_name'        => 'required|string|max:255',
-                'last_name'         => 'required|string|max:255',
-                'designation'       => 'required|string|max:255',
-                'email'             => 'required|email|unique:users,email,' . $user->id,
-                'phone'             => 'required|string|max:20',
-                'bio'               => 'required|max:300',
-                'tags'              => 'required|string',
-                'company_name'      => 'required|string|max:255',
-                'company_website'   => 'nullable|string|max:255'
-            ],
-            [
-                'first_name.required'       => 'First name is required.',
-                'last_name.required'        => 'Last name is required.',
-                'designation.required'      => 'Please enter your designation.',
-                'email.required'            => 'Email address is required.',
-                'email.email'               => 'Please enter a valid email address.',
-                'email.unique'              => 'This email address is already registered.',
-                'phone.required'            => 'Phone number is required.',
-                'phone.max'                 => 'Phone number can’t exceed 20 characters.',
-                'bio.required'              => 'Please add a short bio.',
-                'bio.max'                   => 'Bio cannot exceed 300 characters.',
-                'tags.required'             => 'Please enter at least one tag.',
-                'company_name.required'     => 'Company name is required.',
-                'company_website.max'       => 'Company website URL can’t exceed 255 characters.'
-            ]
-        );
+        $validator = Validator::make($request->all(), [
+            'first_name'        => 'required|string|max:255',
+            'last_name'    => 'required|string|max:255',
+            'designation' => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email,' . $user->id,
+            'phone'      => 'required|string|max:20',
+            'bio'    => 'required|max:300',
+            'tags'   => 'required|string',
+            // company fields
+            'company_name'     => 'required|string|max:255',
+            'company_website'     => 'nullable|string|max:255'
+        ]);
         
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first(),
+                'message' => 'Failed to update profile.',
                 'errors'  => $validator->errors()->first(),
-            ], 401);
+            ], 422);
         }
         
 
