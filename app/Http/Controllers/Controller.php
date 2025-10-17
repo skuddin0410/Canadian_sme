@@ -241,3 +241,5 @@ public static function imageBase64Upload($file, string $uploadPath = null, $tabl
     }
 
 }
+
+}
