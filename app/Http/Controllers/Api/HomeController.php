@@ -869,8 +869,8 @@ public function readAllNotifications(Request $request){
                     ],
                 ]);
              
-                Log::info('OneSignal Response:', [$response->body()]);
-             
+               
+               return $response->body();
                 if ($response->failed()) {
                     Log::error('OneSignal push failed:', [$response->json()]);
                 }
