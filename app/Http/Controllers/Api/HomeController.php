@@ -20,7 +20,8 @@ use App\Mail\UserWelcome;
 use Illuminate\Support\Facades\Mail;
 use App\Services\ActivityTrackingService;
 use App\Mail\UserConnectionsExportMail;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -847,6 +848,32 @@ public function readAllNotifications(Request $request){
 
           return response()->json(["message" => $e->getMessage()]);
 
+        }
+   }
+
+   public function sendPushNotificationTest(Request $request){
+      try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
+                    'Content-Type' => 'application/json; charset=utf-8',
+                ])->post('https://api.onesignal.com/api/v1/notifications', [
+                    'app_id' => env('ONESIGNAL_APP_ID'),
+                    'include_player_ids' => ['a0d8c5cb-5e9c-4913-ac9a-7a13fd06c821','1778baf6-f1ee-4351-ac5a-4ec3d57a3472'],
+                    'headings' => [
+                        'en' => 'Hi Subhabrata',
+                    ],
+                    'contents' => [
+                        'en' => 'Test ',
+                    ],
+                ]);
+             
+                Log::info('OneSignal Response:', [$response->body()]);
+             
+                if ($response->failed()) {
+                    Log::error('OneSignal push failed:', [$response->json()]);
+                }
+        } catch (\Exception $e) {
+            Log::error('OneSignal Exception:', [$e->getMessage()]);
         }
    }
 
