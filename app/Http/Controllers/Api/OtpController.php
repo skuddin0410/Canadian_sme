@@ -24,10 +24,16 @@ class OtpController extends Controller
 
         try {
             $validator = Validator::make($request->all(), [
-                'email' => 'required|nullable|string|max:255|email',
+                'email' => 'required|string|email|max:255',
             ]);
 
-              if (User::onlyTrashed()->where('email', $request->email)->first()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => "Invalid email format",
+                ], 422);
+            }
+
+            if (User::onlyTrashed()->where('email', $request->email)->first()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Your account is deleted or block. Please contact support for assistance.',
@@ -41,20 +47,19 @@ class OtpController extends Controller
                 ], 403); 
             }
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'error' => "Invalid email format",
-                ], 422);
-            }
+            
 
             $code = rand(1000, 9999);
             $currentDateTime = Carbon::now();
 
           
-                $otp = Otp::firstOrNew(['email' => $request->email]);
-                $otp->otp = $code;
-                $otp->expired_at = $currentDateTime->copy()->addMinutes(60);
-                $otp->save();
+                $otp = Otp::updateOrCreate(
+            ['email' => $email],
+            [
+                'otp' => $code,
+                'expired_at' => now()->addMinutes(60),
+            ]
+        );
 
                 Mail::to($request->email)->send(new OtpMail($code));
 
