@@ -180,8 +180,8 @@ class AttendeeUserController extends Controller
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
-
-        qrCode($user->id);
+       
+       
 
         $primaryGroupArray= [];
         $secondaryGroupArray=[];
@@ -219,6 +219,7 @@ class AttendeeUserController extends Controller
         
         if($user){  
           sendNotification("Welcome Email",$user);
+          qrCode($user->id);
         }
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
@@ -457,12 +458,18 @@ public function bulkAction(Request $request)
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
             $message = str_replace('{{site_name}}', config('app.name'), $message);
-                if(!empty($user->onesignal_userid)){
-                    /*OneSignal::sendNotificationToUser(
-                        $message,   // Notification message
-                        $user->onesignal_userids   // OneSignal Player ID
-                    );*/
 
+            $message = $message; // dynamic message from database
+            $notificationMessage = trim(
+                preg_replace('/\s+/', ' ',
+                    strip_tags(
+                        html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                    )
+                )
+            );
+
+
+                if(!empty($user->onesignal_userid)){
                     Http::withHeaders([
                         'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
                         'Content-Type' => 'application/json'
@@ -470,10 +477,10 @@ public function bulkAction(Request $request)
                         'app_id' => env('ONESIGNAL_APP_ID'),
                         'include_player_ids' => [$user->onesignal_userid], // must be a valid player_id
                         'headings' => ['en' => 'Hi '. $user->full_name ?? ''],
-                        'contents' => ['en' => $message],
+                        'contents' => ['en' => $notificationMessage],
                     ]);
 
-                    notification($user->id, 'bulk_notification',null, $subject, $message);
+                    notification($user->id, 'bulk_notification',null, $subject, $notificationMessage);
                 }
         }
     }
