@@ -15,7 +15,7 @@ class IOSPushService
             ? 'gateway.push.apple.com'        // Live
             : 'gateway.sandbox.push.apple.com'; // Dev/Sandbox
 
-        $this->apnsCert = storage_path('app/certs/ios_push_cert.pem');
+        $this->apnsCert = asset('SMESummit2025.pem');
         $this->apnsPassphrase = env('IOS_PUSH_PASSPHRASE', '');
     }
 
