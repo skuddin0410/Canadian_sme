@@ -860,7 +860,7 @@ public function readAllNotifications(Request $request){
                     'Content-Type' => 'application/json; charset=utf-8',
                 ])->post('https://api.onesignal.com/api/v1/notifications', [
                     'app_id' => env('ONESIGNAL_APP_ID'),
-                    'include_player_ids' => ['a0d8c5cb-5e9c-4913-ac9a-7a13fd06c821','1778baf6-f1ee-4351-ac5a-4ec3d57a3472'],
+                    'include_player_ids' => ['a0d8c5cb-5e9c-4913-ac9a-7a13fd06c821'],
                     'headings' => [
                         'en' => 'Hi Subhabrata',
                     ],
