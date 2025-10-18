@@ -881,7 +881,7 @@ public function readAllNotifications(Request $request){
 
       public function sendPushTest(Request $request){
       try {
-                sendPush('1778baf6-f1ee-4351-ac5a-4ec3d57a3472');
+                sendPush('a9d79193-9831-413c-bc35-f2e050e10cd2');
         } catch (\Exception $e) {
             Log::error('OneSignal Exception:', [$e->getMessage()]);
         }
