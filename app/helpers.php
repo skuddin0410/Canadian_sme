@@ -563,7 +563,7 @@ if (!function_exists('sendPush')) {
         $message = 'This is a test push notification.';
 
         $ios = new IOSPushService();
-        $sent = $ios->send('1778baf6-f1ee-4351-ac5a-4ec3d57a3472', $title, $message);
+        $sent = $ios->sendNotification('a9d79193-9831-413c-bc35-f2e050e10cd2', $title, $message);
     }
 
 }

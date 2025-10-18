@@ -12,6 +12,7 @@
         "berkayk/onesignal-laravel": "^2.4",
         "doctrine/dbal": "^4.2",
         "dompdf/dompdf": "^3.1",
+        "edamov/pushok": "^0.14.3",
         "intervention/image": "^3.11",
         "intervention/image-laravel": "^1.5",
         "laravel/framework": "^11.31",

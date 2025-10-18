@@ -1,64 +1,48 @@
 <?php
 
 namespace App\Services;
+ 
+use Pushok\AuthProvider\Token;
+use Pushok\Client;
+use Pushok\Notification;
+use Pushok\Payload;
+use Pushok\Payload\Alert;
+
 
 class IOSPushService
 {
-    protected $apnsHost;
-    protected $apnsPort = 2195;
-    protected $apnsCert;
-    protected $apnsPassphrase;
-
-    public function __construct()
+     public static function sendNotification($deviceToken, $title, $body)
     {
-        // $this->apnsHost = config('app.env') === 'production'
-        //     ? 'gateway.push.apple.com'        // Live
-        //     : 'gateway.sandbox.push.apple.com'; // Dev/Sandbox
-        $this->apnsHost  =  'gateway.push.apple.com';
-        $this->apnsCert = asset('SMESummit2025.pem');
-        $this->apnsPassphrase = env('IOS_PUSH_PASSPHRASE', '');
-    }
-
-    public function send($deviceToken, $title, $message)
-    {
-        $payload = [
-            'aps' => [
-                'alert' => [
-                    'title' => $title,
-                    'body'  => $message,
-                ],
-                'sound' => 'default',
-                'badge' => 1,
-            ],
-        ];
-
-        $body = json_encode($payload);
-
-        $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'local_cert', $this->apnsCert);
-        if (!empty($this->apnsPassphrase)) {
-            stream_context_set_option($ctx, 'ssl', 'passphrase', $this->apnsPassphrase);
-        }
-
-        $fp = stream_socket_client(
-            'ssl://' . $this->apnsHost . ':' . $this->apnsPort,
-            $err,
-            $errstr,
-            60,
-            STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT,
-            $ctx
+        $pemFilePath =  storage_path('app/certs/SMESummit2025.pem');
+        $pemFilePath =  asset('SMESummit2025.pem');
+        // Your passphrase (if any)
+        $passphrase = ''; 
+        $alert = Alert::create()->setTitle($title)->setBody($body);
+        $payload = Payload::create()->setAlert($alert);
+        $payload->setSound('default');
+        $payload->setBadge(1);
+ 
+        $notification = new Notification($payload, $deviceToken);
+        $client = new Client(
+            Token::create([
+                'key_id' => '3Q22UA87BA',
+                'team_id' => 'MCVPUT2HX2',
+                'app_bundle_id' => 'com.canadianSME.app',
+                'private_key_path' => $pemFilePath,
+                'private_key_secret' => $passphrase,
+            ]),
+            Client::PRODUCTION_URL
         );
 
-        if (!$fp) {
-            \Log::error("APNs connection failed: $err $errstr");
-            return false;
+        $client->addNotification($notification);
+        $responses = $client->push(); // Send notifications
+ 
+        foreach ($responses as $response) {
+            if ($response->getStatusCode() === 200) {
+                info('APNs notification sent successfully');
+            } else {
+                info('APNs error: ' . $response->getReasonPhrase());
+            }
         }
-
-        $msg = chr(0) . pack('n', 32) . pack('H*', $deviceToken) . pack('n', strlen($body)) . $body;
-
-        $result = fwrite($fp, $msg, strlen($msg));
-        fclose($fp);
-
-        return $result ? true : false;
-    }
+    }    
 }

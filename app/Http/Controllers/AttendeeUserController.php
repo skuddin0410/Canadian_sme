@@ -467,10 +467,9 @@ public function bulkAction(Request $request)
                     )
                 )
             );
-
-
+            
                 if(!empty($user->onesignal_userid)){
-                   /*/ $response = Http::withHeaders([
+                    $response = Http::withHeaders([
                         'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
                     ])
                     ->post('https://api.onesignal.com/notifications', [
@@ -482,16 +481,9 @@ public function bulkAction(Request $request)
                         'contents' => [
                             'en' => $notificationMessage,
                         ],
-                    ]);*/
+                    ]);
 
-                        OneSignal::sendNotificationToUser(
-                            "Hi ".$user->full_name,
-                            $user->onesignal_userid,
-                            $url = null,
-                            $data = null,
-                            $buttons = null,
-                            $schedule = null
-                        );
+                
                     notification($user->id, 'bulk_notification',null, $subject, $notificationMessage);
                 }
         }

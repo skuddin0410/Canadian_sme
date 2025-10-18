@@ -856,7 +856,7 @@ public function readAllNotifications(Request $request){
    public function sendPushNotificationTest(Request $request){
       try {
                 $response = Http::withHeaders([
-                    'Authorization' => 'Basic ' . 'os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztch5tw6yaxhevv4zc5n4hrqwe2lubebiptssd4uvvw3hvrtfcbmoagv37brv7otxmogdprcgfv7ezcy',
+                    'Authorization' => 'Basic ' . 'os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq',
                     'Content-Type' => 'application/json; charset=utf-8',
                 ])->post('https://api.onesignal.com/api/v1/notifications', [
                     'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
@@ -879,12 +879,49 @@ public function readAllNotifications(Request $request){
         }
    }
 
-      public function sendPushTest(Request $request){
+    public function sendPushTest(Request $request){
       try {
-                sendPush('a9d79193-9831-413c-bc35-f2e050e10cd2');
+            sendPush('a9d79193-9831-413c-bc35-f2e050e10cd2');
         } catch (\Exception $e) {
             Log::error('OneSignal Exception:', [$e->getMessage()]);
         }
-   }
+    }
+
+    public  function sendNotification($playerId="a0d8c5cb-5e9c-4913-ac9a-7a13fd06c821", $title="Hi", $message="Test From Subhabrata") {
+        $content = array(
+            "en" => $message
+        );
+     
+        $headings = array(
+            "en" => $title
+        );
+     
+        $fields = array(
+            'app_id' => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+            'include_player_ids' => array($playerId),
+            'headings' => $headings,
+            'contents' => $content
+        );
+
+        $fields = json_encode($fields);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json; charset=utf-8',
+            'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq'
+
+        ));
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $response = curl_exec($ch);
+        curl_close($ch);
+     
+        return $response;
+
+    }
 
 }
