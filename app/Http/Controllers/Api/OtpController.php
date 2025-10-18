@@ -139,7 +139,7 @@ public function verify(Request $request)
         ['email' => $request->email],
         ['password' => Hash::make($request->otp)]
     );
-    $user->update(['password' => Hash::make($request->otp)]); 
+    
     $user->assignRole('Attendee');
     
     try {
@@ -156,7 +156,7 @@ public function verify(Request $request)
             'password' => $request->otp, 
         ];
 
-        $token = JWTAuth::attempt($credentials);
+        $token = JWTAuth::fromUser($user);
       
         if (! $token ) {
             return response()->json([
