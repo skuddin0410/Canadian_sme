@@ -11,10 +11,10 @@ class IOSPushService
 
     public function __construct()
     {
-        $this->apnsHost = config('app.env') === 'production'
-            ? 'gateway.push.apple.com'        // Live
-            : 'gateway.sandbox.push.apple.com'; // Dev/Sandbox
-
+        // $this->apnsHost = config('app.env') === 'production'
+        //     ? 'gateway.push.apple.com'        // Live
+        //     : 'gateway.sandbox.push.apple.com'; // Dev/Sandbox
+        $this->apnsHost  =  'gateway.push.apple.com';
         $this->apnsCert = asset('SMESummit2025.pem');
         $this->apnsPassphrase = env('IOS_PUSH_PASSPHRASE', '');
     }
