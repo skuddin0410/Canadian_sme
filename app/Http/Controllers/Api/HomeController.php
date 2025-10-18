@@ -856,10 +856,10 @@ public function readAllNotifications(Request $request){
    public function sendPushNotificationTest(Request $request){
       try {
                 $response = Http::withHeaders([
-                    'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
+                    'Authorization' => 'Basic ' . 'os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztch5tw6yaxhevv4zc5n4hrqwe2lubebiptssd4uvvw3hvrtfcbmoagv37brv7otxmogdprcgfv7ezcy',
                     'Content-Type' => 'application/json; charset=utf-8',
                 ])->post('https://api.onesignal.com/api/v1/notifications', [
-                    'app_id' => env('ONESIGNAL_APP_ID'),
+                    'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
                     'include_player_ids' => ['a0d8c5cb-5e9c-4913-ac9a-7a13fd06c821'],
                     'headings' => [
                         'en' => 'Hi Subhabrata',
