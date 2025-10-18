@@ -47,19 +47,24 @@ class OtpController extends Controller
                 ], 403); 
             }
 
-            
+            $lastOtp = Otp::where('email',$request->email)->latest()->first();
+            if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please wait a minute before requesting another OTP.',
+                ], 429);
+            }
 
             $code = rand(1000, 9999);
             $currentDateTime = Carbon::now();
-
           
                 $otp = Otp::updateOrCreate(
-            ['email' => $email],
-            [
-                'otp' => $code,
-                'expired_at' => now()->addMinutes(60),
-            ]
-        );
+                    ['email' => $request->email],
+                    [
+                        'otp' => $code,
+                        'expired_at' => now()->addMinutes(60),
+                    ]
+                );
 
                 Mail::to($request->email)->send(new OtpMail($code));
 
@@ -178,7 +183,9 @@ public function verify(Request $request)
                 sendNotification("Welcome Email", $user);
             }
         }
-
+        if ($otp) {
+          $otp->delete();
+        }
         return response()->json([
             'success'    => true,
             'message'    => 'Login successful',

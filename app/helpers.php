@@ -552,3 +552,18 @@ if (!function_exists('getLandingPageSettings')) {
     }
 
 }
+
+
+if (!function_exists('sendPush')) {
+
+    function sendPush($device_token) {
+        $deviceToken = $device_token; // iOS device token from app
+        $title = 'Hello!';
+        $message = 'This is a test push notification.';
+
+        $ios = new IOSPushService();
+        $sent = $ios->send($deviceToken, $title, $message);
+    }
+
+}
+
