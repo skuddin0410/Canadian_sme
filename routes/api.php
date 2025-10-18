@@ -91,8 +91,10 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     
     Route::get('/delete-account', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteAccount']);
 
-    
+
   
 });
 
  Route::post('/onesignal/test', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotificationTest']);
+
+  Route::post('/ios/test', [App\Http\Controllers\Api\HomeController::class, 'sendPushTest']);
