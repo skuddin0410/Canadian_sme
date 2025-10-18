@@ -485,7 +485,7 @@ public function bulkAction(Request $request)
                     ]);*/
 
                         OneSignal::sendNotificationToExternalUser(
-                            $notificationMessage,
+                            "Hi ".$user->full_name,
                             $user->onesignal_userid,
                             $url = null,
                             $data = null,
