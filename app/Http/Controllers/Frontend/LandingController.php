@@ -29,7 +29,7 @@ class LandingController extends Controller
 
         $shareUrl = $event ? route('events.show', $event->id) : url()->current();
         
-        $speakers = Speaker::orderBy('created_at', 'DESC')->take(6)->get();
+        $speakers = Speaker::orderBy('created_at', 'DESC')->take(10)->get();
 
         $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(6)->get();
         $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
