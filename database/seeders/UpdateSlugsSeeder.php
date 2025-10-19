@@ -15,11 +15,12 @@ class UpdateSlugsSeeder extends Seeder
             foreach ($users as $user) {
               $slug = createUniqueSlug('users', $user->name.'-'.$user->lastname,'slug', $user->id);
                DB::table('users')->where('id', $user->id)->update(['slug' => $slug]);
+               DB::table('users')->where('id', $user->id)->update(['primary_group' => 'Attendee']);
             }
         });
 
         // Speakers
-        DB::table('speakers')->orderBy('id')->chunk(100, function ($speakers) {
+       /* DB::table('speakers')->orderBy('id')->chunk(100, function ($speakers) {
             foreach ($speakers as $speaker) {
                 $slug = createUniqueSlug('speakers', $speaker->name.'-'.$speaker->lastname, 'slug',$speaker->id);
                 DB::table('speakers')->where('id', $speaker->id)->update(['slug' => $slug]);
@@ -41,6 +42,6 @@ class UpdateSlugsSeeder extends Seeder
                $slug =  createUniqueSlug('event_sessions', $session->title,'slug', $session->id);
                DB::table('event_sessions')->where('id', $session->id)->update(['slug' => $slug]);
             }
-        });
+        });*/
     }
 }

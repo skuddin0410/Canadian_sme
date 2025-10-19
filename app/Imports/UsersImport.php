@@ -53,6 +53,8 @@ class UsersImport implements ToModel,WithStartRow
             $user->twitter_url = $row[11] ?? '';
             $user->linkedin_url = $row[12] ?? '';
             $user->instagram_url = $row[13] ?? '';
+            $user->slug = createUniqueSlug('users', $row[0].'_'.$row[1]);
+            $user->primary_group = 'Attendee';
             $user->save();
             $user->assignRole('Attendee');
 

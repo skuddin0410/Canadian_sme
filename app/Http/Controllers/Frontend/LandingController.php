@@ -29,20 +29,28 @@ class LandingController extends Controller
 
         $shareUrl = $event ? route('events.show', $event->id) : url()->current();
         
-        $speakers = Speaker::orderBy('id', 'ASC')->take(10)->get();
+        $speakers = Speaker::inRandomOrder()->take(10)->get();
 
-        $exhibitors = Company::where('is_sponsor',0)->orderBy('id', 'ASC')->take(6)->get();
-        $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('id', 'ASC')->take(6)->get();
+        $exhibitors = Company::where('is_sponsor', 0)
+            ->inRandomOrder()
+            ->take(6)
+            ->get();
 
-       $attendees = User::with(['photo', 'roles'])
-                    ->whereHas('roles', function ($q) {
-                        $q->where('name', 'Attendee');
-                    })
-                    ->whereNotNull('name')
-                    ->whereNotNull('slug')
-                    ->orderBy('id', 'ASC')
-                    ->take(5)
-                    ->get();
+        $sponsors = Company::with(['category'])
+            ->where('is_sponsor', 1)
+            ->inRandomOrder()
+            ->take(6)
+            ->get();
+
+        $attendees = User::with(['photo', 'roles'])
+            ->whereHas('roles', function ($q) {
+                $q->where('name', 'Attendee');
+            })
+            ->whereNotNull('name')
+            ->whereNotNull('slug')
+            ->inRandomOrder()
+            ->take(5)
+            ->get();
 
         $schedules = Session::where('start_time', '>=', now())->orderBy('start_time', 'ASC')->take(6)->get();
         $location = !empty($event->location) ? $event->location : null;
@@ -112,7 +120,7 @@ public function sponsorIndex()
 
     $sponsors = Company::with('logo')
         ->where('is_sponsor', 1)   
-        ->orderby('id','ASC')->paginate(10);
+        ->orderby('id','DESC')->paginate(10);
 
     return view('frontend.page.sponsor', compact('event', 'sponsors'));
 }
@@ -124,7 +132,7 @@ public function attendeeIndex()
                     $q->whereIn("name", ["Attendee"]);
                 })->whereNotNull('name')
                     ->whereNotNull('slug')
-                    ->orderBy('id','ASC')->paginate(10); 
+                    ->orderBy('id','DESC')->paginate(10); 
 
     
     return view('frontend.page.attendee', compact('attendees'));
