@@ -29,10 +29,10 @@ class LandingController extends Controller
 
         $shareUrl = $event ? route('events.show', $event->id) : url()->current();
         
-        $speakers = Speaker::orderBy('created_at', 'DESC')->take(10)->get();
+        $speakers = Speaker::orderBy('id', 'ASC')->take(10)->get();
 
-        $exhibitors = Company::where('is_sponsor',0)->orderBy('created_at', 'DESC')->take(6)->get();
-        $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('created_at', 'DESC')->take(6)->get();
+        $exhibitors = Company::where('is_sponsor',0)->orderBy('id', 'ASC')->take(6)->get();
+        $sponsors = Company::with(['category'])->where('is_sponsor',1)->orderBy('id', 'ASC')->take(6)->get();
 
        $attendees = User::with(['photo', 'roles'])
                     ->whereHas('roles', function ($q) {
@@ -40,7 +40,7 @@ class LandingController extends Controller
                     })
                     ->whereNotNull('name')
                     ->whereNotNull('slug')
-                    ->orderBy('id', 'DESC')
+                    ->orderBy('id', 'ASC')
                     ->take(5)
                     ->get();
 
@@ -112,7 +112,7 @@ public function sponsorIndex()
 
     $sponsors = Company::with('logo')
         ->where('is_sponsor', 1)   
-        ->orderby('created_at','DESC')->paginate(10);
+        ->orderby('id','ASC')->paginate(10);
 
     return view('frontend.page.sponsor', compact('event', 'sponsors'));
 }
@@ -124,7 +124,7 @@ public function attendeeIndex()
                     $q->whereIn("name", ["Attendee"]);
                 })->whereNotNull('name')
                     ->whereNotNull('slug')
-                    ->orderBy('created_at','DESC')->paginate(10); 
+                    ->orderBy('id','ASC')->paginate(10); 
 
     
     return view('frontend.page.attendee', compact('attendees'));
