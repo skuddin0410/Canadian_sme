@@ -120,7 +120,7 @@ public function verify(Request $request)
         ], 422);
     }
 
-
+       $otp = null;
         if (!in_array($request->email, $allowedEmails)) {
             $otp = Otp::where('email', $request->email)
                 ->where('otp', $request->otp)

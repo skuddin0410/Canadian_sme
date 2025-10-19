@@ -454,6 +454,7 @@ public function bulkAction(Request $request)
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
     } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
+
          foreach ($users as $user) {
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
@@ -467,25 +468,25 @@ public function bulkAction(Request $request)
                     )
                 )
             );
-            
-                if(!empty($user->onesignal_userid)){
-                    $response = Http::withHeaders([
-                        'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
-                    ])
-                    ->post('https://api.onesignal.com/notifications', [
-                        'app_id' => env('ONESIGNAL_APP_ID'),
-                        'include_player_ids' => [$user->onesignal_userid], // valid OneSignal player_id
-                        'headings' => [
-                            'en' => 'Hi ' . ($user->full_name ?? ''),
-                        ],
-                        'contents' => [
-                            'en' => $notificationMessage,
-                        ],
-                    ]);
 
-                
-                    notification($user->id, 'bulk_notification',null, $subject, $notificationMessage);
-                }
+            if(!empty($user->onesignal_userid)){
+                $response = Http::withHeaders([
+                    'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
+                ])
+                ->post('https://api.onesignal.com/notifications', [
+                    'app_id' => env('ONESIGNAL_APP_ID'),
+                    'include_player_ids' => [$user->onesignal_userid], // valid OneSignal player_id
+                    'headings' => [
+                        'en' => 'Hi ' . $user->full_name ?? '',
+                    ],
+                    'contents' => [
+                        'en' => $notificationMessage,
+                    ],
+                ]);
+
+            
+                notification($user->id, 'bulk_notification',null, $subject, $notificationMessage);
+            }
         }
     }
 
