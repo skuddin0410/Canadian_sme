@@ -41,7 +41,7 @@ class LandingController extends Controller
                     ->whereNotNull('name')
                     ->whereNotNull('slug')
                     ->orderBy('id', 'DESC')
-                    ->take(10)
+                    ->take(5)
                     ->get();
 
         $schedules = Session::where('start_time', '>=', now())->orderBy('start_time', 'ASC')->take(6)->get();
