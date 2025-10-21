@@ -29,6 +29,20 @@ Route::get('/generate-user-qrcodes', function () {
     return "✅ QR codes generated for all users without one.";
 });
 
+Route::get('/users-with-no-name', function () {
+    $users = User::whereNull('name')
+                ->orWhere('name', '')
+                ->orWhereNull('lastname')
+                ->orWhere('lastname', '')
+                 ->whereHas('roles', function ($q) {
+                    $q->where('name', 'Attendee');
+                })
+                ->get(['id', 'name', 'lastname', 'email']);
+     
+
+    return  $users;
+});
+
 Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
