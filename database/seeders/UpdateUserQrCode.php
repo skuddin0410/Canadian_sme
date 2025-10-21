@@ -12,8 +12,9 @@ class UpdateUserQrCode extends Seeder
     {   
         $users = User::get();
         foreach ($users as $user) {
-            print_r($user);
-            qrCode($user->id, 'user');
+            if(empty($user->qr_code)){
+               qrCode($user->id, 'user'); 
+            }  
         }
     }
 }

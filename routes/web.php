@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\User;
 
 
 Route::get('/login', function () {
@@ -18,7 +19,15 @@ Route::get('/admin', function () {
     return redirect()->route('login');
 });
 
-
+Route::get('/generate-user-qrcodes', function () {
+    $users = User::all();
+    foreach ($users as $user) {
+        if (empty($user->qr_code)) {
+            qrCode($user->id, 'user');
+        }
+    }
+    return "✅ QR codes generated for all users without one.";
+});
 
 Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
