@@ -55,7 +55,14 @@ class AttendeeUserController extends Controller
             if ($request->filled('search')) {
                 $users = $users->where(function ($query) use ($request) {
                     $query->where('name', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('email', 'LIKE', '%' . $request->search . '%');
+                          ->orWhere('email', 'LIKE', '%' . $request->search . '%')
+                          ->orWhere('lastname', 'LIKE', '%' . $request->search . '%')
+                          ->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', "%{$request->search}%")
+                          ->orWhere('designation', 'LIKE', '%' . $request->search . '%')
+                          ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
+                          ->orWhere('company', 'LIKE', '%' . $request->search . '%');
+
+                          
                 });
             }
 
