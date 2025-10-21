@@ -17,43 +17,35 @@ class UsersImport implements ToModel,WithStartRow
         return 2; // Skip the header row
     }
 
-public function model(array $row)
-{
-    // Start the retry logic
-    $maxRetries = 3;
-    $retries = 0;
+    public function model(array $row)
+    {   
+        $import = ImportData::create([
+            "name" =>  $row[0],
+            "lastname" => $row[1],
+            "email" => $row[2] ?? '',
+            "status" => $row[3] ?? '',
+            "gdpr_consent" => $row[4] == 'confirmed' ? 1 : 0,
+            "bio" => $row[5] ?? '',
+            "company" => $row[6] ?? '',
+            "designation" => $row[7] ?? '',
+            "mobile" => $row[8] ?? '',
+            "dob" => $row[9] ?? '',
+            "facebook_url" => $row[10] ?? '',
+            "twitter_url" => $row[11] ?? '',
+            "linkedin_url" => $row[12] ?? '',
+            "instagram_url" => $row[13] ?? '',
+        ]);
 
-    while ($retries < $maxRetries) {
-        try {
-            // Check if essential fields are empty
-            if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
-                return null;
-            }
+        if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
+         return null;
+        }
+        
+        $contact = User::where('email', $row[2])->first();
+        if(!empty($contact)){
+           return null; 
+        }
 
-       
-            $import = ImportData::create([
-                "name" =>  $row[0],
-                "lastname" => $row[1],
-                "email" => $row[2] ?? '',
-                "status" => $row[3] ?? '',
-                "gdpr_consent" => $row[4] == 'confirmed' ? 1 : 0,
-                "bio" => $row[5] ?? '',
-                "company" => $row[6] ?? '',
-                "designation" => $row[7] ?? '',
-                "mobile" => $row[8] ?? '',
-                "dob" => $row[9] ?? '',
-                "facebook_url" => $row[10] ?? '',
-                "twitter_url" => $row[11] ?? '',
-                "linkedin_url" => $row[12] ?? '',
-                "instagram_url" => $row[13] ?? '',
-            ]);
-
-     
-            $contact = User::where('email', $row[2])->first();
-            if ($contact) {
-                return null;
-            }
-
+        if( empty($contact) ){
             $user = new User();
             $user->name =  $row[0];
             $user->lastname = $row[1];
@@ -75,24 +67,7 @@ public function model(array $row)
             $user->assignRole('Attendee');
          
             qrCode($user->id);
+        } 
 
-            // If the insert was successful, exit the loop
-            break;
-
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == '40001') {
-                $retries++;
-                if ($retries >= $maxRetries) {
-                    throw $e; // If max retries are exceeded, throw the error
-                }
-              
-                sleep(1); 
-            } else {
-        
-                throw $e;
-            }
-        }
     }
-}
-
 }
