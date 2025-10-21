@@ -46,6 +46,14 @@ class OtpController extends Controller
                     'message' => 'Your account is inactive. Please contact support for assistance.',
                 ], 403); 
             }
+            
+            if (User::where('email', $request->email)->doesntExist()) {
+                return response()->json([
+                   'success' => false,
+                   'message' => 'You are not approved by admin.Please contact support for assistance.',
+                ]);  
+            }
+           
 
             $lastOtp = Otp::where('email',$request->email)->latest()->first();
             if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
@@ -104,6 +112,13 @@ public function verify(Request $request)
                 'success' => false,
                 'message' => 'Your account is inactive. Please contact support for assistance.',
             ], 403); 
+        }
+
+        if (User::where('email', $request->email)->doesntExist()) {
+            return response()->json([
+               'success' => false,
+               'message' => 'You are not approved by admin.Please contact support for assistance.',
+            ]);  
         }
     
         $allowedEmails = [
@@ -177,8 +192,8 @@ public function verify(Request $request)
         notification($user->id);
         $user = User::where('id',$user->id)->first();
         if(empty($user->qr_code)){
-            $qrGenerated = qrCode($user->id);
             $user->refresh();
+            $qrGenerated = qrCode($user->id);
             if (!empty($user->qr_code) && $qrGenerated) {
                 sendNotification("Welcome Email", $user);
             }

@@ -277,25 +277,25 @@ function submitBadgeAction() {
         alert("Please select at least one user.");
         return;
     }
-    
-    //const badge = document.getElementById('badge').value;
-{{-- 
-    if (!badge) {
-        alert('Please select an badge template.');
-    } --}}
-    const badge = '' 
-    const template_name = ''
-    const  type= 'badge'
-    if(badge){
-      template_name = badge
-      type= 'badge'
-    }
-   
+
+    const badge = ''; // can be dynamic if needed
+    const template_name = badge || '';
+    const type = 'badge';
+
+    // Set selected IDs
     document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+
+    // Configure form
     let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('badges.print') }}?template_name=" + template_name+"&type="+type;
+    form.action = "{{ route('badges.print') }}?template_name=" + template_name + "&type=" + type;
+
+    // ✅ Open submission in a new tab
+    form.target = "_blank";
+
+    // Submit the form
     form.submit();
 }
+
 </script>
 <style>
   .badge-sm {

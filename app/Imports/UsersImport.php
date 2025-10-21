@@ -20,7 +20,7 @@ class UsersImport implements ToModel,WithStartRow
     public function model(array $row)
     {   
         $import = ImportData::create([
-             "name" =>  $row[0],
+            "name" =>  $row[0],
             "lastname" => $row[1],
             "email" => $row[2] ?? '',
             "status" => $row[3] ?? '',
@@ -35,8 +35,16 @@ class UsersImport implements ToModel,WithStartRow
             "linkedin_url" => $row[12] ?? '',
             "instagram_url" => $row[13] ?? '',
         ]);
+
+        if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
+         return null;
+        }
         
         $contact = User::where('email', $row[2])->first();
+        if(!empty($contact)){
+           return null; 
+        }
+
         if( empty($contact) ){
             $user = new User();
             $user->name =  $row[0];
@@ -57,10 +65,8 @@ class UsersImport implements ToModel,WithStartRow
             $user->primary_group = 'Attendee';
             $user->save();
             $user->assignRole('Attendee');
-
+         
             qrCode($user->id);
-            //notification($user->id);
-            //sendNotification("Welcome Email",$user);
         } 
 
     }
