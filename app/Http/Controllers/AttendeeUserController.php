@@ -41,7 +41,7 @@ class AttendeeUserController extends Controller
     public function index(Request $request)
     {
         //
-        $perPage = (int) $request->input('perPage', 15);
+        $perPage = (int) $request->input('perPage', 150);
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
         $search = $request->input('search', '');

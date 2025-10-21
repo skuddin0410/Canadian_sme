@@ -853,31 +853,29 @@ public function readAllNotifications(Request $request){
         }
    }
 
-   public function sendPushNotificationTest(Request $request){
-      try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Basic ' . 'os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq',
-                    'Content-Type' => 'application/json; charset=utf-8',
-                ])->post('https://api.onesignal.com/api/v1/notifications', [
-                    'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
-                    'include_player_ids' => ['a0d8c5cb-5e9c-4913-ac9a-7a13fd06c821'],
-                    'headings' => [
-                        'en' => 'Hi Subhabrata',
-                    ],
-                    'contents' => [
-                        'en' => 'Test ',
-                    ],
-                ]);
-             
-               
-               return $response->body();
-                if ($response->failed()) {
-                    Log::error('OneSignal push failed:', [$response->json()]);
-                }
-        } catch (\Exception $e) {
-            Log::error('OneSignal Exception:', [$e->getMessage()]);
-        }
-   }
+public function sendPushNotificationTest(Request $request)
+{
+    try {
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa',
+            'Content-Type' => 'application/json; charset=utf-8',
+        ])->post('https://api.onesignal.com/api/v1/notifications', [
+            'app_id' => '45726252-6dce-4f91-bb5e-58f9d6f75f2d',
+            'include_player_ids' => ['232d65bd-4636-498c-86c1-4df3421b6c60'],
+            'headings' => ['en' => 'Hi Subhabrata'],
+            'contents' => ['en' => 'Test'],
+        ]);
+ 
+        Log::info('OneSignal status: ' . $response->status());
+        Log::info('OneSignal response: ' . $response->body());
+ 
+        return $response->json();
+ 
+    } catch (\Exception $e) {
+        Log::error('OneSignal Exception:', [$e->getMessage()]);
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 
     public function sendPushTest(Request $request){
       try {
@@ -922,6 +920,35 @@ public function readAllNotifications(Request $request){
      
         return $response;
 
+    }
+
+    public static function sendNotificationTest()
+    {
+        $content = [
+            "app_id" => "45726252-6dce-4f91-bb5e-58f9d6f75f2d",
+            "include_player_ids" => ['c562d159-5963-4611-bda4-19a4c8dd5a0a'],
+            "headings" => ["en" => 'Hi'],
+            "contents" => ["en" => 'Hello']
+        ];
+     
+        $fields = json_encode($content);
+     
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json; charset=utf-8',
+            'Authorization: Basic os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+     
+        $response = curl_exec($ch);
+        curl_close($ch);
+     
+        info('OneSignal Response: ' . $response);
     }
 
 }

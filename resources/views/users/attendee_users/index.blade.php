@@ -291,31 +291,41 @@ function closeImportModal(){
     $('#openImportModal').modal('hide'); 
 }
 </script>
+<script>
+  // Event listener for file input change
+  document.getElementById('userImportFile').addEventListener('change', function (event) {
+    const file = event.target.files[0];
 
- <script>
-    // Event listener for file input change
-    document.getElementById('userImportFile').addEventListener('change', function (event) {
-      const file = event.target.files[0];
+    if (!file) {
+      alert('Please select a CSV file');
+      return;
+    }
 
-      if (!file) {
-        alert('Please select a CSV file');
-        return;
-      }
+    // Parse the selected CSV file
+    Papa.parse(file, {
+      complete: function(results) {
+        // Remove blank rows (rows that don't have any meaningful data)
+        const filteredData = results.data.filter(row => {
+          // Check if there's at least one non-empty cell in the row
+          return Object.values(row).some(cell => cell.trim() !== '');
+        });
 
-      // Parse the selected CSV file
-      Papa.parse(file, {
-        complete: function(results) {
-          // Get the number of rows
-          const numRows = results.data.length;
+        // Get the number of rows after filtering out blank ones
+        const numRows = filteredData.length;
 
-          // Show the row count
-          document.getElementById('rowCount').innerText = `Number of rows in CSV: ${numRows}`;
+        // Show the row count
+        document.getElementById('rowCount').innerText = `Number of rows in CSV: ${numRows}`;
+
+        // Enable the submit button if there are rows to process
+        if (numRows > 0) {
           document.getElementById('submitBtn').style.display = 'inline-block';
-  
-        },
-        header: true, // Assuming the first row is a header
-        skipEmptyLines: true // Skip any empty lines in the CSV
-      });
+        } else {
+          document.getElementById('submitBtn').style.display = 'none';
+        }
+      },
+      header: true, // Assuming the first row is a header
+      skipEmptyLines: true // Skip any empty lines in the CSV
     });
-  </script>
+  });
+</script>
 @endsection

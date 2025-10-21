@@ -97,4 +97,4 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
 
  Route::post('/onesignal/test', [App\Http\Controllers\Api\HomeController::class, 'sendNotification']);
 
-  Route::post('/ios/test', [App\Http\Controllers\Api\HomeController::class, 'sendPushTest']);
+Route::post('/ios/test', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotificationTest']);
