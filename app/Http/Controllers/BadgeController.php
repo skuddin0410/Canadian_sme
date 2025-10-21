@@ -177,8 +177,9 @@ class BadgeController extends Controller
 
     public function generateBadges(Request $request)
     {   
-    
-        $badge = Badge::where('badge_name',$request->template_name)->first();
+       
+        //$badge = Badge::where('badge_name',$request->template_name)->first();
+        $badge = Badge::latest()->first();
         $badges = [];
         $userIds = json_decode($request->user_ids, true);
         $users = User::whereIn('id', $userIds)->get();

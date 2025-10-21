@@ -267,7 +267,7 @@ function submitBulkAction(actionType) {
 }
 
 
-function submitBadgeAction(actionType) {
+function submitBadgeAction() {
     let selected = [];
     document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
         selected.push(cb.value);
@@ -278,12 +278,14 @@ function submitBadgeAction(actionType) {
         return;
     }
     
-    const badge = document.getElementById('badge').value;
-
+    //const badge = document.getElementById('badge').value;
+{{-- 
     if (!badge) {
         alert('Please select an badge template.');
-    }
-
+    } --}}
+    const badge = '' 
+    const template_name = ''
+    const  type= 'badge'
     if(badge){
       template_name = badge
       type= 'badge'

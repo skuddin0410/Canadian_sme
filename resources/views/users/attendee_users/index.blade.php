@@ -59,7 +59,7 @@
                                     Send Notification (<span id="notifCount">0</span>)
                                 </button>
 
-                                 <button type="button" class="btn btn-secondary" onclick="openModal('badge')">
+                                 <button type="button" class="btn btn-secondary" onclick="submitBadgeAction()">
                                     Generate Badge (<span id="badgeCount">0</span>)
                                 </button>
                             </div>
@@ -140,7 +140,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="bulkBadgeModal" tabindex="-1" role="dialog" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+<!---<div class="modal fade" id="bulkBadgeModal" tabindex="-1" role="dialog" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -166,7 +166,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --->
 
 <div class="modal fade" id="openImportModal" tabindex="-1" role="dialog" aria-labelledby="ImportModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
