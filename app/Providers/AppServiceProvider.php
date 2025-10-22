@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {   
         \URL::forceScheme('https');
+        date_default_timezone_set(config('app.timezone'));
         Paginator::useBootstrap();
         \App\Models\TicketType::observe(\App\Observers\TicketTypeObserver::class);
         Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page') {

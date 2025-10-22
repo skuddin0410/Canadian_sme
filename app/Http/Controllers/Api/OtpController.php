@@ -36,22 +36,22 @@ class OtpController extends Controller
             if (User::onlyTrashed()->where('email', $request->email)->first()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Your account is deleted or block. Please contact support for assistance.',
+                    'message' => 'Your account is deleted or block.',
                 ], 403); 
             }
 
             if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Your account is inactive. Please contact support for assistance.',
+                    'message' => 'Your account is inactive.',
                 ], 403); 
             }
             
             if (User::where('email', $request->email)->doesntExist()) {
                 return response()->json([
                    'success' => false,
-                   'message' => 'You are not approved by admin.Please contact support for assistance.',
-                ]);  
+                   'message' => 'You are not approved by admin.',
+                ],403);  
             }
            
 
@@ -103,22 +103,22 @@ public function verify(Request $request)
         if (User::onlyTrashed()->where('email', $request->email)->first()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Your account is deleted or block. Please contact support for assistance.',
+                'message' => 'Your account is deleted or block.',
             ], 403); 
         }
 
         if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Your account is inactive. Please contact support for assistance.',
+                'message' => 'Your account is inactive.',
             ], 403); 
         }
 
         if (User::where('email', $request->email)->doesntExist()) {
             return response()->json([
                'success' => false,
-               'message' => 'You are not approved by admin.Please contact support for assistance.',
-            ]);  
+               'message' => 'You are not approved by admin.',
+            ],403);  
         }
     
         $allowedEmails = [
@@ -162,7 +162,7 @@ public function verify(Request $request)
         if($user->is_approve == 0){
            return response()->json([
             'success'    => false,
-            'message'    => 'Your account is inactive. Please contact support for assistance.',
+            'message'    => 'Your account is inactive.',
            ]); 
         }
         
