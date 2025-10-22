@@ -471,22 +471,30 @@ public function bulkAction(Request $request)
             );
 
             if(!empty($user->onesignal_userid)){
-                $response = Http::withHeaders([
-                    'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
-                ])
-                ->post('https://api.onesignal.com/notifications', [
-                    'app_id' => env('ONESIGNAL_APP_ID'),
-                    'include_player_ids' => [$user->onesignal_userid], // valid OneSignal player_id
-                    'headings' => [
-                        'en' => 'Hi ' . $user->full_name ?? '',
-                    ],
-                    'contents' => [
-                        'en' => $notificationMessage,
-                    ],
-                ]);
+                    $content = [
+                        "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+                        "include_player_ids" => [$user->onesignal_userid],
+                        "headings" => ["en" => 'Hi' . $user->full_name ?? ''],
+                        "contents" => ["en" => $message]
+                    ];
+                 
+                    $fields = json_encode($content);
+                 
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json; charset=utf-8',
+                        'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
+                    ]);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                    curl_setopt($ch, CURLOPT_POST, TRUE);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                 
+                    $response = curl_exec($ch);
+                    curl_close($ch);
 
-            
-                notification($user->id, 'bulk_notification',null, $subject, $notificationMessage);
             }
         }
     }
