@@ -474,7 +474,7 @@ public function bulkAction(Request $request)
                     $content = [
                         "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
                         "include_player_ids" => [$user->onesignal_userid],
-                        "headings" => ["en" => 'Hi' . $user->full_name ?? ''],
+                        "headings" => ["en" => 'Hi,' . $user->full_name.','. ?? ''],
                         "contents" => ["en" => $message]
                     ];
                  
