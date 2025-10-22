@@ -14,6 +14,8 @@ use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
 use App\Models\Page;
+use App\Models\Speaker;
+use App\Models\Company;
 
 class HomeController extends Controller
 {
@@ -34,35 +36,21 @@ class HomeController extends Controller
      */
     public function index()
     {  
-        if ( Auth::user()->hasRole('Admin') 
-            || Auth::user()->hasRole('Exhibitor')
-            || Auth::user()->hasRole('Representative')
-            || Auth::user()->hasRole('Attendee')
-            || Auth::user()->hasRole('Speaker')
-            || Auth::user()->hasRole('Support Staff Or Helpdesk')
-            || Auth::user()->hasRole('Registration Desk')) {
+        if ( Auth::user()->hasRole('Admin')) {
             
             $evntCount = Session::count();
             $attendeeCount = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ["Attendee"]);
+                    $q->where("name", "Attendee");
                 })->count();
 
-            $speakerCount = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ["Speaker"]);
-                })->count();  
+            $speakerCount = Speaker::count();  
 
-            $sponsorCount = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ["Sponsors"]);
-                })->count();         
+            $sponsorCount = Company::where('is_sponsor',1)->count();         
             
-            $exhibitorCount = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->whereNotIn("name", ["Exhibitor"]);
-                })->count();
-            $revenue = 0;
+            $exhibitorCount = Company::where('is_sponsor',0)->count();
+           
+
             if(Auth::user()->hasRole('Admin') ){
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
@@ -71,7 +59,7 @@ class HomeController extends Controller
                 $loginlogs = UserLogin::with('user')->where('user_logins.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
             } 
 
-            return view('home',compact('evntCount','attendeeCount','speakerCount','sponsorCount','exhibitorCount','revenue','logs','loginlogs'));
+            return view('home',compact('evntCount','attendeeCount','speakerCount','sponsorCount','exhibitorCount','logs','loginlogs'));
         }
 
     }

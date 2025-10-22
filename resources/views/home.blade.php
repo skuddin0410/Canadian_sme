@@ -47,82 +47,73 @@
     @php
       $fmt = fn($n) => number_format((int)($n ?? 0));
     @endphp
-
-    <div class="row g-3">
-      <div class="col-12 col-sm-6 col-xl-2">
-        <div class="card kpi-card gradient-primary">
-          <div class="card-body d-flex align-items-center justify-content-between">
-            <div>
-              <p class="kpi-label mb-1">Total Events</p>
-              <h4 class="kpi-value mb-0">{{ $fmt($eventCount ?? $evntCount ?? 0) }}</h4>
-            </div>
-            <i class="bi bi-calendar-event kpi-icon" aria-hidden="true"></i>
-          </div>
+<div class="row g-3">
+  <!-- Total Events Card -->
+  <!--<div class="col-12 col-sm-6 col-md-4 col-xl-2">
+    <div class="card kpi-card gradient-primary">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+          <p class="kpi-label mb-1">Total Events</p>
+          <h4 class="kpi-value mb-0">{{ $fmt($eventCount ?? $evntCount ?? 0) }}</h4>
         </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-2">
-        <div class="card kpi-card gradient-success">
-          <div class="card-body d-flex align-items-center justify-content-between">
-            <div>
-              <p class="kpi-label mb-1">Total Attendees</p>
-              <h4 class="kpi-value mb-0">{{ $fmt($attendeeCount ?? 0) }}</h4>
-            </div>
-            <i class="bi bi-people-fill kpi-icon" aria-hidden="true"></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-2">
-        <div class="card kpi-card gradient-info">
-          <div class="card-body d-flex align-items-center justify-content-between">
-            <div>
-              <p class="kpi-label mb-1">Total Speakers</p>
-              <h4 class="kpi-value mb-0">{{ $fmt($speakerCount ?? 0) }}</h4>
-            </div>
-            <i class="bi bi-mic-fill kpi-icon" aria-hidden="true"></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-2">
-        <div class="card kpi-card gradient-warning">
-          <div class="card-body d-flex align-items-center justify-content-between">
-            <div>
-              <p class="kpi-label mb-1">Total Sponsors</p>
-              <h4 class="kpi-value mb-0">{{ $fmt($sponsorCount ?? 0) }}</h4>
-            </div>
-            <i class="bi bi-briefcase-fill kpi-icon" aria-hidden="true"></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-2">
-        <div class="card kpi-card gradient-secondary">
-          <div class="card-body d-flex align-items-center justify-content-between">
-            <div>
-              <p class="kpi-label mb-1">Total Exhibitors</p>
-              <h4 class="kpi-value mb-0">{{ $fmt($exhibitorCount ?? 0) }}</h4>
-            </div>
-            <i class="bi bi-shop kpi-icon" aria-hidden="true"></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-2">
-        <div class="card kpi-card gradient-dark">
-          <div class="card-body d-flex align-items-center justify-content-between">
-            <div>
-              <p class="kpi-label mb-1">Revenue</p>
-              <h4 class="kpi-value mb-0">
-                {{ isset($revenue) ? '₹'.number_format($revenue,2) : '₹0.00' }}
-              </h4>
-            </div>
-            <i class="bi bi-currency-rupee kpi-icon" aria-hidden="true"></i>
-          </div>
-        </div>
+        <i class="bi bi-calendar-event kpi-icon" aria-hidden="true"></i>
       </div>
     </div>
+  </div>-->
+
+  <!-- Total Attendees Card -->
+  <div class="col-12 col-sm-6 col-md-3">
+    <div class="card kpi-card gradient-success">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+          <p class="kpi-label mb-1">Total Attendees</p>
+          <h4 class="kpi-value mb-0">{{ $fmt($attendeeCount ?? 0) }}</h4>
+        </div>
+        <i class="bi bi-people-fill kpi-icon" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Speakers Card -->
+  <div class="col-12 col-sm-6 col-md-3">
+    <div class="card kpi-card gradient-info">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+          <p class="kpi-label mb-1">Total Speakers</p>
+          <h4 class="kpi-value mb-0">{{ $fmt($speakerCount ?? 0) }}</h4>
+        </div>
+        <i class="bi bi-mic-fill kpi-icon" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Sponsors Card -->
+  <div class="col-12 col-sm-6 col-md-3">
+    <div class="card kpi-card gradient-warning">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+          <p class="kpi-label mb-1">Total Sponsors</p>
+          <h4 class="kpi-value mb-0">{{ $fmt($sponsorCount ?? 0) }}</h4>
+        </div>
+        <i class="bi bi-briefcase-fill kpi-icon" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Exhibitors Card -->
+  <div class="col-12 col-sm-6 col-md-3">
+    <div class="card kpi-card gradient-secondary">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+          <p class="kpi-label mb-1">Total Exhibitors</p>
+          <h4 class="kpi-value mb-0">{{ $fmt($exhibitorCount ?? 0) }}</h4>
+        </div>
+        <i class="bi bi-shop kpi-icon" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <div class="row mt-4">
       <div class="col-12">
