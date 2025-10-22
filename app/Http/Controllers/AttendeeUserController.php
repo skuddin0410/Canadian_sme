@@ -148,14 +148,7 @@ class AttendeeUserController extends Controller
 
             'secondary_group'   => ['nullable','array'],
             'secondary_group.*' => ['string'],  
-            'primary_group' => 'required|string', 
-
-          'access_speaker_ids'    => ['nullable','array'],
-          'access_speaker_ids.*'  => ['integer','exists:users,id'],
-          'access_exhibitor_ids'  => ['nullable','array'],
-          'access_exhibitor_ids.*'=> ['integer','exists:companies,id'],
-          'access_sponsor_ids'    => ['nullable','array'],
-          'access_sponsor_ids.*'  => ['integer','exists:companies,id'],                
+            'primary_group' => 'required|string',               
         ]);
 
         if ($validator->fails()) {
