@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class UsersImport implements ToModel, WithStartRow
 {
     protected $users = [];
+    protected $emails = [];  // Store emails to check duplicates
 
     public function startRow(): int
     {  
@@ -18,16 +19,26 @@ class UsersImport implements ToModel, WithStartRow
 
     public function model(array $row)
     {   
-
+        // Skip rows with missing critical information
         if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
             return null;
         }
-        
-    
+
+        // Check if the email already exists in the current batch
+        if (in_array($row[2], $this->emails)) {
+            return null; // Skip duplicate email in the batch
+        }
+
+        // Check if email already exists in the database
         $existingUser = User::where('email', $row[2])->first();
         if ($existingUser) {
-            return null; 
+            return null;  // Skip existing users
         }
+
+        // Add the email to the list of processed emails in the batch
+        $this->emails[] = $row[2];
+
+        // Add the user to the batch for bulk insertion
         $this->users[] = [
             'name' => $row[0],
             'lastname' => $row[1],
@@ -52,7 +63,8 @@ class UsersImport implements ToModel, WithStartRow
         // Perform bulk insert after a certain number of records (e.g., 500)
         if (count($this->users) >= 500) {
             User::insert($this->users);
-            $this->users = []; // Reset the users array after the insert
+            $this->users = [];  // Reset the users array after the insert
+            $this->emails = []; // Reset the email list
         }
 
         return null; // We don’t need to return anything for each row
