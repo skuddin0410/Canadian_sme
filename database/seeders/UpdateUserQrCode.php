@@ -10,11 +10,15 @@ class UpdateUserQrCode extends Seeder
 {
     public function run(): void
     {   
-        $users = User::get();
+        $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
         foreach ($users as $user) {
             if(empty($user->qr_code)){
                qrCode($user->id, 'user'); 
-            }  
+            } 
+
+            if (!$user->hasRole('Attendee')) {
+              $user->assignRole('Attendee');
+            } 
         }
     }
 }
