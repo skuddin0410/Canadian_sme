@@ -47,11 +47,11 @@ class AttendeeUserController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-        // $users = User::with("roles")->whereHas("roles", function ($q) {
-        //      $q->whereIn("name", ['Attendee']);
-        // })->orderBy('created_at', 'DESC');
+            $users = User::with("roles")->whereHas("roles", function ($q) {
+              $q->whereIn("name", ['Attendee']);
+            })->orderBy('id', 'DESC');
             
-            $users = User::with("roles")->orderBy('id', 'DESC');
+            //$users = User::with("roles")->orderBy('id', 'DESC');
  
             if ($request->filled('search')) {
                 $users = $users->where(function ($query) use ($request) {
@@ -500,6 +500,25 @@ public function bulkAction(Request $request)
 
     return redirect()->back()->with('success', ucfirst($type) . " sent successfully to selected users.");
 }
+
+public function generateQrCodeManually(){
+        $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
+        if(!empty($users)){
+           foreach ($users as $user) {
+            if(empty($user->qr_code)){
+               qrCode($user->id, 'user'); 
+            } 
+
+            if (!$user->hasRole('Attendee')) {
+              $user->assignRole('Attendee');
+            } 
+           } 
+
+           
+        }
+
+        return redirect()->back()->with('success',"Qr Code generated sent successfully.");   
+    }
 
 
 }

@@ -19,6 +19,10 @@
                             <a href="{{ route('attendee-users.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add Attendee
                             </a>
+
+                             <a href="{{ route('attendee-users.generateQrCodeManually') }}" class="btn btn-secondary dt-button create-new">
+                                 Generate Qrcode
+                            </a>
                     
                     </div>
                 </div>

@@ -154,6 +154,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
      Route::get('/attendees/export', [AttendeeUserController::class, 'exportAttendees'])
     ->name('attendee-users.export');
 
+     Route::get('/attendees/generate-qr-code-manually', [AttendeeUserController::class, 'generateQrCodeManually'])
+    ->name('attendee-users.generateQrCodeManually');
+
      Route::resource('sponsors', SponsorsController::class);
      
      Route::resource('speaker', SpeakerController::class);
