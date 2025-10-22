@@ -47,10 +47,11 @@ class AttendeeUserController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-        $users = User::with("roles")->whereHas("roles", function ($q) {
-             $q->whereIn("name", ['Attendee']);
-        })->orderBy('created_at', 'DESC');
-
+        // $users = User::with("roles")->whereHas("roles", function ($q) {
+        //      $q->whereIn("name", ['Attendee']);
+        // })->orderBy('created_at', 'DESC');
+            
+            $users = User::with("roles")->orderBy('id', 'DESC');
  
             if ($request->filled('search')) {
                 $users = $users->where(function ($query) use ($request) {
