@@ -552,7 +552,14 @@ public function scanDetails(Request $request){
                 'data' => $request->all(),
             ], 422);
         }
-  
+        
+        if($user->id == $request->qrData){
+            return response()->json([
+                'success' => false,
+                'message' => "Your own QR code cannot be scanned."
+            ], 422);
+        }
+
         $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
        
         if(!$data){

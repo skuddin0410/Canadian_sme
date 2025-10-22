@@ -32,6 +32,13 @@ class OtpController extends Controller
                     'error' => "Invalid email format",
                 ], 422);
             }
+            
+            if (User::where('email', $request->email)->doesntExist()) {
+                return response()->json([
+                   'success' => false,
+                   'message' => 'You are not approved by admin.',
+                ],403);  
+            }
 
             if (User::onlyTrashed()->where('email', $request->email)->first()) {
                 return response()->json([
@@ -47,14 +54,7 @@ class OtpController extends Controller
                 ], 403); 
             }
             
-            if (User::where('email', $request->email)->doesntExist()) {
-                return response()->json([
-                   'success' => false,
-                   'message' => 'You are not approved by admin.',
-                ],403);  
-            }
            
-
             $lastOtp = Otp::where('email',$request->email)->latest()->first();
             if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
                 return response()->json([
@@ -98,7 +98,13 @@ public function verify(Request $request)
             'email' => 'required|string|email|max:255',
             'otp'   => 'required|digits:4',
         ]);
-
+        
+        if (User::where('email', $request->email)->doesntExist()) {
+            return response()->json([
+               'success' => false,
+               'message' => 'You are not approved by admin.',
+            ],403);  
+        }
              
         if (User::onlyTrashed()->where('email', $request->email)->first()) {
             return response()->json([
@@ -112,13 +118,6 @@ public function verify(Request $request)
                 'success' => false,
                 'message' => 'Your account is inactive.',
             ], 403); 
-        }
-
-        if (User::where('email', $request->email)->doesntExist()) {
-            return response()->json([
-               'success' => false,
-               'message' => 'You are not approved by admin.',
-            ],403);  
         }
     
         $allowedEmails = [
