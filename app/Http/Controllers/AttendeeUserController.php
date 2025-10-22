@@ -113,9 +113,9 @@ class AttendeeUserController extends Controller
     {   
         $speakers = Speaker::select('id','name','lastname')->orderBy('created_at', 'DESC')->get();
 
-        $exhibitors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+        $exhibitors = Company::select('id','name')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
 
-        $sponsors = Company::select('id','name')->orderBy('created_at', 'DESC')->get();
+        $sponsors = Company::select('id','name')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
 
         $groups = config('roles.groups');
         return view('users.attendee_users.create',compact('groups','exhibitors','sponsors','speakers'));
