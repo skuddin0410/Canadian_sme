@@ -34,7 +34,7 @@ class EmailTemplateController extends Controller
             function ($attribute, $value, $fail) use ($request) {
                 // Strip tags if it's a notification before counting length
                 $textValue = $request->type === 'notifications' ? strip_tags($value) : $value;
-                $max = $request->type === 'notifications' ? 150 : 3000;
+                $max = $request->type === 'notifications' ? 300 : 3000;
 
                 if (strlen($textValue) > $max) {
                     $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
@@ -71,7 +71,7 @@ class EmailTemplateController extends Controller
             'message' => [
                 'required',
                 function ($attribute, $value, $fail) use ($request) {
-                    $max = $request->type === 'notifications' ? 150 : 3000;
+                    $max = $request->type === 'notifications' ? 300 : 3000;
                     if (strlen($value) > $max) {
                         $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
                     }
