@@ -3,48 +3,60 @@
 namespace App\Imports;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
-use Maatwebsite\Excel\Facades\Excel;
 
 class UsersImport implements ToModel, WithStartRow
 {
     protected $users = [];
-    protected $emails = [];  // Store emails to check duplicates
+    protected $emails = [];       // Track all processed emails
+    protected $duplicates = [];   // Track duplicate emails
+    protected $added = [];        // Track successfully added emails
+
+    public function __construct()
+    {
+        // Load all existing emails from DB (keep original case)
+        $this->emails = User::pluck('email')->map(fn($e) => trim($e))->toArray();
+    }
 
     public function startRow(): int
-    {  
-        return 2; 
+    {
+        return 2;
     }
 
     public function model(array $row)
-    {   
-        // Skip rows with missing critical information
+    {
         if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
             return null;
         }
 
-        // Check if the email already exists in the current batch
-        if (in_array($row[2], $this->emails)) {
-            return null; // Skip duplicate email in the batch
+        $email = trim($row[2]);
+
+        // Case-insensitive duplicate check
+        if (in_array(strtolower($email), array_map('strtolower', $this->emails))) {
+            $this->duplicates[] = $email;
+            return null; // Skip duplicate emails
         }
 
-        // Check if email already exists in the database
-        $existingUser = User::where('email', $row[2])->first();
+        // Check if email exists in DB (case-insensitive)
+        $existingUser = User::whereRaw('LOWER(email) = ?', [strtolower($email)])->first();
         if ($existingUser) {
-            return null;  // Skip existing users
+            $this->duplicates[] = $email;
+            return null;
         }
 
-        // Add the email to the list of processed emails in the batch
-        $this->emails[] = $row[2];
+        // Mark as processed
+        $this->emails[] = $email;
+        $this->added[] = $email;
 
-        // Add the user to the batch for bulk insertion
+        // Add to batch for bulk insert
         $this->users[] = [
-            'name' => $row[0],
-            'lastname' => $row[1],
-            'email' => $row[2],
+            'name' => trim($row[0]),
+            'lastname' => trim($row[1]),
+            'email' => $email,
             'status' => $row[3] ?? '',
-            'gdpr_consent' => ($row[4] == 'confirmed') ? 1 : 0,
+            'gdpr_consent' => (isset($row[4]) && strtolower(trim($row[4])) === 'confirmed') ? 1 : 0,
             'bio' => $row[5] ?? '',
             'company' => $row[6] ?? '',
             'designation' => $row[7] ?? '',
@@ -60,21 +72,29 @@ class UsersImport implements ToModel, WithStartRow
             'updated_at' => now(),
         ];
 
-        // Perform bulk insert after a certain number of records (e.g., 500)
+        // Insert batch every 500 rows
         if (count($this->users) >= 500) {
             User::insert($this->users);
-            $this->users = [];  // Reset the users array after the insert
-            $this->emails = []; // Reset the email list
+            $this->users = [];
         }
 
-        return null; // We don’t need to return anything for each row
+        return null;
     }
 
     public function __destruct()
     {
-        // Insert any remaining users that weren’t inserted in the batch
+        // Insert remaining users
         if (count($this->users) > 0) {
             User::insert($this->users);
+        }
+
+        // Log results
+        if (!empty($this->added)) {
+           // Log::info('Imported Users:', $this->added);
+        }
+
+        if (!empty($this->duplicates)) {
+           // Log::info('Duplicate/Skipped Users:', $this->duplicates);
         }
     }
 }
