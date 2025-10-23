@@ -51,10 +51,7 @@ class AttendeeUserController extends Controller
             //   $q->whereIn("name", ['Attendee']);
             // })->orderBy('id', 'DESC');
             
-           $users = User::with('roles')
-            ->whereDoesntHave('roles', function ($query) {
-                $query->whereIn('name', ['Admin','Support Staff Or Helpdesk','Registration Desk','Guest','Representative']);
-            })->orderBy('id', 'DESC');
+           $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC');
  
             if ($request->filled('search')) {
                 $users = $users->where(function ($query) use ($request) {
