@@ -202,8 +202,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    // Function to load users via AJAX
+
+    // 🧠 Load saved state from localStorage on page load
+    let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
+    loadUsers(savedParams);
+
+    // 🔹 Function to load users via AJAX
     function loadUsers(params = {}) {
+        // Save params to localStorage
+        localStorage.setItem('attendeeParams', JSON.stringify(params));
+
         $(".spinner-border").fadeIn(300);
         $.ajax({
             url: "{{ route('attendee-users.index') }}",
@@ -221,41 +229,53 @@ $(document).ready(function() {
         });
     }
 
-    // Initial load
-    loadUsers();
-
-    // Search button click
+    // 🔹 Search button click
     $('#search-btn').click(function() {
         const searchVal = $('#search').val().trim();
-        loadUsers({ search: searchVal });
+        let params = {
+            search: searchVal,
+            page: 1 // reset to first page when searching
+        };
+        loadUsers(params);
     });
 
-    // Filter button click
+    // 🔹 Filter button click
     $('#filter-btn').click(function() {
-        const kycVal = $('#kyc').val().trim();
-        loadUsers({ kyc: kycVal });
+        const searchVal = $('#search').val().trim();
+        let params = {
+            search: searchVal,
+            page: 1
+        };
+        loadUsers(params);
     });
 
-    // Reset function
+    // 🔹 Reset filters
     $('.reset-filter').click(function() {
         $('#search').val('');
-        $('#kyc').val('');
+        localStorage.removeItem('attendeeParams'); // clear saved state
         loadUsers();
     });
 
-    // Pagination click
+    // 🔹 Pagination click
     $(document).on("click", ".custom_pagination .pagination-link", function(e) {
         e.preventDefault();
-        var url = $(this).attr("href");
-        if(!url) return;
-        $(".spinner-border").fadeIn(300);
-        $.get(url + '&ajax_request=true', function(data) {
-            $("#user-table").html(data.html);
-        }).done(function() {
-            $(".spinner-border").fadeOut(300);
-        });
+
+        let url = $(this).attr("href");
+        if (!url) return;
+
+        // Extract page number from URL
+        let pageMatch = url.match(/page=(\d+)/);
+        let page = pageMatch ? pageMatch[1] : 1;
+
+        // Get current filters/search from localStorage
+        let params = JSON.parse(localStorage.getItem('attendeeParams')) || {};
+        params.page = page; // update current page
+
+        loadUsers(params);
     });
+
 });
+
 
 
 function openModal(actionType) {

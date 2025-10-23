@@ -469,12 +469,16 @@ public function bulkAction(Request $request)
                     )
                 )
             );
+            
+            $title = 'Hi, ' . ($user->full_name ?? '') . ',' ;
+
+            notification($user->id,$type='push_notification',null, $title ,$message);
 
             if(!empty($user->onesignal_userid)){
                     $content = [
                         "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
                         "include_player_ids" => [$user->onesignal_userid],
-                        'headings' => ['en' => 'Hi, ' . ($user->full_name ?? '') . ','],
+                        'headings' => ['en' => $title],
                         "contents" => ["en" => $message]
                     ];
                  
