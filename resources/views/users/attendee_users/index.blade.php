@@ -274,6 +274,19 @@ $(document).ready(function() {
         loadUsers(params);
     });
 
+
+    $(document).on("click", ".filterAppUsers", function(e) {
+        const searchVal = $('#search').val().trim();
+        let params = {
+            search: searchVal,
+            page: 1,
+            onsignal: 1
+        };
+        loadUsers(params);
+
+    });        
+
+
 });
 
 

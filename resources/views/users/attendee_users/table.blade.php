@@ -33,8 +33,17 @@
   margin: 10px 0 10px 0;
 }
 </style>
-<div class="col-12 text-end p-3">
+<div class="row">
+<div class="col-6 text-end p-3"></div>
+<div class="col-3 text-end p-3">
+        <button type="button" class="btn btn-outline-info filterAppUsers">
+               Total App Users: {{ $totalAppUsers }}
+        </button>
+ 
+</div>
+<div class="col-3 text-end p-3">
  {{$range}} out of {{$totalRecords}} users
+</div>
 </div>
 <table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
@@ -43,8 +52,9 @@
 		<th>Name</th>
 		<th>Email</th>
 		<th>Mobile</th>
-    <th>Added on</th>
-    <th>QR</th>
+        <th>App Use</th>
+        <th>Added on</th>
+        <th>QR</th>
 		
 		<th width="25%">Action</th>
 	</tr>
@@ -83,6 +93,7 @@
     </th>
 		<th style="text-transform: lowercase;">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
+        <th>{{$user->onesignal_userid ? 'Yes' : ''}}</th>
     <th>{{dateFormat($user->created_at) ?? '' }}</th>
     <th>
 		

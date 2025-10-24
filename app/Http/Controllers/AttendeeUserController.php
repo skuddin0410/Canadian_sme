@@ -75,10 +75,17 @@ class AttendeeUserController extends Controller
             if ($request->has('exhibitor_id')) {
                 $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
             }
+
+            if ($request->has('onsignal') && $request->onsignal == 1) {
+                $users = $users->whereNotNull('onesignal_userid');
+            }
                      
          
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
+            $totalAppUsers = (clone $usersCount)
+                ->whereNotNull('onesignal_userid')
+                ->count(DB::raw('DISTINCT(users.id)'));
             $users = $users->offset($offset)->limit($perPage)->get();
 
             $users = new LengthAwarePaginator($users, $totalRecords, $perPage, $pageNo, [
@@ -90,12 +97,13 @@ class AttendeeUserController extends Controller
 
             // Prepare response data
             $data['totalUsers'] = $totalRecords; // Total number of users
+            $data['totalAppUsers'] = $totalAppUsers;
             $data['offset'] = $offset;
             $data['pageNo'] = $pageNo;
             $range=$data['range'] = "$startRange-$endRange"; 
 
             $users->setPath(route('attendee-users.index'));
-            $data['html'] = view('users.attendee_users.table', compact('users', 'perPage','range','totalRecords'))
+            $data['html'] = view('users.attendee_users.table', compact('users', 'perPage','range','totalRecords','totalAppUsers'))
                 ->with('i', $pageNo * $perPage)
                 ->render();
 
