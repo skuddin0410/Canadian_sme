@@ -20,7 +20,7 @@ class LandingController extends Controller
      * Show the landing page.
     */
 
-    public function index()
+    /*public function index()
     {   
         $event = Event::with(['photo'])->first();
         $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])->where('start_time', '>=', now())
@@ -61,7 +61,127 @@ class LandingController extends Controller
         : null;
 
         return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location' , 'mapUrl','shareUrl'));
+    }*/
+
+    public function index(Request $request)
+{   
+    $query = $request->input('q');
+ 
+    $event = Event::with('photo')->first();
+    $shareUrl = $event ? route('events.show', $event->id) : url()->current();
+ 
+    /* ---------------------------------------------------------
+        DEFAULT HOMEPAGE DATA
+    ----------------------------------------------------------*/
+    $defaultSession = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+        ->where('start_time', '>=', now())
+        ->orderBy('start_time', 'ASC')
+        ->first();
+ 
+    $defaultSpeakers   = Speaker::inRandomOrder()->take(10)->get();
+    $defaultExhibitors = Company::where('is_sponsor', 0)->inRandomOrder()->take(6)->get();
+    $defaultSponsors   = Company::with('category')->where('is_sponsor', 1)->inRandomOrder()->take(6)->get();
+ 
+    $defaultAttendees = User::with(['photo','roles'])
+        ->whereHas('roles', fn($q) => $q->where('name','Attendee'))
+        ->whereNotNull('name')->whereNotNull('slug')
+        ->inRandomOrder()->take(5)->get();
+ 
+    $defaultSchedules = Session::where('start_time','>=',now())
+        ->orderBy('start_time','ASC')
+        ->take(6)->get();
+ 
+    /* ---------------------------------------------------------
+        MAP CONFIG
+    ----------------------------------------------------------*/
+    $location = $event->location ?? null;
+ 
+    $googleApiKey = config('services.google_maps.key');
+ 
+    $mapUrl = $location && $googleApiKey
+        ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
+        : null;
+ 
+    /* ---------------------------------------------------------
+        IF NO SEARCH → RETURN HOMEPAGE WITH DEFAULT DATA
+    ----------------------------------------------------------*/
+    if (!$query) {
+        return view('frontend.landing.index', [
+            'event' => $event,
+            'session' => $defaultSession,
+            'speakers' => $defaultSpeakers,
+            'exhibitors' => $defaultExhibitors,
+            'sponsors' => $defaultSponsors,
+            'attendees' => $defaultAttendees,
+            'schedules' => $defaultSchedules,
+            'location' => $location,
+            'mapUrl' => $mapUrl,
+            'shareUrl' => $shareUrl
+        ]);
     }
+ 
+    /* ---------------------------------------------------------
+        SEARCH MODE — GET ONLY FILTERED DATA
+    ----------------------------------------------------------*/
+ 
+    // Sessions
+    $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+        ->where(function($q) use ($query) {
+            $q->where('title','like',"%{$query}%")
+            ->orWhereHas('speakers', fn($s)=>$s->where('name','like',"%{$query}%"))
+            ->orWhereHas('exhibitors', fn($e)=>$e->where('name','like',"%{$query}%"))
+            ->orWhereHas('sponsors', fn($sp)=>$sp->where('name','like',"%{$query}%"))
+            ->orWhereHas('attendees', fn($a)=>$a->where('name','like',"%{$query}%"));
+        })
+        ->orderBy('start_time','ASC')
+        ->first();
+ 
+    // Speakers
+    $speakers = Speaker::where('name','like',"%{$query}%")
+        ->orWhere('lastname','like',"%{$query}%")
+        ->take(10)->get();
+ 
+    // Exhibitors
+    $exhibitors = Company::where('is_sponsor',0)
+        ->where('name','like',"%{$query}%")
+        ->take(6)->get();
+ 
+    // Sponsors
+    $sponsors = Company::with('category')
+        ->where('is_sponsor',1)
+        ->where('name','like',"%{$query}%")
+        ->take(6)->get();
+ 
+    // Attendees
+    $attendees = User::with(['photo','roles'])
+        ->whereHas('roles', fn($q)=>$q->where('name','Attendee'))
+        ->where(function($q) use ($query){
+            $q->where('name','like',"%{$query}%")
+              ->orWhere('lastname','like',"%{$query}%");
+        })
+        ->take(5)->get();
+ 
+    // Schedules
+    $schedules = Session::where('start_time','>=',now())
+        ->where('title','like',"%{$query}%")
+        ->take(6)->get();
+ 
+    /* ---------------------------------------------------------
+        RETURN NEW SEARCH RESULTS PAGE
+    ----------------------------------------------------------*/
+    return view('frontend.search.results', [
+        'event' => $event,
+        'session' => $session,
+        'speakers' => $speakers,
+        'exhibitors' => $exhibitors,
+        'sponsors' => $sponsors,
+        'attendees' => $attendees,
+        'schedules' => $schedules,
+        'location' => $location,
+        'mapUrl' => $mapUrl,
+        'shareUrl' => $shareUrl
+    ]);
+}
 
 
 
@@ -362,5 +482,7 @@ public function session(Request $request, $slug)
         $speakers = Speaker::orderBy('created_at','DESC')->paginate(10); 
         return view('frontend.page.speaker', compact('speakers'));
     } 
+
+
 
 }

@@ -7,7 +7,7 @@
             </a>
 
             <!-- Search Box -->
-            <form class="d-none d-md-flex mx-auto w-25 position-relative" action="#" method="GET">
+            <form class="d-none d-md-flex mx-auto w-25 position-relative" action="{{ route('front.landing') }}" method="GET">
                 <input 
                     class="form-control rounded-pill ps-4 pe-5 py-2 shadow-sm fs-6"
                     type="text"
