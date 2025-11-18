@@ -534,4 +534,137 @@ public function generateQrCodeManually(){
     }
 
 
+public function sendBoth(Request $request)
+{
+    $request->validate([
+        'email_template' => 'nullable|string',
+        'notification_template' => 'nullable|string',
+    ]);
+ 
+    $emailTemplateName = $request->email_template;
+    $notificationTemplateName = $request->notification_template;
+ 
+   
+    $userIds = $request->input('user_ids');
+ 
+    if ($userIds && $userIds !== 'all') {
+      
+        if (is_string($userIds)) {
+            $decoded = json_decode($userIds, true);
+            if (is_array($decoded)) {
+                $userIds = $decoded;
+            } else {
+                $userIds = explode(',', $userIds);
+            }
+        }
+        $users = User::whereIn('id', $userIds)->get();
+    } else {
+      
+        $users = User::whereNotIn('id', [1, 2])->get();
+    }
+ 
+    if ($users->isEmpty()) {
+        return redirect()->back()->withErrors('No users found to send.');
+    }
+ 
+    foreach ($users as $user) {
+ 
+      
+        if ($emailTemplateName) {
+            $emailTemplate = EmailTemplate::where('template_name', $emailTemplateName)->first();
+            if ($emailTemplate && $emailTemplate->type === 'email') {
+                $subject = str_replace('{{ site_name }}', config('app.name'), $emailTemplate->subject ?? '');
+                $message = $emailTemplate->message ?? '';
+ 
+                $qr_code_url = $user->qr_code ? asset($user->qr_code) : '';
+                $updateUrl = route('update-user', Crypt::encryptString($user->id));
+ 
+                $message = str_replace(
+                    ['{{ name }}', '{{ qr_code }}', '{{ profile_update_link }}'],
+                    [
+                        $user->name ?? $user->email,
+                        $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
+                        '<br><a href="' . $updateUrl . '">Update Profile</a>'
+                    ],
+                    $message
+                );
+ 
+                Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+            }
+        }
+ 
+      
+        if ($notificationTemplateName) {
+            $notificationTemplate = EmailTemplate::where('template_name', $notificationTemplateName)->first();
+            if ($notificationTemplate && $notificationTemplate->type === 'notifications') {
+                $title = 'Hi, ' . ($user->name ?? $user->email) . ',';
+                $message = str_replace(
+                    ['{{ name }}', '{{ qr_code }}', '{{ profile_update_link }}'],
+                    [
+                        $user->name ?? $user->email,
+                        $user->qr_code ?? '',
+                        route('update-user', Crypt::encryptString($user->id))
+                    ],
+                    $notificationTemplate->message ?? ''
+                );
+ 
+               
+                $user->notifications()->create([
+                    'title' => $notificationTemplate->title ?? $title,
+                    'body' => $message,
+                    'read_at' => null
+                ]);
+ 
+              
+                if (!empty($user->onesignal_userid)) {
+                    $content = [
+                        "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+                        "include_player_ids" => [$user->onesignal_userid],
+                        'headings' => ['en' => $title],
+                        "contents" => ["en" => $message]
+                    ];
+ 
+                    $fields = json_encode($content);
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json; charset=utf-8',
+                        'Authorization: Basic YOUR_ONESIGNAL_KEY'
+                    ]);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                    curl_setopt($ch, CURLOPT_POST, TRUE);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                    curl_exec($ch);
+                    curl_close($ch);
+                }
+            }
+        }
+    }
+ 
+    return redirect()->back()->with('success', 'Emails & Notifications sent successfully to all selected users.');
+}
+    
+public function generateBadge(Request $request)
+{
+    $request->validate([
+        'badge_id' => 'required|exists:badges,id',
+        'user_ids' => 'required',
+    ]);
+ 
+    $badge = Badge::findOrFail($request->badge_id);
+    $userIds = json_decode($request->user_ids, true);
+ 
+    if (empty($userIds)) {
+        return back()->with('error', 'No users selected.');
+    }
+ 
+    $users = User::whereIn('id', $userIds)->get();
+ 
+    // Generate PDF (or redirect to view)
+    $pdf = PDF::loadView('badges.pdf', compact('badge', 'users'));
+    return $pdf->download('attendee_badges.pdf');
+}
+
 }

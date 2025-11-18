@@ -69,6 +69,11 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
     Route::get('/attendees', [UserController::class, 'attendeeIndex'])
     ->name('users.attendee');
+
+    Route::post('/attendee-users/send-both', [AttendeeUserController::class, 'sendBoth'])
+    ->name('attendee-users.send-both');
+    Route::post('/attendee-users/generate-badge', [AttendeeUserController::class, 'generateBadge'])
+    ->name('attendee-users.generateBadge');
     
       Route::resource('usergroup', UserGroupController::class);
     
