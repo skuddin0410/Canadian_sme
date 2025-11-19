@@ -36,9 +36,9 @@ class LandingController extends Controller
             ->take(6)
             ->get();
 
-        $sponsors = Company::with(['category'
-            ->inRandomOrder()])
+        $sponsors = Company::with(['category'])
             ->where('is_sponsor', 1)
+            ->inRandomOrder()
             ->take(6)
             ->get();
 
