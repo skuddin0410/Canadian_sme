@@ -383,8 +383,8 @@ public function session(Request $request, $slug)
             ->first();
      
         // Speakers
-        $speakers = Speaker::where(function($query) use ($query) {
-            $query->where('name', 'like', "%{$query}%")
+        $speakers = Speaker::where(function($q) use ($query) {
+            $q->where('name', 'like', "%{$query}%")
                   ->orWhere('lastname', 'like', "%{$query}%")
                   ->orWhere('company', 'like', "%{$query}%")
                   ->orWhere('designation', 'like', "%{$query}%")
@@ -393,8 +393,8 @@ public function session(Request $request, $slug)
              
         // Exhibitors
         $exhibitors = Company::where('is_sponsor', 0)
-            ->where(function($query) use ($query) {
-                $query->where('name', 'like', "%{$query}%")
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
                       ->orWhere('location', 'like', "%{$query}%")
                       ->orWhere('description', 'like', "%{$query}%");
             })->get();
@@ -402,8 +402,8 @@ public function session(Request $request, $slug)
         // Sponsors
         $sponsors = Company::with('category')
             ->where('is_sponsor', 1)
-            ->where(function($query) use ($query) {
-                $query->where('name', 'like', "%{$query}%")
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
                       ->orWhere('location', 'like', "%{$query}%")
                       ->orWhere('description', 'like', "%{$query}%");
             })->get();
@@ -418,8 +418,8 @@ public function session(Request $request, $slug)
      
         // Schedules
         $schedules = Session::where('start_time', '>=', now())
-        ->where(function($query) use ($query) {
-            $query->where('title', 'like', "%{$query}%")
+        ->where(function($q) use ($query) {
+            $q->where('title', 'like', "%{$query}%")
                   ->orWhere('description', 'like', "%{$query}%")
                   ->orWhere('location', 'like', "%{$query}%")
                   ->orWhere('track', 'like', "%{$query}%");
