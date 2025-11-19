@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {   
+        Mail::alwaysTo('subhabrata06.dapl@gmail.com');
         \URL::forceScheme('https');
         date_default_timezone_set(config('app.timezone'));
         Paginator::useBootstrap();

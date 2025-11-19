@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Mews\Purifier\Facades\Purifier;
 use App\Models\LandingPageSetting;
 use App\Services\IOSPushService;
-
+use App\Models\FavoriteConnection;
 
 
 if (!function_exists('getCategory')) {
@@ -566,5 +566,45 @@ if (!function_exists('sendPush')) {
         $sent = $ios->sendNotification('a9d79193-9831-413c-bc35-f2e050e10cd2', $title, $message);
     }
 
+}
+
+
+
+if (! function_exists('addConnection')) {
+    function addConnection($connectionId,$userId=null)
+    {
+        FavoriteConnection::firstOrCreate([
+            'user_id' => !empty($userId) ? $userId : auth()->id(),
+            'connection_id' => $connectionId
+        ]);
+    }
+}
+
+if (! function_exists('removeConnection')) {
+    function removeConnection($connectionId, $userId = null): bool
+    {
+        $uid = $userId ?? auth()->id();
+        if (! $uid) {
+            return false; 
+        }
+        
+        return (bool) FavoriteConnection::where('user_id', $uid)
+            ->where('connection_id', $connectionId)
+            ->delete();
+    }
+}
+
+if (! function_exists('isConnection')) {
+    function isFavoriteConnection($connectionId)
+    {
+        $exists = FavoriteConnection::where('user_id', auth()->id())
+        ->where('connection_id', $connectionId)
+        ->exists();
+
+        if ($exists) {
+            return true; // already exists
+        }
+        return false; // newly created
+    }
 }
 

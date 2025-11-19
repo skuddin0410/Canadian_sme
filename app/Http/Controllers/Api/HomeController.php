@@ -23,6 +23,7 @@ use App\Mail\UserConnectionsExportMail;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Services\IOSPushService;
+use App\Models\FavoriteConnection;
 
 
 class HomeController extends Controller
@@ -419,6 +420,7 @@ public function getConnectionsDetails(Request $request)
                                     : asset('images/default.png'),
             "status"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->status ?? null : null,
             "address"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->street ?? null : null,
+            'is_favorite'     => $connecteduser && $connecteduser->connection ? isFavoriteConnection($connecteduser->connection->id) :false,
 
             "uploaded_files" => $connecteduser && $connecteduser->connection && $connecteduser->connection->privateDocs 
                             ? $connecteduser->connection->privateDocs->map(fn ($doc) => [
@@ -957,5 +959,66 @@ public function sendPushNotificationTest(Request $request)
      
         info('OneSignal Response: ' . $response);
     }
+
+
+    public function addFavoriteConnection(Request $request){
+
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        } 
+       
+       if(!isFavoriteConnection($request->connectionId)){
+          addConnection($request->connectionId);
+          return response()->json(["message"=> "Connection added as favourite"]);
+        }else{
+          removeConnection($request->connectionId);
+          return response()->json(["message"=> "Connection moved from favourite"]);
+        }
+    }
+
+    public function favoriteConnectionList(Request $request){
+    try {
+        if (!$user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        
+        $user = auth()->user();
+        $connectionData = FavoriteConnection::where('user_id', $user->id)->pluck('connection_id');
+        $connections = [];
+        if(!empty($connectionData)){
+
+            $connectionIds = $connectionData->toArray();
+            $connectionsData = User::whereIn('id', $connectionIds)->get();
+            foreach($connectionsData as $connection){  
+                array_push($connections, [
+                        "id"              => (string) $connection->id,
+                        "name"            => $connection->full_name ?? $connection->name,
+                        "connection_role" => $connection->getRoleNames()->implode(', '),
+                        "company_name"    => $connection->company ?? null,
+                        "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
+                        "status"          => $connection->pivot->status ?? null, // include status if needed
+                        'is_favorite'     => true
+                    ]); 
+                //}
+            }
+
+        }
+
+        return response()->json($connections);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            "success" => false,
+            "message" => $e->getMessage(),
+        ], 500);
+    }
+}
 
 }

@@ -73,6 +73,9 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::put('/update/scan', [HomeController::class, 'scanDetailsUpdate']);
         Route::post('/create', [HomeController::class, 'createConnection']);
         Route::get('/lead/export/{qr_code}', [HomeController::class, 'exportConnections']);
+
+        Route::post('/favorite', [HomeController::class, 'addFavoriteConnection']);
+        Route::get('/favorite/list', [HomeController::class, 'favoriteConnectionList']);
     });
 
     Route::prefix('agenda')->group(function () {
