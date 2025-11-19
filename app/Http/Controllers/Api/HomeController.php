@@ -190,7 +190,7 @@ public function getAllSession()
 
         $sessions = Session::with(['speakers', 'booth'])
             ->where('event_id', 1)
-            ->where('end_time', '>', now())
+            //->where('end_time', '>', now())
             ->orderBy('start_time', 'ASC')
             ->get()
             ->groupBy(function ($session) {
