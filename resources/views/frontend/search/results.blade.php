@@ -4,6 +4,12 @@
 
 @section('content')
 
+<style>
+    .exhibitor{
+        padding:10px !important;
+    }
+</style>
+
     <div class="container py-3">
         @if (
             $schedules->count() === 0 &&
@@ -96,7 +102,7 @@
         2. EXHIBITORS
     ============================================= --}}
             @if ($exhibitors->count())
-                <section class="exhibitor mb-5" id="exhibitors">
+                <section class="exhibitor mb-2">
                     <h3 class="mb-3">Exhibitors</h3>
 
                     <div class="attendee-box d-flex flex-column">
@@ -145,13 +151,8 @@
 
 
 
-
-
-            {{-- ============================================
-        3. SPEAKERS
-    ============================================= --}}
             @if ($speakers->count())
-                <section class="speakers mb-5" id="speakers">
+                <section class="exhibitor mb-2">
                     <h3 class="mb-3">Speakers</h3>
 
                     <div class="attendee-box d-flex flex-column">
@@ -209,12 +210,8 @@
 
 
 
-
-            {{-- ============================================
-        4. SPONSORS
-    ============================================= --}}
             @if ($sponsors->count())
-                <section class="sponsors mb-5" id="sponsors">
+                <section class="exhibitor mb-2">
                     <h3 class="mb-3">Sponsors</h3>
 
                     <div class="attendee-box d-flex flex-column">
@@ -270,14 +267,8 @@
             @endif
 
 
-
-
-
-            {{-- ============================================
-        5. ATTENDEES
-    ============================================= --}}
             @if ($attendees->count())
-                <section class="attendee mb-5" id="attendees">
+                <section class="exhibitor mb-2" >
                     <h3 class="mb-3">Attendees</h3>
 
                     <div class="attendee-box d-flex flex-column">

@@ -7,6 +7,8 @@ use App\Http\Controllers\FormBuilderController;
 use App\Http\Controllers\Frontend\SupportController;
 
 Route::get('/', [LandingController::class, 'index'])->name('front.landing');
+Route::get('/search', [LandingController::class, 'search'])->name('front.landing.search');
+
 
 Route::get('/page/{slug}', [PageController::class, 'publicPage'])->name('public.page');//Use on Frontend
 Route::get('/registration', [FormBuilderController::class, 'showFrontendForm'])->name('registration');
