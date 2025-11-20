@@ -82,7 +82,7 @@ class HomeController extends Controller
                     "workshop_no" => $session->track ?? '',
                     "location" => !empty($session->location) ? $session->location: '',
                     "status" => $session->status ?? 'Upcoming',
-                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name, "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')]),
+                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name, "image"=> !empty($sp->photo) ? $sp->photo->mobile_path : asset('images/default.png')]),
                     "isFavorite" => isFavorite($session->id)
                 ];
             });
@@ -95,7 +95,7 @@ class HomeController extends Controller
         return [
             "id" => $connection->id,
             "name" => $connection->full_name ?? $connection->name,
-            "avatarUrl" => $connection->photo && $connection->photo->file_path ? $connection->photo->file_path : asset('images/default.png')
+            "avatarUrl" => $connection->photo && $connection->photo->mobile_path ? $connection->photo->mobile_path : asset('images/default.png')
         ];
     });
 
@@ -153,7 +153,7 @@ public function getNotifications(Request $request)
 
     $isSpeaker = $user->hasRole('Speaker');
     $photo = $user->photo;
-    $userPhoto = !empty($user->photo) ? $user->photo->file_path : asset('images/default.png');
+    $userPhoto = !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png');
     
     $notifications = GeneralNotification::query()
         ->where(function ($q) use ($user) {        
@@ -222,7 +222,7 @@ public function getAllSession()
                             "workshop_no" => $session->track ?? '',
                             "location"    => $session->location ?? '',
                             "status"      => $status,
-                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name ,"image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png')])->values(),
+                            "speakers"    => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name ,"image"=> !empty($sp->photo) ? $sp->photo->mobile_path : asset('images/default.png')])->values(),
                             "isFavorite"  => isFavorite($session->id),
                             "agenda" => isAgenda($session->id),
                             "my_agenda" => agendaNote($session->id)
@@ -297,7 +297,7 @@ public function getSession($sessionId)
             "speakers"    => $session->speakers->map(fn ($sp) => [
                 "id"   => $sp->id,
                 "name" => $sp->full_name,
-                "image"=> !empty($sp->photo) ? $sp->photo->file_path : asset('images/default.png'),
+                "image"=> !empty($sp->photo) ? $sp->photo->mobile_path : asset('images/default.png'),
                 "designation" => $sp->designation ?? '',
                 "company" => $sp->company ?? ''
             ]),
@@ -339,7 +339,7 @@ public function getConnections(Request $request)
                         "name"            => $connection->full_name ?? $connection->name,
                         "connection_role" => $connection->getRoleNames()->implode(', '),
                         "company_name"    => $connection->company ?? null,
-                        "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
+                        "connection_image"=> $connection->photo ? $connection->photo->mobile_path : asset('images/default.png'),
                         "status"          => $connection->pivot->status ?? null, // include status if needed
                     ]); 
                 //}
@@ -416,7 +416,7 @@ public function getConnectionsDetails(Request $request)
 
             "note"            => $connecteduser->note ?? '',
             "avatarUrl"       => $connecteduser && $connecteduser->connection && $connecteduser->connection->photo 
-                                    ? $connecteduser->connection->photo->file_path 
+                                    ? $connecteduser->connection->photo->mobile_path 
                                     : asset('images/default.png'),
             "status"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->status ?? null : null,
             "address"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->street ?? null : null,
@@ -584,7 +584,7 @@ public function scanDetails(Request $request){
             "company_website"=> !empty($data->connection) ? $data->connection->website_url: '',
             "email"=> !empty($data->connection) ? $data->connection->email: '',
             "phone"=> !empty($data->connection) ? $data->connection->mobile: '',
-            "avatar"=> !empty($data->connection) && !empty($data->connection->photo) ? $data->connection->photo->file_path: asset('images/default.png'),
+            "avatar"=> !empty($data->connection) && !empty($data->connection->photo) ? $data->connection->photo->mobile_path: asset('images/default.png'),
             "visiting_card_image" => !empty($data->connection) && !empty($data->connection->visitingcard) ? $data->connection->visitingcard->file_path: asset('images/default.png'),
             "tags"=> !empty($data->connection) ? $data->connection->tags: '' ,
             "rating"=> !empty($data->rating) ? $data->rating: '' ,
@@ -1002,7 +1002,7 @@ public function sendPushNotificationTest(Request $request)
                         "name"            => $connection->full_name ?? $connection->name,
                         "connection_role" => $connection->getRoleNames()->implode(', '),
                         "company_name"    => $connection->company ?? null,
-                        "connection_image"=> $connection->photo ? $connection->photo->file_path : asset('images/default.png'),
+                        "connection_image"=> $connection->photo ? $connection->photo->mobile_path : asset('images/default.png'),
                         "status"          => $connection->pivot->status ?? null, // include status if needed
                         'is_favorite'     => true
                     ]); 

@@ -637,7 +637,7 @@ public function getSpeaker(Request $request)
                 'name'     => $speaker->full_name,
                 'company_name'  => $speaker->company ?? '',
                 'role'  => $speaker->designation ?? '',
-                'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/default.png'),
                 'roles' => speakerGroups($speaker)
             ];
         });
@@ -699,7 +699,7 @@ public function getSpeakerById(Request $request){
             'company_details'=> $speaker->bio ?? '',
             'bio'            => $speaker->bio ?? '',
             'role'           => $speaker->designation ?? '',
-            'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
+            'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/default.png'),
             'roles'          => speakerGroups($speaker),
             'company_website'=> $speaker->website_url ?? '',
             'contact_details'=> $contactDetails
@@ -746,7 +746,7 @@ public function getAttendee(Request $request)
                     'name'     => $speaker->full_name,
                     'company_name'  => $speaker->company ?? '',
                     'role'  => $speaker->designation ?? '',
-                    'image_url'   => !empty($speaker->photo) ? $speaker->photo->file_path  : asset('images/default.png'),
+                    'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/default.png'),
                     'roles' => groups($speaker)
                 ];
         });
@@ -807,7 +807,7 @@ public function getAttendeeById(Request $request){
             'company_details'=> $speaker->bio ?? '',
             'bio'            => $speaker->bio ?? '',
             'role'           => $speaker->designation ?? '',
-            'image_url'      => !empty($speaker->photo) ? $speaker->photo->file_path : asset('images/default.png'),
+            'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/default.png'),
             'roles'          => groups($speaker),
             'contact_details'=> $contactDetails,
             'company_website' => $speaker->website_url ?? ''
