@@ -30,7 +30,7 @@ class JWTAuthController extends Controller
                 'data' => collect(),
             ], 404);
         }
-        
+
         $token = request()->bearerToken() ?? JWTAuth::refresh();
         $user->load(['photo', 'usercompany']);
         return response()->json([
@@ -414,7 +414,7 @@ public function getExhibitor($exhibitorId)
         $response = [
             'name'     => $exhibitor->name ?? '',
             'word_no'  => $exhibitor->booth ?? '',
-            'avatar'   => $exhibitor->contentIconFile?->file_path ?? asset('images/default.png'),
+            'avatar'   => $exhibitor->contentIconFile?->mobile_path ?? asset('images/default.png'),
             'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg'),
             'location' => $exhibitor->booth ?? '',
             'email'    => $exhibitor->email ?? '',
@@ -921,7 +921,7 @@ public function getAllExhibitor(Request $request){
                 return [
                     'id'          => $exhibitor->id,
                     'name'        => $exhibitor->name,
-                    'image_url'   => $exhibitor->contentIconFile ? $exhibitor->contentIconFile->file_path : asset('images/default.png'),
+                    'image_url'   => $exhibitor->contentIconFile ? $exhibitor->contentIconFile->mobile_path : asset('images/default.png'),
                     'location'    => $exhibitor->booth ?? '',
                 ];
             });
@@ -959,7 +959,7 @@ public function getAllExhibitor(Request $request){
                 return [
                     'id'          => $sponsor->id,
                     'name'        => $sponsor->name,
-                    'image_url'   => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
+                    'image_url'   => $sponsor->logo ? $sponsor->logo->mobile_path : asset('images/default.png'),
                     'level'    =>  $sponsor->type ? ucfirst(str_replace('-', ' ', $sponsor->type)) : '',
                     'color_code'    => $sponsor->type ?  typeColor($sponsor->type) : '',
                 ];
@@ -998,7 +998,7 @@ public function getAllExhibitor(Request $request){
                 $data = [
                     "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
-                    "avatar" => $sponsor->logo ? $sponsor->logo->file_path : asset('images/default.png'),
+                    "avatar" => $sponsor->logo ? $sponsor->logo->mobile_path : asset('images/default.png'),
                     'banner'   => $sponsor->banner?->file_path ?? asset('images/eventify-banner.jpg'),
                     "word_no" => $sponsor->booth ?? '',
                     "location" => $sponsor->booth ?? '',
