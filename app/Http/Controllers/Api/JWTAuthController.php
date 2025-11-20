@@ -30,7 +30,7 @@ class JWTAuthController extends Controller
                 'data' => collect(),
             ], 404);
         }
-
+        
         $token = request()->bearerToken() ?? JWTAuth::refresh();
         $user->load(['photo', 'usercompany']);
         return response()->json([
@@ -42,7 +42,7 @@ class JWTAuthController extends Controller
             'last_name' => $user->lastname ?? '',
             'email'     => $user->email ?? '',
             'phone'    => $user->mobile ?? '',
-            'imageUrl' => !empty($user->photo) ? $user->photo->file_path : asset('images/default.png'),
+            'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
             'company_about_page'  => config('app.url').'app/page/about',
             'company_location_page'    => config('app.url').'app/page/location',
             'company_privacy_policy_page' => config('app.url').'app/page/privacy',

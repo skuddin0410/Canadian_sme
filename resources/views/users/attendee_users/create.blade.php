@@ -21,7 +21,9 @@ Admin | Add Attendee
     <div class="card-body">
       <div class="row g-3 align-items-start">
         <div class="col-md-4">
-  <label class="form-label fw-semibold mb-2">Profile Photo</label>
+  <label class="form-label fw-semibold mb-2">
+    Profile Photo (<span class="text-danger">600px (width) x 600px (height)</span>)
+</label>
   <div id="profileDropZone" class="profile-drop-zone rounded border border-2 d-flex align-items-center justify-content-center">
     <input type="file" id="profileImageInput" accept="image/*" class="d-none form-control">
     <img id="profileImagePreview"

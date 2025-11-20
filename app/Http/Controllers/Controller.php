@@ -64,7 +64,7 @@ class Controller extends BaseController
                 }
 
                 if($table_type=='speakers' && $file_type =='photo'){
-                   $image = Image::read($file)->resize(490, 559, function ($constraint) {
+                    $image = Image::read($file)->resize(490, 559, function ($constraint) {
                         $constraint->aspectRatio();
                         $constraint->upsize();
                     });
@@ -86,9 +86,12 @@ class Controller extends BaseController
                 }
                 
                 if(!empty($image)){
-                 //Storage::disk('public')->put($file_path.'/'.$filename,$image->encodeByExtension($file->getClientOriginalExtension(), quality: 70));
+                Storage::disk('s3')->put($file_path . '/' . $filename, $image->encodeByExtension($file->getClientOriginalExtension(), quality: 70)); 
+     
+                    if($file_type =='content_icon' || $file_type =='logo' || $file_type =='photo' ){ 
+                       $url = $file->storeAs($file_path, $filename, 's3');
+                    } 
 
-                  Storage::disk('s3')->put($file_path . '/' . $filename, $image->encodeByExtension($file->getClientOriginalExtension(), quality: 70));  
                 }else{
                     //$url = $file->storeAs($file_path,$filename,'public');
                       $url = $file->storeAs($file_path, $filename, 's3');
@@ -120,48 +123,6 @@ class Controller extends BaseController
            $drive->is_local_file = 0;
            $drive->save();
     }
-        public static function generateMobileImage($file, string $file_path, string $filename): string
-{
-    // Ensure "mobile" folder exists
-    $mobileFolder = rtrim($file_path, '/') . '/mobile';
-    if (!Storage::disk('public')->exists($mobileFolder)) {
-        Storage::disk('public')->makeDirectory($mobileFolder);
-    }
-
-    // Load image
-    $image = Image::make($file);
-
-    // Crop to square and resize
-    $size = min($image->width(), $image->height());
-    $image->crop($size, $size, intval(($image->width() - $size) / 2), intval(($image->height() - $size) / 2));
-    $image->resize(300, 300);
-
-    // Create circular mask using Intervention
-    $mask = Image::canvas(300, 300);
-    $mask->circle(300, 150, 150, function ($draw) {
-        $draw->background('#000'); // black circle for mask
-    });
-
-    $image->mask($mask, true); // apply mask
-
-    // Determine extension
-    $extension = strtolower(
-        method_exists($file, 'getClientOriginalExtension') 
-            ? $file->getClientOriginalExtension() 
-            : pathinfo($filename, PATHINFO_EXTENSION)
-    );
-    if (!in_array($extension, ['jpg','jpeg','png','webp'])) {
-        $extension = 'png';
-    }
-
-    // Save into public/mobile
-    $dest = $mobileFolder . '/' . $filename;
-    Storage::disk('public')->put($dest, (string) $image->encode($extension, 70));
-
-    return $dest;
-}
-
-
        
     public static function deleteFile($table_id,$table_type,$file_type='photo'){
         $drive = Drive::where('table_type',$table_type)

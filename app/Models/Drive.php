@@ -37,5 +37,45 @@ class Drive extends Model
         return asset('images/default.png');
     }
 
-    protected $appends = ['file_path'];
+    public function getMobilePathAttribute()
+    {  
+        if( $this->is_local_file == 1){
+             if (\File::isFile('storage/mobile/' . $this->table_type . '/' . $this->file_name)) {
+                return asset('storage//mobile/' . $this->table_type . '/' . $this->file_name . '?v=' . time());
+            }
+
+            if (\File::isFile('storage/mobile/' . $this->file_type . '/' . $this->file_name)) {
+                return asset('storage/mobile/' . $this->file_type . '/' . $this->file_name . '?v=' . time());
+            }
+
+            if (\File::isFile('storage/' . $this->table_type . '/' . $this->file_name)) {
+                return asset('storage/' . $this->table_type . '/' . $this->file_name . '?v=' . time());
+            }
+
+            if (\File::isFile('storage/' . $this->file_type . '/' . $this->file_name)) {
+                return asset('storage/' . $this->file_type . '/' . $this->file_name . '?v=' . time());
+            }
+        }else{
+
+            if (Storage::disk('s3')->get('mobile/'.$this->file_type . '/' . $this->file_name)) {
+              return Storage::disk('s3')->url('mobile/'.$this->file_type . '/' . $this->file_name);
+            }
+
+            if (Storage::disk('s3')->get('mobile/'.$this->table_type . '/' . $this->file_name)) {
+              return Storage::disk('s3')->url('mobile/'.$this->table_type . '/' . $this->file_name);
+            }
+            
+            if (Storage::disk('s3')->get($this->file_type . '/' . $this->file_name)) {
+              return Storage::disk('s3')->url($this->file_type . '/' . $this->file_name);
+            }
+
+            if (Storage::disk('s3')->get($this->table_type . '/' . $this->file_name)) {
+              return Storage::disk('s3')->url($this->table_type . '/' . $this->file_name);
+            }
+        }
+
+        return asset('images/default.png');
+    }
+
+    protected $appends = ['file_path','mobile_path'];
 }
