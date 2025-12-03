@@ -7,7 +7,7 @@
             </a>
 
             <!-- Search Box -->
-            <!--<form class="d-none d-md-flex mx-auto w-25 position-relative" action="{{ route('front.landing.search') }}" method="GET">
+            <form class="d-none d-md-flex mx-auto w-25 position-relative" action="{{ route('front.landing.search') }}" method="GET">
                 <input 
                     class="form-control rounded-pill ps-4 pe-5 py-2 shadow-sm fs-6"
                     type="text"
@@ -21,7 +21,7 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <span>Search</span>
                 </button>
-            </form>-->
+            </form>
 
             <!-- Navbar Menu -->
             <div class="d-flex align-items-center">

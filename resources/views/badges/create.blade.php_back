@@ -4,161 +4,146 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-7">
             <div class="card">
                 <div class="card-header">
                     <h4><i class="fas fa-plus me-2"></i>Create New Badge</h4>
                 </div>
-    <div class="card-body">
-    <form action="{{ route('badges.store') }}" method="POST" enctype="multipart/form-data" id="badgeForm">
-        @csrf
-        
-        {{-- Field Selection --}}
-        <div class="mb-4">
+                <div class="card-body">
+                    <form action="{{ route('badges.store') }}" method="POST" enctype="multipart/form-data" id="badgeForm">
+                        @csrf
+                        
+                        {{-- Field Selection --}}
+                        <div class="mb-4">
+                            <div class="row">
+                                <div class="mb-3">
+                                    <label for="badge_name" class="form-label">
+                                        Badge name
+                                    </label>
+                                    <input type="text" class="form-control" id="badge_name" name="badge_name" placeholder="Enter badge name">
+                                </div>
+                            </div>
+                            <label class="form-label fw-bold">Select Fields to Include:</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="selected_fields[]" value="name" id="field_name">
+                                        <label class="form-check-label" for="field_name">
+                                            <i class="fas fa-user me-1"></i>Name
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2" >
+                                        <input class="form-check-input" type="checkbox" name="selected_fields[]" value="company_name" id="field_company">
+                                        <label class="form-check-label" for="field_company">
+                                            <i class="fas fa-building me-1"></i>Company Name
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2 d-none">
+                                        <input class="form-check-input" type="checkbox" name="selected_fields[]" value="designation" id="field_designation">
+                                        <label class="form-check-label" for="field_designation">
+                                            <i class="fas fa-briefcase me-1"></i>Designation
+                                        </label>
+                                    </div>
+                                      <div class="mb-3">
+                                      <label for="width" class="form-label">
+                                        <i class="fas fa-arrows-alt-h me-1"></i> Width (in)
+                                      </label>
+                                      <input type="text" class="form-control" name="width" id="width"  placeholder="Enter width in cm" value="3">
+                                    </div>
 
-            {{-- Badge name (full width, left aligned) --}}
-            <div class="mb-3">
-                <label for="badge_name" class="form-label">
-                    Badge name
-                </label>
-                <input type="text" class="form-control" id="badge_name" name="badge_name" placeholder="Enter badge name">
-            </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="selected_fields[]" value="logo" id="field_logo">
+                                        <label class="form-check-label" for="field_logo">
+                                            <i class="fas fa-image me-1"></i>Logo
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="selected_fields[]" value="qr_code" id="field_qr">
+                                        <label class="form-check-label" for="field_qr">
+                                            <i class="fas fa-qrcode me-1"></i>QR Code
+                                        </label>
+                                    </div>
 
-            {{-- List heading --}}
-            <label class="form-label fw-bold d-block mb-2">Select Fields to Include:</label>
+                                    <div class="mb-3">
+                                      <label for="height" class="form-label">
+                                        <i class="fas fa-arrows-alt-v me-1"></i> Height (in)
+                                      </label>
+                                      <input type="text" class="form-control" name="height" id="height"  placeholder="Enter height in cm" value="2.2">
+                                    </div>
 
-            {{-- LEFT ALIGNED LIST VIEW --}}
-            <div class="field-list">
+                                </div>
+                            </div>
+                            @error('selected_fields')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                {{-- NAME --}}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="selected_fields[]" value="name" id="field_name">
-                    <label class="form-check-label" for="field_name">
-                        <i class="fas fa-user me-1"></i>Name
-                    </label>
+                        <hr>
+
+                        {{-- Conditional Fields --}}
+                        <div class="conditional-field d-none" id="name_field">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter full name">
+                            </div>
+                        </div>
+
+                        <div class="conditional-field d-none" id="company_name_field">
+                            <div class="mb-3">
+                                <label for="company_name" class="form-label">
+                                    <i class="fas fa-building me-1"></i>Company Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter company name">
+                            </div>
+                        </div>
+
+                        <div class="conditional-field d-none" id="designation_field">
+                            <div class="mb-3">
+                                <label for="designation" class="form-label">
+                                    <i class="fas fa-briefcase me-1"></i>Designation <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="designation" name="designation" placeholder="Enter designation">
+                            </div>
+                        </div>
+
+                        <div class="conditional-field d-none" id="logo_field">
+                            <div class="mb-3">
+                                <label for="logo" class="form-label">
+                                    <i class="fas fa-image me-1"></i>Logo <span class="text-danger">*</span>
+                                </label>
+                                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                                <div class="form-text">Supported formats: JPEG, PNG, JPG, GIF (Max: 2MB)</div>
+                            </div>
+                        </div>
+
+                        <div class="conditional-field d-none" id="qr_code_field">
+                            <div class="mb-3">
+                                <label for="qr_code_data" class="form-label">
+                                    <i class="fas fa-qrcode me-1"></i>QR Code Data <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control" id="qr_code_data" name="qr_code_data" rows="3" placeholder="Enter data for QR code (URL, text, contact info, etc.)"></textarea>
+                            </div>
+                        </div> 
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ route('badges.index') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-1"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-magic me-1"></i>Generate Badge
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                {{-- COMPANY --}}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="selected_fields[]" value="company_name" id="field_company">
-                    <label class="form-check-label" for="field_company">
-                        <i class="fas fa-building me-1"></i>Company Name
-                    </label>
-                </div>
-
-                {{-- DESIGNATION --}}
-                <div class="form-check mb-2 d-none">
-                    <input class="form-check-input" type="checkbox" name="selected_fields[]" value="designation" id="field_designation">
-                    <label class="form-check-label" for="field_designation">
-                        <i class="fas fa-briefcase me-1"></i>Designation
-                    </label>
-                </div>
-
-                {{-- LOGO --}}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="selected_fields[]" value="logo" id="field_logo">
-                    <label class="form-check-label" for="field_logo">
-                        <i class="fas fa-image me-1"></i>Logo
-                    </label>
-                </div>
-
-                {{-- QR CODE --}}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="selected_fields[]" value="qr_code" id="field_qr">
-                    <label class="form-check-label" for="field_qr">
-                        <i class="fas fa-qrcode me-1"></i>QR Code
-                    </label>
-                </div>
-
-            </div> {{-- End List View --}}
-
-            {{-- WIDTH --}}
-            <div class="mb-3 mt-3">
-                <label for="width" class="form-label">
-                    <i class="fas fa-arrows-alt-h me-1"></i> Width (in)
-                </label>
-                <input type="text" class="form-control" name="width" id="width" placeholder="Enter width in cm" value="3">
-            </div>
-
-            {{-- HEIGHT --}}
-            <div class="mb-3">
-                <label for="height" class="form-label">
-                    <i class="fas fa-arrows-alt-v me-1"></i> Height (in)
-                </label>
-                <input type="text" class="form-control" name="height" id="height" placeholder="Enter height in cm" value="2.2">
-            </div>
-
-            @error('selected_fields')
-                <div class="text-danger mt-1">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <hr>
-
-        {{-- Conditional Fields --}}
-        <div class="conditional-field d-none" id="name_field">
-            <div class="mb-3">
-                <label for="name" class="form-label">
-                    <i class="fas fa-user me-1"></i>Name <span class="text-danger">*</span>
-                </label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Enter full name">
-            </div>
-        </div>
-
-        <div class="conditional-field d-none" id="company_name_field">
-            <div class="mb-3">
-                <label for="company_name" class="form-label">
-                    <i class="fas fa-building me-1"></i>Company Name <span class="text-danger">*</span>
-                </label>
-                <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter company name">
-            </div>
-        </div>
-
-        <div class="conditional-field d-none" id="designation_field">
-            <div class="mb-3">
-                <label for="designation" class="form-label">
-                    <i class="fas fa-briefcase me-1"></i>Designation <span class="text-danger">*</span>
-                </label>
-                <input type="text" class="form-control" id="designation" name="designation" placeholder="Enter designation">
-            </div>
-        </div>
-
-        <div class="conditional-field d-none" id="logo_field">
-            <div class="mb-3">
-                <label for="logo" class="form-label">
-                    <i class="fas fa-image me-1"></i>Logo <span class="text-danger">*</span>
-                </label>
-                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
-                <div class="form-text">Supported formats: JPEG, PNG, JPG, GIF (Max: 2MB)</div>
-            </div>
-        </div>
-
-        <div class="conditional-field d-none" id="qr_code_field">
-            <div class="mb-3">
-                <label for="qr_code_data" class="form-label">
-                    <i class="fas fa-qrcode me-1"></i>QR Code Data <span class="text-danger">*</span>
-                </label>
-                <textarea class="form-control" id="qr_code_data" name="qr_code_data" rows="3" placeholder="Enter data for QR code"></textarea>
-            </div>
-        </div> 
-
-        {{-- Action --}}
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <a href="{{ route('badges.index') }}" class="btn btn-secondary me-md-2">
-                <i class="fas fa-arrow-left me-1"></i>Back
-            </a>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-magic me-1"></i>Generate Badge
-            </button>
-        </div>
-    </form>
-</div>
-
             </div>
         </div>
 
         <!-- Enhanced Preview Panel (Right side) -->
-        <div class="col-md-9">
+        <div class="col-md-5">
             <div class="card">
                 <div class="card-header">
                     <h5><i class="fas fa-eye me-2"></i>Live Preview</h5>
