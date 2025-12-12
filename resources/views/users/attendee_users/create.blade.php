@@ -332,17 +332,32 @@ Admin | Add Attendee
                     {{-- EXHIBITORS --}}
                    
                     <div class="col-md-12">
-                      <label class="form-label">Exhibitor</label>
-                      <select class="form-select select2" name="access_exhibitor_ids"
-                              data-placeholder="Select exhibitor(s)" data-allow-clear="true">
-                              <option value="">Please select</option>
-                        @foreach($exhibitors as $exhibitor)
-                          <option value="{{ $exhibitor->id }}">
-                            {{ $exhibitor->name }}
-                          </option>
-                        @endforeach
-                      </select>
-                      @error('access_exhibitor_ids') <div class="text-danger">{{ $message }}</div> @enderror
+                      <div class="row">
+                         <div class="col-md-9">
+                          <label class="form-label">Exhibitor</label>
+                          <select class="form-select select2" name="access_exhibitor_ids"
+                                  data-placeholder="Select exhibitor(s)" data-allow-clear="true">
+                                  <option value="">Please select</option>
+                            @foreach($exhibitors as $exhibitor)
+                              <option value="{{ $exhibitor->id }}">
+                                {{ $exhibitor->name }}
+                              </option>
+                            @endforeach
+                          </select>
+                          @error('access_exhibitor_ids') <div class="text-danger">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">User has edit permission</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="editPermission" name="edit_permission" value="1">
+                                <label class="form-check-label" for="editPermission">
+                                    Yes, allow editing
+                                </label>
+                            </div>
+                        </div>
+
+                      </div>
                     </div>
 
       

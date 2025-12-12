@@ -190,8 +190,10 @@ class AttendeeUserController extends Controller
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
        
-       
-
+        if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
+            $user->givePermissionTo('Edit Company');
+        }
+        
         $primaryGroupArray= [];
         $secondaryGroupArray=[];
          
@@ -270,7 +272,6 @@ class AttendeeUserController extends Controller
      */
     public function update(Request $request, string $id)
     {    
-
         $user = User::findOrFail($id);
         $validator = Validator::make($request->all(), [
             
@@ -323,6 +324,13 @@ class AttendeeUserController extends Controller
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
+
+        if ( $request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
+            $user->givePermissionTo('Edit Company');
+        }else{
+            $user->revokePermissionTo('Edit Company'); 
+        }
+
     
         $primaryGroupArray= [];
         $secondaryGroupArray=[];

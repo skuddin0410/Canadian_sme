@@ -11,6 +11,15 @@ Route::get('/login', function () {
     return redirect()->route('login');
 });
 
+Route::get('/run/command', function () {
+    Artisan::call('db:seed', [
+      '--class' => 'PermissionSeeder'
+    ]);
+
+    echo 'Completed';
+});
+
+
 Route::get('/admin/login', function () {
     return redirect()->route('login');
 });

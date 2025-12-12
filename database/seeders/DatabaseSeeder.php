@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             //*****
 
             UpdateSlugsSeeder::class, //php artisan db:seed --class=UpdateSlugsSeeder
-            
+            PermissionSeeder::class,
             
         ]);
     }

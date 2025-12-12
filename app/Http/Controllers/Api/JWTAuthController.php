@@ -402,7 +402,7 @@ public function getExhibitor($exhibitorId)
             'quickLinkIconFile',
             'Docs',
         ])->find($exhibitorId);
-
+        $user = JWTAuth::user();
         if (! $exhibitor) {
             return response()->json([
                 'success' => false,
@@ -427,7 +427,8 @@ public function getExhibitor($exhibitorId)
                 ['name' => 'twitter',   'url' => $exhibitor->twitter   ?? '']
             ],
             'bio'         => $exhibitor->description ?? '',
-            "company_details"=>$sponsor->description ?? '',
+            "company_details"=> $sponsor->description ?? '',
+            "is_editable" => $user->can('Edit Company'),
             "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
                            "fileID"=>$sp->id,
                            "name"=> $sp->file_name,
