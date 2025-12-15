@@ -1049,13 +1049,20 @@ public function getAllExhibitor(Request $request){
     }
     
     public function updateExhibitor(Request $request){
-        try {
+        try { 
 
             if (!$user = JWTAuth::parseToken()->authenticate()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized'
                 ], 401);
+            }
+       
+            if($user->can('Edit Company') == false){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User does not have permission'
+                ], 401); 
             }
             
             $validator = Validator::make($request->all(), [
