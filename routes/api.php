@@ -27,6 +27,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAllExhibitor']);
         Route::get('/{exhibitorId}', [App\Http\Controllers\Api\JWTAuthController::class, 'getExhibitor']);
         //Route::put('/{exhibitorId}/files/{fileId}', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteExhibitorFiles']);
+        Route::post('/update', [App\Http\Controllers\Api\JWTAuthController::class, 'updateExhibitor']);
     });
 
 

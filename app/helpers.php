@@ -608,3 +608,11 @@ if (! function_exists('isConnection')) {
     }
 }
 
+if (! function_exists('isBase64String')) {
+    function isBase64String(?string $value): bool
+    {
+        if (!$value || !is_string($value)) return false;
+        $raw = preg_replace('/^data:image\/\w+;base64,/', '', $value);
+        return base64_decode($raw, true) !== false;
+    }
+}

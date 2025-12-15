@@ -1047,6 +1047,117 @@ public function getAllExhibitor(Request $request){
         }
 
     }
+    
+    public function updateExhibitor(Request $request){
+        try {
+
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+            
+            $validator = Validator::make($request->all(), [
+                'name'        => 'required|string|max:255',
+                'id'       => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors'  => $validator->errors()->first(),
+                ], 422);
+            }
+            
+            $company = Company::where('id',$request->id)->first();
+            if ($company) {
+                $company->update([
+                    'name'        => $request->name,
+                    'email'       => $request->email,
+                    'phone'       => $request->phone,
+                    'description' => $request->bio,
+                    'website'     => $request->website,
+                    'booth'       => $request->word_no,
+                    'location'    => $request->location, 
+                    'industry'    => $request->industry
+                ]); 
+            }
+             
+            if(!empty($request->social_links)) {
+
+                foreach($request->social_links as $val){
+
+                      if($val['name'] == 'linkedin'){
+                        $company->update([
+                          'linkedin'    => $val['url'],
+                        ]); 
+                      }
+
+                      if($val['name'] == 'facebook'){
+                        $company->update([
+                         'facebook'    => $val['url'],
+                        ]); 
+                      }
+
+                      if($val['name'] == 'instagram'){
+                        $company->update([
+                          'instagram'    => $val['url'],
+                        ]); 
+                      }
+
+                      if($val['name'] == 'twitter'){
+                        $company->update([
+                          'twitter'    => $val['url'],
+                        ]); 
+                      }
+
+                }
+            } 
+
+
+            if ( $request->avatar && isBase64String($request->avatar) ) {
+
+                $this->imageBase64Upload(
+                    $request->avatar,
+                    'content_icon',
+                    $company->id,
+                    'companies',
+                    'content_icon',
+                    $company->id,
+                );
+
+            }
+
+          
+            if ( $request->banner && isBase64String($request->banner) ) {
+
+                $this->imageBase64Upload(
+                    $request->banner,
+                    'quick_link_icon',
+                    $company->id,
+                    'companies',
+                    'quick_link_icon',
+                    $company->id,
+                );
+
+            }
+
+            return response()->json([
+                'status'=> 1,
+                'success' => true,
+                'message' => 'Company details updated successfully!',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to update data! ',
+            ], 500);
+        }
+
+    }
 
     public function deleteAccount(){
       try {
