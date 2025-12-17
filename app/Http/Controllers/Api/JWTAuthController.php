@@ -428,7 +428,7 @@ public function getExhibitor($exhibitorId)
             ],
             'bio'         => $exhibitor->description ?? '',
             "company_details"=> $sponsor->description ?? '',
-            "is_editable" => $user->can('Edit Company'),
+            "is_editable" => ($user->can('Edit Company') && $user->access_exhibitor_ids == $exhibitorId) ? true : false ,
             "uploaded_files" => $exhibitor->Docs->map(fn ($sp) => [
                            "fileID"=>$sp->id,
                            "name"=> $sp->file_name,
@@ -1058,12 +1058,12 @@ public function getAllExhibitor(Request $request){
                 ], 401);
             }
        
-            if($user->can('Edit Company') == false){
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User does not have permission'
-                ], 401); 
-            }
+            // if(($user->can('Edit Company') && $user->access_exhibitor_ids == $exhibitorId) == false){
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'User does not have permission'
+            //     ], 401); 
+            // }
             
             $validator = Validator::make($request->all(), [
                 'name'        => 'required|string|max:255',
@@ -1122,7 +1122,23 @@ public function getAllExhibitor(Request $request){
 
                 }
             } 
+            
+            if(!empty($request->uploaded_files)) {
 
+                foreach($request->uploaded_files as $val){
+
+                    if(isBase64String($val['base64'])){
+                        $this->imageBase64Upload(
+                            $val['base64'],
+                            'companies',
+                            $company->id,
+                            'companies',
+                            'private_docs'
+                       );
+                    }
+
+                }
+            }
 
             if ( $request->avatar && isBase64String($request->avatar) ) {
 
