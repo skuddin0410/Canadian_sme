@@ -1127,15 +1127,15 @@ public function getAllExhibitor(Request $request){
 
                 foreach($request->uploaded_files as $val){
 
-                    if(isBase64String($val['base64'])){
-                        $this->imageBase64Upload(
+                   // if(isBase64String($val['base64'])){
+                        $this->imageUpload(
                             $val['base64'],
                             'companies',
                             $company->id,
                             'companies',
                             'private_docs'
                        );
-                    }
+                    //}
 
                 }
             }
