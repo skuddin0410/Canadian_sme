@@ -91,8 +91,8 @@
                         <div data-i18n="Attendee">Attendee </div>
                     </a>
                 </li>
-               <li class="menu-item {{ request()->is('admin/badges*') ? 'active' : '' }}">
-                    <a href="{{ route('badges.index') }}" class="menu-link">
+               <li class="menu-item {{ request()->is('admin/newbadges*') ? 'active' : '' }}">
+                    <a href="{{ route('newbadges.index') }}" class="menu-link">
                         <div data-i18n="Badges">Badges </div>
                     </a>
                 </li> 
