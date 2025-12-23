@@ -45,8 +45,11 @@ public function index(Request $request)
         $search = "%" . $request->search . "%";
         $query->where(function ($q) use ($search) {
             $q->where("companies.name", "LIKE", $search)
-              ->orWhere("companies.phone", "LIKE", $search)
-              ->orWhere("companies.email", "LIKE", $search);
+              //->orWhere("companies.phone", "LIKE", $search)
+              ->orWhere("companies.email", "LIKE", $search)
+              ->orWhere("companies.booth", "LIKE", $search);
+
+              
         });
     }
    

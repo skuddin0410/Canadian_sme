@@ -1050,7 +1050,7 @@ public function getAllExhibitor(Request $request){
     
     public function updateExhibitor(Request $request){
         try { 
-
+           
             if (!$user = JWTAuth::parseToken()->authenticate()) {
                 return response()->json([
                     'success' => false,
@@ -1092,7 +1092,7 @@ public function getAllExhibitor(Request $request){
                 ]); 
             }
              
-            if(!empty($request->social_links)) {
+            /*if(!empty($request->social_links)) {
 
                 foreach($request->social_links as $val){
 
@@ -1121,28 +1121,26 @@ public function getAllExhibitor(Request $request){
                       }
 
                 }
-            } 
+            } */
             
             if(!empty($request->uploaded_files)) {
 
                 foreach($request->uploaded_files as $val){
 
-                   // if(isBase64String($val['base64'])){
                         $this->imageUpload(
-                            $val['base64'],
+                            $val,
                             'companies',
                             $company->id,
                             'companies',
                             'private_docs'
                        );
-                    //}
 
                 }
             }
 
-            if ( $request->avatar && isBase64String($request->avatar) ) {
+            if ( $request->avatar) {
 
-                $this->imageBase64Upload(
+                $this->imageUpload(
                     $request->avatar,
                     'content_icon',
                     $company->id,
@@ -1154,9 +1152,9 @@ public function getAllExhibitor(Request $request){
             }
 
           
-            if ( $request->banner && isBase64String($request->banner) ) {
+            if ( $request->banner) {
 
-                $this->imageBase64Upload(
+                $this->imageUpload(
                     $request->banner,
                     'quick_link_icon',
                     $company->id,
