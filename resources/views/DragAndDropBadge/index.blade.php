@@ -35,7 +35,7 @@
                         <td>{{$badge->width}} inch X {{$badge->height}} inch</td>
                         <td>{{$badge->target}}</td>
                         <td>
-                            <a href="{{route('newbadges.show',1)}}" class="btn btn-sm btn-primary">show</a>
+                            <a href="{{route('newbadges.show',$badge->id)}}" class="btn btn-sm btn-primary">show</a>
                             <!-- <button class="btn btn-sm btn-danger">Delete</button> -->
                         </td>
                     </tr>
