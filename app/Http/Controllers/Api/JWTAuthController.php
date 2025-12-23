@@ -1092,7 +1092,7 @@ public function getAllExhibitor(Request $request){
                 ]); 
             }
              
-            /*if(!empty($request->social_links)) {
+            if(!empty($request->social_links)) {
 
                 foreach($request->social_links as $val){
 
@@ -1121,7 +1121,7 @@ public function getAllExhibitor(Request $request){
                       }
 
                 }
-            } */
+            } 
             
             if(!empty($request->uploaded_files)) {
 
