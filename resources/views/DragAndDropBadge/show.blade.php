@@ -85,7 +85,6 @@
 
 <div class="container-xxl flex-grow-1 container-p-y pt-0 mt-3">
    <div class="row">
-
         <!-- LEFT PANEL -->
         <div class="col-md-2">
             <h6>Fields</h6>
@@ -112,7 +111,7 @@
                 <input type="number" id="fontSize" class="form-control" value="14">
             </div>
 
-            <div class="mb-2">
+            <div class="mb-2 d-none">
                 <label>Text Color</label>
                 <input type="color" id="fontColor" class="form-control">
             </div>
@@ -147,12 +146,13 @@ canvas.addEventListener("drop", e => {
     createItem(e.dataTransfer.getData("type"), e.offsetX, e.offsetY);
 });
 
-/* Create element */
+
 function createItem(type, x, y) {
+    
+    console.log(type, x, y)
     const el = document.createElement("div");
     el.classList.add("canvas-item");
     el.dataset.type = type;
-
     if (type === "qr_code") {
         el.classList.add("qr-box");
         el.innerHTML = "QR";
@@ -268,6 +268,7 @@ function duplicateItem() {
 
 /* Save Layout */
 function saveLayout() {
+
     const data = [];
     document.querySelectorAll(".canvas-item").forEach(el => {
         data.push({
@@ -280,7 +281,8 @@ function saveLayout() {
             color: el.style.color
         });
     });
-   document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+   
+    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
 
     fetch('/admin/newbadges/{{$newbadge->id}}/save-layout', {
         method: 'POST',
@@ -295,10 +297,23 @@ function saveLayout() {
         })
     }).then(response => response.json()).then(res => {
         alert('Layout saved successfully');
-        console.log(res);
+        //console.log(res);
+        
     }).catch(err => {
         console.error('Error saving layout:', err);
+    }).finally(()=>{
+        window.location.reload();
     });
 }
+
+window.onload = function() {
+    <?php foreach(json_decode($newbadge->layout) as $data ){ ?>
+
+       createItem({{$data->type}},{{str_replace('px', '', $data->x)}},{{str_replace('px', '', $data->y)}})
+
+    <?php } ?>
+
+}
 </script>
+
 @endsection

@@ -64,4 +64,13 @@ class NewBadgeController extends Controller
        $badge->save();
 
     }
+
+    // public function showCanvasPage($badgeId)
+    // {
+    //     $newbadge = Badge::find($badgeId); 
+    //     $layout = Layout::where('badge_id', $badgeId)->first(); 
+    //     $elements = $layout ? json_decode($layout->data, true) : [];
+    //     return view('canvas')->with('newbadge', $newbadge)->with('elements', $elements);
+    // }
+
 }
