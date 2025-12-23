@@ -1092,7 +1092,7 @@ public function getAllExhibitor(Request $request){
                 ]); 
             }
              
-            if(!empty($request->social_links)) {
+            /*if(!empty($request->social_links)) {
 
                 foreach($request->social_links as $val){
 
@@ -1121,7 +1121,31 @@ public function getAllExhibitor(Request $request){
                       }
 
                 }
-            } 
+            }*/ 
+            
+            if(!empty($request->linkedin)) {
+                $company->update([
+                  'linkedin'    => $request->linkedin,
+                ]); 
+            }
+            
+            if(!empty($request->facebook)) {
+                $company->update([
+                 'facebook'    => $request->facebook,
+                ]); 
+            }
+            
+            if(!empty($request->instagram)) {
+                $company->update([
+                  'instagram'    => $request->instagram,
+                ]);  
+            }
+            
+            if(!empty($request->twitter)) {
+                $company->update([
+                  'twitter'    => $request->twitter,
+                ]);  
+            }
             
             if(!empty($request->uploaded_files)) {
 
