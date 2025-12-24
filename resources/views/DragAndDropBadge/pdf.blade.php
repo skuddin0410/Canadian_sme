@@ -2,13 +2,21 @@
 <html>
 <head>
 <style>
-@page { margin: 0; }
-
-html, body {
+/* 1️⃣ PDF page margins */
+@page {
     margin: 0;
     padding: 0;
 }
 
+/* 2️⃣ HTML & BODY reset */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 3️⃣ Badge size exactly */
 .badge {
     position: relative;
     width: {{ $badge->width }}in;
@@ -16,6 +24,7 @@ html, body {
     overflow: hidden;
 }
 
+/* Page break control */
 .badge-page {
     page-break-after: always;
 }
@@ -24,6 +33,7 @@ html, body {
     page-break-after: auto;
 }
 
+/* Canvas items */
 .item {
     position: absolute;
     display: flex;
@@ -31,14 +41,18 @@ html, body {
     justify-content: center;
     text-align: center;
     overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
 
 .item img {
+    display: block;
     max-width: 100%;
     max-height: 100%;
 }
 </style>
 </head>
+
 <body>
 
 @foreach($users as $user)

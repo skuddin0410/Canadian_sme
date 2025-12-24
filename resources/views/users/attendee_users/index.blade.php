@@ -67,9 +67,9 @@
                                     <button type="button" class="btn btn-success" onclick="openModal('notification')">
                                         Send Notification (<span id="notifCount">0</span>)
                                     </button>
-                                    <button type="button" class="btn btn-warning" onclick="openModal('both')">
+                                    <!-- <button type="button" class="btn btn-warning" onclick="openModal('both')">
                                         Send Email/Notification (<span id="bothCount">0</span>)
-                                    </button>
+                                    </button> -->
 
                                     <button type="button" class="btn btn-secondary" onclick="openBadgeModal()">
                                         Generate Badge (<span id="badgeCount">0</span>)
