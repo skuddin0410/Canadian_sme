@@ -306,14 +306,42 @@ function saveLayout() {
     });
 }
 
-window.onload = function() {
-    <?php foreach(json_decode($newbadge->layout) as $data ){ ?>
+window.onload = function () {
+    @if($newbadge->layout)
+        const layout = @json(json_decode($newbadge->layout));
+        layout.forEach(item => {
+            createItemFromData(item);
+        });
+    @endif
+};
 
-       createItem({{$data->type}},{{str_replace('px', '', $data->x)}},{{str_replace('px', '', $data->y)}})
 
-    <?php } ?>
+function createItemFromData(data) {
+    const el = document.createElement("div");
+    el.classList.add("canvas-item");
+    el.dataset.type = data.type;
 
+    if (data.type === "qr_code") {
+        el.classList.add("qr-box");
+        el.innerHTML = "QR";
+    } else {
+        el.innerHTML = `{${data.type}}`;
+        el.style.fontSize = data.fontSize || "14px";
+        el.style.color = data.color || "#000";
+    }
+
+    el.style.left = data.x;
+    el.style.top = data.y;
+    el.style.width = data.width + "px";
+    el.style.height = data.height + "px";
+
+    makeDraggable(el);
+    makeResizable(el);
+    selectItem(el);
+
+    canvas.appendChild(el);
 }
+
 </script>
 
 @endsection
