@@ -71,7 +71,8 @@ class User extends Authenticatable implements JWTSubject
         'title',
         'onesignal_userid',
         'jwt_token',
-        'slug'
+        'slug',
+        'cometchat_id'
     ];
 
     /**

@@ -389,6 +389,7 @@ public function getConnectionsDetails(Request $request)
      
         $connectionDetails = [
             "id"              => $connecteduser && $connecteduser->connection ? $connecteduser->connection->id : '',
+            "comet_chat_id"   => $connecteduser && $connecteduser->connection ? $connecteduser->connection->cometchat_id : '',
             "rep_name"        => $connecteduser && $connecteduser->connection 
                                     ? ($connecteduser->connection->full_name ?: $connecteduser->connection->name)
                                     : '',

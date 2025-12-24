@@ -189,6 +189,10 @@ class AttendeeUserController extends Controller
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
+
+        $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
+        $user->cometchat_id = $cometChatID['uid'];
+        $user->save();
        
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
             $user->givePermissionTo('Edit Company');
@@ -235,7 +239,56 @@ class AttendeeUserController extends Controller
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
     }
+    
 
+
+    private function createCometChatUser($userId, $name, $email, $mobile)
+    {
+        $appID = env('COMETCHAT_APP_ID');
+        $apiKey = env('COMETCHAT_API_KEY');
+        $region = env('COMETCHAT_REGION');
+ 
+        $user = User::find($userId);
+        $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/default.png');
+ 
+        $data = [
+            'uid' => "SME_CometChat_{$userId}",
+            'name' => $name,
+            'avatar' => $avatarUrl,
+            // 'link' => "https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg",
+            'role' => 'default',
+            'statusMessage' => 'default',
+            'metadata' => [
+                '@private' => [
+                    'email' => $email,
+                    'contactNumber' => $mobile,
+                ]
+            ],
+            'tags' => [],
+            'withAuthToken' => true
+        ];
+ 
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'apikey' => $apiKey,
+        ])->post(
+            "https://{$appID}.api-{$region}.cometchat.io/v3/users",
+            $data
+        );
+ 
+        if ($response->successful()) {
+            $responseData = $response->json();
+            // Return relevant data
+            return [
+                'uid' => $responseData['data']['uid'],
+                'status' => $responseData['data']['status'],
+                'authToken' => $responseData['data']['authToken']
+            ];
+        }
+ 
+        return null;
+    }
+ 
     /**
      * Display the specified resource.
      */
@@ -661,5 +714,7 @@ public function generateBadge(Request $request)
     $pdf = PDF::loadView('badges.pdf', compact('badge', 'users'));
     return $pdf->download('attendee_badges.pdf');
 }
+
+
 
 }

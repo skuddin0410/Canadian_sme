@@ -37,6 +37,7 @@ class JWTAuthController extends Controller
             'success' => true,
             'message' => 'successful',
             'id'        => $user->id,
+            'comet_chat_id' => $user->cometchat_id,
             'name' => $user->full_name ?? '',
             'first_name' => $user->name ?? '',
             'last_name' => $user->lastname ?? '',
