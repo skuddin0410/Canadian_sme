@@ -499,9 +499,15 @@ public function sendMail(Request $request, $id)
 public function bulkAction(Request $request)
 {
     $userIds = json_decode($request->user_ids, true);
-    $type = $request->query('type'); // email or notification
-    $users = User::whereIn('id', $userIds)->get();
 
+
+    $type = $request->query('type'); // email or notification
+    if (in_array('all', $userIds, true)) {
+       $users = User::get();
+    }else{
+      $users = User::whereIn('id', $userIds)->get();  
+    }
+    dd($users);
     $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
     $subject = $emailTemplate->subject ?? '';
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);

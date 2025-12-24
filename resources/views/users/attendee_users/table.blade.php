@@ -228,6 +228,14 @@ function updateCounts() {
     document.getElementById('emailCount').innerText = selected;
     document.getElementById('notifCount').innerText = selected;
     document.getElementById('badgeCount').innerText = selected;
+    if(selected){
+       document.getElementById('sendAllEmailCheckboxId').style.display = 'none';
+       document.getElementById('sendAllotificationCheckboxId').style.display = 'none';
+       
+   }else{
+       document.getElementById('sendAllEmailCheckboxId').style.display = 'block';
+       document.getElementById('sendAllotificationCheckboxId').style.display = 'block';
+   }
     
 }
 
@@ -249,9 +257,13 @@ function submitBulkAction(actionType) {
         selected.push(cb.value);
     });
      
+    // if (selected.length === 0) {
+    //     alert("Please select at least one user.");
+    //     return;
+    // }
+
     if (selected.length === 0) {
-        alert("Please select at least one user.");
-        return;
+       selected.push('all');
     }
     
     const emailTemplateValue = document.getElementById('emailTemplate').value;
@@ -285,8 +297,7 @@ function submitBadgeAction() {
     });
      
     if (selected.length === 0) {
-        alert("Please select at least one user.");
-        return;
+       selected.push('all');
     }
 
     const badge = document.getElementById('badge_id').value; // can be dynamic if needed

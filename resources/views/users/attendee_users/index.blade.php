@@ -117,6 +117,17 @@
                             @endforeach
                         @endif
                     </select>
+
+                    <div class="form-check mt-2" id="sendAllEmailCheckboxId">
+                       <div class="form-check" id="sendAllotificationCheckboxId">
+                      
+                        <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>No usres was selected.</strong>The email will be sent to all users.
+                        </div>
+                    </div>
+           
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"
@@ -150,7 +161,16 @@
                             @endforeach
                         @endif
                     </select>
+
+                    <div class="form-check" id="sendAllotificationCheckboxId">
+                      
+                        <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>No usres was selected.</strong>The notification will be sent to all users.
+                        </div>
+                    </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"
                         onclick="closeModal()">Close</button>
