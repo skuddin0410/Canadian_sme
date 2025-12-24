@@ -85,7 +85,12 @@
 
 <div class="container-xxl flex-grow-1 container-p-y pt-0 mt-3">
    <div class="row">
-        <!-- LEFT PANEL -->
+        <div class="mb-3 text-end">
+    <a href="{{ route('newbadges.index') }}" class="btn btn-primary">
+        Back
+    </a>
+</div>
+
         <div class="col-md-2">
             <h6>Fields</h6>
             <div class="drag-item" draggable="true" data-type="name">Name</div>
@@ -95,14 +100,12 @@
             <div class="drag-item" draggable="true" data-type="qr_code">QR Code</div>
         </div>
 
-        <!-- CENTER CANVAS -->
         <div class="col-md-7 text-center">
             <h6>Badge ({{$newbadge->width}} x {{$newbadge->height}} inch)</h6>
             <div class="badge-canvas mx-auto" id="canvas"></div>
             <!-- <button class="btn btn-primary mt-3" onclick="window.print()">Print / Save PDF</button> -->
         </div>
 
-        <!-- RIGHT PANEL -->
         <div class="col-md-3">
             <h6>Properties</h6>
 
@@ -120,9 +123,10 @@
                 <button class="btn btn-warning" onclick="duplicateItem()">Duplicate</button>
                 <button class="btn btn-danger" onclick="deleteItem()">Delete</button>
                 <button class="btn btn-success" onclick="saveLayout()">Save Layout</button>
+                <a href="{{route('new.badges.preview',['template_name'=>$newbadge->id])}}" class="btn btn-primary" target="_blank">Preview</a>
             </div>
 
-            <pre id="output" class="bg-dark text-white p-2 mt-3 small"></pre>
+            <pre id="output" class="bg-dark text-white p-2 mt-3 small d-none"></pre>
         </div>
 
     </div>

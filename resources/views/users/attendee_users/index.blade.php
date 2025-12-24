@@ -219,8 +219,8 @@
                 <label for="badge_id">Choose Badge Template</label>
                 <select id="badge_id" class="form-control" name="badge_id">
                     <option value="">Please Select Badge Template</option>
-                    @if (!empty(fetchBadgeTemplates()))
-                        @foreach (fetchBadgeTemplates() as $badge)
+                    @if (!empty(fetchNewBadgeTemplates()))
+                        @foreach (fetchNewBadgeTemplates() as $badge)
                             <option value="{{ $badge->id }}">
                                 {{ $badge->badge_name ?? 'Badge #' . $badge->id }}
                             </option>
@@ -359,7 +359,7 @@
             }
 
             window.closeModal = function() {
-                $('#bulkActionModalEmail, #bulkActionModalNotifications, #bulkActionModalBoth, #openImportModal')
+                $('#bulkActionModalEmail, #bulkActionModalNotifications, #bulkActionModalBoth, #openImportModal, #bulkBadgeModal')
                     .modal('hide');
                 resetTemplateSelections();
                 window.selectedActionType = null;

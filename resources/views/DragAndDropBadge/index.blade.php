@@ -23,7 +23,7 @@
                         <th>Printer</th>
                         <th>Badge Size</th>
                         <th>Target</th>
-                        <th style="width:120px;">Actions</th>
+                        <th style="width:150px">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,8 +35,25 @@
                         <td>{{$badge->width}} inch X {{$badge->height}} inch</td>
                         <td>{{$badge->target}}</td>
                         <td>
-                            <a href="{{route('newbadges.show',$badge->id)}}" class="btn btn-sm btn-primary">show</a>
-                            <!-- <button class="btn btn-sm btn-danger">Delete</button> -->
+                           
+                           <div class="d-flex align-items-center gap-2">
+    <a href="{{ route('newbadges.show', $badge->id) }}"
+       class="btn btn-outline-primary btn-sm">
+        Show
+    </a>
+
+    <form action="{{ route('newbadges.destroy', $badge->id) }}"
+          method="POST"
+          onsubmit="return confirm('Are you sure you want to delete this badge?');">
+        @csrf
+        @method('DELETE')
+        <button class="btn btn-outline-danger btn-sm" type="submit">
+            Delete
+        </button>
+    </form>
+</div>
+
+                         
                         </td>
                     </tr>
                     @endforeach

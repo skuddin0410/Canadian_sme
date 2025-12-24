@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\NewBadge;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\User;
 
 class NewBadgeController extends Controller
 {
@@ -52,9 +54,7 @@ class NewBadgeController extends Controller
     {
         $newbadge->delete();
 
-        return response()->json([
-            'message' => 'Badge deleted successfully'
-        ]);
+         return redirect()->route('newbadges.index');
     }
 
 
@@ -65,12 +65,43 @@ class NewBadgeController extends Controller
 
     }
 
-    // public function showCanvasPage($badgeId)
-    // {
-    //     $newbadge = Badge::find($badgeId); 
-    //     $layout = Layout::where('badge_id', $badgeId)->first(); 
-    //     $elements = $layout ? json_decode($layout->data, true) : [];
-    //     return view('canvas')->with('newbadge', $newbadge)->with('elements', $elements);
-    // }
+
+    public function generateBadgePdf(Request $request)
+    {
+        $badge = NewBadge::findOrFail($request->template_name);
+        $userIds = json_decode($request->user_ids, true);
+        $users = User::whereIn('id', $userIds)->get();
+        $layout = json_decode($badge->layout, true);
+
+        // Inch → Point
+        $widthPt  = $badge->width * 72;
+        $heightPt = $badge->height * 72;
+
+        $pdf = Pdf::loadView(
+            'DragAndDropBadge.pdf',
+            compact('badge', 'layout', 'users')
+        )->setPaper([0, 0, $widthPt, $heightPt]);
+
+        return $pdf->download('badges.pdf');
+    }
+
+     public function generateBadgePdfPreview(Request $request)
+    {
+        $badge = NewBadge::findOrFail($request->template_name);
+        $userIds = json_decode($request->user_ids, true);
+        $users = User::whereIn('id', [6])->get();
+        $layout = json_decode($badge->layout, true);
+
+        // Inch → Point
+        $widthPt  = $badge->width * 72;
+        $heightPt = $badge->height * 72;
+
+        $pdf = Pdf::loadView(
+            'DragAndDropBadge.pdf',
+            compact('badge', 'layout', 'users')
+        )->setPaper([0, 0, $widthPt, $heightPt]);
+
+        return $pdf->stream('badges.pdf');
+    }
 
 }

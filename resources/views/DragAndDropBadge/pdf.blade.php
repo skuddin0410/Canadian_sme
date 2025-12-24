@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@page { margin: 0; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.badge {
+    position: relative;
+    width: {{ $badge->width }}in;
+    height: {{ $badge->height }}in;
+    overflow: hidden;
+}
+
+.badge-page {
+    page-break-after: always;
+}
+
+.badge-page:last-child {
+    page-break-after: auto;
+}
+
+.item {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.item img {
+    max-width: 100%;
+    max-height: 100%;
+}
+</style>
+</head>
+<body>
+
+@foreach($users as $user)
+
+@php
+$data = [
+    'name'         => $user->full_name,
+    'first_name'   => $user->name,
+    'last_name'    => $user->lastname,
+    'company_name' => $user->company,
+    'qr_code'      => $user->qr_code ? public_path($user->qr_code) : null,
+];
+@endphp
+
+<div class="badge-page">
+    <div class="badge">
+        @foreach($layout as $item)
+            @if($item['type'] === 'qr_code')
+                <div class="item"
+                     style="
+                        left: {{ $item['x'] }};
+                        top: {{ $item['y'] }};
+                        width: {{ $item['width'] }}px;
+                        height: {{ $item['height'] }}px;
+                     ">
+                    @if($data['qr_code'] && file_exists($data['qr_code']))
+                        <img src="file://{{ $data['qr_code'] }}">
+                    @endif
+                </div>
+            @else
+                <div class="item"
+                     style="
+                        left: {{ $item['x'] }};
+                        top: {{ $item['y'] }};
+                        width: {{ $item['width'] }}px;
+                        height: {{ $item['height'] }}px;
+                        font-size: {{ $item['fontSize'] ?? '14px' }};
+                     ">
+                    {{ $data[$item['type']] ?? '' }}
+                </div>
+            @endif
+        @endforeach
+    </div>
+</div>
+
+@endforeach
+
+</body>
+</html>

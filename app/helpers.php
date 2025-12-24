@@ -27,7 +27,7 @@ use Mews\Purifier\Facades\Purifier;
 use App\Models\LandingPageSetting;
 use App\Services\IOSPushService;
 use App\Models\FavoriteConnection;
-
+use App\Models\NewBadge;
 
 if (!function_exists('getCategory')) {
     function getCategory($type=null)
@@ -520,6 +520,14 @@ if (!function_exists('fetchBadgeTemplates')) {
     function fetchBadgeTemplates()
     {  
        $emailBadgeTemplate = Badge::orderBy("created_at","DESC")->get();
+       return $emailBadgeTemplate;
+    }
+}
+
+if (!function_exists('fetchNewBadgeTemplates')) {
+    function fetchNewBadgeTemplates()
+    {  
+       $emailBadgeTemplate = NewBadge::orderBy("created_at","DESC")->get();
        return $emailBadgeTemplate;
     }
 }

@@ -289,7 +289,7 @@ function submitBadgeAction() {
         return;
     }
 
-    const badge = ''; // can be dynamic if needed
+    const badge = document.getElementById('badge_id').value; // can be dynamic if needed
     const template_name = badge || '';
     const type = 'badge';
 
@@ -298,7 +298,7 @@ function submitBadgeAction() {
 
     // Configure form
     let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('badges.print') }}?template_name=" + template_name + "&type=" + type;
+    form.action = "{{ route('new.badges.print') }}?template_name=" + template_name + "&type=" + type;
 
     // ✅ Open submission in a new tab
     form.target = "_blank";
