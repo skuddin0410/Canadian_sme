@@ -6,8 +6,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterImport;
+use App\Jobs\UpdateUserQrCodeJob;
 
-class UsersImport implements ToModel, WithStartRow
+class UsersImport implements ToModel, WithStartRow, WithEvents
 {
     protected $users = [];
     protected $emails = [];       // Track all processed emails
@@ -16,7 +19,6 @@ class UsersImport implements ToModel, WithStartRow
 
     public function __construct()
     {
-        // Load all existing emails from DB (keep original case)
         $this->emails = User::pluck('email')->map(fn($e) => trim($e))->toArray();
     }
 
@@ -81,6 +83,8 @@ class UsersImport implements ToModel, WithStartRow
         return null;
     }
 
+
+
     public function __destruct()
     {
         // Insert remaining users
@@ -96,5 +100,15 @@ class UsersImport implements ToModel, WithStartRow
         if (!empty($this->duplicates)) {
            // Log::info('Duplicate/Skipped Users:', $this->duplicates);
         }
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterImport::class => function (AfterImport $event) {
+                //UpdateUserQrCodeJob::dispatch();
+                dispatch(new UpdateUserQrCodeJob());
+            },
+        ];
     }
 }
