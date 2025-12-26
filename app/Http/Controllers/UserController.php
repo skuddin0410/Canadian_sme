@@ -19,6 +19,7 @@ use App\Models\Order;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
 use Carbon;
 
 use App\Models\Email;
@@ -255,11 +256,17 @@ class UserController extends Controller
             return back()->withErrors(['file' => 'Only CSV, XLS, or XLSX files are allowed.']);
         }
 
+        $lineCount = count(file($request->file('file')->getRealPath())) - 1;
+
+        if ($lineCount > 100) {
+            return back()->withErrors(['file' => 'Max 100 rows allowed.']);
+        }
+
         Excel::import(new UsersImport, $request->file('file'));
         return back();
 
       } else {
-       return back()->withErrors(['file' => 'No file uploaded.']);
+        return back()->withErrors(['file' => 'No file uploaded.']);
       }
     }
     public function representativeIndex()

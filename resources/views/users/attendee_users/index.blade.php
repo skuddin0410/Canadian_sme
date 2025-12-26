@@ -266,7 +266,7 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mt-3">
-                            <label for="userImportFile">Import Users (CSV, XLSX)</label>
+                            <label for="userImportFile">Import Users (Max 100 rows allowed, Allowed file CSV, XLSX) </label>
                             <input type="file" id="userImportFile" class="form-control" name="file"
                                 accept=".csv" required>
                             <!-- <small class="form-text text-muted">After the import, an email will be sent to each user.</small> -->
