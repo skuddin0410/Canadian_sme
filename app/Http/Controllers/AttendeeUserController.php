@@ -507,7 +507,7 @@ public function bulkAction(Request $request)
     }else{
       $users = User::whereIn('id', $userIds)->get();  
     }
-    dd($users);
+    
     $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
     $subject = $emailTemplate->subject ?? '';
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);
