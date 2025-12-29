@@ -573,7 +573,6 @@ public function bulkAction(Request $request)
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
                  
                     $response = curl_exec($ch);
-                    dd( $response);
                     curl_close($ch);
 
             }
