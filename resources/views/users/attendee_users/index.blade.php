@@ -119,7 +119,7 @@
                     </select>
 
                     <div class="form-check mt-2" id="sendAllEmailCheckboxId">
-                       <div class="form-check" id="sendAllotificationCheckboxId">
+                       <div class="form-check">
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
