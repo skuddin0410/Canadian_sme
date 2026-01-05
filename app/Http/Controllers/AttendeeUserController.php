@@ -549,41 +549,86 @@ public function bulkAction(Request $request)
 
             notification($user->id,$type='push_notification',null, $title ,$message);
 
-            if(!empty($user->onesignal_userid)){
+            // if(!empty($user->onesignal_userid)){
                 
-                    $content = [
-                        "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-                        "include_player_ids" => [$user->onesignal_userid],
-                        'headings' => ['en' => $title],
-                        "contents" => ["en" => $message]
-                    ];
+            //         $content = [
+            //             "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+            //             "include_player_ids" => [$user->onesignal_userid],
+            //             'headings' => ['en' => $title],
+            //             "contents" => ["en" => $message]
+            //         ];
                  
-                    $fields = json_encode($content);
+            //         $fields = json_encode($content);
                  
-                    $ch = curl_init();
-                    // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                    curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications");
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                        'Content-Type: application/json; charset=utf-8',
-                        // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
-                        'Authorization: Key <os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq>',
-                        // 'target_channel: push'
-                    ]);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                    curl_setopt($ch, CURLOPT_POST, TRUE);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            //         $ch = curl_init();
+            //         // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+            //         curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications");
+            //         curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            //             'Content-Type: application/json; charset=utf-8',
+            //             // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
+            //             'Authorization: Key <os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq>',
+            //             // 'target_channel: push'
+            //         ]);
+            //         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            //         curl_setopt($ch, CURLOPT_HEADER, FALSE);
+            //         curl_setopt($ch, CURLOPT_POST, TRUE);
+            //         curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+            //         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
                  
-                    $response = curl_exec($ch);
-                    curl_close($ch);
+            //         $response = curl_exec($ch);
+            //         curl_close($ch);
 
-            }
+            // }
+
+
+            $this->sendOneSignalPushByExternalId(
+                (string) $user->id,
+                $title,
+                $notificationMessage
+            );
         }
     }
 
     return redirect()->back()->with('success', ucfirst($type) . " sent successfully to selected users.");
 }
+
+    private function sendOneSignalPushByExternalId(string $externalId, string $title, string $content): void
+    {
+        // $appId = env('ONESIGNAL_APP_ID');         // e.g. 53dd6ba7-9382-469d-8ada-7256eddc5998
+        $appId = '53dd6ba7-9382-469d-8ada-7256eddc5998';
+
+        // $apiKey = env('ONESIGNAL_REST_API_KEY');  // your OneSignal App API Key
+        $apiKey = 'os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq';
+
+        if (empty($appId) || empty($apiKey)) {
+            \Log::warning('OneSignal env not set: ONESIGNAL_APP_ID / ONESIGNAL_REST_API_KEY');
+            return;
+        }
+
+        $payload = [
+            'app_id' => $appId,
+            'contents' => ['en' => $content],         // required
+            'headings' => ['en' => $title],
+            'target_channel' => 'push',
+            'include_aliases' => [
+                'external_id' => [$externalId],
+            ],
+        ];
+
+        $res = Http::withHeaders([
+                'Authorization' => 'Key ' . $apiKey,  // required format
+                'Content-Type'  => 'application/json',
+            ])
+            ->post('https://api.onesignal.com/notifications?c=push', $payload);
+
+        if (!$res->successful()) {
+            \Log::error('OneSignal push failed (external_id)', [
+                'external_id' => $externalId,
+                'status' => $res->status(),
+                'body' => $res->body(),
+            ]);
+        }
+    }
 
 public function generateQrCodeManually(){
         $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
