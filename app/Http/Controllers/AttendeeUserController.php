@@ -558,18 +558,18 @@ public function bulkAction(Request $request)
                         "include_subscription_ids" => [$user->onesignal_userid], //new addition
                         'headings' => ['en' => $title],
                         "contents" => ["en" => $message],
-                        // "target_channel" => "push", //new addition
+                        "target_channel" => "push", //new addition
                     ];
                  
                     $fields = json_encode($content);
                  
                     $ch = curl_init();
                     // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                    curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications");
+                    curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
                     curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json; charset=utf-8',
                         // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
-                        'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztckoihtdia3u6cm6nxhfrmy3xmfo57sznthcw2imh6amf2ixzhqmmn54oxhrpii5wu3neotvs5vhlzi',
+                        'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xczta2fjjcewqyuyz4kuwhcc7isatc64afnmopzvmnkd7tw6i5qmu3vdzcl3qh5ittn3xgwpad43g5rd4y',
                         // 'target_channel: push'
                     ]);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
