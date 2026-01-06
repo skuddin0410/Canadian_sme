@@ -706,7 +706,7 @@ public function bulkAction(Request $request)
                         'idempotency_key' => '<string>'
                     ]),
                     CURLOPT_HTTPHEADER => [
-                        "Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbxysaty4gnubovb5nxkdv3jnq4x2zqb3jc3j2ovmetz7wznvc4rvx5oqqkj7x3buipg6flnxj2aevy",
+                        "Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztae3p7gs5bvuzuuh6zsmdtacimxj4rmnfznopl3ousjwptpf7voqosfkxvnf5an77si7klk7vwedw4q",
                         "Content-Type: application/json"
                     ],
                     ]);
