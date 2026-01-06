@@ -569,7 +569,7 @@ public function bulkAction(Request $request)
                     curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json; charset=utf-8',
                         // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
-                        'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztcp56u2cjywulenkinosd3qyob4kgz4ihhe2u7qdo5bnsuniwplss2biyctwp4poppe6cyn7wbwyy2i',
+                        'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztckoihtdia3u6cm6nxhfrmy3xmfo57sznthcw2imh6amf2ixzhqmmn54oxhrpii5wu3neotvs5vhlzi',
                         // 'target_channel: push'
                     ]);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
