@@ -552,21 +552,24 @@ public function bulkAction(Request $request)
             if(!empty($user->onesignal_userid)){
                 
                     $content = [
+                        // "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
                         "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-                        "include_player_ids" => [$user->onesignal_userid],
+                        // "include_player_ids" => [$user->onesignal_userid],
+                        "included_segments" => [$user->onesignal_userid], //new addition
                         'headings' => ['en' => $title],
-                        "contents" => ["en" => $message]
+                        "contents" => ["en" => $message],
+                        "target_channel" => "push", //new addition
                     ];
                  
                     $fields = json_encode($content);
                  
                     $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                    // curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications");
+                    // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                    curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications");
                     curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json; charset=utf-8',
-                        'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
-                        // 'Authorization: Key <os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq>',
+                        // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
+                        'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq',
                         // 'target_channel: push'
                     ]);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
