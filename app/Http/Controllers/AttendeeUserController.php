@@ -748,7 +748,7 @@ public function bulkAction(Request $request)
                 ];
 
                 $response = Http::withHeaders([
-                        'Authorization' => 'Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztcxchozkwy3ev3mhwmznaa7gq66vcthhiacbc7j3tsa5zdrffpripuvqpm5glloxdiumcg4yhkmzfla',
+                        'Authorization' => 'Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztae5btpd2qqetavq76bdeerd2g2hiowcgvfzzyczm5gsjfp2kzyuhxtr6rm55pwods5luzto5nopk4q',
                         'Content-Type'  => 'application/json',
                     ])
                     ->post('https://api.onesignal.com/notifications?c=push', $payload);
