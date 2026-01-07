@@ -31,7 +31,7 @@ use OneSignal;
 use App\Models\Speaker;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Log;
 
 class AttendeeUserController extends Controller
 {
@@ -498,6 +498,8 @@ public function sendMail(Request $request, $id)
 
 public function bulkAction(Request $request)
 {
+    // dd($request->all());
+
     $userIds = json_decode($request->user_ids, true);
 
 
@@ -512,6 +514,7 @@ public function bulkAction(Request $request)
     $subject = $emailTemplate->subject ?? '';
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);
     $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+
     if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
         foreach ($users as $user) {
             $qr_code_url = asset($user->qr_code);
@@ -530,7 +533,7 @@ public function bulkAction(Request $request)
             Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
         }
     } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
-
+        // dd('notification block');
          foreach ($users as $user) {
             $message = $emailTemplate->message ?? '';
             $message = str_replace('{{name}}', $user->full_name, $message);
@@ -544,184 +547,218 @@ public function bulkAction(Request $request)
                     )
                 )
             );
+            Log::info(''. $notificationMessage .'');
             
             $title = 'Hi, ' . ($user->full_name ?? '') . ',' ;
 
             notification($user->id,$type='push_notification',null, $title ,$message);
 
-            if(!empty($user->onesignal_userid)){
+            // if(!empty($user->onesignal_userid)){
                 
-                    $content = [
-                        // "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-                        "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-                        // "include_player_ids" => [$user->onesignal_userid],
-                        "include_subscription_ids" => [$user->onesignal_userid], //new addition
-                        'headings' => ['en' => $title],
-                        "contents" => ["en" => $message],
-                        "target_channel" => "push", //new addition
-                    ];
+            //         $content = [
+            //             // "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+            //             "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+            //             // "include_player_ids" => [$user->onesignal_userid],
+            //             "include_subscription_ids" => [$user->onesignal_userid], //new addition
+            //             'headings' => ['en' => $title],
+            //             "contents" => ["en" => $message],
+            //             "target_channel" => "push", //new addition
+            //         ];
                  
-                    // $fields = json_encode($content);
+            //         // $fields = json_encode($content);
                  
-                    // $ch = curl_init();
-                    // // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                    // curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
-                    // curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    //     'Content-Type: application/json; charset=utf-8',
-                    //     // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
-                    //     'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xczta2fjjcewqyuyz4kuwhcc7isatc64afnmopzvmnkd7tw6i5qmu3vdzcl3qh5ittn3xgwpad43g5rd4y',
-                    //     // 'target_channel: push'
-                    // ]);
-                    // curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    // curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                    // curl_setopt($ch, CURLOPT_POST, TRUE);
-                    // curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            //         // $ch = curl_init();
+            //         // // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+            //         // curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
+            //         // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            //         //     'Content-Type: application/json; charset=utf-8',
+            //         //     // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
+            //         //     'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xczta2fjjcewqyuyz4kuwhcc7isatc64afnmopzvmnkd7tw6i5qmu3vdzcl3qh5ittn3xgwpad43g5rd4y',
+            //         //     // 'target_channel: push'
+            //         // ]);
+            //         // curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            //         // curl_setopt($ch, CURLOPT_HEADER, FALSE);
+            //         // curl_setopt($ch, CURLOPT_POST, TRUE);
+            //         // curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+            //         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
                  
-                    // $response = curl_exec($ch);
-                    // curl_close($ch);
+            //         // $response = curl_exec($ch);
+            //         // curl_close($ch);
 
-                    $curl = curl_init();
+            //         $curl = curl_init();
  
-                    curl_setopt_array($curl, [
-                    CURLOPT_URL => "https://api.onesignal.com/notifications?c=push",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => json_encode([
-                        'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
-                        'contents' => [
-                            'en' => $content
-                        ],
-                        'include_aliases' => [
-                            'external_id' => [
-                                    '<string>'
-                            ]
-                        ],
-                        'target_channel' => 'push',
-                        'include_subscription_ids' => [
-                            $user->onesignal_userid
-                        ],
-                        'included_segments' => [
-                            '<string>'
-                        ],
-                        'excluded_segments' => [
-                            '<string>'
-                        ],
-                        'filters' => [
-                            [
-                                    'field' => 'tag',
-                                    'relation' => '=',
-                                    'key' => '<string>',
-                                    'value' => '<string>'
-                            ]
-                        ],
-                        'headings' => [
-                            'en' => '<string>'
-                        ],
-                        'subtitle' => [
-                            'en' => '<string>'
-                        ],
-                        'name' => '<string>',
-                        'template_id' => '<string>',
-                        'custom_data' => [
-                        ],
-                        'ios_attachments' => [
-                            'id' => '<string>'
-                        ],
-                        'big_picture' => '<string>',
-                        'huawei_big_picture' => '<string>',
-                        'adm_big_picture' => '<string>',
-                        'chrome_web_image' => '<string>',
-                        'small_icon' => '<string>',
-                        'huawei_small_icon' => '<string>',
-                        'adm_small_icon' => '<string>',
-                        'large_icon' => '<string>',
-                        'huawei_large_icon' => '<string>',
-                        'adm_large_icon' => '<string>',
-                        'chrome_web_icon' => '<string>',
-                        'firefox_icon' => '<string>',
-                        'chrome_web_badge' => '<string>',
-                        'android_channel_id' => '<string>',
-                        'existing_android_channel_id' => '<string>',
-                        'huawei_channel_id' => '<string>',
-                        'huawei_existing_channel_id' => '<string>',
-                        'huawei_category' => 'MARKETING',
-                        'huawei_msg_type' => 'message',
-                        'huawei_bi_tag' => '<string>',
-                        'priority' => 10,
-                        'ios_interruption_level' => 'active',
-                        'ios_sound' => '<string>',
-                        'ios_badgeType' => 'None',
-                        'ios_badgeCount' => 123,
-                        'android_accent_color' => '<string>',
-                        'huawei_accent_color' => '<string>',
-                        'url' => '<string>',
-                        'app_url' => '<string>',
-                        'web_url' => '<string>',
-                        'target_content_identifier' => '<string>',
-                        'buttons' => [
-                            [
-                                    'id' => '<string>',
-                                    'text' => '<string>',
-                                    'icon' => '<string>'
-                            ]
-                        ],
-                        'web_buttons' => [
-                            [
-                                    'id' => '<string>',
-                                    'text' => '<string>',
-                                    'url' => '<string>'
-                            ]
-                        ],
-                        'thread_id' => '<string>',
-                        'ios_relevance_score' => 123,
-                        'android_group' => '<string>',
-                        'adm_group' => '<string>',
-                        'ttl' => 259200,
-                        'collapse_id' => '<string>',
-                        'web_push_topic' => '<string>',
-                        'data' => [
-                        ],
-                        'content_available' => true,
-                        'ios_category' => '<string>',
-                        'apns_push_type_override' => '<string>',
-                        'isIos' => true,
-                        'isAndroid' => true,
-                        'isHuawei' => true,
-                        'isAnyWeb' => true,
-                        'isChromeWeb' => true,
-                        'isFirefox' => true,
-                        'isSafari' => true,
-                        'isWP_WNS' => true,
-                        'isAdm' => true,
-                        'send_after' => '<string>',
-                        'delayed_option' => '<string>',
-                        'delivery_time_of_day' => '<string>',
-                        'throttle_rate_per_minute' => 123,
-                        'enable_frequency_cap' => true,
-                        'idempotency_key' => '<string>'
-                    ]),
-                    CURLOPT_HTTPHEADER => [
-                        "Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztae3p7gs5bvuzuuh6zsmdtacimxj4rmnfznopl3ousjwptpf7voqosfkxvnf5an77si7klk7vwedw4q",
-                        "Content-Type: application/json"
-                    ],
-                    ]);
+            //         curl_setopt_array($curl, [
+            //         CURLOPT_URL => "https://api.onesignal.com/notifications?c=push",
+            //         CURLOPT_RETURNTRANSFER => true,
+            //         CURLOPT_ENCODING => "",
+            //         CURLOPT_MAXREDIRS => 10,
+            //         CURLOPT_TIMEOUT => 30,
+            //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //         CURLOPT_CUSTOMREQUEST => "POST",
+            //         CURLOPT_POSTFIELDS => json_encode([
+            //             'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+            //             'contents' => [
+            //                 'en' => $notificationMessage
+            //             ],
+            //             'include_aliases' => [
+            //                 'external_id' => [
+            //                         '<string>'
+            //                 ]
+            //             ],
+            //             'target_channel' => 'push',
+            //             'include_subscription_ids' => [
+            //                 $user->onesignal_userid
+            //             ],
+            //             'included_segments' => [
+            //                 '<string>'
+            //             ],
+            //             'excluded_segments' => [
+            //                 '<string>'
+            //             ],
+            //             'filters' => [
+            //                 [
+            //                         'field' => 'tag',
+            //                         'relation' => '=',
+            //                         'key' => '<string>',
+            //                         'value' => '<string>'
+            //                 ]
+            //             ],
+            //             'headings' => [
+            //                 'en' => '<string>'
+            //             ],
+            //             'subtitle' => [
+            //                 'en' => '<string>'
+            //             ],
+            //             'name' => '<string>',
+            //             'template_id' => '<string>',
+            //             'custom_data' => [
+            //             ],
+            //             'ios_attachments' => [
+            //                 'id' => '<string>'
+            //             ],
+            //             'big_picture' => '<string>',
+            //             'huawei_big_picture' => '<string>',
+            //             'adm_big_picture' => '<string>',
+            //             'chrome_web_image' => '<string>',
+            //             'small_icon' => '<string>',
+            //             'huawei_small_icon' => '<string>',
+            //             'adm_small_icon' => '<string>',
+            //             'large_icon' => '<string>',
+            //             'huawei_large_icon' => '<string>',
+            //             'adm_large_icon' => '<string>',
+            //             'chrome_web_icon' => '<string>',
+            //             'firefox_icon' => '<string>',
+            //             'chrome_web_badge' => '<string>',
+            //             'android_channel_id' => '<string>',
+            //             'existing_android_channel_id' => '<string>',
+            //             'huawei_channel_id' => '<string>',
+            //             'huawei_existing_channel_id' => '<string>',
+            //             'huawei_category' => 'MARKETING',
+            //             'huawei_msg_type' => 'message',
+            //             'huawei_bi_tag' => '<string>',
+            //             'priority' => 10,
+            //             'ios_interruption_level' => 'active',
+            //             'ios_sound' => '<string>',
+            //             'ios_badgeType' => 'None',
+            //             'ios_badgeCount' => 123,
+            //             'android_accent_color' => '<string>',
+            //             'huawei_accent_color' => '<string>',
+            //             'url' => '<string>',
+            //             'app_url' => '<string>',
+            //             'web_url' => '<string>',
+            //             'target_content_identifier' => '<string>',
+            //             'buttons' => [
+            //                 [
+            //                         'id' => '<string>',
+            //                         'text' => '<string>',
+            //                         'icon' => '<string>'
+            //                 ]
+            //             ],
+            //             'web_buttons' => [
+            //                 [
+            //                         'id' => '<string>',
+            //                         'text' => '<string>',
+            //                         'url' => '<string>'
+            //                 ]
+            //             ],
+            //             'thread_id' => '<string>',
+            //             'ios_relevance_score' => 123,
+            //             'android_group' => '<string>',
+            //             'adm_group' => '<string>',
+            //             'ttl' => 259200,
+            //             'collapse_id' => '<string>',
+            //             'web_push_topic' => '<string>',
+            //             'data' => [
+            //             ],
+            //             'content_available' => true,
+            //             'ios_category' => '<string>',
+            //             'apns_push_type_override' => '<string>',
+            //             'isIos' => true,
+            //             'isAndroid' => true,
+            //             'isHuawei' => true,
+            //             'isAnyWeb' => true,
+            //             'isChromeWeb' => true,
+            //             'isFirefox' => true,
+            //             'isSafari' => true,
+            //             'isWP_WNS' => true,
+            //             'isAdm' => true,
+            //             'send_after' => '<string>',
+            //             'delayed_option' => '<string>',
+            //             'delivery_time_of_day' => '<string>',
+            //             'throttle_rate_per_minute' => 123,
+            //             'enable_frequency_cap' => true,
+            //             'idempotency_key' => '<string>'
+            //         ]),
+            //         CURLOPT_HTTPHEADER => [
+            //             "Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztcxchozkwy3ev3mhwmznaa7gq66vcthhiacbc7j3tsa5zdrffpripuvqpm5glloxdiumcg4yhkmzfla",
+            //             "Content-Type: application/json"
+            //         ],
+            //         ]);
                     
-                    $response = curl_exec($curl);
-                    $err = curl_error($curl);
+            //         $response = curl_exec($curl);
+            //         $err = curl_error($curl);
                     
-                    curl_close($curl);
+            //         curl_close($curl);
                     
-                    // if ($err) {
-                    // echo "cURL Error #:" . $err;
-                    // } else {
-                    // echo $response;
-                    // }
+            //         if($err)
+            //         Log::info("". $err);
 
+            //         // if ($err) {
+            //         // echo "cURL Error #:" . $err;
+            //         // } else {
+            //         // echo $response;
+            //         // }
+
+            // }
+
+
+            if(!empty($user->onesignal_userid)){
+                $payload = [
+                    'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+                    'contents' => [
+                        'en' => $notificationMessage ?? 'Default message.',
+                    ],
+                    'headings' => [
+                        'en' => $title ?? 'Notification',
+                    ],
+                    'target_channel' => 'push',
+                    'include_subscription_ids' => [
+                        $user->onesignal_userid,
+                    ],
+                ];
+
+                $response = Http::withHeaders([
+                        'Authorization' => 'Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztcxchozkwy3ev3mhwmznaa7gq66vcthhiacbc7j3tsa5zdrffpripuvqpm5glloxdiumcg4yhkmzfla',
+                        'Content-Type'  => 'application/json',
+                    ])
+                    ->post('https://api.onesignal.com/notifications?c=push', $payload);
+
+                if ($response->failed()) {
+                    Log::error('OneSignal push failed', [
+                        'status' => $response->status(),
+                        'body'   => $response->body(),
+                    ]);
+                }
             }
 
 
