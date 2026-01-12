@@ -812,7 +812,8 @@ public function getAttendeeById(Request $request){
             'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/default.png'),
             'roles'          => groups($speaker),
             'contact_details'=> $contactDetails,
-            'company_website' => $speaker->website_url ?? ''
+            'company_website' => $speaker->website_url ?? '',
+            'comet_chat_id' => $speaker->cometchat_id, //Joydeep new addition jan12 ,2026 
         ];
 
         return response()->json([$response]);
