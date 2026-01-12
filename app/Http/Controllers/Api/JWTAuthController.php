@@ -814,6 +814,7 @@ public function getAttendeeById(Request $request){
             'contact_details'=> $contactDetails,
             'company_website' => $speaker->website_url ?? '',
             'comet_chat_id' => $speaker->cometchat_id, //Joydeep new addition jan12 ,2026 
+            
         ];
 
         return response()->json([$response]);
