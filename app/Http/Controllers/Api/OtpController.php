@@ -75,7 +75,9 @@ class OtpController extends Controller
                     ]
                 );
 
-                Mail::to($request->email)->send(new OtpMail($code));
+                // Mail::to($request->email)->send(new OtpMail($code)); //Subabrata da code for otp mail
+
+                Mail::raw($code.' is your login OTP. Please ensure this as confidential. ' .env('APP_NAME'). ' will never call you to verify your OTP. Good Luck,', function($m) use ($request){ $m->to($request->email)->subject('Login OTP'); }); //My code for otp mail
 
                 return response()->json([
                     'success' => true,
