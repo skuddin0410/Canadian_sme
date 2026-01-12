@@ -734,7 +734,8 @@ public function bulkAction(Request $request)
 
             if(!empty($user->onesignal_userid)){
                 $payload = [
-                    'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+                    // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+                    'app_id' => env('ONESIGNAL_APP_ID'),
                     'contents' => [
                         'en' => $notificationMessage ?? 'Default message.',
                     ],
@@ -748,7 +749,7 @@ public function bulkAction(Request $request)
                 ];
 
                 $response = Http::withHeaders([
-                        'Authorization' => 'Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztatphk7ug5qu645zahbpb7hnitmz5rxogfimm2tyvwsjrenzvh2hcrhwkhoiek62q5fmshvntmkbccq',
+                        'Authorization' => 'Key '.env('ONESIGNAL_REST_API_KEY'),
                         'Content-Type'  => 'application/json',
                     ])
                     ->post('https://api.onesignal.com/notifications?c=push', $payload);
