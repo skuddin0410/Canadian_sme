@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use App\Mail\UserWelcome;
+use Illuminate\Support\Facades\Log;
 
 class OtpController extends Controller
 {
@@ -83,6 +84,7 @@ class OtpController extends Controller
                 ]);
 
             } catch (JWTException $e) {
+                Log::error('OTP Generation Error: ' . $e->getMessage());
                     return response()->json([
                         'success' => false,
                         'message' => 'Fail to send OTP."',
