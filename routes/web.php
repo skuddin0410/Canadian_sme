@@ -13,7 +13,7 @@ Route::get('/login', function () {
 
 Route::get('/run/command', function () {
     Artisan::call('db:seed', [
-      '--class' => 'PermissionSeeder'
+        '--class' => 'PermissionSeeder'
     ]);
 
     echo 'Completed';
@@ -40,14 +40,14 @@ Route::get('/generate-user-qrcodes', function () {
 
 Route::get('/users-with-no-name', function () {
     $users = User::whereNull('name')
-                ->orWhere('name', '')
-                ->orWhereNull('lastname')
-                ->orWhere('lastname', '')
-                 ->whereHas('roles', function ($q) {
-                    $q->where('name', 'Attendee');
-                })
-                ->get(['id', 'name', 'lastname', 'email']);
-     
+        ->orWhere('name', '')
+        ->orWhereNull('lastname')
+        ->orWhere('lastname', '')
+        ->whereHas('roles', function ($q) {
+            $q->where('name', 'Attendee');
+        })
+        ->get(['id', 'name', 'lastname', 'email']);
+
 
     return  $users;
 });
@@ -61,7 +61,7 @@ Route::get('/clear-cache', function () {
     return 'All caches cleared!';
 });
 
-require __DIR__.'/landing.php';
+require __DIR__ . '/landing.php';
 
 Route::get('/email/open/{id}', function ($id) {
     $email = Email::find($id);
@@ -83,23 +83,23 @@ Route::get('/email/open/{id}', function ($id) {
 
 Auth::routes();
 
+Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
+
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
-   Route::prefix('admin')->group(function () {
-       require __DIR__.'/common.php'; //used by all users in web
-       require __DIR__.'/admin.php';  //Admin and Admin 
-       require __DIR__.'/exhibitor.php';
-       require __DIR__.'/helpdesk.php';
+    Route::prefix('admin')->group(function () {
+        require __DIR__ . '/common.php'; //used by all users in web
+        require __DIR__ . '/admin.php';  //Admin and Admin 
+        require __DIR__ . '/exhibitor.php';
+        require __DIR__ . '/helpdesk.php';
 
-       require __DIR__.'/newsletters.php';
-       require __DIR__.'/formbuilder.php';
-       require __DIR__.'/lead.php';
-       require __DIR__.'/badge.php';
-   });
-   
-
+        require __DIR__ . '/newsletters.php';
+        require __DIR__ . '/formbuilder.php';
+        require __DIR__ . '/lead.php';
+        require __DIR__ . '/badge.php';
+    });
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
-    require __DIR__.'/ticket.php';
+    require __DIR__ . '/ticket.php';
 });
