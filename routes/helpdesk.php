@@ -19,7 +19,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
    Route::controller(PasswordResetController::class)->group(function () {
     Route::get('/password/reset', 'showLinkRequestForm')->name('password.request');
     Route::post('/password/email', 'sendResetLinkEmail')->name('password.email');
-    Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');
+    // Route::get('/password/reset/{token}', 'showResetForm')->name('password.reset');
+    Route::get('/password/reset/{token}', 'showResetForm')->name('admin.password.reset');
     Route::post('/password/reset', 'reset')->name('password.update');
     // Route::patch('/users/{user}/toggle-block', [HelpdeskUserController::class, 'toggleBlock'])
     // ->name('users.toggleBlock');
