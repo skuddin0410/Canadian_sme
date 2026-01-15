@@ -683,9 +683,9 @@ header .nav-link:hover {
   overflow: hidden;
 }
 
-.sponsors .swiper-wrapper {
+/* .sponsors .swiper-wrapper {
   justify-content: center;
-}
+} */
 
 .sponsors .swiper-slide {
   margin-right: 20px;
