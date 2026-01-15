@@ -697,6 +697,7 @@ header .nav-link:hover {
   overflow: hidden;
   width: 100%;
   max-width: 575px;
+  height: 300px; /* new addition in jan 15.2026 */
 }
 
 .sponsors .swiper-img-box img {
