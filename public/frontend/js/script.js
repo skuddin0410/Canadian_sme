@@ -23,7 +23,7 @@ const speakers_swiper = new Swiper('.speakers-swiper', {
     slidesPerView: 2.5,
     spaceBetween: 20,
     autoplay: {
-        delay: 2500,
+        delay: 2500000,
         disableOnInteraction: false,
     },
     breakpoints: {
@@ -49,7 +49,7 @@ const sponsors_swiper = new Swiper('.sponsors-swiper', {
         prevEl: '.sponsors-prev',
     },
     autoplay: {
-        delay: 2500,
+        delay: 2500000,
         disableOnInteraction: false,
     },
     breakpoints: {
