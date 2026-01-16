@@ -23,7 +23,7 @@ class Company extends Model
     
     protected $fillable = [
         'user_id','name', 'industry', 'size', 'booth_id', 'location', 'email', 'phone',
-        'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image','is_sponsor','booth','type','slug'
+        'description', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'certifications','certification_image','is_sponsor','booth','type','slug', 'event_name'
     ];
     protected $casts = [
         'is_sponsor' => 'boolean',

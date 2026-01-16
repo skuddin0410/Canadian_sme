@@ -240,6 +240,16 @@
                   </div>
                 </div>
               </div>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Event Name</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bxl-book"></i></span>
+                    <input type="text" name="event_name" class="form-control"
+                           value="{{ old('event_name', $user->event_name ?? 'CanadianSME Small Business Summit 2025') }}">
+                  </div>
+                </div>
+              </div>
 
                   {{-- Description --}}
               <div class="col-12">

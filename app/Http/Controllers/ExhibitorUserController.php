@@ -132,7 +132,8 @@ public function index(Request $request)
                 'twitter'     => $request->twitter,
                 'facebook'    => $request->facebook,
                 'instagram'    => $request->instagram,
-                'booth'=> $request->booth
+                'booth'=> $request->booth,
+                'event_name'=> $request->event_name
                 
             ]);
 
@@ -235,7 +236,8 @@ public function show($exhibitor_user, Request $request){
                     'facebook'    => $request->facebook,
                     'instagram'   => $request->instagram,
                     'booth'       => $request->booth,
-                    'industry'    => $request->industry
+                    'industry'    => $request->industry,
+                    'event_name'=> $request->event_name
 
                 ]); 
             }

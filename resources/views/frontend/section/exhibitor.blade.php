@@ -42,10 +42,21 @@
                         <span class="small-heading-black fw-semibold">{{$exhibitor->booth ?? 'NA'}}</span>
                     </div>
                    
-                    <div class="">
+                    <!-- <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
                         <span class="small-heading-black fw-semibold">{{$session?->title ? truncateString($session->title, 40) : 'NA'}}</span>
+                    </div> -->
+                    <!-- ///Subabrata da code/// -->
+
+                    <!-- <div class="">
+                        <span class="blue-text-18 mb-2">Event Name</span>
+                        <span class="small-heading-black fw-semibold">{{$event->title ? truncateString($event->title, 40) : 'NA'}}</span>
+                    </div> -->
+                    <div class="">
+                        <span class="blue-text-18 mb-2">Event Name</span>
+                        <span class="small-heading-black fw-semibold">{{$exhibitor->event_name ?? 'CanadianSME Small Business Summit 2025'}}</span>
                     </div>
+                    <!-- ///My code addition/// -->
                    
                     <div>
                         <a class="view-more position-relative d-flex
