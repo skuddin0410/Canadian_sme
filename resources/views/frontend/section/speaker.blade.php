@@ -20,7 +20,7 @@
 
                 </div>
                 
-                <div class="col-xl-8 p-0">
+                <div class="col-xl-8 p-0 mt-3 mt-xl-0">
                     <div class="swiper speakers-swiper">
 
                         <div class="swiper-wrapper">
