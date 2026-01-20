@@ -83,9 +83,31 @@ Route::get('/email/open/{id}', function ($id) {
 
 Auth::routes();
 
+Route::prefix('user')->name('user.')->middleware(['webauth'])->group(function () {
+    Route::get('/home', [App\Http\Controllers\UserHomeController::class, 'edit'])->name('home');
+    // Route::get('/profile/edit', [App\Http\Controllers\UserHomeController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [App\Http\Controllers\UserHomeController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/company-details', [App\Http\Controllers\UserHomeController::class, 'updateCompanyDetails'])->name('company.update');
+    Route::post('/company-details/file-delete', [App\Http\Controllers\UserHomeController::class, 'deleteCompanyFile'])->name('company.file.delete');
+});
+
+Route::get('/login', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+
+        if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+            return redirect('/admin/home');
+        }
+
+        return redirect('/user/home');
+    }
+
+    return view('auth.login');
+})->name('login');
+
 Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+Route::group(['middleware' => ['webauth', 'admin', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
     Route::prefix('admin')->group(function () {
         require __DIR__ . '/common.php'; //used by all users in web

@@ -39,16 +39,30 @@
                     </ul>
                 </div>
                 
+                @if(!Auth::check())
                 <a class="heroBtn ms-md-3" href="{{ route('login') }}">
                     <img class="d-md-none" src="{{ asset('frontend/images/login.png') }}" alt="">
                     <span class="d-none d-md-block">Login</span>
                 </a>
+                @else
+                <a class="heroBtn ms-md-3" @if(auth()->user()->hasRole('Admin')) href="{{ route('home') }}" @else href="{{ route('user.home') }}" @endif>
+                    <img class="d-md-none" src="{{ asset('frontend/images/login.png') }}" alt="">
+                    <span class="d-none d-md-block">Dashboard</span>
+                </a>
+                @endif
 
+                @if (!Auth::check())
                 <!-- Buttons -->
                 <a class="heroBtn ms-md-3" href="{{ route('registration') }}">
                     <img class="d-md-none" src="{{ asset('frontend/images/login.png') }}" alt="">
                     <span class="d-none d-md-block">Registration</span>
                 </a>
+                @else
+                <a class="heroBtn ms-md-3" href="{{ route('logout') }}">
+                    <img class="d-md-none" src="{{ asset('frontend/images/login.png') }}" alt="">
+                    <span class="d-none d-md-block">Logout</span>
+                </a>
+                @endif
             
                 <!-- Toggler -->
                 <button class="navbar-toggler heroBtn bg-transparent custom-toggler-open ms-3 ms-md-5">

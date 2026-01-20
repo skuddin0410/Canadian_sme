@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'jwtauth' => \App\Http\Middleware\JwtAuthenticate::class,
             'webauth' => \App\Http\Middleware\RedirectIfNotAuthenticated::class,
             'company.exists' => \App\Http\Middleware\EnsureCompanyExists::class,
+            'admin' => \App\Http\Middleware\AdminOnly::class,
         ]);
     })->withMiddleware(function (Middleware $middleware) {
         $middleware

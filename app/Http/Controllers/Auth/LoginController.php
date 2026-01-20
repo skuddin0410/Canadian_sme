@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Login Controller
     |--------------------------------------------------------------------------
@@ -19,30 +19,47 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers{
-       logout as performLogout;
-    }
+  use AuthenticatesUsers {
+    logout as performLogout;
+  }
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/admin/home';
-    
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-        $this->middleware('auth')->only('logout');
-    }
+  /**
+   * Where to redirect users after login.
+   *
+   * @var string
+   */
+  // protected $redirectTo = '/admin/home';
 
-    protected function loggedOut(Request $request)
-    {
-      return redirect(route('login'));
-    }
+  protected function redirectTo()
+  {
+    // dd(1);
+      $user = auth()->user();
+      // dd($user->roles->pluck('name'));
+
+      if ($user->hasRole('Admin')) {
+        // dd(1);
+        // dd(auth()->user());
+          return '/admin/home';
+      }
+        dd(2);
+
+      return '/user/home';
+  }
+
+
+  /**
+   * Create a new controller instance.
+   *
+   * @return void
+   */
+  public function __construct()
+  {
+    $this->middleware('guest')->except('logout');
+    $this->middleware('auth')->only('logout');
+  }
+
+  protected function loggedOut(Request $request)
+  {
+    return redirect(route('login'));
+  }
 }
