@@ -41,7 +41,7 @@ class LoginController extends Controller
         // dd(auth()->user());
           return '/admin/home';
       }
-        dd(2);
+        // dd(2);
 
       return '/user/home';
   }
