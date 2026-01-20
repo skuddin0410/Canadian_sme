@@ -119,6 +119,7 @@
     {{-- =========================
       CARD 2: COMPANY DETAILS EDIT
     ========================= --}}
+    @if($user->access_exhibitor_ids)
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h5 class="mb-0">Company Details (Edit)</h5>
@@ -279,6 +280,7 @@
             </form>
         </div>
     </div>
+    @endif
 
 </div>
 
