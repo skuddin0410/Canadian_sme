@@ -68,7 +68,15 @@ class NewBadgeController extends Controller
 
     public function generateBadgePdf(Request $request)
     {
-        $badge = NewBadge::findOrFail($request->template_name);
+        // dd($request->all());
+        
+        if($request->template_name)
+            $badge = NewBadge::findOrFail($request->template_name);
+            // dd($badge);
+        else
+            $badge = NewBadge::latest()->first();
+            // dd($badge);
+
         $userIds = json_decode($request->user_ids, true);
         $users = User::whereIn('id', $userIds)->get();
         $layout = json_decode($badge->layout, true);
@@ -82,8 +90,10 @@ class NewBadgeController extends Controller
             compact('badge', 'layout', 'users')
         )->setPaper([0, 0, $widthPt, $heightPt]);
 
-        //return $pdf->download('badges.pdf');
-        return $pdf->stream('badges.pdf');
+        if(!$request->template_name)
+            return $pdf->download('badges.pdf');
+        else
+            return $pdf->stream('badges.pdf');
     }
 
      public function generateBadgePdfPreview(Request $request)

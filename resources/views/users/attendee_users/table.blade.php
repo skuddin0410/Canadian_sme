@@ -55,6 +55,7 @@
         <th>App Use</th>
         <th>Added on</th>
         <th>QR</th>
+        <th>Badge</th>
 		
 		<th width="25%">Action</th>
 	</tr>
@@ -107,6 +108,14 @@
           <span class="text-muted">No QRCode Generated Yet</span>
         @endif
 		
+	</th>
+
+  <th>
+        <a href="" 
+           class="btn btn-sm btn-primary" 
+           title="Download QR" data-id="{{$user->id ?? ''}}" onclick="submitBadgeActionNew()">
+             Download Badge
+        </a>
 	</th>
 		
 		
@@ -306,6 +315,40 @@ function submitBadgeAction() {
 
     // Set selected IDs
     document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+
+    // Configure form
+    let form = document.getElementById('bulkActionForm');
+    form.action = "{{ route('new.badges.print') }}?template_name=" + template_name + "&type=" + type;
+
+    // ✅ Open submission in a new tab
+    form.target = "_blank";
+
+    // Submit the form
+    form.submit();
+}
+
+function submitBadgeActionNew() {
+  // alert('Badge generation initiated. Please wait 123...');
+    let selected = [];
+    document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
+        selected.push(cb.value);
+    });
+     
+    if (selected.length === 0) {
+       selected.push('all');
+    }
+
+    const badge = document.getElementById('badge_id').value; // can be dynamic if needed
+    const template_name = badge || '';
+    const type = 'badge';
+
+    // Set selected IDs
+    // document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+    
+    let selectedUserIds = [];
+        selectedUserIds.push(event.currentTarget.getAttribute('data-id'));
+    
+    document.getElementById('selectedUserIds').value = JSON.stringify(selectedUserIds);
 
     // Configure form
     let form = document.getElementById('bulkActionForm');
