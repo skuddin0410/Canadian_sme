@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\FormSubmission;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class FormBuilderController extends Controller
@@ -136,6 +137,7 @@ public function submitForm(Request $request, $id)
         'designation'  => 'nullable|string|max:255',
         'company'      => 'nullable|string|max:255',
         'bio'      => 'nullable|string|max:500',
+        'password'      => 'required', //new addition by joydeep
     ];
 
     $validator = Validator::make($data, $rules);
@@ -166,6 +168,7 @@ public function submitForm(Request $request, $id)
     $user->designation = $data['designation'] ?? null;
     $user->company     = $data['company'] ?? null;
     $user->bio         = $data['bio'] ?? null;
+    $user->password         = Hash::make($data['password']); //new addition by joydeep
     $user->save();
     $user->assignRole('Attendee');
     notification($user->id);
