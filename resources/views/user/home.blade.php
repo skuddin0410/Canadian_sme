@@ -178,7 +178,7 @@
                             style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee;" />
 
                         <div class="mt-2">
-                            <label class="form-label">Upload New Banner</label>
+                            <label class="form-label">Upload New Banner / Replace Existing Banner</label>
                             <input type="file" name="banner" id="bannerInput"
                                 accept="image/png,image/jpeg,image/jpg"
                                 class="form-control @error('banner') is-invalid @enderror">
