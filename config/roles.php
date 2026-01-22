@@ -4,7 +4,8 @@ return [
     'groups' => [
         'Attendee',
         'Speaker',
-        'Sponsors',
+        // 'Sponsors',
+        'Sponsor',
         'Exhibitor',
         'Admin',
     ],
