@@ -499,10 +499,11 @@ header .nav-link:hover {
 .speakers .swiper-slide {
   /* margin-right: 20px; */
   border-radius: 20px;
+  overflow: hidden;
 }
 
 .speakers .swiper-img-box {
-  border-radius: 20px;
+  /* border-radius: 20px; */
   overflow: hidden;
   max-width: 576px;
   width: 100%;
@@ -519,12 +520,12 @@ header .nav-link:hover {
 .speakers .swiper-img-text {
   padding: 30px 10px;
   text-align: center;
-  width: 80%;
+  width: 100%;
   position: relative;
   background-color: var(--white);
   margin: auto;
-  top: -66px;
-  border-radius: 20px;
+  /* top: -66px; */
+  /* border-radius: 20px; */
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
