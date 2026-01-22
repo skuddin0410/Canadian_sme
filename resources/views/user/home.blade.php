@@ -12,6 +12,24 @@
     <div class="alert alert-danger">Please fix the highlighted errors.</div>
     @endif
 
+    @if($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+
+    @if($errors->has('general'))
+    <div class="alert alert-danger">
+        {{ $errors->first('general') }}
+    </div>
+    @endif
+
+
     {{-- =========================
       CARD 1: EDIT PROFILE
     ========================= --}}
@@ -149,7 +167,7 @@
 
                     {{-- Banner --}}
                     <div class="col-md-12">
-                        <label class="form-label">Upload Banner</label>
+                        <label class="form-label">Uploaded Banner</label>
 
                         @php
                         $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg');
@@ -160,6 +178,7 @@
                             style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee;" />
 
                         <div class="mt-2">
+                            <label class="form-label">Upload New Banner</label>
                             <input type="file" name="banner" id="bannerInput"
                                 accept="image/png,image/jpeg,image/jpg"
                                 class="form-control @error('banner') is-invalid @enderror">
@@ -207,6 +226,8 @@
                         <input type="text" name="linkedin"
                             value="{{ old('linkedin', $companySocialMap['linkedin'] ?? '') }}"
                             class="form-control">
+                        @error('linkedin') <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -214,6 +235,8 @@
                         <input type="text" name="facebook"
                             value="{{ old('facebook', $companySocialMap['facebook'] ?? '') }}"
                             class="form-control">
+                        @error('facebook') <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -221,6 +244,7 @@
                         <input type="text" name="instagram"
                             value="{{ old('instagram', $companySocialMap['instagram'] ?? '') }}"
                             class="form-control">
+                            @error('instagram') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -228,6 +252,7 @@
                         <input type="text" name="twitter"
                             value="{{ old('twitter', $companySocialMap['twitter'] ?? '') }}"
                             class="form-control">
+                            @error('twitter') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="col-md-12">
@@ -239,7 +264,7 @@
 
                     {{-- Upload Files --}}
                     <div class="col-md-12">
-                        <label class="form-label">Upload File</label>
+                        <label class="form-label">Upload New File</label>
                         <input type="file" name="company_files[]" multiple class="form-control">
                         <div class="form-text">Max 10MB each file.</div>
                         @error('company_files.*') <div class="text-danger small mt-2">{{ $message }}</div> @enderror

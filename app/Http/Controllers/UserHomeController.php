@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Drive;
+// use AWS\CRT\Log;
 use Illuminate\Http\Request;
 
 class UserHomeController extends Controller
@@ -263,6 +264,9 @@ class UserHomeController extends Controller
 
     public function updateCompanyDetails(Request $request)
     {
+        // try {
+            // dd($request->all());
+        
         $user = auth()->user();
 
         // if (!$user->can('Edit Company')) {
@@ -293,18 +297,19 @@ class UserHomeController extends Controller
             'company_emailid' => ['required', 'email', 'max:255'],
             'company_phone'   => ['required', 'string', 'min:10', 'max:25'],
             'company_address' => ['required', 'string', 'max:500'],
-            'company_website2' => ['nullable', 'url', 'max:255'],
+            'company_website2' => ['nullable', 'max:255'],
 
-            'linkedin'        => ['nullable', 'url', 'max:255'],
-            'facebook'        => ['nullable', 'url', 'max:255'],
-            'instagram'       => ['nullable', 'url', 'max:255'],
-            'twitter'         => ['nullable', 'url', 'max:255'],
+            'linkedin'        => ['nullable', 'max:255'],
+            'facebook'        => ['nullable', 'max:255'],
+            'instagram'       => ['nullable', 'max:255'],
+            'twitter'         => ['nullable', 'max:255'],
 
             'company_about'   => ['required', 'string', 'min:10', 'max:5000'],
 
             'banner'          => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:10240'],
             'company_files.*' => ['nullable', 'file', 'max:10240'],
         ]);
+        
 
         $company = \App\Models\Company::with(['contentIconFile', 'quickLinkIconFile', 'Docs'])
             ->findOrFail($exhibitorId);
@@ -396,6 +401,18 @@ class UserHomeController extends Controller
         }
 
         return redirect()->back()->with('success', 'Company details updated successfully.');
+
+        // } 
+        // catch (\Exception $e) {
+        //     \Log::error($e);
+
+        //     return redirect()->back()
+        //         ->withInput()
+        //         ->withErrors([
+        //             'general' => 'Something went wrong while updating company details. Please try again.'
+        //             // or: $e->getMessage() (only in dev)
+        //         ]);
+        // }
     }
 
 
