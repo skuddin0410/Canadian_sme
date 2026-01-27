@@ -714,7 +714,7 @@ header .nav-link:hover {
 
 .sponsors .swiper-img-text {
   padding: 30px;
-  text-align: center;
+  text-align: left;
   /* width: 90%; */
   position: relative;
   background-color: var(--white);
