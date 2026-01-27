@@ -692,14 +692,17 @@ header .nav-link:hover {
 .sponsors .swiper-slide {
   margin-right: 20px;
   border-radius: 20px;
+  overflow: hidden;
+  background-color: #fff;
 }
 
 .sponsors .swiper-img-box {
-  border-radius: 20px;
+  /* border-radius: 20px; */
   overflow: hidden;
   width: 100%;
   max-width: 575px;
   height: 300px; /* new addition in jan 15.2026 */
+  box-shadow: rgba(100, 100, 111, 0.938) 0px 7px 29px 0px;
 }
 
 .sponsors .swiper-img-box img {
@@ -711,13 +714,13 @@ header .nav-link:hover {
 
 .sponsors .swiper-img-text {
   padding: 30px;
-  text-align: left;
-  width: 90%;
+  text-align: center;
+  /* width: 90%; */
   position: relative;
   background-color: var(--white);
   margin: auto;
-  top: -66px;
-  border-radius: 20px;
+  /* top: -66px; */
+  /* border-radius: 20px; */
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
@@ -813,7 +816,7 @@ header .nav-link:hover {
 
   .sponsors .swiper-img-text {
     padding: 10px 20px;
-    top: -40px;
+    /* top: -40px; */
   }
 }
 
