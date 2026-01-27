@@ -165,9 +165,18 @@
                         @error('booth_no') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
+                    <div class="col-md-12">
+                        <label class="form-label">Upload New Banner / Replace Existing Banner</label>
+                        <input type="file" name="banner" id="bannerInput"
+                            accept="image/png,image/jpeg,image/jpg"
+                            class="form-control @error('banner') is-invalid @enderror">
+                        <div class="form-text">Only JPG, JPEG, PNG. Max 10MB.</div>
+                        @error('banner') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
                     {{-- Banner --}}
                     <div class="col-md-12">
-                        <label class="form-label">Uploaded Banner</label>
+                        <label class="form-label">Uploaded Banner / Existing Banner</label>
 
                         @php
                         $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg');
@@ -177,14 +186,14 @@
                             src="{{ $bannerUrl }}"
                             style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee;" />
 
-                        <div class="mt-2">
+                        <!-- <div class="mt-2">
                             <label class="form-label">Upload New Banner / Replace Existing Banner</label>
                             <input type="file" name="banner" id="bannerInput"
                                 accept="image/png,image/jpeg,image/jpg"
                                 class="form-control @error('banner') is-invalid @enderror">
                             <div class="form-text">Only JPG, JPEG, PNG. Max 10MB.</div>
                             @error('banner') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="col-md-6">
