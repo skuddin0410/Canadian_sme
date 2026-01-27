@@ -494,7 +494,11 @@ class UserHomeController extends Controller
         $file = Drive::where('id', $request->fileId)
             ->where('table_id', $company->id)
             ->where('table_type', 'companies')
-            ->where('file_type', 'private_docs')
+            // ->where('file_type', 'private_docs')
+            ->where(function ($q) {
+                $q->where('file_type', 'private_docs')
+                ->orWhere('file_type', 'quick_link_icon');
+            })
             ->first();
 
         if (!$file) {

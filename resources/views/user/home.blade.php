@@ -179,12 +179,36 @@
                         <label class="form-label">Uploaded Banner / Existing Banner</label>
 
                         @php
-                        $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg');
+                        // $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg');
+                        $defaultBanner = asset('images/eventify-banner.jpg');
+                        $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? $defaultBanner;
+                        $hasCustomBanner = $user->usercompany->quickLinkIconFile?->file_path ? true : false;
                         @endphp
 
-                        <img id="bannerPreview"
+                        <div class="position-relative" style="width:100%;">
+                            <img id="bannerPreview"
+                                src="{{ $bannerUrl }}"
+                                style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee;" />
+
+                            {{-- show delete only if a custom banner exists --}}
+                            @if($hasCustomBanner)
+                                <button type="button"
+                                        id="deleteBannerBtn"
+                                        class="btn btn-danger btn-sm position-absolute"
+                                        style="top:10px; right:10px; border-radius:5px; width:38px; height:38px; padding:0; display:flex; align-items:center; justify-content:center;"
+                                        title="Remove banner" onclick="deleteCompanyFile('{{ $user->usercompany->quickLinkIconFile?->id ?? '' }}', this)">
+                                    {{-- Bootstrap icon (if you use bootstrap-icons) --}}
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            @endif
+                        </div>
+
+                        {{-- This hidden input will tell backend to delete banner --}}
+                        <input type="hidden" name="remove_banner" id="remove_banner" value="0">
+
+                        <!-- <img id="bannerPreview"
                             src="{{ $bannerUrl }}"
-                            style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee;" />
+                            style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee;" /> -->
 
                         <!-- <div class="mt-2">
                             <label class="form-label">Upload New Banner / Replace Existing Banner</label>
@@ -351,6 +375,8 @@
     }
 </style>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <script>
     // Banner preview
     document.getElementById('bannerInput')?.addEventListener('change', (e) => {
@@ -388,6 +414,8 @@
             }
 
             btn.closest('li')?.remove();
+            
+            window.location.reload();
         } catch (e) {
             console.error(e);
             btn.disabled = false;
