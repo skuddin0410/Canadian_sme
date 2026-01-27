@@ -49,7 +49,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center mt-3 mt-lg-4">
                     <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index')}}">View More </a>
                 </div>
 </div>
