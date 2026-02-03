@@ -1,8 +1,9 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 <div class="app-brand demo" style="display: flex; justify-content: center; align-items: center; width: 100%;">
-    <a href="" class="app-brand-link">
+    <a href="/" class="app-brand-link">
         <span class="app-brand-logo">
-            <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="70%">
+            <!-- <img src="{{asset('sme-logo.png')}}" alt="{{ config('app.name', 'SME') }}" width="70%"> -->
+            <img style="margin-left: 12px; margin-top: 12px;" src="{{asset('eventzen-logo.svg')}}" alt="{{ config('app.name', 'SME') }}" width="50%">
         </span>
     </a>
 
@@ -49,9 +50,15 @@
                 <div data-i18n="events">Setup</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('admin/events*') ? 'active open' : '' }}">
+                <!-- <li class="menu-item {{ request()->is('admin/events*') ? 'active open' : '' }}">
                     <a href="{{ route("events.edit",["event"=> 1 ]) }}" class="menu-link">
                         <div data-i18n="events">Basic Info</div>
+                    </a>
+                </li> -->
+
+                <li class="menu-item {{ request()->is('admin/events*') ? 'active open' : '' }}">
+                    <a href="{{ route("events.index",) }}" class="menu-link">
+                        <div data-i18n="events">Event Management</div>
                     </a>
                 </li>
 
