@@ -26,12 +26,23 @@ body {
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
   color: var(--black);
+  position: relative;
 }
 
 body.lock {
   height: 100vh;
   overflow: hidden;
   transition: 0.4s;
+}
+body.overlay::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #00000080;
+  z-index: 100;
 }
 
 a {
@@ -212,38 +223,41 @@ header .nav-link:hover {
   color: var(--theme);
 }
 
-@media (max-width: 767px) {
-  header {
-    padding: 10px 0;
-  }
+.header-search-input{
+  padding-right: 50px;
+}
 
+ .logo{
+  width: 230px;
+}
+
+.header-search-div{
+  width: 100%;
+}
+
+@media (max-width: 991px){
   .custom-nav {
     position: fixed;
     background-color: var(--theme);
-    width: 100vw;
+    width: 320px;
     height: 100vh;
-    top: -100vh;
-    right: 0;
+    top: 0;
+    right: -320px;
     display: block;
     z-index: 1000;
     transition: 0.4s;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 30px;
+    padding-top: 60px;
   }
 
   .custom-nav.open {
-    top: 0;
-  }
-
-  .custom-toggler-close {
-    top: 20px;
-    right: 20px;
+    right: 0;
   }
 
   header .nav-link {
     color: var(--white) !important;
-    font-size: 30px;
+    font-size: 18px;
     text-align: center;
   }
 
@@ -251,9 +265,47 @@ header .nav-link:hover {
     color: var(--white) !important;
   }
 
+  .custom-toggler-close {
+    top: 20px;
+    right: 20px;
+  }
+
+  .headerRegistrationText{
+    font-size: 18px;
+  }
+
+  .navbar-nav {
+    align-items: start !important;
+  }
+  .heroBtn.reg{
+    width: inherit;
+    height: inherit;
+    padding: 0;
+  }
+  .header-search-div{
+    width: 300px;
+  }
+}
+
+@media (max-width: 767px) {
+  header {
+    padding: 10px 0 37px;
+    position: relative;
+  }
+  .header-search-div{
+    position: absolute;
+    left: 10px;
+    bottom: -30px;
+    right: 10px;
+    width: calc(100% - 20px);
+  }
+  .header-search-div form input{
+    height: 33px;
+  }
+
   header .heroBtn {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     padding: 0;
   }
 }
@@ -1023,7 +1075,7 @@ footer {
 
 @media (max-width: 1199px) {
   .logo {
-    height: 40px;
+    width: 170px;
   }
 
   .container {
@@ -1040,6 +1092,10 @@ footer {
   .container {
     padding-left: 15px;
     padding-right: 15px;
+  }
+
+  .logo {
+    width: 170px;
   }
 
   .heroBtn,
