@@ -68,6 +68,7 @@
                     </form>
                 </div>
             </div>
+            <h3 class="mt-3">Don't have an account? <a href="/registration">Register here</a></h3>
         </div>
     </div>
 </div>

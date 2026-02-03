@@ -3,7 +3,8 @@
     <div class="container">
         <div class="footer-top d-flex flex-column flex-sm-row gap-4 justify-content-sm-between align-items-center">
             <a href="{{ url('/') }}">
-                <img class="logo" src="{{ asset('frontend/images/footer-logo.png') }}" alt="">
+                <!-- <img class="logo" src="{{ asset('frontend/images/footer-logo.png') }}" alt=""> -->
+                <img class="logo" src="{{asset('eventzen-logo-white.svg')}}" alt="">
             </a>
 
             <div class="d-lg-flex align-items-center gap-4">

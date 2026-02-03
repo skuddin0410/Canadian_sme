@@ -1,4 +1,4 @@
-@extends('layouts.frontendapp')
+@extends('layouts.app')
 
 @php
     use Illuminate\Support\Str;
@@ -206,6 +206,7 @@
                     </form>
                 </div>
             </div>
+            <h3 class="mt-3">Already have an account? <a href="/login">Login</a></h3>
 
         </div>
     </div>

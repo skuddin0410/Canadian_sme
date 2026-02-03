@@ -155,7 +155,7 @@
                 <textarea
                   type="text"
                   name="description"
-                  id="description"
+                  id="description1"
                   class="form-control"
                   placeholder="Event Description"
                   rows="8" cols="50"
