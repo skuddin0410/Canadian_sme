@@ -50,6 +50,11 @@
                                     <div class="col-auto">
                                         <button type="button" class="btn btn-md btn-secondary reset-filter">Reset</button>
                                     </div>
+                                    @if(isSuperAdmin())
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-md btn-danger search-admins" onclick="filterAdmins()">Event Admins</button>
+                                    </div>
+                                    @endif
                                 </div>
                             </form>
                         </div>
@@ -255,7 +260,7 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
 
 
     <div class="modal fade" id="openImportModal" tabindex="-1" role="dialog" aria-labelledby="ImportModal"
@@ -291,37 +296,79 @@
 @section('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script type="text/javascript">
+        let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
+        loadUsers(savedParams);
+
+        function loadUsers(params = {}) {
+            localStorage.setItem('attendeeParams', JSON.stringify(params));
+            $(".spinner-border").fadeIn(300);
+
+            $.ajax({
+                url: "{{ route('attendee-users.index') }}",
+                type: 'GET',
+                headers: {
+                    'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+                },
+                data: Object.assign({
+                    ajax_request: true
+                }, params),
+                dataType: "json",
+                success: function(data) {
+                    $("#user-table").html(data.html);
+                },
+                error: function(xhr) {
+                    console.error('Error loading users:', xhr.responseText);
+                },
+                complete: function() {
+                    $(".spinner-border").fadeOut(300);
+                }
+            });
+        }
+            
+        // Function to handle Admin filter
+        function filterAdmins() {
+            // Create a new search parameter object with show_admins as true
+            let params = {
+                show_admins: 'true',
+                search: $('#search').val().trim(),  // Retain any existing search values
+                page: 1
+            };
+
+            // Reload users with the new filter applied
+            loadUsers(params);
+        }
+
         $(document).ready(function() {
 
 
-            let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
-            loadUsers(savedParams);
+            // let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
+            // loadUsers(savedParams);
 
-            function loadUsers(params = {}) {
-                localStorage.setItem('attendeeParams', JSON.stringify(params));
-                $(".spinner-border").fadeIn(300);
+            // function loadUsers(params = {}) {
+            //     localStorage.setItem('attendeeParams', JSON.stringify(params));
+            //     $(".spinner-border").fadeIn(300);
 
-                $.ajax({
-                    url: "{{ route('attendee-users.index') }}",
-                    type: 'GET',
-                    headers: {
-                        'X-CSRF-Token': $('meta[name="_token"]').attr('content')
-                    },
-                    data: Object.assign({
-                        ajax_request: true
-                    }, params),
-                    dataType: "json",
-                    success: function(data) {
-                        $("#user-table").html(data.html);
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading users:', xhr.responseText);
-                    },
-                    complete: function() {
-                        $(".spinner-border").fadeOut(300);
-                    }
-                });
-            }
+            //     $.ajax({
+            //         url: "{{ route('attendee-users.index') }}",
+            //         type: 'GET',
+            //         headers: {
+            //             'X-CSRF-Token': $('meta[name="_token"]').attr('content')
+            //         },
+            //         data: Object.assign({
+            //             ajax_request: true
+            //         }, params),
+            //         dataType: "json",
+            //         success: function(data) {
+            //             $("#user-table").html(data.html);
+            //         },
+            //         error: function(xhr) {
+            //             console.error('Error loading users:', xhr.responseText);
+            //         },
+            //         complete: function() {
+            //             $(".spinner-border").fadeOut(300);
+            //         }
+            //     });
+            // }
 
 
             $('#search-btn, #filter-btn').click(function() {
@@ -432,7 +479,44 @@
                 });
             }
 
+            // window.submitBulkAction = function() {
+            //     const emailTemplate = $('#emailTemplate').val();
+            //     const notificationTemplate = $('#notificationTemplate').val();
 
+            //     if (!emailTemplate && !notificationTemplate) {
+            //         alert("Please select at least one template (email or notification).");
+            //         return;
+            //     }
+
+            //     // Always send to all users
+            //     let data = {
+            //         user_ids: 'all',
+            //         _token: '{{ csrf_token() }}'
+            //     };
+
+            //     if (emailTemplate) data.email_template = emailTemplate;
+            //     if (notificationTemplate) data.notification_template = notificationTemplate;
+
+            //     $.ajax({
+            //         url: "{{ route('attendee-users.bulkAction') }}",
+            //         method: "POST",
+            //         data: data,
+            //         beforeSend: function() {
+            //             $('.btn-primary').prop('disabled', true).text('Sending...');
+            //         },
+            //         success: function(resp) {
+            //             alert(resp.message || 'Emails & Notifications sent successfully!');
+            //             closeModal();
+            //         },
+            //         error: function(xhr) {
+            //             console.error(xhr.responseText);
+            //             alert(xhr.responseJSON?.message || 'Unexpected error occurred.');
+            //         },
+            //         complete: function() {
+            //             $('.btn-primary').prop('disabled', false).text('Send');
+            //         }
+            //     });
+            // }
 
         });
     </script>

@@ -229,5 +229,12 @@ class User extends Authenticatable implements JWTSubject
             ->whereNotNull('file_name');
     }
 
+    // Define the relationship between User and EventAndEntityLink
+    public function eventAndEntityLinks()
+    {
+        return $this->hasMany(EventAndEntityLink::class, 'entity_id', 'id')
+                    ->where('entity_type', 'users');
+    }
+
     protected $appends = ['full_name'];
 }

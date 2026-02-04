@@ -1,19 +1,46 @@
 // ---------toggler header-----------
-const custom_toggler_open = document.querySelector(".custom-toggler-open");
+const custom_toggler_open  = document.querySelector(".custom-toggler-open");
 const custom_toggler_close = document.querySelector(".custom-toggler-close");
 const custom_nav = document.querySelector(".custom-nav");
-const body = document.querySelector("body");
+const body = document.body;
 
-custom_toggler_open.addEventListener("click", function () {
-    custom_nav.classList.add("open");
-    body.classList.add("lock");
+function openNav() {
+  custom_nav.classList.add("open");
+  body.classList.add("lock");
+  body.classList.add("overlay");
+}
 
-})
+function closeNav() {
+  custom_nav.classList.remove("open");
+  body.classList.remove("lock");
+  body.classList.remove("overlay");
+}
 
-custom_toggler_close.addEventListener("click", function () {
-    custom_nav.classList.remove("open");
-    body.classList.remove("lock");
-})
+// Open nav
+custom_toggler_open.addEventListener("click", (e) => {
+  e.stopPropagation();
+  openNav();
+});
+
+// Close nav button
+custom_toggler_close.addEventListener("click", (e) => {
+  e.stopPropagation();
+  closeNav();
+});
+
+// Prevent closing when clicking inside nav
+custom_nav.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+
+// Close when clicking outside
+document.addEventListener("click", () => {
+  if (custom_nav.classList.contains("open")) {
+    closeNav();
+  }
+});
+// ---------toggler header end-----------
+
 
 
 

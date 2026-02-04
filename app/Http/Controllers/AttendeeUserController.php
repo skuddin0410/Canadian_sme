@@ -51,7 +51,36 @@ class AttendeeUserController extends Controller
             //   $q->whereIn("name", ['Attendee']);
             // })->orderBy('id', 'DESC');
             
-           $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC');
+            // $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC'); //subabrata da code
+            // Check if "admins" filter is applied
+        if ($request->has('show_admins') && $request->show_admins == 'true') {
+            // Filter users by the 'Admin' role
+            $users = User::with('roles')
+                ->whereHas('roles', function($query) {
+                    $query->where('name', 'Admin');  // Filter by Admin role
+                })
+                ->orderBy('id', 'DESC');
+        } else {
+            if(isSuperAdmin()){
+                $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC');
+            }else{
+                $users = User::with('roles')
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
+                })
+                ->whereNotIn('id', [1, 2])
+                ->whereHas('eventAndEntityLinks', function ($q) {
+                    $q->where('entity_type', 'users')
+                    ->whereIn('event_id', function($query) {
+                        $query->select('id')
+                                ->from('events')
+                                ->where('created_by', auth()->id());
+                    });
+                })
+                ->orderBy('id', 'DESC');
+            }
+            
+            // dd($users->get());
  
             if ($request->filled('search')) {
                 $users = $users->where(function ($query) use ($request) {
@@ -79,7 +108,7 @@ class AttendeeUserController extends Controller
             if ($request->has('onsignal') && $request->onsignal == 1) {
                 $users = $users->whereNotNull('onesignal_userid');
             }
-                     
+        }             
          
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));

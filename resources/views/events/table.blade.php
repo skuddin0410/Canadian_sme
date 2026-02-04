@@ -42,6 +42,7 @@
 		<th>Author</th>
 		<th>Created At</th>
 		<th width="12%">Action</th>
+		<th>Clone</th>
 	</tr>
 </thead>
 <tbody>	
@@ -84,6 +85,12 @@
       </div>
       </div>    
       </th>
+	  <th>
+		<button type="button" class="btn btn-warning clone-btn" data-id="{{ $event->id }}">
+			Clone
+		</button>
+	  </th>
+
 	</tr>
 	@endforeach
 

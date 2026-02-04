@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Drive;
+use App\Models\EventAndEntityLink;
 
 class EventController extends Controller
 {
@@ -25,6 +26,8 @@ class EventController extends Controller
        if($request->ajax() && $request->ajax_request == true){
         $events = Event::with(['category','photo'])->orderBy('id','DESC');
 
+        $events = isSuperAdmin() ? $events : $events->where('created_by',auth()->id());
+        
         if($request->search){
             $events = $events->where(function($query) use($request){
                     $query->where('name', 'LIKE', '%'. $request->search .'%');
@@ -99,6 +102,100 @@ class EventController extends Controller
         return redirect()->route('events.index')->with('success', 'Event created.');
     }
 
+    // public function clone($id)
+    // {
+    //     // Find the event by ID
+    //     $event = Event::find($id);
+
+    //     if (!$event) {
+    //         return response()->json(['success' => false, 'message' => 'Event not found'], 404);
+    //     }
+
+    //     // Clone the event by copying its properties
+    //     $clonedEvent = $event->replicate(); // Replicates the event but doesn't save it yet
+
+    //     // Modify the title to include 'Clone' and ensure unique slug
+    //     $clonedEvent->title = $event->title . ' Clone';
+    //     $clonedEvent->slug = Str::slug($clonedEvent->title);
+    //     $clonedEvent->created_by = auth()->id(); // The current logged-in user will be the creator of the cloned event
+
+    //     // Save the cloned event
+    //     $clonedEvent->save();
+
+    //     // Handle image upload if necessary (you can add this logic based on your `store` function)
+    //     if ($event->image) {
+    //         $this->imageUpload($event->image, 'events', $clonedEvent->id, 'events', 'photo');
+    //     }
+
+    //     // Return success response
+    //     return response()->json(['success' => true, 'message' => 'Event cloned successfully.']);
+    // }
+
+
+    public function clone($eventId)
+    {
+        // Get the event that you want to clone
+        $event = Event::findOrFail($eventId);
+
+        // Clone the event
+        $clonedEvent = $event->replicate();
+        
+        // Modify the title to indicate it's a clone
+        $clonedEvent->title = $event->title . ' Clone';
+
+        // Generate the slug based on the new title
+        $slug = Str::slug($clonedEvent->title);
+
+        // First check: Check if the slug already exists
+        $slugCount = Event::where('slug', $slug)->count();
+
+        // If the slug exists, append a number and check again
+        $attempt = 1;
+        while ($slugCount > 0) {
+            $slug = Str::slug($clonedEvent->title . '-' . $attempt); // Modify the slug
+            $slugCount = Event::where('slug', $slug)->count(); // Re-check if the new slug exists
+            $attempt++;
+        }
+
+        // Set the unique slug
+        $clonedEvent->slug = $slug;
+
+        // Set other fields as necessary (e.g., created_by)
+        $clonedEvent->created_by = auth()->id();
+
+        // Save the cloned event
+        $clonedEvent->save();
+
+        // Clone the related records from `event_and_entity_link`
+        $eventAndEntityLinks = EventAndEntityLink::where('event_id', $eventId)->get();
+        // If no records are found, log a message
+        if ($eventAndEntityLinks->isEmpty()) {
+            \Log::warning('No event_and_entity_link records found for event ID: ' . $eventId);
+        }
+
+        foreach ($eventAndEntityLinks as $link) {
+            // Log the link being cloned
+            \Log::info('Cloning event_and_entity_link record with entity_type: ' . $link->entity_type . ' and entity_id: ' . $link->entity_id);
+
+            $newLink = EventAndEntityLink::create([
+                'event_id' => $clonedEvent->id, // Set the cloned event ID
+                'entity_type' => $link->entity_type,
+                'entity_id' => $link->entity_id,
+            ]);
+
+            // Log after creating the record
+            if ($newLink) {
+                \Log::info('Successfully cloned event_and_entity_link record for new event ID: ' . $clonedEvent->id);
+            } else {
+                \Log::error('Failed to clone event_and_entity_link record for event ID: ' . $clonedEvent->id);
+            }
+        }
+
+        // return redirect()->route('events.index')->with('success', 'Event cloned successfully!');
+
+        return response()->json(['success' => true, 'message' => 'Event cloned successfully.']);
+    }
+
     public function show(Event $event)
     {
         return view('events.view', compact('event'));
@@ -112,6 +209,7 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {   
+        // dd($request->all());
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:events,slug,' . $event->id,
@@ -152,6 +250,8 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {   
+        // Delete related records in event_and_entity_link first
+        EventAndEntityLink::where('event_id', $event->id)->delete();
         $event->delete();
         return redirect()->route('events.index')->with('success', 'Event deleted.');
     }

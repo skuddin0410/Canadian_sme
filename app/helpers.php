@@ -624,3 +624,15 @@ if (! function_exists('isBase64String')) {
         return base64_decode($raw, true) !== false;
     }
 }
+
+if(! function_exists('isSuperAdmin')){
+    function isSuperAdmin(){
+        // $superAdminRole = config('app.super_admin_role', 'Super Admin');
+        // return $user->hasRole($superAdminRole);
+        if(auth()->user() && auth()->user()->id === 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
