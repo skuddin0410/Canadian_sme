@@ -24,8 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {   
-        Mail::alwaysTo('subhabrata06.dapl@gmail.com');
+        // Mail::alwaysTo('subhabrata06.dapl@gmail.com');
+        if(config('app.env') === 'production')
         \URL::forceScheme('https');
+    
         date_default_timezone_set(config('app.timezone'));
         Paginator::useBootstrap();
         \App\Models\TicketType::observe(\App\Observers\TicketTypeObserver::class);
