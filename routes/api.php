@@ -14,15 +14,17 @@ Route::prefix('password')->group(function () {
     Route::post('/reset', [App\Http\Controllers\Api\JWTAuthController::class, 'resetPassword']);
 });
 
-Route::middleware(['auth:api', 'jwtauth'])->group(function () {
+// Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
 
-       Route::prefix('profile')->group(function () {
+Route::middleware(['auth:api', 'jwtauth'])->group(function () {
+    Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
+
+    Route::prefix('profile')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getUser']);
         Route::put('/', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUser']);
         Route::post('/avatar', [App\Http\Controllers\Api\JWTAuthController::class, 'updateUserImage']);
-      
     });
-    
+
     Route::prefix('exhibitors')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAllExhibitor']);
         Route::get('/{exhibitorId}', [App\Http\Controllers\Api\JWTAuthController::class, 'getExhibitor']);
@@ -35,7 +37,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
 
 
     Route::post('/{detailsID}/files', [App\Http\Controllers\Api\JWTAuthController::class, 'uploadExhibitorFiles']);
-    
+
     Route::prefix('sponsors')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAllSponsor']);
         Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getSponsor']);
@@ -46,18 +48,18 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::get('/{sessionId}', [HomeController::class, 'getSession']);
         Route::get('/{sessionId}/favourite', [HomeController::class, 'addSessionToFavourite']);
         Route::post('/{sessionId}/agenda', [HomeController::class, 'createAgenda']);
-    }); 
-    
+    });
+
     Route::prefix('speakers')->group(function () {
-       Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeaker']);
-      Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeakerById']);
+        Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeaker']);
+        Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getSpeakerById']);
     });
 
     Route::prefix('attendees')->group(function () {
-       Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAttendee']);
-      Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getAttendeeById']);
+        Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAttendee']);
+        Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getAttendeeById']);
     });
-    
+
 
     Route::get('/tags', [App\Http\Controllers\Api\JWTAuthController::class, 'getTags']);
     Route::post('/home', [HomeController::class, 'index']);
@@ -65,7 +67,7 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     Route::get('/get-notifications', [HomeController::class, 'getNotifications']);
     Route::get('/notification-read-all', [HomeController::class, 'readAllNotifications']);
 
-    
+
     Route::prefix('connections')->group(function () {
         Route::get('/', [HomeController::class, 'getConnections']);
         Route::get('/{connectionId}', [HomeController::class, 'getConnectionsDetails']);
@@ -80,25 +82,22 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     });
 
     Route::prefix('agenda')->group(function () {
-         Route::get('/', [HomeController::class, 'getAgenda']);
+        Route::get('/', [HomeController::class, 'getAgenda']);
     });
 
-  
+
     Route::prefix('password')->group(function () {
         Route::post('/change', [App\Http\Controllers\Api\JWTAuthController::class, 'changePassword']);
     });
 
     Route::get('/refresh-token', [App\Http\Controllers\Api\JWTAuthController::class, 'refreshToken']);
     Route::get('/logout', [App\Http\Controllers\Api\JWTAuthController::class, 'logout']);
-    
+
     Route::post('/onesignal', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotification']);
-    
+
     Route::get('/delete-account', [App\Http\Controllers\Api\JWTAuthController::class, 'deleteAccount']);
-
-
-  
 });
 
- Route::post('/onesignal/test', [App\Http\Controllers\Api\HomeController::class, 'sendNotification']);
+Route::post('/onesignal/test', [App\Http\Controllers\Api\HomeController::class, 'sendNotification']);
 
 Route::post('/ios/test', [App\Http\Controllers\Api\HomeController::class, 'sendPushNotificationTest']);
