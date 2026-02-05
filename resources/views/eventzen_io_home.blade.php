@@ -119,7 +119,7 @@
                     <div>
                         <h1>
                             <!-- Lorem ipsum dolor sit amet consectetur. -->
-                            Why Event Leaders Choose Eventify?
+                            Why Event Leaders Choose Eventzen.io?
                         </h1>
                         <p class="mt-3 mt-lg-4">
                             <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita omnis suscipit doloremque aliquid distinctio facere esse, ipsum ducimus quidem, rerum ipsam iure quas nihil aperiam dolorem laudantium autem reprehenderit provident. -->
