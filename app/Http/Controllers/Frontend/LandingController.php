@@ -20,7 +20,7 @@ class LandingController extends Controller
      * Show the landing page.
     */
 
-    public function index()
+    public function index1()
     {   
         $event = Event::with(['photo'])->first();
         $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])->where('start_time', '>=', now())
@@ -64,7 +64,10 @@ class LandingController extends Controller
     }
 
 
-
+    public function index()
+    {
+        return view('eventzen_io_home');
+    }
 
 
 

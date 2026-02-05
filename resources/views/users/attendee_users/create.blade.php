@@ -297,13 +297,29 @@ Admin | Add Attendee
                         @error('instagram_url') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
 
-                       <div>
+                       <div class="mb-3">
                         <label class="form-label">Twitter</label>
                         <div class="input-group input-group-merge">
                           <span class="input-group-text"><i class="bx bxl-twitter"></i></span>
                           <input type="text" class="form-control" name="twitter_url" value="{{  old('twitter_url') }}" placeholder="https://twitter.com/username">
                         </div>
                         @error('twitter_url') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Events</label>
+                        <div class="input-group input-group-merge">
+                        <select class="form-select select2" name="event_id"
+                                data-placeholder="Select event" data-allow-clear="true" multiple>
+                                <option value="">Please select</option>
+                          @foreach($events as $event)
+                            <option value="{{ $event->id }}">
+                              {{ $event->title }}
+                            </option>
+                          @endforeach
+                        </select>
+                        </div>
+                        @error('event_id') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
                 
                 </div>

@@ -155,7 +155,10 @@ class AttendeeUserController extends Controller
         $sponsors = Company::select('id','name')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
 
         $groups = config('roles.groups');
-        return view('users.attendee_users.create',compact('groups','exhibitors','sponsors','speakers'));
+
+        $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+
+        return view('users.attendee_users.create',compact('groups','exhibitors','sponsors','speakers','events'));
     }
 
     /**
@@ -345,7 +348,16 @@ class AttendeeUserController extends Controller
 
     $groups = config('roles.groups');
 
-    return view('users.attendee_users.edit', compact('user','groups','exhibitors','sponsors','speakers'));
+    $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+
+    $perticipantEvents = $user->eventAndEntityLinks()
+                            ->where('entity_type', 'users')
+                            ->where('entity_id', $user->id)
+                            ->pluck('event_id')
+                            ->toArray();
+    // dd($perticipantEvents);
+
+    return view('users.attendee_users.edit', compact('user','groups','exhibitors','sponsors','speakers','events','perticipantEvents'));
 
     }
 

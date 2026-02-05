@@ -133,5 +133,9 @@ class Company extends Model
     return $this->hasOne(Category::class,'slug','type');
     }
 
-
+    public function eventAndEntityLinks()
+    {
+        return $this->hasMany(EventAndEntityLink::class, 'entity_id', 'id')
+                    ->where('entity_type', 'companies');
+    }
 }

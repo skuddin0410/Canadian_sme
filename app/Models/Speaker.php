@@ -61,5 +61,11 @@ class Speaker extends Model
         return $this->name . ' ' . $this->lastname;
     }
 
+    public function eventAndEntityLinks()
+    {
+        return $this->hasMany(EventAndEntityLink::class, 'entity_id', 'id')
+                    ->where('entity_type', 'speakers');
+    }
+
     protected $appends = ['full_name'];
 }
