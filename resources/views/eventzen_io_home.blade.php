@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="http://localhost:8000/images/favicon.png" type="image/x-icon" />
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon" />
 
     <title>Eventzen.io</title>
 
@@ -17,7 +17,7 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="http://localhost:8000/frontend/css/style.css?v=1770271652">
+    <link rel="stylesheet" href="/frontend/css/style.css?v=1770271652">
 
 
 
@@ -30,17 +30,17 @@
         <nav class="navbar navbar-expand-lg bg-transparent p-0">
             <div class="container d-flex align-items-center justify-content-between">
                 <!-- Logo -->
-                <!-- <a class="navbar-brand" href="http://localhost:8000">
-                <img class="logo" src="http://localhost:8000/frontend/images/logo.png" alt="logo">
+                <!-- <a class="navbar-brand" href="">
+                <img class="logo" src="/frontend/images/logo.png" alt="logo">
             </a> -->
 
-                <a class="navbar-brand" href="http://localhost:8000">
-                    <img class="logo" src="http://localhost:8000/eventzen-logo.svg" alt="logo" width="50%">
+                <a class="navbar-brand" href="">
+                    <img class="logo" src="/eventzen-logo.svg" alt="logo" width="50%">
                 </a>
 
                 <!-- Search Box -->
                 <!-- <div class="header-search-div">
-                    <form class=" d-md-flex ms-auto w-100 w-sm-25 position-relative" action="http://localhost:8000/search" method="GET">
+                    <form class=" d-md-flex ms-auto w-100 w-sm-25 position-relative" action="/search" method="GET">
                         <input
                             class="form-control rounded-pill ps-4 py-2 shadow-sm fs-6 header-search-input"
                             type="text"
@@ -59,30 +59,30 @@
                 <div class="d-flex align-items-center">
                     <div class="ms-auto custom-nav">
                         <button class="custom-toggler-close position-absolute d-lg-none">
-                            <img src='http://localhost:8000/frontend/images/cross.png' alt="">
+                            <img src='/frontend/images/cross.png' alt="">
                         </button>
                         <ul class="navbar-nav mb-2 mb-md-0 gap-3 gap-lg-5 align-items-center ms-lg-4">
                             <li class="nav-item">
-                                <a class="nav-link p-0 active" href="http://localhost:8000">Why Us?</a>
+                                <a class="nav-link p-0 active" href="">Why Us?</a>
                             </li>
                             <!-- <li class="nav-item">
-                            <a class="nav-link p-0 " href="http://localhost:8000/venue">Venue Information</a>
+                            <a class="nav-link p-0 " href="/venue">Venue Information</a>
                             </li> -->
 
                             <!-- <li class="nav-item">
-                                <a class="nav-link p-0 " href="http://localhost:8000/venue">Venue</a>
+                                <a class="nav-link p-0 " href="/venue">Venue</a>
                             </li> -->
 
                             <li class="nav-item">
-                                <a class="nav-link p-0 " href="http://localhost:8000/events">Events</a>
+                                <a class="nav-link p-0 " href="/events">Events</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link p-0 " href="http://localhost:8000/venue">Pricing</a>
+                                <a class="nav-link p-0 " href="/venue">Pricing</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link p-0 " href="http://localhost:8000/support">Contact Us</a>
+                                <a class="nav-link p-0 " href="/support">Contact Us</a>
                             </li>
 
                             <li class="nav-item">
@@ -125,7 +125,7 @@
                             <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita omnis suscipit doloremque aliquid distinctio facere esse, ipsum ducimus quidem, rerum ipsam iure quas nihil aperiam dolorem laudantium autem reprehenderit provident. -->
                             From the most diverse events on the planet to simple business meetings, brands have placed their trust in us to create online and in-person events using our app. Thrilled with the outstanding results, event leaders find their way back to our platform to make every event sensational.
                         </p>
-                        <a href="http://localhost:8000/support">
+                        <a href="/support">
                         <button class="heroBtn mt-4 mt-lg-5">
                             Request a Demo
                         </button>
@@ -178,9 +178,9 @@
     <footer>
         <div class="container">
             <div class="footer-top d-flex flex-column flex-sm-row gap-4 justify-content-sm-between align-items-center">
-                <a href="http://localhost:8000">
-                    <!-- <img class="logo" src="http://localhost:8000/frontend/images/footer-logo.png" alt=""> -->
-                    <img class="logo" src="http://localhost:8000/eventzen-logo-white.svg" alt="">
+                <a href="">
+                    <!-- <img class="logo" src="/frontend/images/footer-logo.png" alt=""> -->
+                    <img class="logo" src="/eventzen-logo-white.svg" alt="">
                 </a>
 
                 <div class="d-lg-flex align-items-center gap-4">
@@ -227,7 +227,7 @@
 
             <div class="footer-bottom">
                 <p class="black-text-18 text-light text-center">© 2026
-                    <a class="text-light" href="http://localhost:8000">Eventzen.io</a>
+                    <a class="text-light" href="">Eventzen.io</a>
                 </p>
             </div>
         </div>
@@ -277,7 +277,7 @@
     <!-- Swiper JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <!-- add js file -->
-    <script src="http://localhost:8000/frontend/js/script.js"></script>
+    <script src="/frontend/js/script.js"></script>
     <script>
         const startEl = document.getElementById('startInTime');
 
