@@ -104,7 +104,7 @@
 
 @if($users->count() <= 0)
 <tr>
-	<td colspan="5" class="text-center">No data available</td>
+	<td colspan="7" class="text-center">No data available</td>
 </tr>
 @endif
 </tbody>

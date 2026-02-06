@@ -35,6 +35,7 @@ class ExhibitorUserController extends Controller
 
 public function index(Request $request)
 {
+    // dd(1);
     $perPage = (int) $request->input('perPage', 20);
     $pageNo = (int) $request->input('page', 1);
 
@@ -50,6 +51,19 @@ public function index(Request $request)
               ->orWhere("companies.booth", "LIKE", $search);
 
               
+        });
+    }
+
+    /* EVENT FILTER (THIS WAS MISSING) */
+    if ($request->filled('event_id')) {
+        $eventId = $request->event_id;
+
+        $query->whereExists(function ($q) use ($eventId) {
+            $q->select(DB::raw(1))
+              ->from('event_and_entity_link')
+              ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+              ->where('event_and_entity_link.entity_type', 'companies')
+              ->where('event_and_entity_link.event_id', $eventId);
         });
     }
    
@@ -70,12 +84,15 @@ public function index(Request $request)
         ]);
     }
 
+    $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+
     
     return view("users.exhibitor_users.index", [
         "users"  => $users,
         "perPage" => $perPage,
         "offset" => $offset,
         "kyc"    => "",
+        "events" => $events
     ]);
 }
 

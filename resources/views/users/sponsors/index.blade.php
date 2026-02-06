@@ -29,6 +29,17 @@
         <div class="row justify-content-end g-2 align-items-center">
             <!-- Search -->
             <div class="col-auto">
+                <select class="form-select select2" name="event_id"
+                        data-placeholder="Select event" data-allow-clear="true" id="event_id">
+                        <option value="">Please select event</option>
+                @foreach($events as $event)
+                    <option value="{{ $event->id }}">
+                    {{ $event->title }}
+                    </option>
+                @endforeach
+                </select>
+            </div>
+            <div class="col-auto">
                 <input type="text" class="form-control form-control-md" name="search" id="search" 
                     value="{{ request('search') }}" placeholder="Search by Name, Email">
             </div>
@@ -37,9 +48,9 @@
             </div>
 
             <!-- Filter -->
-            <div class="col-auto">
+            <!-- <div class="col-auto">
                 <button type="button" class="btn btn-md btn-primary" id="filter-btn">Filter</button>
-            </div>
+            </div> -->
 
             <!-- Reset Button -->
             <div class="col-auto">
@@ -93,7 +104,9 @@ $(document).ready(function() {
     // Search button click
     $('#search-btn').click(function() {
         const searchVal = $('#search').val().trim();
-        loadUsers({ search: searchVal });
+        const eventId = $('#event_id').val();
+        loadUsers({ search: searchVal, event_id: eventId });
+        // loadUsers({ search: searchVal });
     });
 
     // Filter button click

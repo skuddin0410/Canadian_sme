@@ -29,7 +29,17 @@
                         <div class="col-4">  
                         </div>
                         <div class="col-3">
-                            
+                            <div class="col-auto">
+                                <select class="form-select select2" name="event_id"
+                                        data-placeholder="Select event" data-allow-clear="true" id="event_id">
+                                        <option value="">Please select event</option>
+                                @foreach($events as $event)
+                                    <option value="{{ $event->id }}">
+                                    {{ $event->title }}
+                                    </option>
+                                @endforeach
+                                </select>
+                            </div>
                         </div>          
                         <div class="col-3">  
                          <div class="mb-3">
@@ -113,9 +123,9 @@
   });
    $(document).on("click", ".filter", function(e) {
         var search = $('#search').val();
-        if( search.trim() == ''){
-           return ;
-        }
+        // if( search.trim() == ''){
+        //    return ;
+        // }
        $(".spinner-border").fadeIn(300);  
        $.ajax({
             url: "{{route('speaker.index')}}" + '?' + $("#users-filter").serialize(),

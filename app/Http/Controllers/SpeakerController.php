@@ -34,6 +34,7 @@ class SpeakerController extends Controller
      */
     public function index(Request $request)
     {
+        // dd(1);
         //
         $perPage = (int) $request->input('perPage', 20);
         $pageNo = (int) $request->input('page', 1);
@@ -47,6 +48,19 @@ class SpeakerController extends Controller
                     $query->where('name', 'LIKE', '%' . $request->search . '%');
                     $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
                     $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
+                });
+            }
+
+            /* EVENT FILTER (THIS WAS MISSING) */
+            if ($request->filled('event_id')) {
+                $eventId = $request->event_id;
+
+                $users->whereExists(function ($q) use ($eventId) {
+                    $q->select(DB::raw(1))
+                    ->from('event_and_entity_link')
+                    ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
+                    ->where('event_and_entity_link.entity_type', 'speakers')
+                    ->where('event_and_entity_link.event_id', $eventId);
                 });
             }
 
@@ -77,7 +91,9 @@ class SpeakerController extends Controller
             return response($data);
               }
 
-        return view('users.speaker.index', ["kyc" => ""]);
+        $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+
+        return view('users.speaker.index', ["kyc" => "", "events" => $events]);
     }
 
     /**
