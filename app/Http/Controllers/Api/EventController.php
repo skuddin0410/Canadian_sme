@@ -35,7 +35,7 @@ class EventController extends Controller
             $query->whereDate('start_date', '>', $today);
         }
 
-        return EventResource::collection($query->latest()->paginate(1));
+        return EventResource::collection($query->latest()->paginate(6));
     }
 
     public function store(EventRequest $request)
