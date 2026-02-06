@@ -96,6 +96,13 @@ class AttendeeUserController extends Controller
                 });
             }
 
+            if ($request->filled('event_id')) {
+                $users->whereHas('eventAndEntityLinks', function ($q) use ($request) {
+                    $q->where('event_id', $request->event_id)
+                    ->where('entity_type', 'users');
+                });
+            }
+
             // Filters (triggered by filter button, add your filter logic here)
             if ($request->filled('start_at') && $request->filled('end_at')) {
                 $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
@@ -139,7 +146,9 @@ class AttendeeUserController extends Controller
             return response($data);
         }
 
-        return view('users.attendee_users.index', ["kyc" => ""]);
+        $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+
+        return view('users.attendee_users.index', ["kyc" => "", "events" => $events]);
 
     }
 
