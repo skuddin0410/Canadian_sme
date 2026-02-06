@@ -43,6 +43,17 @@
                                             placeholder="Search by Name, Email">
                                     </div>
                                     <div class="col-auto">
+                                        <select class="form-select select2" name="event_id"
+                                                data-placeholder="Select event" data-allow-clear="true" id="event_id">
+                                                <option value="">Please select</option>
+                                        @foreach($events as $event)
+                                            <option value="{{ $event->id }}">
+                                            {{ $event->title }}
+                                            </option>
+                                        @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
                                         <button type="button" class="btn btn-md btn-primary"
                                             id="search-btn">Search</button>
                                     </div>
@@ -373,14 +384,18 @@
 
             $('#search-btn, #filter-btn').click(function() {
                 const searchVal = $('#search').val().trim();
+                const eventId   = $('#event_id').val();
+
                 loadUsers({
                     search: searchVal,
+                    event_id: eventId,
                     page: 1
                 });
             });
 
             $('.reset-filter').click(function() {
                 $('#search').val('');
+                $('#event_id').val('').trigger('change');
                 localStorage.removeItem('attendeeParams');
                 loadUsers();
             });
