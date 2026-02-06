@@ -61,4 +61,10 @@ class Event extends Model
     {
         return $this->hasMany(Session::class);
     }
+
+    public function entityLinks()
+    {
+        return $this->hasMany(EventAndEntityLink::class, 'event_id');
+    }
+
 }

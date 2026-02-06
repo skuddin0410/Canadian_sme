@@ -7,6 +7,7 @@ use App\Http\Resources\EventResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class EventController extends Controller
 {
@@ -20,7 +21,25 @@ class EventController extends Controller
         $type = $request->type; // past | ongoing | future
         $today = Carbon::today();
 
-        $query = Event::query();
+        // $query = Event::query();
+
+        if (! $requester = JWTAuth::parseToken()->authenticate()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data'    => collect(),
+            ], 401);
+        }
+        $userId = $requester->id;
+        // dd($userId);
+        
+        $query = Event::query()
+            ->withExists([
+                'entityLinks as is_registered' => function ($q) use ($userId) {
+                    $q->where('entity_type', 'users')
+                    ->where('entity_id', $userId);
+                }
+            ]);
 
         if ($type === 'past') {
             $query->whereDate('end_date', '<', $today);

@@ -29,6 +29,7 @@ class EventResource extends JsonResource
                 'keywords' => $this->meta_keywords,
             ],
             'created_at' => $this->created_at,
+            'is_registered' => (bool) $this->is_registered,
         ];
     }
 }

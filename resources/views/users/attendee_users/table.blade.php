@@ -90,6 +90,12 @@
     : '' 
 !!} 
 
+  @if($user->hasRole('Admin'))
+  {!! 
+      '<span class="badge border border-danger text-danger rounded-pill badge-sm">As Admin</span>' 
+  !!}
+  @endif
+
 
     </th>
 		<th style="text-transform: lowercase;">{{$user->email ?? ''}}</th>
