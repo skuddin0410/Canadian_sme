@@ -166,6 +166,16 @@ class EventController extends Controller
         // Save the cloned event
         $clonedEvent->save();
 
+        if($event->photo){
+         Drive::create([
+            'table_id' => $clonedEvent->id,
+            'table_type' => 'events',
+            'file_type' => 'photo',
+            'file_name' => $event->photo->file_name,
+            'is_local_file' => $event->photo->is_local_file,
+         ]);
+        }
+
         // Clone the related records from `event_and_entity_link`
         $eventAndEntityLinks = EventAndEntityLink::where('event_id', $eventId)->get();
         // If no records are found, log a message

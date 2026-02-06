@@ -308,6 +308,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script type="text/javascript">
         let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
+        // 🔹 Restore search input
+        if (savedParams.search) {
+            $('#search').val(savedParams.search);
+        }
+
+        // 🔹 Restore event dropdown
+        if (savedParams.event_id) {
+            $('#event_id').val(savedParams.event_id).trigger('change');
+        }
         loadUsers(savedParams);
 
         function loadUsers(params = {}) {
