@@ -53,7 +53,22 @@
     	@else
          <th></th>
     	@endif
-    	<th>{{$event->title}}</th>
+    	<th>
+			{{$event->title}}
+			@php
+			$today = \Carbon\Carbon::today();
+			@endphp
+
+			@if($event->end_date < $today)
+				<span class="badge bg-secondary ms-1">Past</span>
+
+			@elseif($event->start_date <= $today && $event->end_date >= $today)
+				<span class="badge bg-success ms-1">Ongoing</span>
+
+			@elseif($event->start_date > $today)
+				<span class="badge bg-primary ms-1">Future</span>
+			@endif
+		</th>
 		<th>{{$event->tags}}</th>
 		<th>{{$event->creator->full_name ?? ''}}</th>
 		<th>{{dateFormat($event->created_at)}}</th>
