@@ -318,8 +318,11 @@ public function getAllSession()
         }   
         $now = now();
 
+        // Resolve event_id
+        $eventId = $request->event_id ?? 1;
+
         $sessions = Session::with(['speakers', 'booth'])
-            ->where('event_id', 1)
+            ->where('event_id', $eventId)
             //->where('end_time', '>', now())
             ->orderBy('start_time', 'ASC')
             ->get()
