@@ -12,6 +12,7 @@ use App\Models\SessionDate;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -730,9 +731,34 @@ public function getAttendee(Request $request)
         }
 
      
-        $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
-         $q->where('name', 'Attendee');
-        })->whereNotNull('users.name')->orderBy('id', 'DESC')->get();
+        // $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+        //  $q->where('name', 'Attendee');
+        // })->whereNotNull('users.name')->orderBy('id', 'DESC')->get();
+
+        if($request->event_id){
+            //cehck form event table
+            $event = Event::where('id', $request->event_id)->first();
+            if(!$event){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid Event ID',
+                    'data'    => collect(),
+                ], 400);
+            }
+
+            // choose form event_and_entity_link table 
+            $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+                $q->where('name', 'Attendee');
+            })->whereNotNull('users.name')->whereHas('eventAndEntityLinks', function($q) use($request){
+                $q->where('event_id', $request->event_id);
+            })->orderBy('id', 'DESC')->get();
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Event ID is required',
+                'data'    => collect(),
+            ], 400);
+        }
 
         if ($speakers->isEmpty()) {
             return response()->json([

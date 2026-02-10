@@ -28,45 +28,169 @@ use App\Models\FavoriteConnection;
 
 class HomeController extends Controller
 {
+    public function index_old(Request $request)
+    {
+        // ================= Banner =================
+        $featuredEvent = Event::with('photo')->first();
+
+        $banner = $featuredEvent ? [
+            "id" => $featuredEvent->id,
+            "title" => $featuredEvent->title,
+            "description" => $featuredEvent->description,
+            "location" => $featuredEvent->location,
+            "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : asset('images/default.png'),
+            "videoUrl" => $featuredEvent->youtube_link ?? '',
+            "startTime" => $featuredEvent->start_date ?? '',
+            "endTime" => $featuredEvent->end_date ?? '',
+            "status" => $featuredEvent->status,
+        ] : [
+            "title" => "No Featured Event Available",
+            "imageUrl" => asset('images/default.png'),
+        ];
+
+        // ================= Upcoming Session =================
+        $upcomingSession = Session::with('attendees','sponsors')->where('start_time', '>=', now())
+            ->orderBy('start_time', 'ASC')
+            ->first();
+
+        $upcomingSessionData = $upcomingSession ? [
+            "id" => $upcomingSession->id,
+            "title" => $upcomingSession->title,
+            "description" => $upcomingSession->description,
+            "startDateTime" => $upcomingSession->start_time ?? '',
+            "status" => "upcoming",
+        ] : null;
+
+        // ================= Home Sessions (all sessions from the upcoming session’s event) =================
+        $homeSessions = collect();
+        if ($upcomingSession && $upcomingSession->event) {
+            $homeSessions = Session::with(['speakers'])
+                ->where('start_time', '>=', now())
+                ->where('event_id', $upcomingSession->event->id)
+                ->orderBy('start_time', 'ASC')
+                ->get()
+                ->map(function ($session) {
+                    return [
+                        "id" => $session->id,
+                        "title" => $session->title,
+                        "description" => $session->description,
+                        "keynote" => $session->keynote ?? '',
+                        "demoes" => $session->demoes ?? '',
+                        "panels" => $session->panels ?? '',
+                        "start_time" => $session->start_time ?? '',
+                        "end_time" => $session->end_time ?? '',
+                        "workshop_no" => $session->track ?? '',
+                        "location" => !empty($session->location) ? $session->location: '',
+                        "status" => $session->status ?? 'Upcoming',
+                        "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name, "image"=> !empty($sp->photo) ? $sp->photo->mobile_path : asset('images/default.png')]),
+                        "isFavorite" => isFavorite($session->id)
+                    ];
+                });
+        }
+
+    
+        // ================= Home Connections (from session_sponsors) =================
+        $user = auth()->user();
+        $homeConnections = $user->connections->map(function ($connection) {
+            return [
+                "id" => $connection->id,
+                "name" => $connection->full_name ?? $connection->name,
+                "avatarUrl" => $connection->photo && $connection->photo->mobile_path ? $connection->photo->mobile_path : asset('images/default.png')
+            ];
+        });
+
+
+
+        // ================= Notifications =================
+        $user = auth()->user();
+        
+        $notificationsQuery = GeneralNotification::where('is_read', 0)
+        ->where(function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->latest();
+
+        $notificationsList = $notificationsQuery->get()->map(function ($n) {
+            return [
+                "id" => $n->id,
+                "title" => $n->title,
+                "message" => $n->body,
+                "is_read" => $n->is_read==1 ? true : false
+            ];
+        });
+        $notifications = [
+            "count" => $notificationsList->count(),
+            "hasNew" => $notificationsQuery->where('is_read',0)->exists(),
+            "data" => $notificationsList,
+        ];
+
+        //================= My Stats =================
+        $myStats = [
+            "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
+            "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
+            "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
+        ];
+
+        return response()->json([
+            "banner" => $banner,
+            "upcomingEvent" => $upcomingSessionData,
+            "home_sessions" => $homeSessions,
+            "home_connections" => $homeConnections,
+            "myStats" => $myStats,
+            "notifications" =>  $notifications
+        ]);
+    }
+
     public function index(Request $request)
-{
-    // ================= Banner =================
-    $featuredEvent = Event::with('photo')->first();
+    {
+        $eventId = $request->event_id;
 
-    $banner = $featuredEvent ? [
-        "id" => $featuredEvent->id,
-        "title" => $featuredEvent->title,
-        "description" => $featuredEvent->description,
-        "location" => $featuredEvent->location,
-        "imageUrl" => !empty($featuredEvent->photo) ? $featuredEvent->photo->file_path : asset('images/default.png'),
-        "videoUrl" => $featuredEvent->youtube_link ?? '',
-        "startTime" => $featuredEvent->start_date ?? '',
-        "endTime" => $featuredEvent->end_date ?? '',
-        "status" => $featuredEvent->status,
-    ] : [
-        "title" => "No Featured Event Available",
-        "imageUrl" => asset('images/default.png'),
-    ];
+        if (!$eventId) {
+            return response()->json([
+                'message' => 'event_id is required'
+            ], 400);
+        }
 
-    // ================= Upcoming Session =================
-    $upcomingSession = Session::with('attendees','sponsors')->where('start_time', '>=', now())
-        ->orderBy('start_time', 'ASC')
-        ->first();
+        // ================= Banner =================
+        $featuredEvent = Event::with('photo')
+            ->where('id', $eventId)
+            ->first();
 
-    $upcomingSessionData = $upcomingSession ? [
-        "id" => $upcomingSession->id,
-        "title" => $upcomingSession->title,
-        "description" => $upcomingSession->description,
-        "startDateTime" => $upcomingSession->start_time ?? '',
-        "status" => "upcoming",
-    ] : null;
+        $banner = $featuredEvent ? [
+            "id" => $featuredEvent->id,
+            "title" => $featuredEvent->title,
+            "description" => $featuredEvent->description,
+            "location" => $featuredEvent->location,
+            "imageUrl" => !empty($featuredEvent->photo)
+                ? $featuredEvent->photo->file_path
+                : asset('images/default.png'),
+            "videoUrl" => $featuredEvent->youtube_link ?? '',
+            "startTime" => $featuredEvent->start_date ?? '',
+            "endTime" => $featuredEvent->end_date ?? '',
+            "status" => $featuredEvent->status,
+        ] : [
+            "title" => "No Featured Event Available",
+            "imageUrl" => asset('images/default.png'),
+        ];
 
-    // ================= Home Sessions (all sessions from the upcoming session’s event) =================
-    $homeSessions = collect();
-    if ($upcomingSession && $upcomingSession->event) {
-        $homeSessions = Session::with(['speakers'])
+        // ================= Upcoming Session =================
+        $upcomingSession = Session::with(['attendees', 'sponsors'])
+            ->where('event_id', $eventId)
             ->where('start_time', '>=', now())
-            ->where('event_id', $upcomingSession->event->id)
+            ->orderBy('start_time', 'ASC')
+            ->first();
+
+        $upcomingSessionData = $upcomingSession ? [
+            "id" => $upcomingSession->id,
+            "title" => $upcomingSession->title,
+            "description" => $upcomingSession->description,
+            "startDateTime" => $upcomingSession->start_time ?? '',
+            "status" => "upcoming",
+        ] : null;
+
+        // ================= Home Sessions =================
+        $homeSessions = Session::with(['speakers'])
+            ->where('event_id', $eventId)
+            ->where('start_time', '>=', now())
             ->orderBy('start_time', 'ASC')
             ->get()
             ->map(function ($session) {
@@ -80,66 +204,71 @@ class HomeController extends Controller
                     "start_time" => $session->start_time ?? '',
                     "end_time" => $session->end_time ?? '',
                     "workshop_no" => $session->track ?? '',
-                    "location" => !empty($session->location) ? $session->location: '',
+                    "location" => $session->location ?? '',
                     "status" => $session->status ?? 'Upcoming',
-                    "speakers" => $session->speakers->map(fn ($sp) => ["name" => $sp->full_name, "image"=> !empty($sp->photo) ? $sp->photo->mobile_path : asset('images/default.png')]),
+                    "speakers" => $session->speakers->map(fn ($sp) => [
+                        "name" => $sp->full_name,
+                        "image" => !empty($sp->photo)
+                            ? $sp->photo->mobile_path
+                            : asset('images/default.png')
+                    ]),
                     "isFavorite" => isFavorite($session->id)
                 ];
             });
+
+        // ================= Home Connections =================
+        $user = auth()->user();
+
+        $homeConnections = $user->connections->map(function ($connection) {
+            return [
+                "id" => $connection->id,
+                "name" => $connection->full_name ?? $connection->name,
+                "avatarUrl" => $connection->photo && $connection->photo->mobile_path
+                    ? $connection->photo->mobile_path
+                    : asset('images/default.png')
+            ];
+        });
+
+        // ================= Notifications =================
+        $notificationsQuery = GeneralNotification::where('is_read', 0)
+            ->where('user_id', $user->id)
+            ->latest();
+
+        $notificationsList = $notificationsQuery->get()->map(function ($n) {
+            return [
+                "id" => $n->id,
+                "title" => $n->title,
+                "message" => $n->body,
+                "is_read" => $n->is_read == 1
+            ];
+        });
+
+        $notifications = [
+            "count" => $notificationsList->count(),
+            "hasNew" => $notificationsQuery->exists(),
+            "data" => $notificationsList,
+        ];
+
+        // ================= My Stats =================
+        $myStats = [
+            "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
+
+            "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
+
+            "totalSessionAttendee" => $upcomingSession
+                ? $upcomingSession->attendees->count()
+                : 0,
+        ];
+
+        return response()->json([
+            "banner" => $banner,
+            "upcomingEvent" => $upcomingSessionData,
+            "home_sessions" => $homeSessions,
+            "home_connections" => $homeConnections,
+            "myStats" => $myStats,
+            "notifications" => $notifications
+        ]);
     }
-
-   
-    // ================= Home Connections (from session_sponsors) =================
-    $user = auth()->user();
-    $homeConnections = $user->connections->map(function ($connection) {
-        return [
-            "id" => $connection->id,
-            "name" => $connection->full_name ?? $connection->name,
-            "avatarUrl" => $connection->photo && $connection->photo->mobile_path ? $connection->photo->mobile_path : asset('images/default.png')
-        ];
-    });
-
-
-
-    // ================= Notifications =================
-    $user = auth()->user();
-    
-    $notificationsQuery = GeneralNotification::where('is_read', 0)
-    ->where(function ($q) use ($user) {
-        $q->where('user_id', $user->id);
-    })->latest();
-
-    $notificationsList = $notificationsQuery->get()->map(function ($n) {
-        return [
-            "id" => $n->id,
-            "title" => $n->title,
-            "message" => $n->body,
-            "is_read" => $n->is_read==1 ? true : false
-        ];
-    });
-    $notifications = [
-        "count" => $notificationsList->count(),
-        "hasNew" => $notificationsQuery->where('is_read',0)->exists(),
-        "data" => $notificationsList,
-    ];
-
-    //================= My Stats =================
-    $myStats = [
-        "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
-        "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
-        "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
-    ];
-
-    return response()->json([
-        "banner" => $banner,
-        "upcomingEvent" => $upcomingSessionData,
-        "home_sessions" => $homeSessions,
-        "home_connections" => $homeConnections,
-        "myStats" => $myStats,
-        "notifications" =>  $notifications
-    ]);
-}
-
 
 public function getNotifications(Request $request)
 {
