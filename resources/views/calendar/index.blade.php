@@ -62,6 +62,19 @@
                             </p>
                         </div>
                         <div class="col-auto">
+                            <select class="form-select" id="eventSelect" name="event_id" required>
+                                @foreach($events as $ev)
+                                    <option 
+                                        value="{{ $ev->id }}"
+                                        data-slug="{{ $ev->slug }}"
+                                        {{ $event->id === $ev->id ? 'selected' : '' }}
+                                    >
+                                        {{ $ev->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-auto">
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventTrackModal">
                               Add Event Track
                             </button>
@@ -449,4 +462,18 @@
     }
   })();
 </script>
+<script>
+document.getElementById('eventSelect').addEventListener('change', function () {
+    const selectedOption = this.options[this.selectedIndex];
+    const slug = selectedOption.getAttribute('data-slug');
+
+    if (!slug) return;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('slug', slug);
+
+    window.location.href = url.toString();
+});
+</script>
+
 @endsection
