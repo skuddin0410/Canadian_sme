@@ -753,11 +753,9 @@ public function getAttendee(Request $request)
                 $q->where('event_id', $request->event_id);
             })->orderBy('id', 'DESC')->get();
         }else{
-            return response()->json([
-                'success' => false,
-                'message' => 'Event ID is required',
-                'data'    => collect(),
-            ], 400);
+            $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+            $q->where('name', 'Attendee');
+            })->whereNotNull('users.name')->orderBy('id', 'DESC')->get();
         }
 
         if ($speakers->isEmpty()) {
