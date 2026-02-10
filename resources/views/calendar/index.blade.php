@@ -128,7 +128,7 @@
             <form id="sessionForm" enctype="multipart/form-data" method="POST">
                 @csrf
                 <input type="hidden" id="sessionId" name="session_id">
-                <input type="hidden" name="event_id" value="{{ $event->id }}">
+                <!-- <input type="hidden" name="event_id" value="{{ $event->id }}"> -->
                 
                 <div class="modal-body">
                     <div id="alertContainer"></div>
@@ -159,6 +159,19 @@
 
                          <p class="text-muted mt-2">JPG/PNG recommended. Square works best.(<span class="text-danger">1920px (width) x 1081px (height)</span>)</p>
                     </div>
+
+                        <div class="col-md-12">
+                            <label for="eventSelect" class="form-label">Event *</label>
+                            <select class="form-select" id="eventSelect" name="event_id" required>
+                                <option value="">Select an event...</option>
+                                @foreach($events as $ev)
+                                    <option value="{{ $ev->id }}"
+                                        {{ isset($event) && $event->id == $ev->id ? 'selected' : '' }}>
+                                        {{ $ev->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
                         <div class="col-6">
                             <label for="sessionTitle" class="form-label">Title *</label>

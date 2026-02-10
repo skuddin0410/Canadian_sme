@@ -17,11 +17,25 @@ class CalendarController extends Controller
     public function index(Request $request)
     {
         $slug = $request->get('slug');
-        if(!empty($slug)){
-          $event = Event::where('slug',$slug)->firstOrFail();
-        }else{
-            $event = Event::firstOrFail();
+        // if(!empty($slug)){
+        //   $event = Event::where('slug',$slug)->firstOrFail();
+        // }else{
+        //     $event = Event::firstOrFail();
+        // }
+        // dd($event->id);
+
+        // All events for dropdown
+        $events = isSuperAdmin()
+            ? Event::orderBy('created_at', 'DESC')->get()
+            : Event::where('created_by', auth()->id())->orderBy('created_at', 'DESC')->get();
+
+        // Selected event
+        if (!empty($slug)) {
+            $event = Event::where('slug', $slug)->firstOrFail();
+        } else {
+            $event = $events->first(); // default selected event
         }
+        // dd($event, $events);
         
         $booths = Booth::all();
 
@@ -31,7 +45,7 @@ class CalendarController extends Controller
 
         $sponsors = Company::select('id','name','email')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
         $tracks = Track::orderBy('created_at', 'DESC')->get();
-        return view('calendar.index', compact('event','speakers','exhibitors','sponsors','booths','tracks'));
+        return view('calendar.index', compact('event','events','speakers','exhibitors','sponsors','booths','tracks'));
     }
 
     public function speakers(Request $request)
@@ -145,6 +159,7 @@ class CalendarController extends Controller
 
     public function createSession(Request $request): JsonResponse
     {   
+        // dd($request->except(['speaker_ids','exhibitor_ids','sponsor_ids']));
        
         $speakerIds = collect($request->all())
         ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
@@ -160,6 +175,7 @@ class CalendarController extends Controller
         ->filter(fn($value, $key) => str_starts_with($key, 'sponsor_ids['))
         ->values()
         ->all();
+        // dd($speakerIds,$exhibitorIds,$sponsorIds);
 
         $calendarColors = config('calendar.colors');
 
