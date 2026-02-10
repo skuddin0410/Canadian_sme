@@ -623,7 +623,27 @@ public function getSpeaker(Request $request)
          $q->where('name', 'Speaker');
         })->whereNotNull('access_speaker_ids')->orderBy('id', 'DESC')->get();*/
 
-        $speakers = Speaker::with('photo')->orderBy('id', 'DESC')->get();
+        // $speakers = Speaker::with('photo')->orderBy('id', 'DESC')->get();
+
+        if($request->event_id){
+            //cehck form event table
+            $event = Event::where('id', $request->event_id)->first();
+            if(!$event){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid Event ID',
+                    'data'    => collect(),
+                ], 400);
+            }
+
+            // choose form event_and_entity_link table 
+            $speakers = Speaker::with('photo')
+            ->whereHas('eventAndEntityLinks', function($q) use($request){
+                $q->where('event_id', $request->event_id);
+            })->orderBy('id', 'DESC')->get();
+        }else{
+            $speakers = Speaker::with('photo')->orderBy('id', 'DESC')->get();
+        }
 
         if ($speakers->isEmpty()) {
             return response()->json([
@@ -936,7 +956,28 @@ public function getAllExhibitor(Request $request){
                 ], 401);
             }
 
-          $exhibitors = Company::with(['contentIconFile'])->where('is_sponsor', 0)->orderBy('id', 'DESC')->get();
+        //   $exhibitors = Company::with(['contentIconFile'])->where('is_sponsor', 0)->orderBy('id', 'DESC')->get();
+
+          if( $request->event_id){
+            //cehck form event table
+            $event = Event::where('id', $request->event_id)->first();
+            if(!$event){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid Event ID',
+                    'data'    => collect(),
+                ], 400);
+            }
+
+            // choose form event_and_entity_link table 
+            $exhibitors = Company::with(['contentIconFile'])
+            ->where('is_sponsor', 0)
+            ->whereHas('eventAndEntityLinks', function($q) use($request){
+                $q->where('event_id', $request->event_id);
+            })->orderBy('id', 'DESC')->get();
+          }else{
+            $exhibitors = Company::with(['contentIconFile'])->where('is_sponsor', 0)->orderBy('id', 'DESC')->get();
+          }
 
             if ($exhibitors->isEmpty()) {
                 return response()->json([
@@ -975,7 +1016,28 @@ public function getAllExhibitor(Request $request){
                     'message' => 'Unauthorized'
                 ], 401);
             }
-          $sponsors = Company::with(['logo'])->where('is_sponsor', 1)->orderBy('id', 'DESC')->get();
+        //   $sponsors = Company::with(['logo'])->where('is_sponsor', 1)->orderBy('id', 'DESC')->get();
+
+        if( $request->event_id){
+            //cehck form event table
+            $event = Event::where('id', $request->event_id)->first();
+            if(!$event){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid Event ID',
+                    'data'    => collect(),
+                ], 400);
+            }
+
+            // choose form event_and_entity_link table 
+            $sponsors = Company::with(['contentIconFile'])
+            ->where('is_sponsor', 1)
+            ->whereHas('eventAndEntityLinks', function($q) use($request){
+                $q->where('event_id', $request->event_id);
+            })->orderBy('id', 'DESC')->get();
+          }else{
+            $sponsors = Company::with(['contentIconFile'])->where('is_sponsor', 1)->orderBy('id', 'DESC')->get();
+          }
 
             if ($sponsors->isEmpty()) {
                 return response()->json([
