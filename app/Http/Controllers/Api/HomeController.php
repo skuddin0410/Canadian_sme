@@ -144,11 +144,12 @@ class HomeController extends Controller
     {
         $eventId = $request->event_id;
 
-        // if (!$eventId) {
-        //     return response()->json([
-        //         'message' => 'event_id is required'
-        //     ], 400);
-        // }
+        if (!$eventId) {
+            // return response()->json([
+            //     'message' => 'event_id is required'
+            // ], 400);
+            return $this->index_old($request);
+        }
 
         // ================= Banner =================
         $featuredEvent = Event::with('photo')
