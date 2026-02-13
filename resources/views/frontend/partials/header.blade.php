@@ -47,7 +47,16 @@
                         </li> -->
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Events</a>
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Location</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Terms</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Policy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">About</a>
                         </li>
                         <li class="nav-item">
                             {{-- @if (!Auth::check())
