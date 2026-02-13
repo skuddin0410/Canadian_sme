@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use DataTables;
 use App\Models\Category;
+use App\Models\Event;
 
 class PageController extends Controller
 {
@@ -204,6 +205,28 @@ class PageController extends Controller
         return view($view,compact('page'));
     }
 
+    // public function appPage(Request $request, $slug){
+    //    if($slug=='privacy-policy'){
+    //         $slug = 'privacy';
+    //     }
+    //     if($slug=='terms-condition'){
+    //         $slug = 'terms';
+    //     }
+
+    //     if($slug=='help-support'){
+    //         $slug = 'support';
+    //     }
+      
+    //     $page = Page::where('slug', $slug)->first();
+    //     if(!$page){
+    //         return response()->json([
+    //            'message'=> 'Fail to load data!'
+    //     ]   );
+    //     }
+    //     return response(['data'=>$page->description ?? '']);
+    // }
+
+    
     public function appPage(Request $request, $slug){
        if($slug=='privacy-policy'){
             $slug = 'privacy';
@@ -215,14 +238,42 @@ class PageController extends Controller
         if($slug=='help-support'){
             $slug = 'support';
         }
-      
-        $page = Page::where('slug', $slug)->first();
-        if(!$page){
-            return response()->json([
-               'message'=> 'Fail to load data!'
-        ]   );
+
+        if($slug=='about'){
+            $slug = 'about';
         }
-        return response(['data'=>$page->description ?? '']);
+
+        if($slug=='location'){
+            $slug = 'location';
+        }
+
+        if($event_id = $request->input('event_id')){
+            if($slug=='privacy-policy'){
+                $page = Event::where('id', $event_id)->first();
+                return response(['data'=>$page->privacy_policy ?? '']);
+            }
+            if($slug=='terms-condition'){
+                $page = Event::where('id', $event_id)->first();
+                return response(['data'=>$page->terms_conditions ?? '']);
+            }
+            if($slug=='about'){
+                $page = Event::where('id', $event_id)->first();
+                return response(['data'=>$page->about ?? '']);
+            }
+            if($slug=='support'){
+                $page = Page::where('slug', $slug)->first();
+                return response(['data'=>$page->description ?? '']);
+            }
+            if($slug=='location'){
+                $page = Event::where('id', $event_id)->first();
+                return response(['data'=>$page->location ?? '']);
+            }
+            
+        }else{
+            $page = Page::where('slug', $slug)->first();
+            return response(['data'=>$page->description ?? '']);
+        }
+        
     }
 
     public function appContent(Request $request, $slug){
