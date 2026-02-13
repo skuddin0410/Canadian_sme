@@ -248,6 +248,54 @@
                @enderror
             </div>
 
+            <div class="mb-3">
+              <label class="form-label" for="about">About</label>
+              <input type="hidden" name="meta_description" id="about" value="">
+              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
+                <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about', $e->about ?? '') }}</textarea>
+
+              </div>
+              @if ($errors->has('about'))
+                <span class="text-danger text-left">{{ $errors->first('about') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="privacy_policy">Privacy Policy</label>
+              <input type="hidden" name="meta_description" id="privacy_policy" value="">
+              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
+                <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy', $e->privacy_policy ?? '') }}</textarea>
+
+              </div>
+              @if ($errors->has('privacy_policy'))
+                <span class="text-danger text-left">{{ $errors->first('privacy_policy') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="terms_condition">Terms & Condition</label>
+              <input type="hidden" name="meta_description" id="terms_condition" value="">
+              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
+                <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition', $e->terms_condition ?? '') }}</textarea>
+
+              </div>
+              @if ($errors->has('terms_condition'))
+                <span class="text-danger text-left">{{ $errors->first('terms_condition') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="help_support">Help & Support</label>
+              <input type="hidden" name="meta_description" id="help_support" value="">
+              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
+                <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support', $e->help_support ?? '') }}</textarea>
+
+              </div>
+              @if ($errors->has('help_support'))
+                <span class="text-danger text-left">{{ $errors->first('help_support') }}</span>
+              @endif
+            </div>
+
                 
           </div>
         </div>

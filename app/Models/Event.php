@@ -30,6 +30,10 @@ class Event extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'terms_condition',
+        'privacy_policy',
+        'about',
+        'help_support',
     ];
 
     protected $casts = [

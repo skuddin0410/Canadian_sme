@@ -69,11 +69,17 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|unique:events,slug',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
+            'about' => 'nullable|string',
+            'terms_condition' => 'nullable|string',
+            'help_support' => 'nullable|string',
+            'privacy_policy' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:draft,published,cancelled',
@@ -225,6 +231,10 @@ class EventController extends Controller
             'slug' => 'nullable|string|unique:events,slug,' . $event->id,
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'about' => 'nullable|string',
+            'privacy_policy' => 'nullable|string',
+            'terms_condition' => 'nullable|string',
+            'help_support' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'youtube_link' => [
@@ -250,6 +260,10 @@ class EventController extends Controller
         $event->status       = $validated['status'];
         $event->visibility   = $validated['visibility'];
         $event->tags         = $validated['tags'];
+        $event->about        = $validated['about'] ?? null;
+        $event->privacy_policy = $validated['privacy_policy'] ?? null;
+        $event->terms_condition = $validated['terms_condition'] ?? null;
+        $event->help_support = $validated['help_support'] ?? null;
         $event->save();
         if($request->file("image")){
           $this->imageUpload($request->file("image"),'events',$event->id,'events','photo',$idForUpdate=$event->id);   
