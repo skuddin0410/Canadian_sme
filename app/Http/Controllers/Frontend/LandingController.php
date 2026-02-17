@@ -567,17 +567,17 @@ public function session(Request $request, $slug)
             ->whereDate('start_date', '<=', $today)
             ->whereDate(\DB::raw('COALESCE(end_date, start_date)'), '>=', $today)
             ->orderBy('start_date', 'DESC')
-            ->paginate(10, ['*'], 'ongoing_page');
+            ->paginate(9, ['*'], 'ongoing_page');
 
         $upcoming = (clone $base)
             ->whereDate('start_date', '>', $today)
             ->orderBy('start_date', 'ASC')
-            ->paginate(10, ['*'], 'upcoming_page');
+            ->paginate(9, ['*'], 'upcoming_page');
 
         $past = (clone $base)
             ->whereDate(\DB::raw('COALESCE(end_date, start_date)'), '<', $today)
             ->orderBy('start_date', 'DESC')
-            ->paginate(10, ['*'], 'past_page');
+            ->paginate(9, ['*'], 'past_page');
 
         // dd($ongoing, $upcoming, $past);
 
