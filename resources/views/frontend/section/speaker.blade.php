@@ -11,12 +11,14 @@
                             including game changing ideas.</span>
                         </span>
                     </div>
-
+                    
+                    @if(count($speakers) > 10)
                     <div class="d-flex justify-content-left">
                       <a href="{{ route('speaker-index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold btn-long">
                         View More
                       </a>
                     </div>
+                    @endif
 
                 </div>
                 
@@ -24,7 +26,7 @@
                     <div class="swiper speakers-swiper">
 
                         <div class="swiper-wrapper">
-                            @if(!empty($speakers))
+                            @if(isset($speakers) && count($speakers) > 0)
                             @foreach($speakers as $speaker)
                             
                             <div class="swiper-slide">
@@ -47,6 +49,10 @@
 
                             </div>
                             @endforeach
+                            @else
+                            <div>
+                                <p class="text-white">No speakers found.</p>
+                            </div>
                             @endif
                         </div>
                            

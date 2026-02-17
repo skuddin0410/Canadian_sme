@@ -34,6 +34,11 @@
     </section>
 @endif
 
+
+    <section class="text-center text-primary py-3 fw-semibold">
+        <h1>{{ $event->title ?? 'Event Name' }}</h1>
+    </section>
+
 <!-- Bootstrap Fullscreen Modal -->
 @if($embedUrl)
 <div class="modal fade" id="youtubeModal" tabindex="-1" aria-hidden="true">

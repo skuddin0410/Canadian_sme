@@ -8,16 +8,18 @@
                 <h2 class="h2-black">
                     Exhibitors Showcasing Innovation Across All Industries
                 </h2>
+                @if(count($exhibitors) > 10)
                 <div class="d-none d-xl-block">
                     <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
                          View More
                     </a>
                     {{-- <button class="heroBtn btn-long">View More</button> --}}
                 </div>
+                @endif
             </div>
 
             <div class="exhibitor-box mt-4 mt-lg-5 d-flex flex-column">
-                @if(!empty($exhibitors))
+                @if(isset($exhibitors) && count($exhibitors) > 0)
                 @foreach($exhibitors as $exhibitor)
                 <div class="exhibitor-card shadow">
                     <div class="exhibitor-card-box">
@@ -66,6 +68,10 @@
                     </div>
                 </div>
                 @endforeach
+                @else
+                <div>
+                    <p class="text-black">No exhibitors found.</p>
+                </div>
                 @endif
             </div>
             <div class="d-flex justify-content-center mt-4 d-xl-none">

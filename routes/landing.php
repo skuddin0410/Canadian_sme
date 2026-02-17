@@ -7,7 +7,8 @@ use App\Http\Controllers\FormBuilderController;
 use App\Http\Controllers\Frontend\SupportController;
 
 Route::get('/', [LandingController::class, 'index'])->name('front.landing');
-Route::get('/events', [LandingController::class, 'index1'])->name('front.events');
+Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
+Route::get('/all-events', [LandingController::class, 'allEvents'])->name('front.allEvents');
 Route::get('/search', [LandingController::class, 'search'])->name('front.landing.search');
 
 

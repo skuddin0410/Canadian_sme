@@ -21,7 +21,7 @@
             </div>
 
             <div class="attendee-box mt-4 mt-lg-5 d-flex flex-column">
-                @if (!empty($attendees))
+                @if (isset($attendees) && count($attendees) > 0)
                     @foreach ($attendees as $attendee)
                         <div class="attendee-card shadow">
                             <div class="attendee-card-box">
@@ -66,6 +66,10 @@
                         </div>
             
             @endforeach
+                @else
+                <div>
+                    <p class="text-black">No attendees found.</p>
+                </div>
             @endif
         </div>
         <div class="d-flex justify-content-center mt-4 d-xl-none">

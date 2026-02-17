@@ -23,7 +23,7 @@
                 <div class="mt-2 mt-sm-4 mt-lg-5">
                     <div class="swiper sponsors-swiper">
                         <div class="swiper-wrapper">
-                            @if(!empty($sponsors))
+                            @if(isset($sponsors) && count($sponsors) > 0)
                              @foreach($sponsors as $sponsor)
                             <div class="swiper-slide">
                                  <a href="{{ route('sponsor', $sponsor->slug) }}" class="text-decoration-none">
@@ -45,13 +45,19 @@
                                 </div>
                             </div>
                              @endforeach
+                            @else
+                            <div>
+                                <p class="text-white">No sponsors found.</p>
+                            </div>
                             @endif
                         </div>
                     </div>
                 </div>
+                @if(count($sponsors) > 10)
                 <div class="d-flex justify-content-center mt-3 mt-lg-4">
                     <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index')}}">View More </a>
                 </div>
+                @endif
 </div>
             </div>
     </section>

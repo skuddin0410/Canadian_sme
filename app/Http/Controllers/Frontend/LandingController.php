@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use DB;
+use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
@@ -20,47 +21,148 @@ class LandingController extends Controller
      * Show the landing page.
     */
 
-    public function index1()
-    {   
-        $event = Event::with(['photo'])->first();
-        $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])->where('start_time', '>=', now())
-        ->orderBy('start_time', 'ASC')
-        ->first();
+    // public function eachEvent($slug)
+    // {   
+    //     $event = Event::with(['photo'])->where('slug', $slug)->first();
+    //     $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])->where('start_time', '>=', now())
+    //     ->orderBy('start_time', 'ASC')
+    //     ->first();
 
-        $shareUrl = $event ? route('events.show', $event->id) : url()->current();
+    //     $shareUrl = $event ? route('events.show', $event->id) : url()->current();
         
-        $speakers = Speaker::inRandomOrder()->take(10)->get();
+    //     $speakers = Speaker::inRandomOrder()->take(10)->get();
 
-        $exhibitors = Company::where('is_sponsor', 0)
-            ->inRandomOrder()
+    //     $exhibitors = Company::where('is_sponsor', 0)
+    //         ->inRandomOrder()
+    //         ->take(6)
+    //         ->get();
+
+    //     $sponsors = Company::with(['category'])
+    //         ->where('is_sponsor', 1)
+    //         ->inRandomOrder()
+    //         ->take(6)
+    //         ->get();
+
+    //     $attendees = User::with(['photo', 'roles'])
+    //         ->whereHas('roles', function ($q) {
+    //             $q->where('name', 'Attendee');
+    //         })
+    //         ->whereNotNull('name')
+    //         ->whereNotNull('slug')
+    //         ->inRandomOrder()
+    //         ->take(5)
+    //         ->get();
+
+    //     $schedules = Session::where('start_time', '>=', now())->orderBy('start_time', 'ASC')->take(6)->get();
+    //     $location = !empty($event->location) ? $event->location : null;
+
+    //     $googleApiKey = config('services.google_maps.key');
+    //     $mapUrl = $location && $googleApiKey
+    //     ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
+    //     : null;
+
+    //     return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location' , 'mapUrl','shareUrl'));
+    // }
+
+    public function eachEvent($slug)
+    {
+        $event = Event::with(['photo'])->where('slug', $slug)->firstOrFail();
+        // dd($event->id);
+
+        // ---- Helper: fetch linked IDs by type (supports "speaker" OR "App\Models\Speaker" style) ----
+        $linkedIds = function (string $type) use ($event) {
+            $type = Str::lower($type);
+
+            return DB::table('event_and_entity_link')
+                ->where('event_id', $event->id)
+                ->where(function ($q) use ($type) {
+                    $q->whereRaw('LOWER(entity_type) = ?', [$type])
+                    ->orWhereRaw('LOWER(entity_type) LIKE ?', ['%\\' . $type]); // supports class names
+                })
+                ->pluck('entity_id')
+                ->unique()
+                ->values()
+                ->all();
+        };
+
+        // ---- Sessions for this event only ----
+        $sessionIds = $linkedIds('session');
+
+        $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
+            ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+            ->where('start_time', '>=', now())
+            ->orderBy('start_time', 'ASC')
+            ->first();
+
+        $schedules = Session::query()
+            ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+            ->where('start_time', '>=', now())
+            ->orderBy('start_time', 'ASC')
             ->take(6)
             ->get();
+
+        // ---- Speakers for this event only ----
+        $speakerIds = $linkedIds('speakers');
+        // dd($speakerIds);
+
+        $speakers = Speaker::query()
+            ->whereIn('id', $speakerIds)   // ONLY these IDs
+            ->with(['photo'])
+            ->take(10)
+            ->get();
+
+        // ---- Exhibitors for this event only (Company model, is_sponsor = 0) ----
+        $exhibitorIds = $linkedIds('companies');
+        // dd($exhibitorIds);
+
+        $exhibitors = Company::query()
+            ->where('is_sponsor', 0)
+            ->whereIn('id', $exhibitorIds)   // ONLY these IDs
+            ->take(6)
+            ->get();
+
+        // ---- Sponsors for this event only (Company model, is_sponsor = 1) ----
+        $sponsorIds = $linkedIds('companies');
+        // dd($sponsorIds);
 
         $sponsors = Company::with(['category'])
             ->where('is_sponsor', 1)
-            ->inRandomOrder()
+            ->whereIn('id', $sponsorIds)   // ONLY these IDs
             ->take(6)
             ->get();
 
+        // ---- Attendees for this event only ----
+        $attendeeIds = $linkedIds('users');
+        // dd($attendeeIds);
+
         $attendees = User::with(['photo', 'roles'])
+            ->whereIn('id', $attendeeIds)   // ONLY these IDs
             ->whereHas('roles', function ($q) {
                 $q->where('name', 'Attendee');
             })
             ->whereNotNull('name')
             ->whereNotNull('slug')
-            ->inRandomOrder()
             ->take(5)
             ->get();
+        // dd($attendees);
 
-        $schedules = Session::where('start_time', '>=', now())->orderBy('start_time', 'ASC')->take(6)->get();
+        // ---- Share URL (use slug route if you have it) ----
+        // If your route is events.show = /events/{slug}, use $event->slug
+        // If your route is /events/{id}, use $event->id
+        $shareUrl = route('events.show', $event->slug);
+
+        // ---- Map ----
         $location = !empty($event->location) ? $event->location : null;
 
         $googleApiKey = config('services.google_maps.key');
         $mapUrl = $location && $googleApiKey
-        ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
-        : null;
+            ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
+            : null;
 
-        return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location' , 'mapUrl','shareUrl'));
+        return view(
+            'frontend.landing.index',
+            compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location','mapUrl','shareUrl')
+        );
     }
 
 
@@ -68,8 +170,6 @@ class LandingController extends Controller
     {
         return view('eventzen_io_home');
     }
-
-
 
 
     public function schudled(){
@@ -437,6 +537,51 @@ public function session(Request $request, $slug)
             'attendees' => $attendees,
             'schedules' => $schedules,
         ]);
+    }
+
+    public function allEvents(Request $request)
+    {
+        // $events = Event::with(['photo'])->orderBy('start_date', 'DESC')->paginate(10);
+        // return view('eventzen_io_events', compact('events'));
+
+        $today = Carbon::today(); // server timezone
+        $q = trim((string) $request->get('q', ''));
+
+        // base query (apply common filters here if needed)
+        $base = Event::query()
+            ->with(['photo'])
+            // optional: only active/visible events
+            // ->where('status', 1)
+            // ->where('visibility', 'public')
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($qq) use ($q) {
+                    $qq->where('title', 'like', "%{$q}%")
+                    ->orWhere('location', 'like', "%{$q}%")
+                    ->orWhere('tags', 'like', "%{$q}%")
+                    ->orWhere('tracks', 'like', "%{$q}%");
+                });
+            });
+
+        // NOTE: handle null end_date => treat it as start_date
+        $ongoing = (clone $base)
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate(\DB::raw('COALESCE(end_date, start_date)'), '>=', $today)
+            ->orderBy('start_date', 'DESC')
+            ->paginate(10, ['*'], 'ongoing_page');
+
+        $upcoming = (clone $base)
+            ->whereDate('start_date', '>', $today)
+            ->orderBy('start_date', 'ASC')
+            ->paginate(10, ['*'], 'upcoming_page');
+
+        $past = (clone $base)
+            ->whereDate(\DB::raw('COALESCE(end_date, start_date)'), '<', $today)
+            ->orderBy('start_date', 'DESC')
+            ->paginate(10, ['*'], 'past_page');
+
+        // dd($ongoing, $upcoming, $past);
+
+        return view('eventzen_io_events', compact('ongoing', 'upcoming', 'past', 'q'));
     }
 
 }
