@@ -296,6 +296,34 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <!-- add js file -->
     <script src="./frontend/js/script_new.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.tab-btn[data-group="explore-event-tab-group"]');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const target = this.getAttribute('data-target'); // explore-event-tab-group-tab1/2/3
+
+                let tab = 'ongoing';
+                if (target === 'explore-event-tab-group-tab2') tab = 'upcoming';
+                if (target === 'explore-event-tab-group-tab3') tab = 'past';
+
+                // Keep existing query params like q, but update tab
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tab);
+
+                // Optional: when switching tabs, reset other paginations
+                url.searchParams.delete('ongoing_page');
+                url.searchParams.delete('upcoming_page');
+                url.searchParams.delete('past_page');
+
+                window.history.replaceState({}, '', url.toString());
+            });
+        });
+    });
+    </script>
+
 </body>
 
 </html>
