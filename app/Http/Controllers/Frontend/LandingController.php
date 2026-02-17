@@ -544,6 +544,8 @@ public function session(Request $request, $slug)
         // $events = Event::with(['photo'])->orderBy('start_date', 'DESC')->paginate(10);
         // return view('eventzen_io_events', compact('events'));
 
+        $tab = $request->get('tab', 'ongoing'); // default ongoing
+
         $today = Carbon::today(); // server timezone
         $q = trim((string) $request->get('q', ''));
 
@@ -581,7 +583,7 @@ public function session(Request $request, $slug)
 
         // dd($ongoing, $upcoming, $past);
 
-        return view('eventzen_io_events', compact('ongoing', 'upcoming', 'past', 'q'));
+        return view('eventzen_io_events', compact('ongoing', 'upcoming', 'past', 'q', 'tab'));
     }
 
 }

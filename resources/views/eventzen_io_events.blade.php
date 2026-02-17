@@ -121,6 +121,7 @@
                     <!-- <input type="search" placeholder="Search Events">
                     <button type="button"><img src="./images/search.png" alt=""></button> -->
                     <form class="explore-event-page-search" method="GET" action="{{ route('front.allEvents') }}">
+                        <input type="hidden" name="tab" value="{{ $tab ?? 'ongoing' }}">
                         <input type="search" name="q" placeholder="Search Events" value="{{ $q ?? '' }}">
                         <button type="submit">
                             <img src="{{ asset('images/search.png') }}" alt="">
@@ -130,14 +131,14 @@
             </div>
             <div class="explore-event-page-row-wrapper">
                 <ul class="explore-event-ul">
-                    <li><button class="tab-btn active" data-group="explore-event-tab-group"
+                    <li><button class="tab-btn {{ ($tab ?? 'ongoing') === 'ongoing' ? 'active' : '' }}" data-group="explore-event-tab-group"
                             data-target="explore-event-tab-group-tab1">Ongoing</button></li>
-                    <li><button class="tab-btn" data-group="explore-event-tab-group"
+                    <li><button class="tab-btn {{ ($tab ?? 'upcoming') === 'upcoming' ? 'active' : '' }}" data-group="explore-event-tab-group"
                             data-target="explore-event-tab-group-tab2">Upcoming</button></li>
-                    <li><button class="tab-btn" data-group="explore-event-tab-group"
+                    <li><button class="tab-btn {{ ($tab ?? 'past') === 'past' ? 'active' : '' }}" data-group="explore-event-tab-group"
                             data-target="explore-event-tab-group-tab3">Past</button></li>
                 </ul>
-                <div id="explore-event-tab-group-tab1" class="tab-content active">
+                <div id="explore-event-tab-group-tab1" class="tab-content {{ ($tab ?? 'ongoing') === 'ongoing' ? 'active' : '' }}">
                     <div class="row explore-event-page-row">
                         @forelse($ongoing as $event)
                             <div class="col-md-6 col-lg-4">
@@ -166,10 +167,11 @@
                         @endforelse
                     </div>
                     <div class="mt-3">
-                        {{ $ongoing->appends(request()->query())->links() }}
+                        <!-- {{ $ongoing->appends(request()->query())->links() }} -->
+                        {{ $ongoing->appends(['q' => $q, 'tab' => 'ongoing'])->links() }}
                     </div>
                 </div>
-                <div id="explore-event-tab-group-tab2" class="tab-content">
+                <div id="explore-event-tab-group-tab2" class="tab-content {{ ($tab ?? 'upcoming') === 'upcoming' ? 'active' : '' }}">
                     <!-- Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum, minus? -->
                     <div class="row explore-event-page-row">
                         @forelse($upcoming as $event)
@@ -199,10 +201,11 @@
                         @endforelse
                     </div>
                     <div class="mt-3">
-                        {{ $upcoming->appends(request()->query())->links() }}
+                        <!-- {{ $upcoming->appends(request()->query())->links() }} -->
+                        {{ $upcoming->appends(['q' => $q, 'tab' => 'upcoming'])->links() }}
                     </div>
                 </div>
-                <div id="explore-event-tab-group-tab3" class="tab-content">
+                <div id="explore-event-tab-group-tab3" class="tab-content {{ ($tab ?? 'past') === 'past' ? 'active' : '' }}">
                     <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem libero aspernatur, sunt aperiam quis tempore saepe voluptate laboriosam? Nesciunt, esse. -->
                     <div class="row explore-event-page-row">
                         @forelse($past as $event)
@@ -232,7 +235,8 @@
                         @endforelse
                     </div>
                     <div class="mt-3">
-                        {{ $past->appends(request()->query())->links() }}
+                        <!-- {{ $past->appends(request()->query())->links() }} -->
+                        {{ $past->appends(['q' => $q, 'tab' => 'past'])->links() }}
                     </div> 
                 </div>
             </div>
