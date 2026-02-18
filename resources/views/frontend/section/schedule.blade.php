@@ -10,7 +10,7 @@
             </div>
 
             <div class="schedule-box mt-4 mt-lg-5 d-flex flex-column">
-                @if(isset($schedules) && count($schedules) > 6)
+                @if(isset($schedules) && count($schedules) > 0)
                     @foreach($schedules as $schedule)
                         <div class="schedule-card shadow">
                             <div class="d-flex align-items-center gap-4 date-col">
