@@ -86,16 +86,18 @@ class LandingController extends Controller
         };
 
         // ---- Sessions for this event only ----
-        $sessionIds = $linkedIds('session');
+        // $sessionIds = $linkedIds('session');
 
         $session = Session::with(['photo','speakers','exhibitors','sponsors','attendees'])
-            ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+            // ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+            ->where('event_id', $event->id) // direct filter by event_id
             ->where('start_time', '>=', now())
             ->orderBy('start_time', 'ASC')
             ->first();
 
         $schedules = Session::query()
-            ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+            // ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+            ->where('event_id', $event->id) // direct filter by event_id
             ->where('start_time', '>=', now())
             ->orderBy('start_time', 'ASC')
             ->take(6)
