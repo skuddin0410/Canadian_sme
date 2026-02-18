@@ -57,11 +57,13 @@
             </div>
 
             <!-- View More Button at Bottom -->
+             @if(count($schedules) > 6)
             <div class="d-flex justify-content-center mt-4">
                 <a href="{{route('schedule-index')}}" class="heroBtn btn-long">
                     View More
                 </a>
             </div>
+            @endif
         </div>
     </section>
     <!-- Schedule end -->
