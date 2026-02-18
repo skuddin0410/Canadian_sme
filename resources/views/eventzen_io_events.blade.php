@@ -58,7 +58,7 @@
                     <div class="row explore-event-page-row">
                         @forelse($ongoing as $event)
                             <div class="col-md-6 col-lg-4">
-                                <a href="{{ route('front.events', $event->slug) }}" class="explore-event-page-col">
+                                <a @if($event->is_registered) href="{{ route('front.events', $event->slug) }}" @else href="javascript:void(0)" onclick="alert('You are not a memeber in this event'); return false;" @endif  class="explore-event-page-col">
                                     <figure>
                                         <img
                                         src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
@@ -92,7 +92,7 @@
                     <div class="row explore-event-page-row">
                         @forelse($upcoming as $event)
                             <div class="col-md-6 col-lg-4">
-                                <a href="{{ route('front.events', $event->slug) }}" class="explore-event-page-col">
+                                <a @if($event->is_registered) href="{{ route('front.events', $event->slug) }}" @else href="javascript:void(0)" onclick="alert('You are not a memeber in this event'); return false;" @endif class="explore-event-page-col">
                                     <figure>
                                         <img
                                         src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
@@ -126,7 +126,7 @@
                     <div class="row explore-event-page-row">
                         @forelse($past as $event)
                             <div class="col-md-6 col-lg-4">
-                                <a href="{{ route('front.events', $event->slug) }}" class="explore-event-page-col">
+                                <a @if($event->is_registered) href="{{ route('front.events', $event->slug) }}" @else href="javascript:void(0)" onclick="alert('You are not a memeber in this event'); return false;" @endif class="explore-event-page-col">
                                     <figure>
                                         <img
                                         src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"

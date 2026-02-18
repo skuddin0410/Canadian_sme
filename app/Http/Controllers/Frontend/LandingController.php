@@ -545,6 +545,8 @@ public function session(Request $request, $slug)
     {
         // $events = Event::with(['photo'])->orderBy('start_date', 'DESC')->paginate(10);
         // return view('eventzen_io_events', compact('events'));
+        $userId = auth()->id();
+        // dd($userId);
 
         $tab = $request->get('tab', 'ongoing'); // default ongoing
 
@@ -552,8 +554,22 @@ public function session(Request $request, $slug)
         $q = trim((string) $request->get('q', ''));
 
         // base query (apply common filters here if needed)
-        $base = Event::query()
-            ->with(['photo'])
+        $base = Event::query();
+
+            if (auth()->user() && auth()->user()->hasRole('Admin')) {
+                // dd(1);
+                $base->select('*')->selectRaw('1 as is_registered'); // always true
+            } else {
+                // dd(2);
+                $base->withExists([
+                    'entityLinks as is_registered' => function ($q) use ($userId) {
+                        $q->where('entity_type', 'users')
+                        ->where('entity_id', $userId);
+                    }
+                ]);
+            }
+
+        $base = $base->with(['photo'])
             // optional: only active/visible events
             // ->where('status', 1)
             // ->where('visibility', 'public')
