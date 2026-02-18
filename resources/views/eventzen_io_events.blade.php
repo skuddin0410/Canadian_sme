@@ -25,91 +25,7 @@
 <body>
 
     <!-- header -->
-    <header>
-        <nav class="navbar navbar-expand-lg bg-transparent p-0">
-            <div class="container d-flex align-items-center justify-content-between">
-                <!-- Logo -->
-                <!-- <a class="navbar-brand" href="">
-                <img class="logo" src="/frontend/images/logo.png" alt="logo">
-            </a> -->
-
-                <a class="navbar-brand" href="">
-                    <img class="logo" src="/eventzen-logo.svg" alt="logo" width="50%">
-                </a>
-
-                <!-- Search Box -->
-                <!-- <div class="header-search-div">
-                    <form class=" d-md-flex ms-auto w-100 w-sm-25 position-relative" action="/search" method="GET">
-                        <input
-                            class="form-control rounded-pill ps-4 py-2 shadow-sm fs-6 header-search-input"
-                            type="text"
-                            name="q"
-                            placeholder="Please enter search key..."
-                            value="">
-                        <button
-                            class="btn position-absolute end-0 top-50 translate-middle-y me-2 px-3 py-1 border-0 bg-transparent text-secondary d-flex align-items-center gap-1"
-                            type="submit">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </form>
-                </div> -->
-
-                <!-- Navbar Menu -->
-                <div class="d-flex align-items-center">
-                    <div class="ms-auto custom-nav">
-                        <button class="custom-toggler-close position-absolute d-lg-none">
-                            <img src='/frontend/images/cross.png' alt="">
-                        </button>
-                        <ul class="navbar-nav mb-2 mb-md-0 gap-3 gap-lg-5 align-items-center ms-lg-4">
-                            <li class="nav-item">
-                                <a class="nav-link p-0 active" href="">Why Us?</a>
-                            </li>
-                            <!-- <li class="nav-item">
-                            <a class="nav-link p-0 " href="/venue">Venue Information</a>
-                            </li> -->
-
-                            <!-- <li class="nav-item">
-                                <a class="nav-link p-0 " href="/venue">Venue</a>
-                            </li> -->
-
-                            <li class="nav-item">
-                                <a class="nav-link p-0 " href="/events">Events</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link p-0 " href="/venue">Pricing</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link p-0 " href="/support">Contact Us</a>
-                            </li>
-
-                            <li class="nav-item">
-
-                            </li>
-                        </ul>
-                    </div>
-
-                    @if(!Auth::check())
-                    <a class="heroBtn ms-3" href="{{ route('login') }}">
-                        <img class="d-xl-none" src="{{ asset('frontend/images/login.png') }}" alt="">
-                        <span class="d-none d-xl-block">Login</span>
-                    </a>
-                    @else
-                    <a class="heroBtn ms-3" @if(auth()->user()->hasRole('Admin')) href="{{ route('home') }}" @else href="{{ route('user.home') }}" @endif>
-                        <img class="d-xl-none" src="{{ asset('frontend/images/home-2.png') }}" alt="">
-                        <span class="d-none d-xl-block">Dashboard</span>
-                    </a>
-                    @endif
-
-                    <!-- Toggler -->
-                    <button class="navbar-toggler heroBtn bg-transparent custom-toggler-open ms-3">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
+    @include('partials_new.header')
     <!-- header end -->
 
     <!-- explore event start -->
@@ -245,45 +161,7 @@
     <!-- explore event end -->
 
     <!-- footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-top d-flex flex-column flex-sm-row gap-4 justify-content-sm-between align-items-center">
-                <a href="javascript:void()">
-                    <img class="logo" src="./images/footer-logo.png" alt="">
-                </a>
-                <div class=" d-lg-flex  align-items-center gap-4">
-                    <span class="small-heading-white text-center text-sm-start">Share event information on</span>
-                    <ul class=" footer-social-group p-0">
-                        <li>
-                            <a href="javascript:void()">
-                                <i class="fa-brands fa-facebook-f text-light"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="javascript:void()">
-                                <i class="fa-brands fa-instagram text-light"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="javascript:void()">
-                                <i class="fa-brands fa-linkedin-in text-light"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="javascript:void()">
-                                <i class="fa-brands fa-x-twitter text-light"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p class="black-text-18 text-light text-center">© 2025
-                    <a class="text-light" href="javascript:void()">Eventzen.io</a>
-                </p>
-            </div>
-        </div>
-    </footer>
+    @include('partials_new.footer')
     <!-- footer end -->
 
 
