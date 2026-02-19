@@ -223,6 +223,18 @@
     }
 
     #supportModal .btn-close {
+        position: absolute;
+        top: 5%;
+        right: 18px;
+        transform: translateY(-50%);
+
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        margin: 0;
+
+        border-radius: 50%;
+        opacity: 1;
         filter: invert(1) brightness(2);
     }
 
@@ -283,101 +295,101 @@
 
 <div class="support-wrapper">
 
-@if($supports->count() > 0)
+    @if($supports->count() > 0)
 
-<div class="support-table-card">
-    <div class="table-responsive">
-        <table class="support-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Requester</th>
-                    <th>Email</th>
-                    <th>Subject</th>
-                    <th>Status</th>
-                   
-                    <th>Date</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($supports as $support)
-                <tr>
-                    <td>
-                        <span class="ticket-id">{{ $loop->iteration + ($supports->currentPage() - 1) * $supports->perPage() }}</span>
-                    </td>
+    <div class="support-table-card">
+        <div class="table-responsive">
+            <table class="support-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Requester</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Status</th>
 
-                    <td>
-                        <div class="name-cell">
-                            <div class="avatar-circle">{{ strtoupper(substr($support->name, 0, 1)) }}</div>
-                            <span class="name-text">{{ $support->name }}</span>
-                        </div>
-                    </td>
+                        <th>Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($supports as $support)
+                    <tr>
+                        <td>
+                            <span class="ticket-id">{{ $loop->iteration + ($supports->currentPage() - 1) * $supports->perPage() }}</span>
+                        </td>
 
-                    <td>
-                        <a class="email-link" href="mailto:{{ $support->email }}?subject=Re: {{ urlencode($support->subject) }}">
-                            {{ $support->email }}
-                        </a>
-                    </td>
+                        <td>
+                            <div class="name-cell">
+                                <div class="avatar-circle">{{ strtoupper(substr($support->name, 0, 1)) }}</div>
+                                <span class="name-text">{{ $support->name }}</span>
+                            </div>
+                        </td>
 
-                    <td>
-                        <span class="subject-text" title="{{ $support->subject }}">{{ $support->subject }}</span>
-                    </td>
+                        <td>
+                            <a class="email-link" href="mailto:{{ $support->email }}?subject=Re: {{ urlencode($support->subject) }}">
+                                {{ $support->email }}
+                            </a>
+                        </td>
 
-                    <td>
-                        <form class="status-form" action="{{ route('support.updateStatus', $support->id) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <select name="status"
-                                class="form-select status-{{ $support->status }}"
-                                onchange="this.form.submit()">
-                                <option value="pending"    {{ $support->status === 'pending'    ? 'selected' : '' }}>⏳ Pending</option>
-                                <option value="inprogress" {{ $support->status === 'inprogress' ? 'selected' : '' }}>🔄 In Progress</option>
-                                <option value="completed"  {{ $support->status === 'completed'  ? 'selected' : '' }}>✅ Completed</option>
-                            </select>
-                        </form>
-                    </td>
+                        <td>
+                            <span class="subject-text" title="{{ $support->subject }}">{{ $support->subject }}</span>
+                        </td>
 
-                   
+                        <td>
+                            <form class="status-form" action="{{ route('support.updateStatus', $support->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <select name="status"
+                                    class="form-select status-{{ $support->status }}"
+                                    onchange="this.form.submit()">
+                                    <option value="pending" {{ $support->status === 'pending'    ? 'selected' : '' }}>⏳ Pending</option>
+                                    <option value="inprogress" {{ $support->status === 'inprogress' ? 'selected' : '' }}>🔄 In Progress</option>
+                                    <option value="completed" {{ $support->status === 'completed'  ? 'selected' : '' }}>✅ Completed</option>
+                                </select>
+                            </form>
+                        </td>
 
-                    <td>
-                        <span class="date-cell">{{ $support->created_at->format('d M, Y H:i') }}</span>
-                    </td>
 
-                    <td>
-                        <button class="btn-view viewSupportBtn"
-                            data-name="{{ $support->name }}"
-                            data-email="{{ $support->email }}"
-                            data-phone="{{ $support->phone }}"
-                            data-location="{{ $support->location }}"
-                            data-subject="{{ $support->subject }}"
-                            data-description="{{ $support->description }}"
-                            data-date="{{ $support->created_at->format('d M Y H:i') }}">
-                            View
-                        </button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+
+                        <td>
+                            <span class="date-cell">{{ $support->created_at->format('d M, Y H:i') }}</span>
+                        </td>
+
+                        <td>
+                            <button class="btn-view viewSupportBtn"
+                                data-name="{{ $support->name }}"
+                                data-email="{{ $support->email }}"
+                                data-phone="{{ $support->phone }}"
+                                data-location="{{ $support->location }}"
+                                data-subject="{{ $support->subject }}"
+                                data-description="{{ $support->description }}"
+                                data-date="{{ $support->created_at->format('d M Y H:i') }}">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-wrapper">
+            {!! $supports->links() !!}
+        </div>
     </div>
 
-    <div class="pagination-wrapper">
-        {!! $supports->links() !!}
+    @else
+
+    <div class="support-table-card">
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p style="font-weight:500; color:#3c4165; margin-bottom:4px;">No support tickets found</p>
+            <p style="font-size:0.85rem;">New tickets will appear here once submitted.</p>
+        </div>
     </div>
-</div>
 
-@else
-
-<div class="support-table-card">
-    <div class="empty-state">
-        <div class="empty-state-icon">📭</div>
-        <p style="font-weight:500; color:#3c4165; margin-bottom:4px;">No support tickets found</p>
-        <p style="font-size:0.85rem;">New tickets will appear here once submitted.</p>
-    </div>
-</div>
-
-@endif
+    @endif
 
 </div>
 
@@ -430,13 +442,13 @@
 <script>
     document.addEventListener("click", function(e) {
         if (e.target.classList.contains("viewSupportBtn")) {
-            document.getElementById("modal_name").innerText        = e.target.dataset.name;
-            document.getElementById("modal_email").innerText       = e.target.dataset.email;
-            document.getElementById("modal_phone").innerText       = e.target.dataset.phone || '—';
-            document.getElementById("modal_location").innerText    = e.target.dataset.location || '—';
-            document.getElementById("modal_subject").innerText     = e.target.dataset.subject;
+            document.getElementById("modal_name").innerText = e.target.dataset.name;
+            document.getElementById("modal_email").innerText = e.target.dataset.email;
+            document.getElementById("modal_phone").innerText = e.target.dataset.phone || '—';
+            document.getElementById("modal_location").innerText = e.target.dataset.location || '—';
+            document.getElementById("modal_subject").innerText = e.target.dataset.subject;
             document.getElementById("modal_description").innerText = e.target.dataset.description;
-            document.getElementById("modal_date").innerText        = e.target.dataset.date;
+            document.getElementById("modal_date").innerText = e.target.dataset.date;
             new bootstrap.Modal(document.getElementById('supportModal')).show();
         }
     });
