@@ -49,6 +49,10 @@ Route::get('/support', function () {
     return view('frontend.support'); // This will load the support.blade.php view
 });
 
+Route::get('/contact-us', function () {
+    return view('new_contact_us'); // This will load the contact-us.blade.php view
+});
+
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 
 Route::get('/promotional-page', function () {
