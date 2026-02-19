@@ -7,6 +7,6 @@ return [
         // 'Sponsors',
         'Sponsor',
         'Exhibitor',
-        'Admin',
+        // 'Admin',
     ],
 ];

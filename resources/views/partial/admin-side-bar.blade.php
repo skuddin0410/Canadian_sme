@@ -85,7 +85,7 @@
         </li>
         
 
-        <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active open' : '' }} {{ request()->is('admin/usergroup*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active open' : '' }} {{ request()->is('admin/usergroup*') ? 'active open' : '' }} {{ request()->is('admin/newbadges*') ? 'active open' : '' }} {{ request()->is('admin/admin-users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class=" menu-link menu-toggle">
                  <i class="menu-icon  fa fa-list"></i>
                 <div data-i18n="tickets">People</div>
@@ -101,7 +101,12 @@
             @endif
               <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active' : '' }}">
                     <a href="{{ route('attendee-users.index') }}" class="menu-link">
-                        <div data-i18n="Attendee">Attendee </div>
+                        <div data-i18n="Attendee">Attendees </div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active' : '' }}">
+                    <a href="{{ route('admin-users.index') }}" class="menu-link">
+                        <div data-i18n="Attendee">Admins </div>
                     </a>
                 </li>
                <li class="menu-item {{ request()->is('admin/newbadges*') ? 'active' : '' }}">
@@ -113,7 +118,7 @@
         </li>
 
 
-         <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active open' : '' }}  {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }}  {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') ? 'active open' : '' }}  {{ request()->is('admin/event-guides.showGallery*') ? 'active open' : '' }}  {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
+         <li class="menu-item   {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }}  {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') ? 'active open' : '' }}  {{ request()->is('admin/event-guides.showGallery*') ? 'active open' : '' }}  {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
