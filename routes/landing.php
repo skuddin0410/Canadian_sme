@@ -51,7 +51,8 @@ Route::get('/support', function () {
 
 Route::get('/contact-us', function () {
     return view('new_contact_us'); // This will load the contact-us.blade.php view
-});
+})->name('contact-us');
+Route::post('/contact-submit' , [SupportController::class,'store'])->name('contact-submit');
 
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 

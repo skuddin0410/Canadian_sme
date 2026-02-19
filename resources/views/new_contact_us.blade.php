@@ -36,6 +36,13 @@
             </div>
             <div class="contact-us-page-row">
                 <div>
+                    @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    @endif
+
                     <div class="row gy-3 mb-4 mb-xl-5">
                         <div class="col-xl-6">
                             <div class="contact-fake-input">
@@ -60,47 +67,49 @@
                             </div>
                         </div>
                     </div>
-                    <form>
+                    <form method="POST" action="{{ route('contact-submit') }}">
+                        @csrf
                         <div class="row gy-2 gy-lg-3">
+
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input class="type-text" type="text" placeholder="Your  Name">
+                                    <input name="name" class="type-text" type="text" placeholder="Your Name" required>
                                 </div>
                             </div>
+
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input class="type-text" type="text" placeholder="Location">
+                                    <input name="location" class="type-text" type="text" placeholder="Location" required>
                                 </div>
                             </div>
+
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input class="type-email" type="email" placeholder="Email Address">
+                                    <input name="email" class="type-email" type="email" placeholder="Email Address" required>
                                 </div>
                             </div>
+
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input class="type-phone" type="tel" placeholder="Phone">
+                                    <input name="phone" class="type-phone" type="tel" placeholder="Phone" required>
                                 </div>
                             </div>
+
                             <div class="col-xl-12">
                                 <div class="input-wrapper">
-                                    <input class="type-phone" type="tel" placeholder="Enter Your Subject">
+                                    <input name="subject" class="type-text" type="text" placeholder="Enter Your Subject" required>
                                 </div>
                             </div>
+
                             <div class="col-12">
-                                <div>
-                                    <textarea class="contact-textarea" rows="4" placeholder="       Type Your Message Here"></textarea>
-                                </div>
+                                <textarea name="description" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
                             </div>
+
                         </div>
-                        <!-- <div class="form-check d-sm-flex align-items-center gap-1 mt-2 mt-sm-3 mt-lg-4">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                I am not a robot*
-                            </label>
-                        </div> -->
-                        <button class="heroBtn contact-from-submit-btn">Submit</button>
+
+                        <button type="submit" class="heroBtn contact-from-submit-btn">Submit</button>
                     </form>
+
                 </div>
                 <div class="h-100">
                     <iframe

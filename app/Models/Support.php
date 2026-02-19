@@ -15,7 +15,10 @@ class Support extends Model
      use AutoHtmlDecode;
 
     protected $fillable = [
-      
+        'name',
+        'email' ,
+        'phone',
+        'location',
         'subject',
         'description',
         'added_by',
