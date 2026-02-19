@@ -90,7 +90,7 @@
     <tr>
         <td style="font-size:14px; color:#4a5068; line-height:1.8;">
             Warm regards,<br>
-            <strong style="color:#0f1530; font-weight:700;">Eventzen Support Team</strong>
+            <strong style="color:#0f1530; font-weight:700;">Eventzen.io</strong>
         </td>
     </tr>
 </table>
