@@ -5,11 +5,15 @@ use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\FormBuilderController;
 use App\Http\Controllers\Frontend\SupportController;
+use App\Http\Controllers\Frontend\DemoController;
 
 Route::get('/', [LandingController::class, 'index'])->name('front.landing');
 Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
 Route::get('/all-events', [LandingController::class, 'allEvents'])->name('front.allEvents');
 Route::get('/search', [LandingController::class, 'search'])->name('front.landing.search');
+
+//Demo Requests
+Route::post('/demo-booking', [DemoController::class, 'store'])->name('demo.submit');
 
 
 Route::get('/page/{slug}', [PageController::class, 'publicPage'])->name('public.page');//Use on Frontend

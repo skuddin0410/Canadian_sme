@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use DB;
 use Illuminate\Support\Str;
+use App\Models\DemoRequests;
 
 class LandingController extends Controller
 {
@@ -170,7 +171,13 @@ class LandingController extends Controller
 
     public function index()
     {
-        return view('eventzen_io_home');
+        $bookings = DemoRequests::select('booking_date', 'time_slot')
+        ->get()
+        ->groupBy('booking_date')
+        ->map(function ($items) {
+            return $items->pluck('time_slot')->toArray();
+        });
+        return view('eventzen_io_home' ,compact('bookings'));
     }
 
 
