@@ -13,13 +13,13 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0">Support Tickets</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
-						<div class="dt-buttons"> 
+						<!-- <div class="dt-buttons"> 
 							<a href="" class="dt-button create-new btn btn-primary">
 								<span><i class="bx bx-plus me-sm-1"></i> 
 									<span class="d-none d-sm-inline-block">Add Support Ticket</span>
 								</span>
 							</a> 
-						</div>
+						</div> -->
 					</div>
 				</div>
 
@@ -36,7 +36,7 @@
                                         class="form-control"
                                         name="search"
                                         id="search"
-                                        placeholder="Search by subject"/>
+                                        placeholder="Search by name"/>
                                 </div>
                             </div>
                             <div class="col-2 text-center">

@@ -25,10 +25,7 @@ class SupportController extends Controller
 
 
             if ($request->search) {
-                $supports = $supports->where(function ($query) use ($request) {
-                    $query->where('subject', 'LIKE', '%' . $request->search . '%')
-                        ->orWhere('description', 'LIKE', '%' . $request->search . '%');
-                });
+                $supports = $supports->where('name', 'LIKE', '%' . $request->search . '%');
             }
 
 
