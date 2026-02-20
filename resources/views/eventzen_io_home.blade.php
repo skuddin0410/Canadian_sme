@@ -20,7 +20,78 @@
     <link rel="stylesheet" href="/frontend/css/style_new.css?v=1770271652">
 
 
+   <style>
+    /* ── Fully booked date card ── */
+    #availableDates .swiper-slide.disabled-date {
+        opacity: 0.4;
+        filter: grayscale(1);
+        cursor: not-allowed;
+        pointer-events: none;
+    }
 
+    /* ── Active selected date ── */
+    #availableDates .swiper-slide.active-date .date-item {
+    background: rgba(34, 197, 94, 0.18);  /* transparent green */
+    border-color: #22c55e;              /* solid green border */
+    color: #15803d;                    /* darker green text */
+}
+
+    /* ── Booked time slot option styling (browsers that support it) ── */
+    select[name='time_slot'] option:disabled {
+        color: #b0b0b0;
+        background: #f5f5f5;
+    }
+
+    /* ── Visual booked slot tags (custom rendered list, replaces select) ── */
+    .time-slot-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .time-slot-btn {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1.5px solid #d0d5e8;
+        background: #fff;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1d30;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        text-align: center;
+    }
+
+    .time-slot-btn:hover:not(.slot-booked) {
+        border-color: #004fb8;
+        color: #004fb8;
+        background: #f0f4ff;
+    }
+
+    .time-slot-btn.slot-selected {
+        background: #004fb8;
+        border-color: #004fb8;
+        color: #fff;
+    }
+
+    .time-slot-btn.slot-booked {
+        background: #f3f4f8;
+        border-color: #e0e2ec;
+        color: #b0b4c8;
+        cursor: not-allowed;
+        filter: grayscale(1);
+        opacity: 0.6;
+        text-decoration: line-through;
+    }
+
+    .slot-booked-label {
+        display: block;
+        font-size: 0.7rem;
+        color: #b0b4c8;
+        margin-top: 2px;
+    }
+</style>
 
 </head>
 
@@ -419,109 +490,117 @@
                 <div class="col-lg-6">
                     <div class="event-booking-right">
                         <h5>Request Demo</h5>
-                        <form action="">
-                            <div class="event-booking-right-cell">
-                                <span class="input-label">Time zone</span>
+                        <form action="{{ route('demo.submit') }}" method="POST">
+    @csrf
 
-                                <div class="position-relative">
-                                    <img src="./images/global.png" class="select-icon" alt="">
+    {{-- Success Message --}}
+    @if(session('success'))
+    <div class="alert alert-success mb-3">
+        {{ session('success') }}
+    </div>
+    @endif
 
-                                    <select class="form-select with-img">
-                                        <option selected>UTC +5:30, India Standard Time (04:00PM)</option>
-                                        <option value="1">UTC +1:00</option>
-                                        <option value="2">UTC +2:00</option>
-                                        <option value="3">UTC +3:00</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="event-booking-right-cell">
-                                <span class="input-label">Available Dates</span>
+    {{-- Timezone --}}
+    <div class="event-booking-right-cell">
+        <span class="input-label">Time zone</span>
 
-                                <div class="position-relative">
-                                    <div class="swiper eventSwiper">
-                                        <div class="swiper-wrapper">
+        <div class="position-relative">
+            <img src="./images/global.png" class="select-icon" alt="">
 
-                                            <div class="swiper-slide">
-                                                <div>
-                                                    <span class="day">Sun</span>
-                                                    <span class="date">08</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide">
-                                                <div>
-                                                    <span class="day">Mon</span>
-                                                    <span class="date">09</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide">
-                                                <div>
-                                                    <span class="day">Tue</span>
-                                                    <span class="date">10</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide">
-                                                <div>
-                                                    <span class="day">Wed</span>
-                                                    <span class="date">11</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide">
-                                                <div>
-                                                    <span class="day">Thu</span>
-                                                    <span class="date">12</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide current-date">
-                                                <div>
-                                                    <span class="day">Fri</span>
-                                                    <span class="date">13</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide booking-date">
-                                                <div>
-                                                    <span class="day">Sat</span>
-                                                    <span class="date">14</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
-                                            <div class="swiper-slide">
-                                                <div>
-                                                    <span class="day">Sun</span>
-                                                    <span class="date">15</span>
-                                                    <span class="month">Feb</span>
-                                                </div>
-                                            </div>
+            <select class="form-select with-img" name="timezone" required>
+                <option value="">Select Timezone</option>
+                <option value="UTC+5:30">UTC +5:30, India Standard Time</option>
+                <option value="UTC+1:00">UTC +1:00</option>
+                <option value="UTC+2:00">UTC +2:00</option>
+                <option value="UTC+3:00">UTC +3:00</option>
+            </select>
+        </div>
+    </div>
 
-                                        </div>
+    {{-- Available Dates --}}
+    <div class="event-booking-right-cell">
+        <span class="input-label">Available Dates</span>
+
+        <div class="position-relative">
+            <div class="swiper eventSwiper">
+                <div class="swiper-wrapper" id="availableDates"></div>
+            </div>
+
+            <input type="hidden" name="booking_date" id="selectedDate" required>
+
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+
+    {{-- Time Slot (custom grid replaces <select> for full visual control) --}}
+    <div class="event-booking-right-cell">
+        <span class="input-label">Time Slot</span>
+
+        {{-- Hidden input carries the actual value to the form --}}
+        <input type="hidden" name="time_slot" id="selectedTimeSlot" required>
+
+        <div class="time-slot-grid" id="timeSlotGrid">
+            {{-- Populated by JS after a date is selected --}}
+        </div>
+    </div>
+
+    <input type="hidden" name="name"  id="hiddenName">
+    <input type="hidden" name="email" id="hiddenEmail">
+    <input type="hidden" name="phone" id="hiddenPhone">
+
+    {{-- Submit --}}
+    <div class="event-booking-right-cell">
+        @auth
+        <button type="submit" class="heroBtn btn-long w-100">
+            Confirm Booking
+        </button>
+        @else
+        <button type="button" class="heroBtn btn-long w-100"
+            data-bs-toggle="modal" data-bs-target="#guestModal">
+            Confirm Booking
+        </button>
+        @endauth
+    </div>
+
+</form>
+                        {{-- Guest Details Modal --}}
+                        <div class="modal fade" id="guestModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Enter Your Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <!-- Arrows -->
-                                    <div class="swiper-button-next"></div>
-                                    <div class="swiper-button-prev"></div>
+
+                                    <div class="modal-body">
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" id="guestName" class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" id="guestEmail" class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="text" id="guestPhone" class="form-control" required>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" onclick="submitGuestForm()">Submit Booking</button>
+                                    </div>
+
                                 </div>
                             </div>
-                            <div class="event-booking-right-cell">
-                                <span class="input-label">Time Slot</span>
-
-                                <div class="position-relative">
-
-                                    <select class="form-select">
-                                        <option selected>Select a time slot</option>
-                                        <option value="1">UTC +1:00</option>
-                                        <option value="2">UTC +2:00</option>
-                                        <option value="3">UTC +3:00</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="event-booking-right-cell">
-                                <button type="button" class="heroBtn btn-long w-100">Confirm Booking</button>
-                            </div>
-                        </form>
+                        </div>
 
                     </div>
                 </div>
@@ -792,6 +871,15 @@
     @include('partials_new.footer')
     <!-- footer end -->
 
+
+    <!-- bootstrap js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <!-- Swiper JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- add js file -->
+    <script src="/frontend/js/script_new.js"></script>
     <script>
         /* Use "http:\/\/localhost:8000\/admin\/events\/1" in onclick above OR define once here for reuse */
         function copyLink(link) {
@@ -827,15 +915,222 @@
             document.body.removeChild(textarea);
         }
     </script>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
 
-    <!-- bootstrap js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-    <!-- Swiper JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <!-- add js file -->
-    <script src="/frontend/js/script_new.js"></script>
+    /* ===============================
+       1️⃣ BOOKED DATA (Safe Fallback)
+    =============================== */
+    const bookedData = @json($bookings ?? []);
+
+    /* ===============================
+       2️⃣ TIME SLOT UPDATE
+       Renders clickable slot cards instead of <select>
+       so booked slots can be visually greyed/struck through
+    =============================== */
+    function updateTimeSlots(selectedDate) {
+
+        const allSlots = ["10:00 AM", "12:00 PM", "03:00 PM", "05:00 PM"];
+        const bookedSlots = bookedData[selectedDate] ?? [];
+
+        const grid = document.getElementById("timeSlotGrid");
+        const hiddenInput = document.getElementById("selectedTimeSlot");
+        if (!grid || !hiddenInput) return;
+
+        hiddenInput.value = "";
+        grid.innerHTML = "";
+
+        allSlots.forEach(slot => {
+            const isBooked = bookedSlots.includes(slot);
+
+            const btn = document.createElement("div");
+            btn.classList.add("time-slot-btn");
+
+            if (isBooked) {
+                btn.classList.add("slot-booked");
+                btn.innerHTML = `${slot}<span class="slot-booked-label"></span>`;
+            } else {
+                btn.textContent = slot;
+                btn.addEventListener("click", function () {
+                    grid.querySelectorAll(".time-slot-btn").forEach(b => b.classList.remove("slot-selected"));
+                    btn.classList.add("slot-selected");
+                    hiddenInput.value = slot;
+                });
+            }
+
+            grid.appendChild(btn);
+        });
+    }
+
+    /* ===============================
+       3️⃣ GUEST FORM SUBMIT
+    =============================== */
+    window.submitGuestForm = function () {
+
+        const name  = document.getElementById('guestName')?.value.trim();
+        const email = document.getElementById('guestEmail')?.value.trim();
+        const phone = document.getElementById('guestPhone')?.value.trim();
+
+        if (!name || !email || !phone) {
+            alert("Please fill all fields.");
+            return;
+        }
+
+        document.getElementById('hiddenName').value  = name;
+        document.getElementById('hiddenEmail').value = email;
+        document.getElementById('hiddenPhone').value = phone;
+
+        const bookingForm = document.querySelector("form[action='{{ route('demo.submit') }}']");
+        if (bookingForm) bookingForm.submit();
+    };
+
+    /* ===============================
+       4️⃣ DATE + TIME SLOT SYSTEM
+    =============================== */
+    const wrapper           = document.getElementById("availableDates");
+    const selectedDateInput = document.getElementById("selectedDate");
+
+    if (wrapper && selectedDateInput) {
+
+        const totalSlots = 4;
+        const today = new Date();
+        wrapper.innerHTML = "";
+
+        for (let i = 0; i < 10; i++) {
+
+            let date = new Date();
+            date.setDate(today.getDate() + i);
+
+            let formattedDate = date.toISOString().split('T')[0];
+            let bookedSlots   = bookedData[formattedDate] ?? [];
+            let isFullyBooked = bookedSlots.length >= totalSlots;
+
+            let slide = document.createElement("div");
+            slide.classList.add("swiper-slide");
+
+            if (isFullyBooked) {
+                // Fully booked: grey out the entire date card
+                slide.classList.add("disabled-date");
+                slide.title = "Fully booked";
+            }
+
+            slide.innerHTML = `
+                <div class="date-item">
+                    <span class="day">${date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                    <span class="date">${date.getDate()}</span>
+                    <span class="month">${date.toLocaleDateString('en-US', { month: 'short' })}</span>
+                    ${isFullyBooked ? '<span style="font-size:0.65rem;color:#b0b4c8;display:block;margin-top:2px;">Full</span>' : ''}
+                </div>
+            `;
+
+            if (!isFullyBooked) {
+                slide.addEventListener("click", function () {
+                    document.querySelectorAll('#availableDates .swiper-slide')
+                        .forEach(el => el.classList.remove('active-date'));
+
+                    slide.classList.add('active-date');
+                    selectedDateInput.value = formattedDate;
+
+                    updateTimeSlots(formattedDate);
+                });
+            }
+
+            wrapper.appendChild(slide);
+        }
+
+        // Auto-select the first available date
+        const firstAvailable = wrapper.querySelector(".swiper-slide:not(.disabled-date)");
+        if (firstAvailable) firstAvailable.click();
+    }
+
+    /* ===============================
+       5️⃣ COUNTDOWN
+    =============================== */
+    const startEl = document.getElementById('startInTime');
+
+    if (startEl) {
+
+        const daysEl    = document.getElementById('days');
+        const hoursEl   = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const messageEl = document.getElementById('message');
+
+        if (daysEl && hoursEl && minutesEl && secondsEl && messageEl) {
+
+            let targetDate = startEl.dataset.start
+                ? new Date(startEl.dataset.start)
+                : null;
+
+            if (!targetDate || isNaN(targetDate.getTime())) {
+                const d  = parseInt(startEl.dataset.days    ?? '0', 10);
+                const h  = parseInt(startEl.dataset.hours   ?? '0', 10);
+                const m  = parseInt(startEl.dataset.minutes ?? '0', 10);
+                const s  = parseInt(startEl.dataset.seconds ?? '0', 10);
+                const ms = (((d * 24 + h) * 60 + m) * 60 + s) * 1000;
+                targetDate = new Date(Date.now() + ms);
+            }
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function updateCountdown() {
+
+                const now  = new Date();
+                const diff = targetDate - now;
+
+                if (diff <= 0) {
+                    daysEl.textContent    = '0';
+                    hoursEl.textContent   = '00';
+                    minutesEl.textContent = '00';
+                    secondsEl.textContent = '00';
+                    messageEl.textContent = "Event started!";
+                    clearInterval(intervalId);
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const days    = Math.floor(totalSeconds / (24 * 3600));
+                const hours   = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                daysEl.textContent    = days;
+                hoursEl.textContent   = pad(hours);
+                minutesEl.textContent = pad(minutes);
+                secondsEl.textContent = pad(seconds);
+            }
+
+            updateCountdown();
+            const intervalId = setInterval(updateCountdown, 1000);
+        }
+    }
+
+});
+</script>
+<!-- 
+    <script>
+        const bookedData = @json($bookings);
+    </script>
+    <script>
+        function submitGuestForm() {
+
+            let name = document.getElementById('guestName').value;
+            let email = document.getElementById('guestEmail').value;
+            let phone = document.getElementById('guestPhone').value;
+
+            if (!name || !email || !phone) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            document.getElementById('hiddenName').value = name;
+            document.getElementById('hiddenEmail').value = email;
+            document.getElementById('hiddenPhone').value = phone;
+
+            document.querySelector('form').submit();
+        }
+    </script>
+
     <script>
         const startEl = document.getElementById('startInTime');
 
@@ -964,8 +1259,97 @@
             // ---------------sponsors end---------------
         })();
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
+            const wrapper = document.getElementById("availableDates");
+            const selectedDateInput = document.getElementById("selectedDate");
+            const totalSlots = 4;
+            const today = new Date();
 
+            wrapper.innerHTML = ""; // Prevent duplicates
+
+            for (let i = 0; i < 10; i++) {
+
+                let date = new Date();
+                date.setDate(today.getDate() + i);
+
+                let formattedDate = date.toISOString().split('T')[0];
+
+                let bookedSlots = bookedData[formattedDate] ?? [];
+                let isFullyBooked = bookedSlots.length >= totalSlots;
+
+                let slide = document.createElement("div");
+                slide.classList.add("swiper-slide");
+
+                if (isFullyBooked) {
+                    slide.classList.add("disabled-date");
+                }
+
+                slide.innerHTML = `
+            <div class="date-item" data-date="${formattedDate}">
+                <span class="day">${date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                <span class="date">${date.getDate()}</span>
+                <span class="month">${date.toLocaleDateString('en-US', { month: 'short' })}</span>
+            </div>
+        `;
+
+                if (!isFullyBooked) {
+                    slide.addEventListener("click", function() {
+
+                        document.querySelectorAll('.swiper-slide').forEach(el => {
+                            el.classList.remove('active-date');
+                        });
+
+                        slide.classList.add('active-date');
+
+                        selectedDateInput.value = formattedDate;
+
+                        updateTimeSlots(formattedDate);
+                    });
+                }
+
+                wrapper.appendChild(slide);
+            }
+
+            // ✅ AUTO SELECT FIRST AVAILABLE DATE
+            const firstAvailable = wrapper.querySelector(".swiper-slide:not(.disabled-date)");
+            if (firstAvailable) {
+                firstAvailable.click();
+            }
+
+        });
+    </script>
+    <script>
+        function updateTimeSlots(selectedDate) {
+
+            const allSlots = [
+                "10:00 AM",
+                "12:00 PM",
+                "03:00 PM",
+                "05:00 PM"
+            ];
+
+            const bookedSlots = bookedData[selectedDate] ?? [];
+
+            let select = document.querySelector("select[name='time_slot']");
+            select.innerHTML = '<option value="">Select a time slot</option>';
+
+            allSlots.forEach(slot => {
+
+                let option = document.createElement("option");
+                option.value = slot;
+                option.textContent = slot;
+
+                if (bookedSlots.includes(slot)) {
+                    option.disabled = true;
+                    option.textContent += " (Booked)";
+                }
+
+                select.appendChild(option);
+            });
+        }
+    </script> -->
 </body>
 
 </html>

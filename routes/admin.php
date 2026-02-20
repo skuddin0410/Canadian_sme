@@ -18,6 +18,7 @@ use App\Http\Controllers\RepresentativeUserController;
 use App\Http\Controllers\ExhibitorAdmin\BoothController;
 use App\Http\Controllers\UserConnectionController;
 use App\Http\Controllers\LandingPageSettingController;
+use App\Http\Controllers\DemoRequestController;
 
 
 
@@ -116,8 +117,11 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('supports', SupportController::class);
   Route::patch('/support/{id}/status', [SupportController::class, 'updateStatus'])
     ->name('support.updateStatus');
-
-
+  Route::get('/demo-requests', [DemoRequestController::class, 'index'])->name('demo.index');
+  Route::patch(
+    '/demo-requests/{id}/status',
+    [DemoRequestController::class, 'updateStatus']
+  )->name('demo.updateStatus');
 
   Route::any('categories/{id}/order/{order}', '\App\Http\Controllers\CategoryController@order');
 
