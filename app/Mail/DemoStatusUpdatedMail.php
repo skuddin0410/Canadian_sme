@@ -29,7 +29,7 @@ class DemoStatusUpdatedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Demo Status Updated',
+            subject: 'Update: Demo Request',
         );
     }
 
