@@ -24,6 +24,66 @@
         </li>
 
         @if(isSuperAdmin())
+        <li class="menu-item {{ request()->is('admin/home-page*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-home-circle" style="font-size: 24px;"></i>
+                <div data-i18n="home_page">Home Page</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('admin/home-page/main') ? 'active' : '' }}">
+                    <a href="{{ route('admin.home-page.main') }}" class="menu-link">
+                        <div data-i18n="main">Main</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/home-page/logos*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.home-page.logos.index') }}" class="menu-link">
+                        <div data-i18n="logos">Logos</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/home-page/about') ? 'active' : '' }}">
+                    <a href="{{ route('admin.home-page.about') }}" class="menu-link">
+                        <div data-i18n="about">About</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/home-page/events*') ? 'active open' : '' }}">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div data-i18n="events">Events</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {{ request()->is('admin/home-page/events/banner') ? 'active' : '' }}">
+                            <a href="{{ route('admin.home-page.events.banner') }}" class="menu-link">
+                                <div data-i18n="banner_text">Banner Text</div>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ request()->is('admin/home-page/events/types*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.home-page.events.types.index') }}" class="menu-link">
+                                <div data-i18n="event_types">Event Types</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-item {{ request()->is('admin/home-page/apart*') ? 'active open' : '' }}">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div data-i18n="us_apart">Us Apart</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {{ request()->is('admin/home-page/apart/text') ? 'active' : '' }}">
+                            <a href="{{ route('admin.home-page.apart.text') }}" class="menu-link">
+                                <div data-i18n="apart_text">Text Content</div>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ request()->is('admin/home-page/apart/cards*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.home-page.apart.cards.index') }}" class="menu-link">
+                                <div data-i18n="apart_cards">Cards</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        @endif
+
+        @if(isSuperAdmin())
         <li class="menu-item {{ request()->is('admin/form-builder*') ? 'active open' : '' }} {{ request()->is('admin/registration-settings*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                  <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
