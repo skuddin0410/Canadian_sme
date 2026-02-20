@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DemoRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\DemoStatusUpdatedMail;
 
 class DemoRequestController extends Controller
 {
