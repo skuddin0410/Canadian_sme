@@ -50,7 +50,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 " href="/venue">Pricing</a>
+                            <a class="nav-link p-0 @if(request()->routeIs('pricing')) active @endif" href="{{ route('pricing') }}">Pricing</a>
                         </li>
 
                         <li class="nav-item">

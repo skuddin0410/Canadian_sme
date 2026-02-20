@@ -54,6 +54,10 @@ Route::get('/contact-us', function () {
 })->name('contact-us');
 Route::post('/contact-submit' , [SupportController::class,'store'])->name('contact-submit');
 
+Route::get('/pricing', function () {
+    return view('new_pricing_page');
+})->name('pricing');
+
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 
 Route::get('/promotional-page', function () {
