@@ -37,7 +37,7 @@ class DemoRequestController extends Controller
             'note' => 'nullable|string|max:1000'
         ]);
          if (in_array($request->status, ['reschedule', 'cancel']) 
-        && empty($request->admin_note)) {
+        && empty($request->note)) {
         
         return back()->withErrors([
             'note' => 'Note is required when rescheduling or cancelling.'
