@@ -31,7 +31,7 @@ Route::get('/sponsor', [LandingController::class, 'sponsorIndex'])->name('sponso
 Route::get('/sponsor/{slug}', [LandingController::class, 'sponsor'])->name('sponsor');
 Route::get('/speaker/{slug}', [LandingController::class, 'speaker'])->name('speaker');
 
-Route::get('/venue', [LandingController::class, 'venue'])->name('venue');
+Route::get('/venue/{slug}', [LandingController::class, 'venue'])->name('venue');
 Route::get('/venue/app', [LandingController::class, 'getVenuInfoForApp'])->name('venue-app');
 
 Route::get('/update-user/{userId}', [LandingController::class, 'showUpdateForm'])->name('update-user');
