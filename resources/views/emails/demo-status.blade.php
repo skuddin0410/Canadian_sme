@@ -4,8 +4,8 @@
 
 <p><strong>Status:</strong> {{ ucfirst($demo->status) }}</p>
 
-@if($demo->admin_note)
-<p><strong>Note from Admin:</strong></p>
+@if($demo->note)
+<p><strong>Reason:</strong></p>
 <p>{{ $demo->note }}</p>
 @endif
 
