@@ -62,7 +62,7 @@ class OtpController extends Controller
                 ], 403); 
             }
 
-            if(!$eventId){
+            if(isset($request->event_id)){
                 // Check mapping: event_and_entity_link
                 $isMapped = DB::table('event_and_entity_link')
                     ->where('event_id', $eventId)
