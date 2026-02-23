@@ -318,12 +318,25 @@ Admin | Demo Requests
 
             <form method="GET" id="demo-filter">
                 <div class="demo-search-row">
-                    <input
-                        type="text"
+
+                    <input type="text"
                         class="demo-search-input"
                         name="search"
                         id="search"
                         placeholder="Search name or email…">
+
+                    <!-- <input type="date"
+               name="start_date"
+               id="start_date"
+               class="demo-search-input"
+               style="min-width:160px;"> -->
+
+                    <input type="date"
+                        name="end_date"
+                        id="end_date"
+                        class="demo-search-input"
+                        style="min-width:160px;">
+
                     <button type="button" class="demo-filter-btn filter">Search</button>
                 </div>
             </form>
@@ -434,9 +447,13 @@ Admin | Demo Requests
     });
 
     $(document).on("click", ".filter", function() {
+
         GetDemoList("{{ route('demo.index') }}", {
-            search: $("#search").val()
+            search: $("#search").val(),
+            start_date: $("#start_date").val(),
+            end_date: $("#end_date").val()
         });
+
     });
 
     $(document).on("keydown", "#search", function(e) {
