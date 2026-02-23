@@ -124,10 +124,11 @@
     font-weight: 600;
     padding: 4px 10px;
     border-radius: 20px;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: auto;
+    white-space: normal;     
+    overflow: visible;       
+    text-overflow: unset; 
+
 }
 
 .es-event-chip svg { flex-shrink: 0; }
