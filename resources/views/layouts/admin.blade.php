@@ -109,7 +109,7 @@
   </body>
 </html>
 <script type="text/javascript">
- tinymce.init({
+  tinymce.init({
     selector: '#description, .description-cls',
     readonly: false,
     width: '100%',
@@ -118,6 +118,11 @@
     toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
     menubar: false,
     branding: false,
+    setup: function (editor) {
+        editor.on('change', function () {
+            editor.save();
+        });
+    }
   });
 
   tinymce.init({
@@ -129,6 +134,11 @@
     toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
     menubar: false,
     branding: false,
+    setup: function (editor) {
+        editor.on('change', function () {
+            editor.save();
+        });
+    }
   });
 </script>
 

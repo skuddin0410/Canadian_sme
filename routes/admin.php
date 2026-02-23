@@ -26,9 +26,25 @@ use App\Http\Controllers\LandingEventBannerController;
 use App\Http\Controllers\LandingEventTypeController;
 use App\Http\Controllers\LandingApartTextController;
 use App\Http\Controllers\LandingApartCardController;
+use App\Http\Controllers\LandingDemoTextController;
+use App\Http\Controllers\LandingCustomerBannerController;
+use App\Http\Controllers\LandingHomeReviewController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+
+  Route::get('/home-page/customer/banner', [LandingCustomerBannerController::class, 'index'])->name('admin.home-page.customer.banner');
+  Route::post('/home-page/customer/banner', [LandingCustomerBannerController::class, 'update'])->name('admin.home-page.customer.banner.update');
+
+  Route::get('/home-page/customer/reviews', [LandingHomeReviewController::class, 'index'])->name('admin.home-page.customer.reviews.index');
+  Route::get('/home-page/customer/reviews/create', [LandingHomeReviewController::class, 'create'])->name('admin.home-page.customer.reviews.create');
+  Route::post('/home-page/customer/reviews', [LandingHomeReviewController::class, 'store'])->name('admin.home-page.customer.reviews.store');
+  Route::get('/home-page/customer/reviews/{id}/edit', [LandingHomeReviewController::class, 'edit'])->name('admin.home-page.customer.reviews.edit');
+  Route::post('/home-page/customer/reviews/{id}', [LandingHomeReviewController::class, 'update'])->name('admin.home-page.customer.reviews.update');
+  Route::delete('/home-page/customer/reviews/{id}', [LandingHomeReviewController::class, 'destroy'])->name('admin.home-page.customer.reviews.destroy');
+
+  Route::get('/home-page/demo-text', [LandingDemoTextController::class, 'index'])->name('admin.home-page.demo-text');
+  Route::post('/home-page/demo-text', [LandingDemoTextController::class, 'update'])->name('admin.home-page.demo-text.update');
 
   Route::get('/home-page/apart/text', [LandingApartTextController::class, 'index'])->name('admin.home-page.apart.text');
   Route::post('/home-page/apart/text', [LandingApartTextController::class, 'update'])->name('admin.home-page.apart.text.update');

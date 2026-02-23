@@ -177,7 +177,60 @@ class LandingController extends Controller
         ->map(function ($items) {
             return $items->pluck('time_slot')->toArray();
         });
-        return view('eventzen_io_home' ,compact('bookings'));
+
+        // Hero / Banner
+        $heroBanner = \App\Models\LandingPageMain::with('mainImage')->first();
+
+        // Logos (partner logos swiper)
+        $logos = \App\Models\LandingPageLogo::with('logoImage')
+            ->where('status', 1)
+            ->orderBy('order_by')
+            ->get();
+
+        // About Us
+        $about = \App\Models\LandingPageAbout::with([
+            'bgBanner', 'bannerImage', 'frontImage', 'bannerButtonImage', 'expImage'
+        ])->first();
+
+        // Event Types (Unforgettable Events section)
+        $eventTypes = \App\Models\LandingEventType::with('typeImage')
+            ->where('status', 1)
+            ->orderBy('order')
+            ->get();
+
+        // Event Banner heading/subheading
+        $eventBanner = \App\Models\LandingEventBanner::first();
+
+        // Us Apart section
+        $apartText = \App\Models\LandingApartText::first();
+        $apartCards = \App\Models\LandingApartCard::with('cardIcon')
+            ->where('status', 1)
+            ->orderBy('order_by')
+            ->get();
+
+        // Demo booking text
+        $demoText = \App\Models\LandingDemoText::first();
+
+        // Customer testimonials
+        $customerBanner = \App\Models\LandingCustomerBanner::first();
+        $homeReviews = \App\Models\LandingHomeReview::with('profileImage')
+            ->where('status', 1)
+            ->orderBy('order_by')
+            ->get();
+
+        return view('eventzen_io_home', compact(
+            'bookings',
+            'heroBanner',
+            'logos',
+            'about',
+            'eventTypes',
+            'eventBanner',
+            'apartText',
+            'apartCards',
+            'demoText',
+            'customerBanner',
+            'homeReviews'
+        ));
     }
 
 
