@@ -23,23 +23,25 @@ class EventController extends Controller
 
         // $query = Event::query();
 
-        if (! $requester = JWTAuth::parseToken()->authenticate()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-                'data'    => collect(),
-            ], 401);
-        }
-        $userId = $requester->id;
-        // dd($userId);
+        // if (! $requester = JWTAuth::parseToken()->authenticate()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Unauthorized',
+        //         'data'    => collect(),
+        //     ], 401);
+        // }
+        // $userId = $requester->id;
+        // // dd($userId);
         
-        $query = Event::query()
-            ->withExists([
-                'entityLinks as is_registered' => function ($q) use ($userId) {
-                    $q->where('entity_type', 'users')
-                    ->where('entity_id', $userId);
-                }
-            ]);
+        // $query = Event::query()
+        //     ->withExists([
+        //         'entityLinks as is_registered' => function ($q) use ($userId) {
+        //             $q->where('entity_type', 'users')
+        //             ->where('entity_id', $userId);
+        //         }
+        //     ]);
+
+        $query = Event::query();
 
         if ($type === 'past') {
             $query->whereDate('end_date', '<', $today);
