@@ -14,10 +14,10 @@ Route::prefix('password')->group(function () {
     Route::post('/reset', [App\Http\Controllers\Api\JWTAuthController::class, 'resetPassword']);
 });
 
-// Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
+Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
 
 Route::middleware(['auth:api', 'jwtauth'])->group(function () {
-    Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
+    // Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
 
     Route::prefix('profile')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getUser']);
