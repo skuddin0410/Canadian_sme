@@ -19,10 +19,49 @@ use App\Http\Controllers\ExhibitorAdmin\BoothController;
 use App\Http\Controllers\UserConnectionController;
 use App\Http\Controllers\LandingPageSettingController;
 use App\Http\Controllers\DemoRequestController;
-
+use App\Http\Controllers\LandingPageMainController;
+use App\Http\Controllers\LandingPageLogoController;
+use App\Http\Controllers\LandingPageAboutController;
+use App\Http\Controllers\LandingEventBannerController;
+use App\Http\Controllers\LandingEventTypeController;
+use App\Http\Controllers\LandingApartTextController;
+use App\Http\Controllers\LandingApartCardController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+
+  Route::get('/home-page/apart/text', [LandingApartTextController::class, 'index'])->name('admin.home-page.apart.text');
+  Route::post('/home-page/apart/text', [LandingApartTextController::class, 'update'])->name('admin.home-page.apart.text.update');
+
+  Route::get('/home-page/apart/cards', [LandingApartCardController::class, 'index'])->name('admin.home-page.apart.cards.index');
+  Route::get('/home-page/apart/cards/create', [LandingApartCardController::class, 'create'])->name('admin.home-page.apart.cards.create');
+  Route::post('/home-page/apart/cards', [LandingApartCardController::class, 'store'])->name('admin.home-page.apart.cards.store');
+  Route::get('/home-page/apart/cards/{id}/edit', [LandingApartCardController::class, 'edit'])->name('admin.home-page.apart.cards.edit');
+  Route::post('/home-page/apart/cards/{id}', [LandingApartCardController::class, 'update'])->name('admin.home-page.apart.cards.update');
+  Route::delete('/home-page/apart/cards/{id}', [LandingApartCardController::class, 'destroy'])->name('admin.home-page.apart.cards.destroy');
+
+  Route::get('/home-page/events/banner', [LandingEventBannerController::class, 'index'])->name('admin.home-page.events.banner');
+  Route::post('/home-page/events/banner', [LandingEventBannerController::class, 'update'])->name('admin.home-page.events.banner.update');
+
+  Route::get('/home-page/events/types', [LandingEventTypeController::class, 'index'])->name('admin.home-page.events.types.index');
+  Route::get('/home-page/events/types/create', [LandingEventTypeController::class, 'create'])->name('admin.home-page.events.types.create');
+  Route::post('/home-page/events/types', [LandingEventTypeController::class, 'store'])->name('admin.home-page.events.types.store');
+  Route::get('/home-page/events/types/{id}/edit', [LandingEventTypeController::class, 'edit'])->name('admin.home-page.events.types.edit');
+  Route::post('/home-page/events/types/{id}', [LandingEventTypeController::class, 'update'])->name('admin.home-page.events.types.update');
+  Route::delete('/home-page/events/types/{id}', [LandingEventTypeController::class, 'destroy'])->name('admin.home-page.events.types.destroy');
+
+  Route::get('/home-page/about', [LandingPageAboutController::class, 'index'])->name('admin.home-page.about');
+  Route::post('/home-page/about', [LandingPageAboutController::class, 'update'])->name('admin.home-page.about.update');
+
+  Route::get('/home-page/logos', [LandingPageLogoController::class, 'index'])->name('admin.home-page.logos.index');
+  Route::get('/home-page/logos/create', [LandingPageLogoController::class, 'create'])->name('admin.home-page.logos.create');
+  Route::post('/home-page/logos', [LandingPageLogoController::class, 'store'])->name('admin.home-page.logos.store');
+  Route::get('/home-page/logos/{id}/edit', [LandingPageLogoController::class, 'edit'])->name('admin.home-page.logos.edit');
+  Route::post('/home-page/logos/{id}', [LandingPageLogoController::class, 'update'])->name('admin.home-page.logos.update');
+  Route::delete('/home-page/logos/{id}', [LandingPageLogoController::class, 'destroy'])->name('admin.home-page.logos.destroy');
+
+  Route::get('/home-page/main', [LandingPageMainController::class, 'index'])->name('admin.home-page.main');
+  Route::post('/home-page/main', [LandingPageMainController::class, 'update'])->name('admin.home-page.main.update');
 
   Route::resource('user-connections', UserConnectionController::class);
   Route::get('/user-connections/{user}/export', [UserConnectionController::class, 'export'])

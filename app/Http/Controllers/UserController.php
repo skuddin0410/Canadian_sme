@@ -24,6 +24,7 @@ use Carbon;
 
 use App\Models\Email;
 use App\Mail\TrackedEmail;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserController extends Controller
 {
@@ -237,38 +238,92 @@ class UserController extends Controller
         return Excel::download(new UsersExport, 'users_'.Carbon\Carbon::now()->timestamp.'.xlsx');
     }
 
-    public function importUser(Request $request){
+    // public function importUser(Request $request){
 
-      if ($request->hasFile('file')) {
+    //   if ($request->hasFile('file')) {
+    //     $file = $request->file('file');
+
+    //     if (!$file->isValid()) {
+    //      return back()->withErrors(['file' => 'Uploaded file is not valid']);
+    //     }
+        
+    //     // Get original extension
+    //     $extension = strtolower($file->getClientOriginalExtension());
+
+    //     // Allowed extensions
+    //     $allowedExtensions = ['csv', 'xls', 'xlsx'];
+
+    //     if (!in_array($extension, $allowedExtensions)) {
+    //         return back()->withErrors(['file' => 'Only CSV, XLS, or XLSX files are allowed.']);
+    //     }
+
+    //     $lineCount = count(file($request->file('file')->getRealPath())) - 1;
+
+    //     if ($lineCount > 100) {
+    //         return back()->withErrors(['file' => 'Max 100 rows allowed.']);
+    //     }
+
+    //     Excel::import(new UsersImport, $request->file('file'));
+    //     return back();
+
+    //   } else {
+    //     return back()->withErrors(['file' => 'No file uploaded.']);
+    //   }
+    // }
+
+    public function importUser(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,xls,xlsx',
+        ]);
+
         $file = $request->file('file');
 
         if (!$file->isValid()) {
-         return back()->withErrors(['file' => 'Uploaded file is not valid']);
-        }
-        
-        // Get original extension
-        $extension = strtolower($file->getClientOriginalExtension());
-
-        // Allowed extensions
-        $allowedExtensions = ['csv', 'xls', 'xlsx'];
-
-        if (!in_array($extension, $allowedExtensions)) {
-            return back()->withErrors(['file' => 'Only CSV, XLS, or XLSX files are allowed.']);
+            return back()->withErrors(['file' => 'Uploaded file is not valid']);
         }
 
-        $lineCount = count(file($request->file('file')->getRealPath())) - 1;
+        $ext = strtolower($file->getClientOriginalExtension());
+        $path = $file->getRealPath();
 
-        if ($lineCount > 100) {
-            return back()->withErrors(['file' => 'Max 100 rows allowed.']);
+        // Count rows excluding header
+        $dataRows = $this->countDataRows($path, $ext); // excluding header row
+
+        if ($dataRows > 100) {
+            return back()->withErrors(['file' => "File has {$dataRows} rows. Max 100 rows allowed."]);
         }
 
-        Excel::import(new UsersImport, $request->file('file'));
-        return back();
+        Excel::import(new UsersImport, $file);
 
-      } else {
-        return back()->withErrors(['file' => 'No file uploaded.']);
-      }
+        return back()->with('success', "Imported successfully. Rows detected: {$dataRows}");
     }
+
+    private function countDataRows(string $path, string $ext): int
+    {
+        if ($ext === 'csv') {
+            $file = new \SplFileObject($path);
+            $file->setFlags(\SplFileObject::READ_CSV);
+
+            $total = 0;
+            foreach ($file as $index => $row) {
+                if ($index === 0) continue; // header
+                if (!empty(array_filter((array)$row, fn($v) => $v !== null && $v !== ''))) {
+                    $total++;
+                }
+            }
+            return $total;
+        }
+
+        // xls/xlsx
+        $spreadsheet = IOFactory::load($path);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $highestRow = $sheet->getHighestDataRow(); // includes header
+        $dataRows = max(0, $highestRow - 1);       // remove header row
+
+        return $dataRows;
+    }
+
     public function representativeIndex()
 {
     $users = User::role('Representative')

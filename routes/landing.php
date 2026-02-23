@@ -35,7 +35,7 @@ Route::get('/sponsor', [LandingController::class, 'sponsorIndex'])->name('sponso
 Route::get('/sponsor/{slug}', [LandingController::class, 'sponsor'])->name('sponsor');
 Route::get('/speaker/{slug}', [LandingController::class, 'speaker'])->name('speaker');
 
-Route::get('/venue', [LandingController::class, 'venue'])->name('venue');
+Route::get('/venue/{slug}', [LandingController::class, 'venue'])->name('venue');
 Route::get('/venue/app', [LandingController::class, 'getVenuInfoForApp'])->name('venue-app');
 
 Route::get('/update-user/{userId}', [LandingController::class, 'showUpdateForm'])->name('update-user');
@@ -57,6 +57,10 @@ Route::get('/contact-us', function () {
     return view('new_contact_us'); // This will load the contact-us.blade.php view
 })->name('contact-us');
 Route::post('/contact-submit' , [SupportController::class,'store'])->name('contact-submit');
+
+Route::get('/pricing', function () {
+    return view('new_pricing_page');
+})->name('pricing');
 
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 

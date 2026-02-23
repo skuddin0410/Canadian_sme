@@ -36,43 +36,27 @@
                     </button>
                     <ul class="navbar-nav mb-2 mb-md-0 gap-3 gap-lg-5 align-items-center ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('/') ? 'active' : '' }}" href="{{ route('front.landing') }}">Home</a>
+                            <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('front.events', ['slug' => $event->slug ?? null]) }}">Home</a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Venue Information</a>
-                        </li> -->
-
-                        <!-- <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Venue</a>
-                        </li> -->
+                        
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Location</a>
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => $event->slug ?? null]) }}">Location</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Terms</a>
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'terms']) }}">Terms</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">Policy</a>
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'policy']) }}">Policy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue') }}">About</a>
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'about']) }}">About</a>
                         </li>
                         <li class="nav-item">
-                            {{-- @if (!Auth::check())
-                            <!-- Buttons -->
-                            <a class="heroBtn reg" href="{{ route('registration') }}">
-                                <!-- <img class="d-md-none" src="{{ asset('frontend/images/login.png') }}" alt=""> -->
-                                <img class="d-none d-lg-block d-xl-none" style="width: 24px; height: 24px;" src="{{ asset('frontend/images/add-square.png') }}" alt="">
-                                <span class="headerRegistrationText d-lg-none d-xl-block">Registration</span>
-                            </a>
-                            @else
-                            <a class="heroBtn reg" href="{{ route('logout') }}">
-                                <!-- <img class="d-md-none" src="{{ asset('frontend/images/login.png') }}" alt=""> -->
-                                <img class="d-xl-none" src="{{ asset('frontend/images/logout.png') }}" alt="">
-                                <span class="d-none d-xl-block">Logout</span>
-                            </a>
-                            @endif --}}
+                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'support']) }}">Support</a>
+                        </li>
+                        <li class="nav-item">
+                        
                         </li>
                     </ul>
                 </div>
