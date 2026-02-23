@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Support;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SupportStatusUpdated;
 
 class SupportController extends Controller
 {
@@ -21,19 +23,16 @@ class SupportController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $supports = Support::orderBy('id', 'DESC');
 
-            
+
             if ($request->search) {
-                $supports = $supports->where(function ($query) use ($request) {
-                    $query->where('subject', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('description', 'LIKE', '%' . $request->search . '%');
-                });
+                $supports = $supports->where('name', 'LIKE', '%' . $request->search . '%');
             }
 
-          
+
             $supportsCount = clone $supports;
             $totalRecords = $supportsCount->count(DB::raw('DISTINCT(supports.id)'));
 
-          
+
             $supports = $supports->offset($offset)->limit($perPage)->get();
 
             $supports = new LengthAwarePaginator($supports, $totalRecords, $perPage, $pageNo, [
@@ -45,7 +44,7 @@ class SupportController extends Controller
             $data['pageNo'] = $pageNo;
             $supports->setPath(route('supports.index'));
 
-           
+
             $data['html'] = view('support.table', compact('supports', 'perPage'))
                 ->with('i', $pageNo * $perPage)
                 ->render();
@@ -53,7 +52,7 @@ class SupportController extends Controller
             return response($data);
         }
 
-       
+
         return view('support.index');
     }
 
@@ -106,15 +105,23 @@ class SupportController extends Controller
     }
     public function updateStatus(Request $request, $id)
     {
-    $request->validate([
-        'status' => 'required|in:pending,inprogress,completed',
-    ]);
+        $request->validate([
+            'status' => 'required|in:pending,inprogress,completed',
+        ]);
 
-    $support = Support::findOrFail($id);
-    $support->status = $request->status;
-    $support->save();
+        $support = Support::findOrFail($id);
+        if ($support->status !== $request->status) {
 
-    return redirect()->back()->with('success', 'Status updated successfully.');
+            $support->status = $request->status;
+            $support->save();
+
+            // Send email to user
+            Mail::to($support->email)->send(new SupportStatusUpdated($support));
+        }
+        // $support->status = $request->status;
+        // $support->save();
+
+
+        return redirect()->back()->with('success', 'Status updated successfully.');
     }
-
 }

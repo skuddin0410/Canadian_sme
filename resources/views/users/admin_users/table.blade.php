@@ -46,7 +46,13 @@
 <tbody>	
     @foreach($users as $user)
     <tr>
-    <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}</th>
+    <th>{{$user->name ?? ''}} {{$user->lastname ?? ''}}
+		@if($user->hasRole('Admin'))
+		{!! 
+			'<span class="badge border border-danger text-danger rounded-pill badge-sm">As event Admin</span>' 
+		!!}
+		@endif
+	</th>
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
 		{{-- <th style="text-transform:none">{{$user->referral_coupon}}</th> --}}

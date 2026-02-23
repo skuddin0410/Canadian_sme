@@ -54,7 +54,8 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 " href="/support">Contact Us</a>
+                            <a class="nav-link p-0 @if(request()->routeIs('contact-us')) active @endif" href="{{ route('contact-us') }}"
+                            <a class="nav-link p-0"  href="/contact-us">Contact Us</a>
                         </li>
 
                         <li class="nav-item">

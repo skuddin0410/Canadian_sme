@@ -62,9 +62,9 @@
                                         <button type="button" class="btn btn-md btn-secondary reset-filter">Reset</button>
                                     </div>
                                     @if(isSuperAdmin())
-                                    <div class="col-auto">
+                                    <!-- <div class="col-auto">
                                         <button type="button" class="btn btn-md btn-danger search-admins" onclick="filterAdmins()">Event Admins</button>
-                                    </div>
+                                    </div> -->
                                     @endif
                                 </div>
                             </form>

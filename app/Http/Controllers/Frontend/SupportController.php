@@ -7,23 +7,39 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactQuery;
 
 class SupportController extends Controller
 { 
+    public function index(){
+        return view('new_contact_us');
+    }
      public function store(Request $request)
     {
        $validated = $request->validate([
-        'email' => 'required|email', 
-        'subject' => 'required|string|max:255', 
-        'description' => 'required|string|max:255', 
-       ]);
-
-
-        Support::create([
-            'email' => $request->email,
-            'subject' => $request->subject,
-            'description' => $request->description,
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|max:255',
+            'phone'       => 'required|string|max:20',
+            'location'    => 'required|string|max:255',
+            'subject'     => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
         ]);
+
+        // Store in DB with default pending status
+        $support = Support::create([
+            'name'        => $validated['name'],
+            'email'       => $validated['email'],
+            'phone'       => $validated['phone'],
+            'location'    => $validated['location'],
+            'subject'     => $validated['subject'],
+            'description' => $validated['description'],
+            'status'      => 'pending'
+        ]);
+
+        // Send confirmation email to user
+        Mail::to($support->email)->send(new ContactQuery($support));
+
         return redirect()->back()->with('success', 'Your request has been submitted successfully!');
     }
     
