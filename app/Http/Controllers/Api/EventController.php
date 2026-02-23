@@ -18,7 +18,7 @@ class EventController extends Controller
 
     public function index(Request $request)
     {
-        $type = $request->type; // past | ongoing | future
+        $type = $request->type; // past | ongoing | upcoming
         $today = Carbon::today();
 
         // $query = Event::query();
@@ -50,7 +50,7 @@ class EventController extends Controller
                 ->whereDate('end_date', '>=', $today);
         }
 
-        if ($type === 'future') {
+        if ($type === 'upcoming') {
             $query->whereDate('start_date', '>', $today);
         }
 
