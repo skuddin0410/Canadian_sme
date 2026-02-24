@@ -19,7 +19,7 @@
 
     @include('partials_new.header')
 
-    {{-- ======== HERO BANNER ======== --}}
+     <!-- ======== HERO BANNER ========  -->
     @if($heroBanner)
     <section class="banner section position-relative">
         <div class="container">
@@ -49,9 +49,9 @@
         </div>
     </section>
     @endif
-    {{-- banner end --}}
+    <!-- banner end -->
 
-    {{-- ======== LOGOS SWIPER ======== --}}
+    <!-- ======== LOGOS SWIPER ======== -->
     @if($logos->count() > 0)
     <section class="banner-bottom-swiper swiper">
         <div class="swiper-wrapper">
@@ -65,9 +65,9 @@
         </div>
     </section>
     @endif
-    {{-- logos end --}}
+    <!-- logos end -->
 
-    {{-- ======== ABOUT US ======== --}}
+    <!-- ======== ABOUT US ======== -->
     @if($about)
     <section class="about-us section">
         <div class="container">
@@ -144,9 +144,9 @@
         </div>
     </section>
     @endif
-    {{-- about-us end --}}
+    <!-- about-us end -->
 
-    {{-- ======== SPEAKERS (static - no CMS yet) ======== --}}
+    <!-- ======== SPEAKERS (static - no CMS yet) ======== -->
     <section class="speakers">
         <div class="container">
             <div class="d-block d-xl-flex align-items-center gap-4 gap-xl-0">
@@ -197,9 +197,9 @@
             </div>
         </div>
     </section>
-    {{-- speakers end --}}
+    <!-- speakers end -->
 
-    {{-- ======== UNFORGETTABLE EVENTS (Event Types) ======== --}}
+    <!-- ======== UNFORGETTABLE EVENTS (Event Types) ======== -->
     @if($eventBanner || $eventTypes->count() > 0)
     <section class="unforgettable-event section">
         <div class="container">
@@ -237,9 +237,9 @@
         </div>
     </section>
     @endif
-    {{-- Unforgettable Events end --}}
+    <!-- Unforgettable Events end -->
 
-    {{-- ======== US APART ======== --}}
+    <!-- ======== US APART ======== -->
     @if($apartText || $apartCards->count() > 0)
     <section class="apart section">
         <div class="container">
@@ -286,9 +286,9 @@
         </div>
     </section>
     @endif
-    {{-- apart end --}}
+    <!-- apart end -->
 
-    {{-- ======== DEMO BOOKING ======== --}}
+    <!-- ======== DEMO BOOKING ======== -->
     <section class="event-booking section">
         <div class="container">
             <div class="row align-items-center event-booking-row">
@@ -362,9 +362,9 @@
             </div>
         </div>
     </section>
-    {{-- event-booking end --}}
+    <!-- event-booking end -->
 
-    {{-- ======== CUSTOMER TESTIMONIALS ======== --}}
+    <!-- ======== CUSTOMER TESTIMONIALS ======== -->
     @if($customerBanner || $homeReviews->count() > 0)
     <section class="testimonial section">
         <div class="container">
@@ -385,6 +385,16 @@
                     <div class="swiper-wrapper first">
                         @foreach($homeReviews as $review)
                         <div class="swiper-slide {{ $loop->first ? 'active' : '' }}">
+                            <div class="img-box">
+                                @if($review->profileImage)
+                                    <img src="{{ $review->profileImage->file_path }}" alt="{{ $review->customer_name }}">
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                        <!-- Duplicate slides for smooth Swiper loop based on the html provided -->
+                        @foreach($homeReviews as $review)
+                        <div class="swiper-slide">
                             <div class="img-box">
                                 @if($review->profileImage)
                                     <img src="{{ $review->profileImage->file_path }}" alt="{{ $review->customer_name }}">
@@ -420,7 +430,7 @@
         </div>
     </section>
     @endif
-    {{-- testimonial end --}}
+    <!-- testimonial end -->
 
     <!-- maps -->
     <section class="maps">
