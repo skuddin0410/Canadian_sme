@@ -13,81 +13,264 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <!-- css -->
     <link rel="stylesheet" href="/frontend/css/style_new.css">
-    <style>
-        /* ── Fully booked date card ── */
-        #availableDates .swiper-slide.disabled-date {
-            opacity: 0.4;
-            filter: grayscale(1);
-            cursor: not-allowed;
-            pointer-events: none;
-        }
+ <style>
+    /* ── Form Card Wrapper ── */
+    .event-booking-right {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 8px 40px rgba(0, 79, 184, 0.10);
+        border: 1px solid #e8edf8;
+    }
 
-        /* ── Active selected date ── */
-        #availableDates .swiper-slide.active-date .date-item {
-            background: rgba(34, 197, 94, 0.18);
-            /* transparent green */
-            border-color: #22c55e;
-            /* solid green border */
-            color: #15803d;
-            /* darker green text */
-        }
+    .event-booking-right h5 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a1d30;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f0f4ff;
+    }
 
-        /* ── Booked time slot option styling (browsers that support it) ── */
-        select[name='time_slot'] option:disabled {
-            color: #b0b0b0;
-            background: #f5f5f5;
-        }
+    /* ── Form Cells ── */
+    .event-booking-right-cell {
+        margin-bottom: 22px;
+    }
 
-        /* ── Visual booked slot tags (custom rendered list, replaces select) ── */
-        .time-slot-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 6px;
-        }
+    .input-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 8px;
+    }
 
-        .time-slot-btn {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1.5px solid #d0d5e8;
-            background: #fff;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #1a1d30;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            text-align: center;
-        }
+    /* ── Select Styling ── */
+    .form-select.with-img {
+        border-radius: 12px;
+        border: 1.5px solid #e0e5f2;
+        padding: 12px 16px 12px 44px;
+        font-size: 0.9rem;
+        color: #1a1d30;
+        background-color: #f8faff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        appearance: none;
+    }
 
-        .time-slot-btn:hover:not(.slot-booked) {
-            border-color: #004fb8;
-            color: #004fb8;
-            background: #f0f4ff;
-        }
+    .form-select.with-img:focus {
+        border-color: #004fb8;
+        box-shadow: 0 0 0 3px rgba(0, 79, 184, 0.12);
+        outline: none;
+        background-color: #fff;
+    }
 
-        .time-slot-btn.slot-selected {
-            background: #004fb8;
-            border-color: #004fb8;
-            color: #fff;
-        }
+    /* ── Date Swiper Slides ── */
+    #availableDates .swiper-slide {
+        text-align: center;
+        cursor: pointer;
+        padding: 0; /* small breathing space */
+    box-sizing: border-box;
+    }
 
-        .time-slot-btn.slot-booked {
-            background: #f3f4f8;
-            border-color: #e0e2ec;
-            color: #b0b4c8;
-            cursor: not-allowed;
-            filter: grayscale(1);
-            opacity: 0.6;
-            text-decoration: line-through;
-        }
+   #availableDates .swiper-slide .date-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-        .slot-booked-label {
-            display: block;
-            font-size: 0.7rem;
-            color: #b0b4c8;
-            margin-top: 2px;
-        }
-    </style>
+    width: 100%;
+    height: 100%;
+
+    padding: 14px 8px;
+    border-radius: 14px;
+
+    border: 1.5px solid #e0e5f2;
+    background: #f8faff;
+
+    transition: all 0.2s ease;
+}
+
+    #availableDates .swiper-slide .date-item .day-name {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    #availableDates .swiper-slide .date-item .day-num {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a1d30;
+        line-height: 1;
+    }
+
+    #availableDates .swiper-slide .date-item .month-name {
+        font-size: 0.68rem;
+        font-weight: 500;
+        color: #9ca3af;
+    }
+
+    #availableDates .swiper-slide:hover:not(.disabled-date) .date-item {
+        border-color: #22c55e;
+        background: rgba(34, 197, 94, 0.08);
+    }
+
+    /* ── ACTIVE DATE — full green card ── */
+    #availableDates .swiper-slide.active-date .date-item {
+        background: #b4ebc8 !important;          /* solid green fill */
+        border-color: #22c55e !important;
+        color: #fff !important;
+    }
+
+    #availableDates .swiper-slide.active-date .date-item .day-name,
+    #availableDates .swiper-slide.active-date .date-item .day-num,
+    #availableDates .swiper-slide.active-date .date-item .month-name {
+        color: #ffffff !important;
+    }
+
+    /* ── Disabled (fully booked) date ── */
+    #availableDates .swiper-slide.disabled-date {
+        opacity: 0.35;
+        filter: grayscale(1);
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+   
+    /* ── Swiper nav buttons ── */
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: #004fb8 !important;
+        background: #fff;
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        top: 50% !important;
+    }
+
+    .swiper-button-next::after,
+    .swiper-button-prev::after {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+    }
+
+    /* ── Time Slot Grid ── */
+    .time-slot-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .time-slot-btn {
+        padding: 11px 12px;
+        border-radius: 10px;
+        border: 1.5px solid #e0e5f2;
+        background: #f8faff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #1a1d30;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .time-slot-btn:hover:not(.slot-booked) {
+        border-color: #004fb8;
+        color: #004fb8;
+        background: #f0f4ff;
+    }
+
+    .time-slot-btn.slot-selected {
+        background: #004fb8;
+        border-color: #004fb8;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(0, 79, 184, 0.25);
+    }
+
+    .time-slot-btn.slot-booked {
+        background: #f3f4f8;
+        border-color: #e0e2ec;
+        color: #c0c4d4;
+        cursor: not-allowed;
+        opacity: 0.55;
+        text-decoration: line-through;
+    }
+
+    .slot-booked-label {
+        display: block;
+        font-size: 0.68rem;
+        color: #c0c4d4;
+        margin-top: 2px;
+    }
+
+    /* ── Alerts ── */
+    .alert {
+        border-radius: 10px;
+        font-size: 0.875rem;
+        padding: 12px 16px;
+    }
+
+    /* ── Submit Button ── */
+    .heroBtn.btn-long {
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #004fb8 0%, #0069f5 100%);
+        border: none;
+        color: #fff;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 16px rgba(0, 79, 184, 0.28);
+    }
+
+    .heroBtn.btn-long:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 22px rgba(0, 79, 184, 0.38);
+    }
+
+    .heroBtn.btn-long:active {
+        transform: translateY(0);
+    }
+
+    /* ── Modal ── */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #f0f4ff;
+        padding: 20px 24px 16px;
+    }
+
+    .modal-body {
+        padding: 20px 24px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #f0f4ff;
+        padding: 16px 24px 20px;
+    }
+
+    .modal-body .form-control {
+        border-radius: 10px;
+        border: 1.5px solid #e0e5f2;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .modal-body .form-control:focus {
+        border-color: #004fb8;
+        box-shadow: 0 0 0 3px rgba(0, 79, 184, 0.12);
+    }
+</style>
 </head>
 
 <body class="min-h-screen flex flex-col bg-gray-50">
@@ -745,7 +928,7 @@
                     <span class="day">${date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
                     <span class="date">${date.getDate()}</span>
                     <span class="month">${date.toLocaleDateString('en-US', { month: 'short' })}</span>
-                    ${isFullyBooked ? '<span style="font-size:0.65rem;color:#b0b4c8;display:block;margin-top:2px;">Full</span>' : ''}
+                   
                 </div>
             `;
 
