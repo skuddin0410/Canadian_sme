@@ -29,6 +29,7 @@ use App\Http\Controllers\LandingApartCardController;
 use App\Http\Controllers\LandingDemoTextController;
 use App\Http\Controllers\LandingCustomerBannerController;
 use App\Http\Controllers\LandingHomeReviewController;
+use App\Http\Controllers\ContactUsController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -172,6 +173,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('supports', SupportController::class);
   Route::patch('/support/{id}/status', [SupportController::class, 'updateStatus'])
     ->name('support.updateStatus');
+  Route::resource('event-support', ContactUsController::class);
   Route::get('/demo-requests', [DemoRequestController::class, 'index'])->name('demo.index');
   Route::patch(
     '/demo-requests/{id}/status',

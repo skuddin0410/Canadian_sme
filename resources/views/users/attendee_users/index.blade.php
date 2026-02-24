@@ -284,12 +284,13 @@
                         <div class="mt-3">
                             <label for="userImportFile">Import Users (Max 100 rows allowed, Allowed file CSV, XLSX) </label>
                             <input type="file" id="userImportFile" class="form-control" name="file"
-                                accept=".csv" required>
+                                accept=".csv,.xlsx,.xls" required>
                             <!-- <small class="form-text text-muted">After the import, an email will be sent to each user.</small> -->
                         </div>
                         <div id="rowCount"></div>
                     </div>
                     <div class="modal-footer">
+                        Sample File: <a href="{{ asset('/Application Test Leads Import.xlsx') }}" download>Download</a>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"
                             onclick="closeImportModal()">Close</button>
                         <button type="submit" class="btn btn-primary" id="submitBtn"

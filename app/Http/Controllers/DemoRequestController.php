@@ -20,6 +20,12 @@ class DemoRequestController extends Controller
                     ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
+        if ($request->filled('end_date')) {
+            $query->where('booking_date', [
+
+                $request->end_date
+            ]);
+        }
 
         $demos = $query->paginate(10);
 
@@ -36,20 +42,22 @@ class DemoRequestController extends Controller
             'status' => 'required|in:pending,confirm,reschedule,cancel,completed',
             'note' => 'nullable|string|max:1000'
         ]);
-         if (in_array($request->status, ['reschedule', 'cancel']) 
-        && empty($request->note)) {
-        
-        return back()->withErrors([
-            'note' => 'Note is required when rescheduling or cancelling.'
-        ]);
-    }
+        if (
+            in_array($request->status, ['reschedule', 'cancel'])
+            && empty($request->note)
+        ) {
+
+            return back()->withErrors([
+                'note' => 'Note is required when rescheduling or cancelling.'
+            ]);
+        }
 
         $demo = DemoRequests::findOrFail($id);
         $demo->status = $request->status;
         $demo->note = $request->note;
         $demo->save();
-         Mail::to($demo->email ?? optional($demo->user)->email)
-        ->send(new DemoStatusUpdatedMail($demo));
+        Mail::to($demo->email ?? optional($demo->user)->email)
+            ->send(new DemoStatusUpdatedMail($demo));
 
         return back()->with('success', 'Status updated successfully.');
     }

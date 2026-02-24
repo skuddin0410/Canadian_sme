@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\FormBuilderController;
+use App\Http\Controllers\Frontend\ContactUsController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\DemoController;
 
@@ -35,7 +36,7 @@ Route::get('/sponsor', [LandingController::class, 'sponsorIndex'])->name('sponso
 Route::get('/sponsor/{slug}', [LandingController::class, 'sponsor'])->name('sponsor');
 Route::get('/speaker/{slug}', [LandingController::class, 'speaker'])->name('speaker');
 
-Route::get('/venue', [LandingController::class, 'venue'])->name('venue');
+Route::get('/venue/{slug}', [LandingController::class, 'venue'])->name('venue');
 Route::get('/venue/app', [LandingController::class, 'getVenuInfoForApp'])->name('venue-app');
 
 Route::get('/update-user/{userId}', [LandingController::class, 'showUpdateForm'])->name('update-user');
@@ -56,7 +57,15 @@ Route::get('/support', function () {
 Route::get('/contact-us', function () {
     return view('new_contact_us'); // This will load the contact-us.blade.php view
 })->name('contact-us');
+
 Route::post('/contact-submit' , [SupportController::class,'store'])->name('contact-submit');
+
+Route::get('/support/{slug}' , [ContactUsController::class,'index'])->name('support');
+Route::post('/support-submit/{slug}', [ContactUsController::class, 'store'])
+     ->name('support.store');
+Route::get('/pricing', function () {
+    return view('new_pricing_page');
+})->name('pricing');
 
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 

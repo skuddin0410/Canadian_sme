@@ -448,10 +448,11 @@ public function session(Request $request, $slug)
     
     
     
-    public function venue(){
+    public function venue($slug = null)
+    {
     $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
     $location = $locationSetting ? $locationSetting->value : null;
-    $event = Event::with(['photo'])->first();
+    $event = Event::with(['photo'])->where('slug', $slug)->first();
     $location = $event->location ?? '';
 
     $googleApiKey = config('services.google_maps.key'); 

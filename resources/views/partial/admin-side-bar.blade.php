@@ -340,13 +340,19 @@
     <li class="menu-item {{ request()->is('admin/supports') ? 'active open' : '' }}">
         <a href="{{ route('supports.index') }}" class="menu-link">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
-            <div data-i18n="Support">Support</div>
+            <div data-i18n="Support">Contact-Us</div>
         </a>
     </li>
     <li class="menu-item {{ request()->routeIs('demo.*') ? 'active open' : '' }}">
         <a href="{{ route('demo.index') }}" class="menu-link">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div>Demo Requests</div>
+        </a>
+    </li>
+    <li class="menu-item {{ request()->is('admin/event-support') ? 'active open' : '' }}">
+        <a href="{{ route('event-support.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+            <div data-i18n="event-support">Event Support</div>
         </a>
     </li>
     @endif

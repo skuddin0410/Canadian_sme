@@ -8,9 +8,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Support;
+use App\Models\EventSupport;
 
-class SupportStatusUpdated extends Mailable
+class EventSupportStatus extends Mailable
 {
     use Queueable, SerializesModels;
     public $support;
@@ -18,7 +18,7 @@ class SupportStatusUpdated extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(Support $support)
+    public function __construct(EventSupport $support)
     {
         $this->support = $support;
     }
@@ -29,7 +29,7 @@ class SupportStatusUpdated extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Contact Query Status Updated',
+            subject: 'Your Event Support Status Updated',
         );
     }
 
