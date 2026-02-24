@@ -24,7 +24,7 @@
 <body>
 
     <!-- header -->
-  @include('frontend.partials.header')
+    @include('frontend.partials.header')
     <!-- header end -->
 
     <!-- contact us start -->
@@ -69,6 +69,15 @@
                     </div>
                     <form method="POST" action="{{ route('support.store', $event->slug) }}">
                         @csrf
+                        @if ($errors->any())
+                        <div class="alert alert-danger mb-3">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
                         <div class="row gy-2 gy-lg-3">
 
                             <div class="col-xl-6">
@@ -77,7 +86,7 @@
                                 </div>
                             </div>
 
-                           
+
 
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
@@ -91,10 +100,10 @@
                                 </div>
                             </div>
 
-                           
+
 
                             <div class="col-12">
-                               <textarea name="message" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
+                                <textarea name="message" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
                             </div>
 
                         </div>

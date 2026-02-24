@@ -42,6 +42,15 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                     @endif
+                    @if ($errors->any())
+                    <div class="alert alert-danger mb-3">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
 
                     <div class="row gy-3 mb-4 mb-xl-5">
                         <div class="col-xl-6">

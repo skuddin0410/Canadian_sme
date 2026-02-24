@@ -22,7 +22,8 @@ class ContactUsController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|max:255',
-            'phone'    => 'nullable|string|max:20',
+            'phone'    => ['nullable',
+            'regex:/^\+?[0-9]{7,15}$/'],
             'message'  => 'required|string',
         ]);
 
