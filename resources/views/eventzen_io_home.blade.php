@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/frontend/css/style_new.css">
  <style>
     /* ── Form Card Wrapper ── */
+    
     .event-booking-right {
         background: #ffffff;
         border-radius: 20px;
@@ -270,6 +271,7 @@
         border-color: #004fb8;
         box-shadow: 0 0 0 3px rgba(0, 79, 184, 0.12);
     }
+    
 </style>
 </head>
 
@@ -616,8 +618,8 @@
 
                                     <input type="hidden" name="booking_date" id="selectedDate" required>
 
-                                    <div class="swiper-button-next"></div>
-                                    <div class="swiper-button-prev"></div>
+                                    <!-- <div class="swiper-button-next"></div>
+                                    <div class="swiper-button-prev"></div> -->
                                 </div>
                             </div>
 
