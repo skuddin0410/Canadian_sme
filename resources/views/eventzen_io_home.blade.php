@@ -94,7 +94,7 @@
 
     @include('partials_new.header')
 
-     <!-- ======== HERO BANNER ========  -->
+    <!-- ======== HERO BANNER ========  -->
     @if($heroBanner)
     <section class="banner section position-relative">
         <div class="container">
@@ -394,6 +394,16 @@
                                 {{ session('success') }}
                             </div>
                             @endif
+                            {{-- Validation Errors --}}
+                            @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            @endif
 
                             {{-- Timezone --}}
                             <div class="event-booking-right-cell">
@@ -537,7 +547,7 @@
                         <div class="swiper-slide">
                             <div class="img-box">
                                 @if($review->profileImage)
-                                    <img src="{{ $review->profileImage->file_path }}" alt="{{ $review->customer_name }}">
+                                <img src="{{ $review->profileImage->file_path }}" alt="{{ $review->customer_name }}">
                                 @endif
                             </div>
                         </div>

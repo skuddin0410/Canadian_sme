@@ -14,13 +14,23 @@ class DemoController extends Controller
 {
     public function store(Request $request)
     {
-        if (Auth::check()) {
 
-            $request->validate([
-                'timezone'     => 'required|string',
-                'booking_date' => 'required|date',
-                'time_slot'    => 'required|string',
-            ]);
+
+        $request->validate([
+            'timezone'     => 'required|string',
+            'booking_date' => 'required|date|after_or_equal:today',
+            'time_slot'    => 'required|string',
+        ]);
+        $alreadyBooked = DemoRequests::where('booking_date', $request->booking_date)
+            ->where('time_slot', $request->time_slot)
+            ->exists();
+
+        if ($alreadyBooked) {
+            return back()->withErrors([
+                'time_slot' => 'This time slot is already booked. Please select another slot.'
+            ])->withInput();
+        }
+        if (Auth::check()) {
 
             $demo = DemoRequests::create([
                 'user_id'      => Auth::id(),
@@ -36,7 +46,10 @@ class DemoController extends Controller
             $request->validate([
                 'name'         => 'required|string|max:255',
                 'email'        => 'required|email|max:255',
-                'phone'        => 'required|string|max:20',
+                'phone' => [
+                    'required',
+                    'regex:/^\+?[0-9]{7,15}$/'
+                ],
                 'timezone'     => 'required|string',
                 'booking_date' => 'required|date',
                 'time_slot'    => 'required|string',
