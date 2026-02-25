@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Services\IOSPushService;
 use App\Models\FavoriteConnection;
+use Carbon\Carbon;
 
 
 class HomeController extends Controller
@@ -167,6 +168,8 @@ class HomeController extends Controller
             "videoUrl" => $featuredEvent->youtube_link ?? '',
             "startTime" => $featuredEvent->start_date ?? '',
             "endTime" => $featuredEvent->end_date ?? '',
+            //if endtime past than current time then event active false
+            "event_active" => now()->lessThanOrEqualTo(Carbon::parse($featuredEvent->end_date)),
             "status" => $featuredEvent->status,
         ] : [
             "title" => "No Featured Event Available",

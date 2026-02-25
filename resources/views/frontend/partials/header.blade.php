@@ -12,20 +12,19 @@
 
             <!-- Search Box -->
             <div class="header-search-div">
-            <form class=" d-md-flex ms-auto w-100 w-sm-25 position-relative" action="{{ route('front.landing.search') }}" method="GET">
-                <input 
-                    class="form-control rounded-pill ps-4 py-2 shadow-sm fs-6 header-search-input"
-                    type="text"
-                    name="q"
-                    placeholder="Please enter search key..."
-                    value="{{ request('q') }}"
-                >
-                <button 
-                    class="btn position-absolute end-0 top-50 translate-middle-y me-2 px-3 py-1 border-0 bg-transparent text-secondary d-flex align-items-center gap-1"
-                    type="submit">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-            </form>
+                <form class=" d-md-flex ms-auto w-100 w-sm-25 position-relative" action="{{ route('front.landing.search') }}" method="GET">
+                    <input
+                        class="form-control rounded-pill ps-4 py-2 shadow-sm fs-6 header-search-input"
+                        type="text"
+                        name="q"
+                        placeholder="Please enter search key..."
+                        value="{{ request('q') }}">
+                    <button
+                        class="btn position-absolute end-0 top-50 translate-middle-y me-2 px-3 py-1 border-0 bg-transparent text-secondary d-flex align-items-center gap-1"
+                        type="submit">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
             </div>
 
             <!-- Navbar Menu -->
@@ -38,7 +37,7 @@
                         <li class="nav-item">
                             <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('front.events', ['slug' => $event->slug ?? null]) }}">Home</a>
                         </li>
-                        
+
 
                         <li class="nav-item">
                             <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => $event->slug ?? null]) }}">Location</a>
@@ -53,14 +52,19 @@
                             <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'about']) }}">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'support']) }}">Support</a>
+                            @isset($event)
+                            <a class="nav-link p-0 {{ request()->is('support*') ? 'active' : '' }}"
+                                href="{{ route('support', ['slug' => $event->slug]) }}">
+                                Support
+                            </a>
+                            @endisset
                         </li>
                         <li class="nav-item">
-                        
+
                         </li>
                     </ul>
                 </div>
-                
+
                 @if(!Auth::check())
                 <a class="heroBtn ms-3" href="{{ route('login') }}">
                     <img class="d-xl-none" src="{{ asset('frontend/images/login.png') }}" alt="">
@@ -72,7 +76,7 @@
                     <span class="d-none d-xl-block">Dashboard</span>
                 </a>
                 @endif
-            
+
                 <!-- Toggler -->
                 <button class="navbar-toggler heroBtn bg-transparent custom-toggler-open ms-3">
                     <span class="navbar-toggler-icon"></span>
@@ -81,4 +85,3 @@
         </div>
     </nav>
 </header>
-

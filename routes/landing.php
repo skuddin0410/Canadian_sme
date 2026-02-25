@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\FormBuilderController;
+use App\Http\Controllers\Frontend\ContactUsController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\DemoController;
 
@@ -56,8 +57,12 @@ Route::get('/support', function () {
 Route::get('/contact-us', function () {
     return view('new_contact_us'); // This will load the contact-us.blade.php view
 })->name('contact-us');
+
 Route::post('/contact-submit' , [SupportController::class,'store'])->name('contact-submit');
 
+Route::get('/support/{slug}' , [ContactUsController::class,'index'])->name('support');
+Route::post('/support-submit/{slug}', [ContactUsController::class, 'store'])
+     ->name('support.store');
 Route::get('/pricing', function () {
     return view('new_pricing_page');
 })->name('pricing');
