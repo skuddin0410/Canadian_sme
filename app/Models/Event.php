@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use App\Models\ContactUs;
 
 class Event extends Model
 {
@@ -70,5 +71,8 @@ class Event extends Model
     {
         return $this->hasMany(EventAndEntityLink::class, 'event_id');
     }
-
+    public function contacts()
+    {
+        return $this->hasMany(ContactUs::class);
+    }
 }

@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin | Support
+    Admin | Event Support
 @endsection
 
 @section('content')
 <div class="container flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Contact Us</span></h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Event Support</span></h4>
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
 				<div class="card-header d-flex justify-content-between align-items-center">
-				    <h5 class="mb-0">Support Tickets</h5>
+				    <h5 class="mb-0">Event Support Tickets</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
 						<!-- <div class="dt-buttons"> 
 							<a href="" class="dt-button create-new btn btn-primary">
@@ -67,7 +67,7 @@
 	function GetSupportList() {
         $(".spinner-border").fadeIn(300);
         $.ajax({
-            url: "{{ route('supports.index') }}",
+            url: "{{ route('event-support.index') }}",
             type: 'get',
             headers: {
                 'X-CSRF-Token': $('meta[name="_token"]').attr('content')
@@ -106,7 +106,7 @@
        var search = $('#search').val();
        $(".spinner-border").fadeIn(300);
        $.ajax({
-            url: "{{ route('supports.index') }}" + '?' + $("#support-filter").serialize(),
+            url: "{{ route('event-support.index') }}" + '?' + $("#support-filter").serialize(),
             type: 'GET',
             headers: {
                 'X-CSRF-Token': $('meta[name="_token"]').attr('content')
@@ -125,7 +125,7 @@
 
     
     $('.reset-filter').on('click', function() {
-        window.location.href = "{{ route('supports.index') }}";
+        window.location.href = "{{ route('event-support.index') }}";
     });    	
 </script>	
 @endsection

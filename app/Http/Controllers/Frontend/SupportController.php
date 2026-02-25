@@ -15,12 +15,12 @@ class SupportController extends Controller
     public function index(){
         return view('new_contact_us');
     }
-     public function store(Request $request)
+    public function store(Request $request)
     {
        $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|max:255',
-            'phone'       => 'required|string|max:20',
+            'phone'       => ['required','regex:/^\+?[0-9]{7,15}$/'],
             'location'    => 'required|string|max:255',
             'subject'     => 'required|string|max:255',
             'description' => 'required|string|max:1000',

@@ -123,7 +123,11 @@ Admin | Demo Requests
         display: none;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 
     /* ── Table ── */
     .demo-table {
@@ -152,8 +156,13 @@ Admin | Demo Requests
         transition: background 0.15s;
     }
 
-    .demo-table tbody tr:last-child { border-bottom: none; }
-    .demo-table tbody tr:hover { background: #fafbff; }
+    .demo-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .demo-table tbody tr:hover {
+        background: #fafbff;
+    }
 
     .demo-table td {
         padding: 13px 18px;
@@ -246,11 +255,30 @@ Admin | Demo Requests
         box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.15);
     }
 
-    .status-pending    { background: #fff8e6; color: #b97b00; }
-    .status-confirm    { background: #e8f0ff; color: #3558d6; }
-    .status-reschedule { background: #e0f7fa; color: #00796b; }
-    .status-cancel     { background: #fdecea; color: #d32f2f; }
-    .status-completed  { background: #e6faf2; color: #1a8a5c; }
+    .status-pending {
+        background: #fff8e6;
+        color: #b97b00;
+    }
+
+    .status-confirm {
+        background: #e8f0ff;
+        color: #3558d6;
+    }
+
+    .status-reschedule {
+        background: #e0f7fa;
+        color: #00796b;
+    }
+
+    .status-cancel {
+        background: #fdecea;
+        color: #d32f2f;
+    }
+
+    .status-completed {
+        background: #e6faf2;
+        color: #1a8a5c;
+    }
 
     /* ── Empty State ── */
     .demo-empty {
@@ -290,12 +318,25 @@ Admin | Demo Requests
 
             <form method="GET" id="demo-filter">
                 <div class="demo-search-row">
-                    <input
-                        type="text"
+
+                    <input type="text"
                         class="demo-search-input"
                         name="search"
                         id="search"
                         placeholder="Search name or email…">
+
+                    <!-- <input type="date"
+               name="start_date"
+               id="start_date"
+               class="demo-search-input"
+               style="min-width:160px;"> -->
+
+                    <input type="date"
+                        name="end_date"
+                        id="end_date"
+                        class="demo-search-input"
+                        style="min-width:160px;">
+
                     <button type="button" class="demo-filter-btn filter">Search</button>
                 </div>
             </form>
@@ -315,36 +356,119 @@ Admin | Demo Requests
 
 @section('scripts')
 <script>
-    function showSpinner() { document.getElementById('demoSpinner').style.display = 'block'; }
-    function hideSpinner() { document.getElementById('demoSpinner').style.display = 'none'; }
+    let currentDemoId = null;
+    let currentSelect = null;
+    let originalValue = null;
+
+    // Delegated listener for dynamically loaded dropdowns
+    $(document).on("change", ".status-dropdown", function() {
+
+        let selectedStatus = $(this).val();
+
+        if (selectedStatus === 'reschedule' || selectedStatus === 'cancel') {
+
+            currentDemoId = $(this).data("id");
+            currentSelect = $(this);
+            originalValue = $(this).data("original");
+
+            let modalElement = document.getElementById('statusReasonModal');
+
+            if (!modalElement) {
+                console.error("Modal element not found.");
+                return;
+            }
+
+            let modal = new bootstrap.Modal(modalElement);
+
+            $("#statusReasonText").val('').removeClass("is-invalid");
+
+            modal.show();
+
+        } else {
+            $("#status-form-" + $(this).data("id")).submit();
+        }
+    });
+
+
+    // Save button click
+    $(document).on("click", "#saveStatusReasonBtn", function() {
+
+        let note = $("#statusReasonText").val().trim();
+
+        if (!note) {
+            $("#statusReasonText").addClass("is-invalid").focus();
+            return;
+        }
+
+        let form = $("#status-form-" + currentDemoId);
+        form.find(".status-note").val(note);
+
+        let modalElement = document.getElementById('statusReasonModal');
+        let modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+
+        form.submit();
+    });
+
+
+    // Reset dropdown if modal closed
+    $(document).on("hidden.bs.modal", "#statusReasonModal", function() {
+
+        if (currentSelect && originalValue !== null) {
+            currentSelect.val(originalValue);
+        }
+
+        currentDemoId = null;
+        currentSelect = null;
+        originalValue = null;
+    });
+</script>
+<script>
+    function showSpinner() {
+        document.getElementById('demoSpinner').style.display = 'block';
+    }
+
+    function hideSpinner() {
+        document.getElementById('demoSpinner').style.display = 'none';
+    }
 
     function GetDemoList(url, params) {
         showSpinner();
-        $.get(url || "{{ route('demo.index') }}", $.extend({ ajax_request: true }, params), function(data) {
+        $.get(url || "{{ route('demo.index') }}", $.extend({
+            ajax_request: true
+        }, params), function(data) {
             $("#demo-table").html(data.html);
             hideSpinner();
         });
     }
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         GetDemoList();
     });
 
-    $(document).on("click", ".filter", function () {
-        GetDemoList("{{ route('demo.index') }}", { search: $("#search").val() });
+    $(document).on("click", ".filter", function() {
+
+        GetDemoList("{{ route('demo.index') }}", {
+            search: $("#search").val(),
+            start_date: $("#start_date").val(),
+            end_date: $("#end_date").val()
+        });
+
     });
 
-    $(document).on("keydown", "#search", function (e) {
+    $(document).on("keydown", "#search", function(e) {
         if (e.key === "Enter") {
             e.preventDefault();
             $(".filter").click();
         }
     });
 
-    $(document).on("click", ".custom_pagination .pagination-link", function (e) {
+    $(document).on("click", ".custom_pagination .pagination-link", function(e) {
         e.preventDefault();
         showSpinner();
-        $.get($(this).attr("href"), { ajax_request: true }, function(data) {
+        $.get($(this).attr("href"), {
+            ajax_request: true
+        }, function(data) {
             $("#demo-table").html(data.html);
             hideSpinner();
         });

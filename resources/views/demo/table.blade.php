@@ -31,7 +31,17 @@
                 </td>
 
                 <td>
-                    <span class="email-text">{{ $demo->email ?? optional($demo->user)->email }}</span>
+                    @php
+                    $email = $demo->email ?? optional($demo->user)->email;
+                    @endphp
+
+                    @if($email)
+                    <a href="mailto:{{ $email }}" class="email-text">
+                        {{ $email }}
+                    </a>
+                    @else
+                    <span class="email-text">—</span>
+                    @endif
                 </td>
 
                 <td>
@@ -61,11 +71,11 @@
                             class="status-dropdown form-select"
                             data-id="{{ $demo->id }}"
                             data-original="{{ $demo->status }}">
-                            <option value="pending"    {{ $demo->status === 'pending'    ? 'selected' : '' }}>⏳ Pending</option>
-                            <option value="confirm"    {{ $demo->status === 'confirm'    ? 'selected' : '' }}>✅ Confirm</option>
+                            <option value="pending" {{ $demo->status === 'pending'    ? 'selected' : '' }}>⏳ Pending</option>
+                            <option value="confirm" {{ $demo->status === 'confirm'    ? 'selected' : '' }}>✅ Confirm</option>
                             <option value="reschedule" {{ $demo->status === 'reschedule' ? 'selected' : '' }}>🔄 Reschedule</option>
-                            <option value="cancel"     {{ $demo->status === 'cancel'     ? 'selected' : '' }}>❌ Cancel</option>
-                            <option value="completed"  {{ $demo->status === 'completed'  ? 'selected' : '' }}>🎉 Completed</option>
+                            <option value="cancel" {{ $demo->status === 'cancel'     ? 'selected' : '' }}>❌ Cancel</option>
+                            <option value="completed" {{ $demo->status === 'completed'  ? 'selected' : '' }}>🎉 Completed</option>
                         </select>
                     </form>
                 </td>
@@ -76,7 +86,7 @@
             </tr>
 
             {{-- ── NOTE ROW ── --}}
-            <tr class="note-row" id="note-row-{{ $demo->id }}" style="display:none;">
+            <!-- <tr class="note-row" id="note-row-{{ $demo->id }}" style="display:none;">
                 <td colspan="8" class="note-row-cell">
                     <div class="note-panel">
                         <div class="note-panel-header">
@@ -114,11 +124,52 @@
                         </div>
                     </div>
                 </td>
-            </tr>
+            </tr> -->
             @endforeach
         </tbody>
     </table>
+    {{-- ── STATUS REASON MODAL ── --}}
+    <div class="modal fade" id="statusReasonModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-3">
 
+                <div class="modal-header">
+                    <h5 class="modal-title">Provide Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="text-muted small mb-2">
+                        Please provide a reason before updating the status.
+                    </p>
+
+                    <textarea
+                        id="statusReasonText"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Describe the reason..."></textarea>
+
+                    <div class="invalid-feedback">
+                        Reason is required.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-primary"
+                        id="saveStatusReasonBtn">
+                        Save & Submit
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="demo-pagination-wrap custom_pagination">
         {!! $demos->links() !!}
     </div>
@@ -136,176 +187,184 @@
 
 {{-- ── STYLES ── --}}
 <style>
-/* ── Note row cell ── */
-.note-row-cell {
-    padding: 0 !important;
-    border-top: none !important;
-}
+    /* ── Note row cell ── */
+    .note-row-cell {
+        padding: 0 !important;
+        border-top: none !important;
+    }
 
-.note-row td {
-    background: transparent;
-}
+    .note-row td {
+        background: transparent;
+    }
 
-/* ── Panel wrapper ── */
-.note-panel {
-    margin: 4px 12px 12px 12px;
-    background: #ffffff;
-    border: 1.5px solid #e0e7ff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.07), 0 1px 4px rgba(0,0,0,0.04);
-    animation: notePanelIn 0.22s cubic-bezier(.34,1.3,.64,1) both;
-}
+    /* ── Panel wrapper ── */
+    .note-panel {
+        margin: 4px 12px 12px 12px;
+        background: #ffffff;
+        border: 1.5px solid #e0e7ff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(99, 102, 241, 0.07), 0 1px 4px rgba(0, 0, 0, 0.04);
+        animation: notePanelIn 0.22s cubic-bezier(.34, 1.3, .64, 1) both;
+    }
 
-@keyframes notePanelIn {
-    from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-    to   { opacity: 1; transform: translateY(0)   scale(1);    }
-}
+    @keyframes notePanelIn {
+        from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+        }
 
-/* ── Header ── */
-.note-panel-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 14px 18px 12px;
-    background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
-    border-bottom: 1px solid #e0e7ff;
-}
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
 
-.note-panel-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    background: #6366f1;
-    color: #fff;
-    flex-shrink: 0;
-    margin-top: 1px;
-}
+    /* ── Header ── */
+    .note-panel-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 18px 12px;
+        background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+        border-bottom: 1px solid #e0e7ff;
+    }
 
-.note-panel-title {
-    margin: 0 0 2px;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #3730a3;
-    letter-spacing: -0.01em;
-}
+    .note-panel-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: #6366f1;
+        color: #fff;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
 
-.note-panel-subtitle {
-    margin: 0;
-    font-size: 0.775rem;
-    color: #6b7280;
-}
+    .note-panel-title {
+        margin: 0 0 2px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #3730a3;
+        letter-spacing: -0.01em;
+    }
 
-/* ── Textarea area ── */
-.note-textarea-wrap {
-    padding: 14px 18px 10px;
-}
+    .note-panel-subtitle {
+        margin: 0;
+        font-size: 0.775rem;
+        color: #6b7280;
+    }
 
-.note-textarea {
-    width: 100%;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 10px 13px;
-    font-size: 0.855rem;
-    color: #1f2937;
-    background: #fafafa;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
-    font-family: inherit;
-    line-height: 1.55;
-    box-sizing: border-box;
-}
+    /* ── Textarea area ── */
+    .note-textarea-wrap {
+        padding: 14px 18px 10px;
+    }
 
-.note-textarea:focus {
-    border-color: #6366f1;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-}
+    .note-textarea {
+        width: 100%;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 10px 13px;
+        font-size: 0.855rem;
+        color: #1f2937;
+        background: #fafafa;
+        resize: vertical;
+        outline: none;
+        transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+        font-family: inherit;
+        line-height: 1.55;
+        box-sizing: border-box;
+    }
 
-.note-textarea::placeholder {
-    color: #9ca3af;
-    font-style: italic;
-}
+    .note-textarea:focus {
+        border-color: #6366f1;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
 
-.note-textarea.is-invalid {
-    border-color: #ef4444;
-    box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
-}
+    .note-textarea::placeholder {
+        color: #9ca3af;
+        font-style: italic;
+    }
 
-.note-char-hint {
-    margin-top: 6px;
-    font-size: 0.73rem;
-    color: #9ca3af;
-}
+    .note-textarea.is-invalid {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+    }
 
-/* ── Actions ── */
-.note-panel-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 10px 18px 14px;
-    border-top: 1px solid #f3f4f6;
-    background: #fafafa;
-}
+    .note-char-hint {
+        margin-top: 6px;
+        font-size: 0.73rem;
+        color: #9ca3af;
+    }
 
-/* Discard button */
-.btn-note-cancel {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    border-radius: 7px;
-    border: 1.5px solid #e5e7eb;
-    background: #ffffff;
-    color: #6b7280;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-}
+    /* ── Actions ── */
+    .note-panel-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 10px 18px 14px;
+        border-top: 1px solid #f3f4f6;
+        background: #fafafa;
+    }
 
-.btn-note-cancel:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #374151;
-}
+    /* Discard button */
+    .btn-note-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 16px;
+        border-radius: 7px;
+        border: 1.5px solid #e5e7eb;
+        background: #ffffff;
+        color: #6b7280;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
 
-/* Save button */
-.btn-note-save {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 18px;
-    border-radius: 7px;
-    border: none;
-    background: #6366f1;
-    color: #ffffff;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    box-shadow: 0 2px 8px rgba(99,102,241,0.25);
-}
+    .btn-note-cancel:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+        color: #374151;
+    }
 
-.btn-note-save:hover {
-    background: #4f46e5;
-    box-shadow: 0 4px 14px rgba(99,102,241,0.35);
-    transform: translateY(-1px);
-}
+    /* Save button */
+    .btn-note-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 18px;
+        border-radius: 7px;
+        border: none;
+        background: #6366f1;
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+    }
 
-.btn-note-save:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(99,102,241,0.2);
-}
+    .btn-note-save:hover {
+        background: #4f46e5;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-note-save:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(99, 102, 241, 0.2);
+    }
 </style>
 
 {{-- ── SCRIPT ── --}}
-<script>
+
+<!-- <script>
     // Set data-original FIRST before attaching any listeners
     document.querySelectorAll('.status-dropdown').forEach(function(select) {
         select.setAttribute('data-original', select.value);
@@ -359,4 +418,4 @@
             select.value = select.getAttribute('data-original');
         });
     });
-</script>
+</script> -->

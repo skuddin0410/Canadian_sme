@@ -18,13 +18,13 @@
     <!-- Swiper CSS CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <!-- css -->
-    <link rel="stylesheet" href="./frontend/css/style_new.css">
+    <link rel="stylesheet" href="/frontend/css/style_new.css">
 </head>
 
 <body>
 
     <!-- header -->
-    @include('partials_new.header')
+    @include('frontend.partials.header')
     <!-- header end -->
 
     <!-- contact us start -->
@@ -42,21 +42,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                     @endif
-                    @if ($errors->any())
-                    <div class="alert alert-danger mb-3">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
 
                     <div class="row gy-3 mb-4 mb-xl-5">
                         <div class="col-xl-6">
                             <div class="contact-fake-input">
                                 <div>
-                                    <img src="./images/phone-call.png" alt="">
+                                    <img src="/images/phone-call.png" alt="">
                                 </div>
                                 <div>
                                     <h5>Phone</h5>
@@ -67,7 +58,7 @@
                         <div class="col-xl-6">
                             <div class="contact-fake-input">
                                 <div>
-                                    <img src="./images/mail.png" alt="">
+                                    <img src="/images/mail.png" alt="">
                                 </div>
                                 <div>
                                     <h5>Email ID</h5>
@@ -76,8 +67,17 @@
                             </div>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('contact-submit') }}">
+                    <form method="POST" action="{{ route('support.store', $event->slug) }}">
                         @csrf
+                        @if ($errors->any())
+                        <div class="alert alert-danger mb-3">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
                         <div class="row gy-2 gy-lg-3">
 
                             <div class="col-xl-6">
@@ -86,11 +86,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-xl-6">
-                                <div class="input-wrapper">
-                                    <input name="location" class="type-text" type="text" placeholder="Location" required>
-                                </div>
-                            </div>
+
 
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
@@ -104,14 +100,10 @@
                                 </div>
                             </div>
 
-                            <div class="col-xl-12">
-                                <div class="input-wrapper">
-                                    <input name="subject" class="type-text" type="text" placeholder="Enter Your Subject" required>
-                                </div>
-                            </div>
+
 
                             <div class="col-12">
-                                <textarea name="description" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
+                                <textarea name="message" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
                             </div>
 
                         </div>
@@ -144,7 +136,7 @@
     <!-- Swiper JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <!-- add js file -->
-    <script src="./frontend/js/script_new.js"></script>
+    <script src="/frontend/js/script_new.js"></script>
 </body>
 
 </html>
