@@ -17,12 +17,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use App\Models\Speaker;
 
 class JWTAuthController extends Controller
 {
 
-    public function getUser() {
+    public function getUser_old() {
     try {
         if (! $user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
@@ -77,6 +78,62 @@ class JWTAuthController extends Controller
     }
 }
 
+public function getUser()
+{
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data' => null,
+            ], 401);
+        }
+
+        $user->load(['photo', 'usercompany']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'successful',
+            'id' => $user->id,
+            'comet_chat_id' => $user->cometchat_id,
+            'name' => $user->full_name ?? '',
+            'first_name' => $user->name ?? '',
+            'last_name' => $user->lastname ?? '',
+            'email' => $user->email ?? '',
+            'phone' => $user->mobile ?? '',
+            'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
+            'my_qr_code' => !empty($user->qr_code) ? asset($user->qr_code) : null,
+            'company_name' => !empty($user->usercompany) ? $user->usercompany->name : $user->company,
+            'company_email' => !empty($user->usercompany) ? $user->usercompany->email : $user->email,
+            'company_phone' => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile,
+            'company_website' => !empty($user->usercompany) ? $user->usercompany->website : $user->website_url,
+            'roles' => function_exists('groups') ? groups($user) : [],
+        ]);
+
+    } catch (TokenExpiredException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Token expired',
+            'data' => null,
+        ], 401);
+
+    } catch (TokenInvalidException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Token invalid',
+            'data' => null,
+        ], 401);
+
+    } catch (JWTException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized',
+            'data' => null,
+        ], 401);
+    }
+}
 
 
 

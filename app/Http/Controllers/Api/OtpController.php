@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use App\Mail\UserWelcome;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OtpController extends Controller
@@ -33,6 +34,12 @@ class OtpController extends Controller
                     'error' => "Invalid email format",
                 ], 422);
             }
+
+            $email   = $request->email;
+            $eventId = (int) $request->event_id;
+
+            // Fetch user once (including soft deleted)
+            $user = User::withTrashed()->where('email', $email)->first();
             
             if (User::where('email', $request->email)->doesntExist()) {
                 return response()->json([
@@ -53,6 +60,22 @@ class OtpController extends Controller
                     'success' => false,
                     'message' => 'Your account is inactive.',
                 ], 403); 
+            }
+
+            if(isset($request->event_id)){
+                // Check mapping: event_and_entity_link
+                $isMapped = DB::table('event_and_entity_link')
+                    ->where('event_id', $eventId)
+                    ->where('entity_type', 'users')   // or 'User' depending on what you store
+                    ->where('entity_id', $user->id)
+                    ->exists();
+
+                if (!$isMapped) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'User is not mapped with this event.',
+                    ], 403);
+                }
             }
             
            
