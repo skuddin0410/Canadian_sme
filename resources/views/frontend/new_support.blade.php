@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>contact us</title>
+    <title>Event Support</title>
     <!-- bootstrap css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -31,8 +31,8 @@
     <section class="contact-us-page section">
         <div class="container">
             <div class="global-heading text-center">
-                <h2>Get in Touch with Us</h2>
-                <p>We’re always here to assist you. Whether you have a question,</p>
+                <h2>Event Support</h2>
+                <p>Need help with your event? Our support team is ready to assist you with any queries or concerns.</p>
             </div>
             <div class="contact-us-page-row">
                 <div>
@@ -62,7 +62,7 @@
                                 </div>
                                 <div>
                                     <h5>Email ID</h5>
-                                    <span>info@ocsedu.com</span>
+                                    <span>support@ocsedu.com</span>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
 
 
                             <div class="col-12">
-                                <textarea name="message" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
+                                <textarea name="message" class="contact-textarea" rows="4" placeholder="Describe your issue or query regarding the event..." required></textarea>
                             </div>
 
                         </div>
