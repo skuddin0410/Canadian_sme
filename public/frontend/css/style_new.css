@@ -247,7 +247,7 @@ header .nav-link:hover {
     color: var(--theme);
 }
 
-@media(max-width:767px) {
+@media(max-width:1199px) {
     header {
         padding: 10px 0;
     }

@@ -6,25 +6,27 @@
                 <img class="logo" src="{{ asset('frontend/images/logo.png') }}" alt="logo">
             </a> -->
 
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <img class="logo" src="{{asset('eventzen-logo.svg')}}" alt="logo" width="50%">
+            <a class="" href="{{ url('/') }}">
+                <img class="logo" src="{{asset('eventzen-logo.svg')}}" alt="logo">
             </a>
 
             <!-- Search Box -->
+            <div class="d-flex justify-content-end w-xl-100">
             <div class="header-search-div">
                 <form class=" d-md-flex ms-auto w-100 w-sm-25 position-relative" action="{{ route('front.landing.search') }}" method="GET">
                     <input
-                        class="form-control rounded-pill ps-4 py-2 shadow-sm fs-6 header-search-input"
-                        type="text"
+                        class="form-control rounded-pill ps-4 py-2 shadow-sm fs-6 header-search-input header-search-input"
+                        type="search"
                         name="q"
-                        placeholder="Please enter search key..."
+                        placeholder="search..."
                         value="{{ request('q') }}">
                     <button
-                        class="btn position-absolute end-0 top-50 translate-middle-y me-2 px-3 py-1 border-0 bg-transparent text-secondary d-flex align-items-center gap-1"
+                        class="btn position-absolute end-0 top-50 translate-middle-y me-2 px-1 px-sm-3 py-1 border-0 bg-transparent text-secondary d-flex align-items-center gap-1"
                         type="submit">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <i class="fa-solid fa-magnifying-glass header-search-icon"></i>
                     </button>
                 </form>
+            </div>
             </div>
 
             <!-- Navbar Menu -->
