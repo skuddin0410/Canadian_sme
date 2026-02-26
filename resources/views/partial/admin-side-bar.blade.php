@@ -355,6 +355,29 @@
             <div data-i18n="event-support">Event Support</div>
         </a>
     </li>
+    <li class="menu-item {{ request()->is('admin/polls*') || request()->is('admin/poll-responses*') ? 'active open' : '' }}">
+
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons fa fa-poll" style="font-size: 20px;"></i>
+            <div>Polls</div>
+        </a>
+
+        <ul class="menu-sub">
+
+            <li class="menu-item {{ request()->is('admin/polls') ? 'active' : '' }}">
+                <a href="{{ route('polls.index') }}" class="menu-link">
+                    <div>List of Polls Created</div>
+                </a>
+            </li>
+
+            <li class="menu-item {{ request()->is('admin/poll-responses') ? 'active' : '' }}">
+                <a href="" class="menu-link">
+                    <div>List of Responses</div>
+                </a>
+            </li>
+
+        </ul>
+    </li>
     @endif
 
     </ul>

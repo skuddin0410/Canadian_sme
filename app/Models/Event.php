@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
 use App\Models\ContactUs;
+use App\Models\Poll;
 
 class Event extends Model
 {
@@ -65,6 +66,10 @@ class Event extends Model
     public function sessions()
     {
         return $this->hasMany(Session::class);
+    }
+    public function polls()
+    {
+        return $this->hasMany(Poll::class);
     }
 
     public function entityLinks()
