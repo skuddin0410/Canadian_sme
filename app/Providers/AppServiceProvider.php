@@ -31,6 +31,17 @@ class AppServiceProvider extends ServiceProvider
         date_default_timezone_set(config('app.timezone'));
         Paginator::useBootstrap();
         \App\Models\TicketType::observe(\App\Observers\TicketTypeObserver::class);
+
+        view()->composer('*', function ($view) {
+            $dynamicNavs = \App\Models\NavbarDynamic::where('status', 'active')
+                ->orderBy('order_by', 'asc')
+                ->get()
+                ->groupBy(function ($item) {
+                    return $item->category ?? 'General';
+                });
+            $view->with('dynamicNavs', $dynamicNavs);
+        });
+
         Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page') {
             $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
 

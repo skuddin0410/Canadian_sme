@@ -91,7 +91,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
   <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
-  <meta name="csrf-token" content="{{ csrf_token() }}">
   <script type="text/javascript">
     tinymce.init({
       selector: '#description',
@@ -102,47 +101,58 @@
       toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
       menubar: false,
       branding: false,
+      images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject('Upload failed');
+        reader.readAsDataURL(blobInfo.blob());
+      })
+    });
 
+    tinymce.init({
+      selector: '#description, .description-cls',
+      readonly: false,
+      width: '100%',
+      height: 300,
+      plugins: 'code image link lists table preview',
+      toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
+      menubar: false,
+      branding: false,
+      setup: function (editor) {
+          editor.on('change', function () {
+              editor.save();
+          });
+      },
+      images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject('Upload failed');
+        reader.readAsDataURL(blobInfo.blob());
+      })
+    });
 
-
+    tinymce.init({
+      selector: '.editor2',
+      readonly: false,
+      width: '100%',
+      height: 300,
+      plugins: 'code image link lists table preview',
+      toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
+      menubar: false,
+      branding: false,
+      setup: function (editor) {
+          editor.on('change', function () {
+              editor.save();
+          });
+      },
+      images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject('Upload failed');
+        reader.readAsDataURL(blobInfo.blob());
+      })
     });
   </script>
-</body>
-
-</html>
-<script type="text/javascript">
-  tinymce.init({
-    selector: '#description, .description-cls',
-    readonly: false,
-    width: '100%',
-    height: 300,
-    plugins: 'code image link lists table preview',
-    toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
-    menubar: false,
-    branding: false,
-    setup: function (editor) {
-        editor.on('change', function () {
-            editor.save();
-        });
-    }
-  });
-
-  tinymce.init({
-    selector: '.editor2',
-    readonly: false,
-    width: '100%',
-    height: 300,
-    plugins: 'code image link lists table preview',
-    toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
-    menubar: false,
-    branding: false,
-    setup: function (editor) {
-        editor.on('change', function () {
-            editor.save();
-        });
-    }
-  });
-</script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -163,3 +173,5 @@
     }
   });
 </script>
+</body>
+</html>

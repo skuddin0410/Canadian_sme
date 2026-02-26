@@ -26,7 +26,7 @@
         @if(isSuperAdmin())
         <li class="menu-item {{ request()->is('admin/home-page*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-home-circle" style="font-size: 24px;"></i>
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="home_page">Home Page</div>
             </a>
             <ul class="menu-sub">
@@ -102,6 +102,15 @@
                     </ul>
                 </li>
             </ul>
+        </li>
+        @endif
+
+        @if(isSuperAdmin())
+        <li class="menu-item {{ request()->is('admin/navbar-dynamic*') ? 'active open' : '' }}">
+            <a href="{{ route('admin.navbar-dynamic.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+                <div data-i18n="navbar_dynamic">Dynamic Nav</div>
+            </a>
         </li>
         @endif
 
