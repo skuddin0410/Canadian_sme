@@ -12,6 +12,7 @@ Route::get('/', [LandingController::class, 'index'])->name('front.landing');
 Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
 Route::get('/all-events', [LandingController::class, 'allEvents'])->name('front.allEvents');
 Route::get('/search', [LandingController::class, 'search'])->name('front.landing.search');
+Route::get('/nav/{slug}', [LandingController::class, 'dynamicNav'])->name('dynamic.nav');
 
 //Demo Requests
 Route::post('/demo-booking', [DemoController::class, 'store'])->name('demo.submit');

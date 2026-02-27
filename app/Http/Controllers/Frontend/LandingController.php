@@ -239,6 +239,11 @@ class LandingController extends Controller
         ));
     }
 
+    public function dynamicNav($slug)
+    {
+        $nav = \App\Models\NavbarDynamic::where('slug', $slug)->where('status', 'active')->firstOrFail();
+        return view('frontend.dynamic_nav', compact('nav'));
+    }
 
     public function schudled()
     {
