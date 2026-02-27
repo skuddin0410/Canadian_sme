@@ -41,9 +41,9 @@ Admin | Dynamic Nav
                                         <td>{{ $navbar->slug }}</td>
                                         <td>
                                             @if($navbar->status == 'active')
-                                                <span class="badge bg-label-success me-1">Active</span>
+                                                <span class="badge bg-label-success me-1">Published</span>
                                             @else
-                                                <span class="badge bg-label-danger me-1">Inactive</span>
+                                                <span class="badge bg-label-danger me-1">Draft</span>
                                             @endif
                                         </td>
                                         <td>{{ $navbar->order_by }}</td>

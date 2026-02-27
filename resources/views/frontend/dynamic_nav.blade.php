@@ -18,7 +18,7 @@
 
     @include('partials_new.header')
 
-    <section class="dynamic-content-section">
+    <section class="dynamic-content-section m-4">
         <div class="dynamic-rich-text">
             {!! $nav->content !!}
         </div>

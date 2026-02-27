@@ -30,10 +30,17 @@ Admin | Event Details
                     <div class="info-container">
                         <ul class="list-unstyled">
                             <li class="mb-3">
-                                <span class="fw-medium me-2">Image:</span>
+                                <span class="fw-medium me-2">Event Image:</span>
                                 @if(!empty($event->photo) && $event->photo->file_path)
-                                <span class="fw-medium me-2"><img src="{{asset($event->photo->file_path)  ?? ''}}"
+                                <span class="fw-medium me-2"><img src="{{ asset($event->photo->file_path) }}"
                                         alt="banner Image" height="100px;"></span>
+                                @endif
+                            </li>
+                            <li class="mb-3">
+                                <span class="fw-medium me-2">Map Image:</span>
+                                @if(!empty($event->mapImage) && $event->mapImage->file_path)
+                                <span class="fw-medium me-2"><img src="{{ asset($event->mapImage->file_path) }}"
+                                        alt="Map Image" height="100px;"></span>
                                 @endif
                             </li>
                             <li class="mb-3"><span class="fw-medium me-2">Location:</span>

@@ -24,7 +24,7 @@ class EventController extends Controller
         $offset = $perPage * ($pageNo - 1);
 
        if($request->ajax() && $request->ajax_request == true){
-        $events = Event::with(['category','photo'])->orderBy('id','DESC');
+        $events = Event::with(['category','photo','mapImage'])->orderBy('id','DESC');
 
         $events = isSuperAdmin() ? $events : $events->where('created_by',auth()->id());
         
@@ -93,7 +93,8 @@ class EventController extends Controller
             'meta_description' => 'nullable|string|max:1000',
             'meta_keywords' => 'nullable|string|max:1000',
             'tags'=>'nullable|string|max:1000',
-            'image'=>'required|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size')
+            'image'=>'required|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size'),
+            'map_image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size')
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
@@ -103,6 +104,10 @@ class EventController extends Controller
         $uploadPath = 'events';
         if($request->file("image")){
          $this->imageUpload($request->file("image"),$uploadPath,$event->id,'events','photo'); 
+        }
+
+        if($request->file("map_image")){
+         $this->imageUpload($request->file("map_image"),$uploadPath,$event->id,'events','map_image'); 
         }
 
         return redirect()->route('events.index')->with('success', 'Event created.');
@@ -182,6 +187,16 @@ class EventController extends Controller
          ]);
         }
 
+        if($event->mapImage){
+         Drive::create([
+            'table_id' => $clonedEvent->id,
+            'table_type' => 'events',
+            'file_type' => 'map_image',
+            'file_name' => $event->mapImage->file_name,
+            'is_local_file' => $event->mapImage->is_local_file,
+         ]);
+        }
+
         // Clone the related records from `event_and_entity_link`
         $eventAndEntityLinks = EventAndEntityLink::where('event_id', $eventId)->get();
         // If no records are found, log a message
@@ -246,7 +261,8 @@ class EventController extends Controller
             'visibility' => 'required|in:listed,unlisted',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255', // each tag must be a string (optional but safer)
-            'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
+            'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size'),
+            'map_image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
         ]);
 
         $validated['tags'] = $request->has('tags') && !empty($request->tags) ? implode(',', $request->tags) : '';
@@ -267,6 +283,10 @@ class EventController extends Controller
         $event->save();
         if($request->file("image")){
           $this->imageUpload($request->file("image"),'events',$event->id,'events','photo',$idForUpdate=$event->id);   
+        }
+
+        if($request->file("map_image")){
+          $this->imageUpload($request->file("map_image"),'events',$event->id,'events','map_image',$idForUpdate=$event->id);   
         }
      
         return redirect()->route('events.edit',['event'=>$event->id])->with('success', 'Event updated successfully');
