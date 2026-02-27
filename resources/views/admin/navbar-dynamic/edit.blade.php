@@ -74,8 +74,8 @@ Admin | Edit Navbar Item
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Status</label>
                                     <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                                        <option value="active" {{ old('status', $navbar->status) == 'active' ? 'selected' : '' }}>Active</option>
-                                        <option value="inactive" {{ old('status', $navbar->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                        <option value="active" {{ old('status', $navbar->status) == 'active' ? 'selected' : '' }}>Publish</option>
+                                        <option value="inactive" {{ old('status', $navbar->status) == 'inactive' ? 'selected' : '' }}>Draft</option>
                                     </select>
                                     @error('status')
                                         <div class="invalid-feedback">{{ $message }}</div>

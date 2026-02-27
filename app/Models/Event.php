@@ -63,6 +63,14 @@ class Event extends Model
             ->whereNotNull('file_name');
     }
 
+    public function mapImage()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'events')
+            ->where('file_type', 'map_image')
+            ->whereNotNull('file_name');
+    }
+
     public function sessions()
     {
         return $this->hasMany(Session::class);
