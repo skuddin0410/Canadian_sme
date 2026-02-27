@@ -9,15 +9,17 @@ use App\Models\Event;
 use App\Models\Session;
 use App\Models\PollAnswer;
 use Illuminate\Support\Facades\DB;
+use App\Exports\PollsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PollController extends Controller
 {
     public function index()
     {
-      
+
         $totalPolls = Poll::count();
 
-      
+
         $polls = Poll::with(['event', 'eventSession'])
             ->latest()
             ->paginate(10);
@@ -32,7 +34,7 @@ class PollController extends Controller
         return view('polls.create', compact('events', 'sessions'));
     }
 
-   
+
     public function store(Request $request)
     {
         $request->validate([
@@ -97,7 +99,7 @@ class PollController extends Controller
 
         return view('polls.create', compact('poll', 'events'));
     }
-   
+
     public function update(Request $request, $id)
     {
         $poll = Poll::findOrFail($id);
@@ -121,7 +123,7 @@ class PollController extends Controller
 
         try {
 
-          
+
             $poll->update([
                 'event_id' => $request->event_id,
                 'event_session_id' => $request->event_session_id,
@@ -198,7 +200,7 @@ class PollController extends Controller
         $poll->is_active = !$poll->is_active;
         $poll->save();
 
-        
+
         if (request()->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -206,7 +208,7 @@ class PollController extends Controller
             ]);
         }
 
-      
+
         return redirect()->route('polls.index')
             ->with('success', 'Poll status updated successfully.');
     }
@@ -217,7 +219,7 @@ class PollController extends Controller
                 $q->where('id', $poll->id);
             });
 
-       
+
         if ($request->event_id) {
             $query->whereHas('question.poll', function ($q) use ($request) {
                 $q->where('event_id', $request->event_id);
@@ -230,20 +232,37 @@ class PollController extends Controller
     }
 
 
-    public function allResponses()
+    // public function allResponses()
+    // {
+    //     $polls = Poll::withCount([
+    //         'questions',
+    //         'answers'
+    //     ])
+    //         ->with('event')
+    //         ->whereHas('questions.answers')
+    //         ->latest()
+    //         ->paginate(10);
+
+    //     return view('polls.response-index', compact('polls'));
+    // }
+    public function allResponses(Request $request)
     {
-        $polls = Poll::withCount([
-            'questions',
-            'answers' 
+        $events = Event::orderBy('title')->get();
+
+        $polls = Poll::with([
+            'event',
+            'questions.answers.user'
         ])
-            ->with('event')
-            ->whereHas('questions.answers') 
+            ->whereHas('questions.answers')
+            ->when($request->event_id, function ($query) use ($request) {
+                $query->where('event_id', $request->event_id);
+            })
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('polls.response-index', compact('polls'));
+        return view('polls.response-index', compact('polls', 'events'));
     }
-
 
     public function getPollResponses(Poll $poll)
     {
@@ -265,5 +284,12 @@ class PollController extends Controller
             'success' => true,
             'question' => $question
         ]);
+    }
+    public function export(Request $request)
+    {
+        return Excel::download(
+            new PollsExport($request->event_id),
+            'poll_responses.xlsx'
+        );
     }
 }

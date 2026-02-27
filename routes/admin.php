@@ -252,6 +252,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     '/poll-responses',
     [PollController::class, 'allResponses']
   )->name('polls.responses.index');
+  Route::get('/response/export', [PollController::class, 'export'])
+    ->name('response.export');
+  
   Route::get(
     '/polls/{poll}/responses',
     [PollController::class, 'responses']
