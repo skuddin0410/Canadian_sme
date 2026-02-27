@@ -372,7 +372,7 @@
 
             <li class="menu-item {{ request()->is('admin/poll-responses') ? 'active' : '' }}">
                 <a href="{{ route('polls.responses.index') }}" class="menu-link">
-                    <i class="menu-icon fa fa-chart-bar"></i>
+                  
                     <div>All Poll Responses</div>
                 </a>
             </li>
