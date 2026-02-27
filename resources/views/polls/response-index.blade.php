@@ -11,7 +11,7 @@
             <table class="table table-bordered mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>#</th>
+                        <th>ID</th>
                         <th>Poll</th>
                         <th>Event</th>
                         <th>Total Questions</th>
