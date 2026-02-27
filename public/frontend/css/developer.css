@@ -110,38 +110,7 @@
 
 /* Dynamic Nav Page Styles */
 .dynamic-content-section {
-    padding: 100px 0;
     min-height: 60vh;
-}
-.content-card {
-    background: #fff;
-    border-radius: 24px;
-    padding: 50px;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.05);
-    border: 1px solid #f0f4ff;
-}
-.page-header {
-    background: linear-gradient(135deg, #f8faff 0%, #e3edff 100%);
-    padding: 80px 0;
-    text-align: center;
-}
-.page-header h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: #1a1d30;
-    margin-bottom: 0;
-}
-.breadcrumb-custom {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-    color: #6b7280;
-    font-weight: 500;
-}
-.breadcrumb-custom a {
-    color: var(--theme);
-    text-decoration: none;
 }
 .dynamic-rich-text {
     font-size: 1.1rem;

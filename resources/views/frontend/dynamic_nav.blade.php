@@ -18,28 +18,9 @@
 
     @include('partials_new.header')
 
-    <section class="page-header">
-        <div class="container">
-            <h1>{{ $nav->title }}</h1>
-            <div class="breadcrumb-custom">
-                <a href="{{ url('/') }}">Home</a>
-                <span>/</span>
-                <span>{{ $nav->title }}</span>
-            </div>
-        </div>
-    </section>
-
     <section class="dynamic-content-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="content-card">
-                        <div class="dynamic-rich-text">
-                            {!! $nav->content !!}
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="dynamic-rich-text">
+            {!! $nav->content !!}
         </div>
     </section>
 
