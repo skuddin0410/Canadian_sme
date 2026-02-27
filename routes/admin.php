@@ -260,6 +260,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     '/poll/{poll}/show',
     [PollController::class, 'getPollResponses']
   )->name('poll.show');
+  Route::get('/question/{question}/answers', 
+    [PollController::class, 'getQuestionAnswers']
+)->name('question.answers.modal');
   Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');

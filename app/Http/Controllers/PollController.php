@@ -286,4 +286,13 @@ class PollController extends Controller
             'poll' => $poll
         ]);
     }
+    public function getQuestionAnswers(PollQuestion $question)
+    {
+        $question->load('answers.user');
+
+        return response()->json([
+            'success' => true,
+            'question' => $question
+        ]);
+    }
 }
