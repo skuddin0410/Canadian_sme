@@ -265,9 +265,14 @@
                             <a href="{{ route('polls.edit', $poll->id) }}" class="action-btn action-btn-edit" title="Edit">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
-                           <form action="{{ route('polls.destroy', $poll->id) }}"
-      method="POST"
-      class="d-inline delete-form">
+                            <a href="{{ route('polls.responses', $poll->id) }}"
+                                class="action-btn action-btn-response"
+                                title="Responses">
+                                <i class="fa-solid fa-chart-simple"></i>
+                            </a>
+                            <form action="{{ route('polls.destroy', $poll->id) }}"
+                                method="POST"
+                                class="d-inline delete-form">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="action-btn action-btn-delete" title="Delete">

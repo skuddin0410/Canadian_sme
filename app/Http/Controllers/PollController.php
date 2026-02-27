@@ -7,6 +7,7 @@ use App\Models\Poll;
 use App\Models\PollQuestion;
 use App\Models\Event;
 use App\Models\Session;
+use App\Models\PollAnswer;
 use Illuminate\Support\Facades\DB;
 
 class PollController extends Controller
@@ -150,5 +151,52 @@ class PollController extends Controller
         // Fallback for normal requests
         return redirect()->route('polls.index')
             ->with('success', 'Poll status updated successfully.');
+    }
+    public function responses(Request $request, Poll $poll)
+    {
+        $query = PollAnswer::with(['question.poll', 'user'])
+            ->whereHas('question.poll', function ($q) use ($poll) {
+                $q->where('id', $poll->id);
+            });
+
+        // Filter by event if passed
+        if ($request->event_id) {
+            $query->whereHas('question.poll', function ($q) use ($request) {
+                $q->where('event_id', $request->event_id);
+            });
+        }
+
+        $answers = $query->latest()->paginate(10);
+
+        return view('polls.response', compact('poll', 'answers'));
+    }
+
+
+    public function allResponses()
+    {
+        $polls = Poll::withCount([
+            'questions',
+            'answers' // using hasManyThrough
+        ])
+            ->with('event')
+            ->whereHas('questions.answers') // only polls with responses
+            ->latest()
+            ->paginate(10);
+
+        return view('polls.response-index', compact('polls'));
+    }
+   
+
+    public function getPollResponses(Poll $poll)
+    {
+        $poll->load([
+            'event',
+            'questions.answers.user'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'poll' => $poll
+        ]);
     }
 }

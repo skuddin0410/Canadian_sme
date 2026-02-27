@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\PollController;
 
 Route::prefix('auth')->group(function () {
     Route::post('login', [App\Http\Controllers\Api\OtpController::class, 'generate']);
@@ -59,7 +60,14 @@ Route::middleware(['auth:api', 'jwtauth'])->group(function () {
         Route::get('/', [App\Http\Controllers\Api\JWTAuthController::class, 'getAttendee']);
         Route::get('/{id}', [App\Http\Controllers\Api\JWTAuthController::class, 'getAttendeeById']);
     });
-
+    Route::post(
+        '/polls/{poll}/submit',
+        [PollController::class, 'submit']
+    );
+    // Route::get('/user/get-poll', [PollController::class, 'latestSubmittedPoll']);
+    Route::get('/user/events/{event}/poll', 
+        [PollController::class, 'latestSubmittedPollByEvent']);
+    
 
     Route::get('/tags', [App\Http\Controllers\Api\JWTAuthController::class, 'getTags']);
     Route::post('/home', [HomeController::class, 'index']);

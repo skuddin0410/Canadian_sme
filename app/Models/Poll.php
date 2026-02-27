@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Event;
 use App\Models\Session;
 use App\Models\PollQuestion;
+use App\Models\PollAnswer;
 
 class Poll extends Model
 {
@@ -46,5 +47,14 @@ class Poll extends Model
     public function questions()
     {
         return $this->hasMany(PollQuestion::class);
+    }
+    public function answers()
+    {
+        return $this->hasManyThrough(
+            PollAnswer::class,
+            PollQuestion::class,
+            'poll_id',
+            'poll_question_id'
+        );
     }
 }

@@ -233,14 +233,25 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/polls/index', [PollController::class, 'index'])->name('polls.index');
   Route::get('/polls/create', [PollController::class, 'create'])->name('polls.create');
 
-    Route::post('/polls', [PollController::class, 'store'])->name('polls.store');
-    Route::get('/polls/{id}', [PollController::class, 'show'])->name('polls.show');
-    Route::get('/polls/{id}/edit', [PollController::class, 'edit'])->name('polls.edit');
-    Route::put('/polls/{id}', [PollController::class, 'update'])->name('polls.update');
-    Route::delete('/polls/{id}', [PollController::class, 'destroy'])->name('polls.destroy');
-   Route::post('/polls/{poll}/toggle-status', [PollController::class, 'toggleStatus'])
+  Route::post('/polls', [PollController::class, 'store'])->name('polls.store');
+  Route::get('/polls/{id}', [PollController::class, 'show'])->name('polls.show');
+  Route::get('/polls/{id}/edit', [PollController::class, 'edit'])->name('polls.edit');
+  Route::put('/polls/{id}', [PollController::class, 'update'])->name('polls.update');
+  Route::delete('/polls/{id}', [PollController::class, 'destroy'])->name('polls.destroy');
+  Route::post('/polls/{poll}/toggle-status', [PollController::class, 'toggleStatus'])
     ->name('polls.toggle-status');
-
+  Route::get(
+    '/poll-responses',
+    [PollController::class, 'allResponses']
+  )->name('polls.responses.index');
+  Route::get(
+    '/polls/{poll}/responses',
+    [PollController::class, 'responses']
+  )->name('polls.responses');
+  Route::get(
+    '/poll/{poll}/show',
+    [PollController::class, 'getPollResponses']
+  )->name('poll.show');
   Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
