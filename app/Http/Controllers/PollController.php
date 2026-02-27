@@ -14,10 +14,10 @@ class PollController extends Controller
 {
     public function index()
     {
-        //  Total polls count
+      
         $totalPolls = Poll::count();
 
-        //  Fetch polls with related data
+      
         $polls = Poll::with(['event', 'eventSession'])
             ->latest()
             ->paginate(10);
@@ -32,7 +32,7 @@ class PollController extends Controller
         return view('polls.create', compact('events', 'sessions'));
     }
 
-    //  STORE POLL + QUESTIONS
+   
     public function store(Request $request)
     {
         $request->validate([
@@ -97,36 +97,7 @@ class PollController extends Controller
 
         return view('polls.create', compact('poll', 'events'));
     }
-    // public function update(Request $request, $id)
-    // {
-    //     $poll = Poll::findOrFail($id);
-
-    //     $poll->update([
-    //         'event_id' => $request->event_id,
-    //         'title' => $request->title,
-    //         'start_date' => $request->start_date,
-    //         'end_date' => $request->end_date,
-    //     ]);
-
-    //     foreach ($request->questions as $questionData) {
-
-    //         $question = PollQuestion::find($questionData['id']);
-
-    //         if ($question) {
-    //             $question->update([
-    //                 'question' => $questionData['question'],
-    //                 'type' => $questionData['type'],
-    //                 'rating_scale' => $questionData['type'] === 'rating'
-    //                     ? $questionData['rating_scale']
-    //                     : null,
-    //             ]);
-    //         }
-    //     }
-
-    //     return redirect()->route('polls.index')
-    //         ->with('success', 'Poll updated successfully.');
-    // }
-
+   
     public function update(Request $request, $id)
     {
         $poll = Poll::findOrFail($id);
@@ -150,7 +121,7 @@ class PollController extends Controller
 
         try {
 
-            // Update poll
+          
             $poll->update([
                 'event_id' => $request->event_id,
                 'event_session_id' => $request->event_session_id,
@@ -227,7 +198,7 @@ class PollController extends Controller
         $poll->is_active = !$poll->is_active;
         $poll->save();
 
-        // Check if the request expects JSON (AJAX)
+        
         if (request()->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -235,7 +206,7 @@ class PollController extends Controller
             ]);
         }
 
-        // Fallback for normal requests
+      
         return redirect()->route('polls.index')
             ->with('success', 'Poll status updated successfully.');
     }
@@ -246,7 +217,7 @@ class PollController extends Controller
                 $q->where('id', $poll->id);
             });
 
-        // Filter by event if passed
+       
         if ($request->event_id) {
             $query->whereHas('question.poll', function ($q) use ($request) {
                 $q->where('event_id', $request->event_id);
@@ -263,10 +234,10 @@ class PollController extends Controller
     {
         $polls = Poll::withCount([
             'questions',
-            'answers' // using hasManyThrough
+            'answers' 
         ])
             ->with('event')
-            ->whereHas('questions.answers') // only polls with responses
+            ->whereHas('questions.answers') 
             ->latest()
             ->paginate(10);
 

@@ -22,7 +22,7 @@ class PollController extends Controller
             ], 401);
         }
 
-        //  Check if poll is active
+      
         if (!$poll->is_active) {
             return response()->json([
                 'success' => false,
@@ -30,7 +30,7 @@ class PollController extends Controller
             ], 403);
         }
 
-        // Check date validity 
+    
         if ($poll->start_date && now()->lt($poll->start_date)) {
             return response()->json([
                 'success' => false,
@@ -57,7 +57,7 @@ class PollController extends Controller
 
         try {
 
-            //  Prevent duplicate submission
+           
             $alreadySubmitted = PollAnswer::whereHas('question', function ($q) use ($poll) {
                 $q->where('poll_id', $poll->id);
             })
@@ -117,7 +117,7 @@ class PollController extends Controller
             ], 401);
         }
 
-        // Get latest poll submitted by user for this event
+      
         $latestAnswer = PollAnswer::with('question.poll')
             ->where('user_id', $user->id)
             ->whereHas('question.poll', function ($q) use ($event) {
@@ -135,7 +135,7 @@ class PollController extends Controller
 
         $poll = $latestAnswer->question->poll;
 
-        // Get all answers of this poll by this user
+        
         $answers = PollAnswer::with('question')
             ->where('user_id', $user->id)
             ->whereHas('question', function ($q) use ($poll) {
