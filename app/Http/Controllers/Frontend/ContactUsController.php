@@ -37,6 +37,6 @@ class ContactUsController extends Controller
 
         return redirect()
             ->route('support', $slug)
-            ->with('success', 'Your message has been submitted successfully.');
+            ->with('success', 'Your request has been submitted successfully.');
     }
 }

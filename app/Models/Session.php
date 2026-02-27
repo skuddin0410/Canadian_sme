@@ -7,15 +7,31 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use App\Models\Poll;
 
 class Session extends Model
-{   
+{
     use  Auditable;
     use AutoHtmlDecode;
     protected $table = "event_sessions";
     protected $fillable = [
-        'event_id', 'booth_id', 'title', 'description',
-        'start_time', 'end_time', 'status', 'type', 'capacity', 'metadata','keynote','demoes','panels','location','color','track','slug'
+        'event_id',
+        'booth_id',
+        'title',
+        'description',
+        'start_time',
+        'end_time',
+        'status',
+        'type',
+        'capacity',
+        'metadata',
+        'keynote',
+        'demoes',
+        'panels',
+        'location',
+        'color',
+        'track',
+        'slug'
     ];
 
     protected $casts = [
@@ -28,12 +44,15 @@ class Session extends Model
     {
         return $this->belongsTo(Event::class);
     }
-
+    public function polls()
+    {
+        return $this->hasMany(Poll::class);
+    }
     public function booth()
     {
         return $this->belongsTo(Booth::class, 'booth_id');
     }
-    
+
 
     public function speakers(): BelongsToMany
     {
@@ -57,7 +76,7 @@ class Session extends Model
 
     public function tickets()
     {
-         return $this->hasMany(EventTicket::class, 'session_id');
+        return $this->hasMany(EventTicket::class, 'session_id');
     }
 
     public function getDurationInMinutes()
@@ -67,8 +86,8 @@ class Session extends Model
 
     public function isConflictingWith($otherSession)
     {
-        return $this->start_time < $otherSession->end_time && 
-               $this->end_time > $otherSession->start_time;
+        return $this->start_time < $otherSession->end_time &&
+            $this->end_time > $otherSession->start_time;
     }
 
     public function photo()
@@ -92,12 +111,12 @@ class Session extends Model
             return null;
         }
         $now = now();
-        $target = $this->start_time; 
+        $target = $this->start_time;
         $diff = $now->diff($target);
         $dd = sprintf('%02d', $diff->d);
         $hh = sprintf('%02d', $diff->h);
         $mm = sprintf('%02d', $diff->i);
-        $ss = sprintf('%02d', $diff->s); 
+        $ss = sprintf('%02d', $diff->s);
         return [
             'direction' => $diff->invert ? 'since' : 'in',
             'days'      => $dd,
@@ -109,7 +128,7 @@ class Session extends Model
             'formatted' => sprintf('%dd %02dh %02dm %02ds', $diff->d, $diff->h, $diff->i, $diff->s),
         ];
     }
-    
+
     public function agendas()
     {
         return $this->hasMany(UserAgenda::class);
@@ -119,7 +138,7 @@ class Session extends Model
     {
         return $this->hasMany(FavoriteSession::class);
     }
- 
 
-    protected $appends = ['starts_in','starts_time_in'];
+
+    protected $appends = ['starts_in', 'starts_time_in'];
 }

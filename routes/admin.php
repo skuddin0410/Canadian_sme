@@ -31,6 +31,7 @@ use App\Http\Controllers\LandingCustomerBannerController;
 use App\Http\Controllers\LandingHomeReviewController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\NavbarDynamicController;
+use App\Http\Controllers\PollController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -237,8 +238,16 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('speaker', SpeakerController::class);
   Route::get('/speaker/{user}/qr/download', [SpeakerController::class, 'downloadQr'])->name('speaker.qr.download');
 
+  Route::get('/polls/index', [PollController::class, 'index'])->name('polls.index');
+  Route::get('/polls/create', [PollController::class, 'create'])->name('polls.create');
 
-
+    Route::post('/polls', [PollController::class, 'store'])->name('polls.store');
+    Route::get('/polls/{id}', [PollController::class, 'show'])->name('polls.show');
+    Route::get('/polls/{id}/edit', [PollController::class, 'edit'])->name('polls.edit');
+    Route::put('/polls/{id}', [PollController::class, 'update'])->name('polls.update');
+    Route::delete('/polls/{id}', [PollController::class, 'destroy'])->name('polls.destroy');
+   Route::post('/polls/{poll}/toggle-status', [PollController::class, 'toggleStatus'])
+    ->name('polls.toggle-status');
 
   Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
