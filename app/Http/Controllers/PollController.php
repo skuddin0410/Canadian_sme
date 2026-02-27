@@ -39,7 +39,7 @@ class PollController extends Controller
             'event_id' => 'required|exists:events,id',
             'event_session_id' => 'nullable|exists:sessions,id',
             'title' => 'required|string|max:255',
-            'start_date' => 'nullable|date',
+            'start_date' => 'nullable|date|after_or_equal:today',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'questions' => 'required|array|min:1',
             'questions.*.question' => 'required|string',
@@ -97,36 +97,123 @@ class PollController extends Controller
 
         return view('polls.create', compact('poll', 'events'));
     }
+    // public function update(Request $request, $id)
+    // {
+    //     $poll = Poll::findOrFail($id);
+
+    //     $poll->update([
+    //         'event_id' => $request->event_id,
+    //         'title' => $request->title,
+    //         'start_date' => $request->start_date,
+    //         'end_date' => $request->end_date,
+    //     ]);
+
+    //     foreach ($request->questions as $questionData) {
+
+    //         $question = PollQuestion::find($questionData['id']);
+
+    //         if ($question) {
+    //             $question->update([
+    //                 'question' => $questionData['question'],
+    //                 'type' => $questionData['type'],
+    //                 'rating_scale' => $questionData['type'] === 'rating'
+    //                     ? $questionData['rating_scale']
+    //                     : null,
+    //             ]);
+    //         }
+    //     }
+
+    //     return redirect()->route('polls.index')
+    //         ->with('success', 'Poll updated successfully.');
+    // }
+
     public function update(Request $request, $id)
     {
         $poll = Poll::findOrFail($id);
 
-        $poll->update([
-            'event_id' => $request->event_id,
-            'title' => $request->title,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
+        $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'event_session_id' => 'nullable|exists:sessions,id',
+            'title' => 'required|string|max:255',
+
+            'start_date' => 'nullable|date|after_or_equal:today',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+
+            'questions' => 'required|array|min:1',
+            'questions.*.id' => 'nullable|exists:poll_questions,id',
+            'questions.*.question' => 'required|string',
+            'questions.*.type' => 'required|in:text,yes_no,rating',
+            'questions.*.rating_scale' => 'nullable|integer|min:2|max:10',
         ]);
 
-        foreach ($request->questions as $questionData) {
+        DB::beginTransaction();
 
-            $question = PollQuestion::find($questionData['id']);
+        try {
 
-            if ($question) {
-                $question->update([
-                    'question' => $questionData['question'],
-                    'type' => $questionData['type'],
-                    'rating_scale' => $questionData['type'] === 'rating'
-                        ? $questionData['rating_scale']
-                        : null,
-                ]);
+            // Update poll
+            $poll->update([
+                'event_id' => $request->event_id,
+                'event_session_id' => $request->event_session_id,
+                'title' => $request->title,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+            ]);
+
+            $existingQuestionIds = [];
+
+            foreach ($request->questions as $questionData) {
+
+
+                if (!empty($questionData['id'])) {
+
+                    $question = PollQuestion::where('id', $questionData['id'])
+                        ->where('poll_id', $poll->id)
+                        ->first();
+
+                    if ($question) {
+
+                        $question->update([
+                            'question' => $questionData['question'],
+                            'type' => $questionData['type'],
+                            'rating_scale' => $questionData['type'] === 'rating'
+                                ? $questionData['rating_scale']
+                                : null,
+                        ]);
+
+                        $existingQuestionIds[] = $question->id;
+                    }
+                } else {
+
+                    $newQuestion = PollQuestion::create([
+                        'poll_id' => $poll->id,
+                        'question' => $questionData['question'],
+                        'type' => $questionData['type'],
+                        'rating_scale' => $questionData['type'] === 'rating'
+                            ? $questionData['rating_scale']
+                            : null,
+                    ]);
+
+                    $existingQuestionIds[] = $newQuestion->id;
+                }
             }
+
+
+            PollQuestion::where('poll_id', $poll->id)
+                ->whereNotIn('id', $existingQuestionIds)
+                ->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('polls.index')
+                ->with('success', 'Poll updated successfully.');
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->withErrors($e->getMessage());
         }
-
-        return redirect()->route('polls.index')
-            ->with('success', 'Poll updated successfully.');
     }
-
     public function destroy($id)
     {
         $poll = Poll::findOrFail($id);
@@ -185,7 +272,7 @@ class PollController extends Controller
 
         return view('polls.response-index', compact('polls'));
     }
-   
+
 
     public function getPollResponses(Poll $poll)
     {

@@ -92,7 +92,7 @@
                     <h4 class="mb-1">{{ isset($poll) ? 'Edit Poll' : 'Create Poll' }}</h4>
                     <p class="text-muted mb-0">Configure poll details and build question flow.</p>
                 </div>
-                <span class="badge bg-label-primary">{{ isset($poll) ? 'Editing Mode' : 'New Poll' }}</span>
+                <span class="badge bg-label-primary">{{ isset($poll) ? 'Edit' : 'New Poll' }}</span>
             </div>
 
             <div class="card-body">
