@@ -204,3 +204,63 @@ img.logo{width: 200px;}
     min-width: 18px;
     height: 18px;
 }
+
+/* ===== Analytics Page Styles ===== */
+    .analytics-page { padding: 1.5rem; }
+
+    /* KPI Cards */
+    .kpi-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .kpi-card {
+        flex: 1; min-width: 160px;
+        background: #fff; border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        border-left: 4px solid #696cff;
+        transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    .kpi-card.kpi-views    { border-left-color: #03c3ec; }
+    .kpi-card.kpi-inquiries{ border-left-color: #71dd37; }
+    .kpi-card.kpi-favorites{ border-left-color: #ff3e1d; }
+    .kpi-card.kpi-users    { border-left-color: #8592a3; }
+    .kpi-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; color: #8592a3; margin-bottom: .35rem; }
+    .kpi-value { font-size: 1.75rem; font-weight: 700; color: #566a7f; }
+    .kpi-icon  { font-size: 2rem; opacity: .6; }
+
+    /* Filter Bar */
+    .filter-bar {
+        background: #fff; border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        margin-bottom: 1.5rem;
+    }
+    .filter-bar .form-label { font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: #8592a3; }
+    .filter-bar .form-select, .filter-bar .form-control { font-size: .875rem; border-radius: 6px; }
+
+    /* Chart Cards */
+    .chart-card {
+        background: #fff; border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        margin-bottom: 1.5rem; overflow: hidden;
+    }
+    .chart-card-header {
+        padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0f0f0;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .chart-card-header h5 { margin: 0; font-weight: 600; color: #566a7f; }
+    .chart-card-body { padding: 1.5rem; position: relative; min-height: 320px; }
+
+    /* Loading Spinner */
+    .chart-loading {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,.85); z-index: 5; border-radius: 10px;
+    }
+    .chart-loading .spinner-border { width: 2.5rem; height: 2.5rem; color: #696cff; }
+
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .kpi-row { flex-direction: column; }
+        .kpi-card { min-width: 100%; }
+    }

@@ -225,6 +225,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
   Route::prefix('analytics')->name('admin.analytics.')->group(function () {
     Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
+    Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
   });
 });
 
