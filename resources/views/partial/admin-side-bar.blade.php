@@ -311,6 +311,20 @@
     @endif
 
     @if(isSuperAdmin())
+    <li class="menu-item {{ request()->is('admin/analytics*') ? 'active open' : '' }}">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+            <div data-i18n="Analytics">Analytics</div>
+        </a>
+        <ul class="menu-sub">
+            <li class="menu-item {{ request()->is('admin/analytics/session') ? 'active' : '' }}">
+                <a href="{{ route('admin.analytics.session') }}" class="menu-link">
+                    <div data-i18n="Session">Session</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>

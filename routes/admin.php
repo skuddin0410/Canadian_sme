@@ -32,6 +32,7 @@ use App\Http\Controllers\LandingHomeReviewController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\NavbarDynamicController;
 use App\Http\Controllers\PollController;
+use App\Http\Controllers\AnalyticsController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -218,6 +219,13 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   });
 
   Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
+
+  Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\HomeController::class, 'markAllNotificationsAsRead'])->name('notifications.markAllAsRead');
+  Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\HomeController::class, 'markNotificationAsRead'])->name('notifications.markAsRead');
+
+  Route::prefix('analytics')->name('admin.analytics.')->group(function () {
+    Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
+  });
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {

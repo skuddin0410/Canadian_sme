@@ -47,6 +47,7 @@
   <!-- Alertify CSS -->
   <link href="{{asset('backend/plugins/alertify/alertify.css?v='.time())}}" rel="stylesheet" />
   <link rel="stylesheet" href="{{asset('backend/assets/css/custom.css')}}" />
+  <link rel="stylesheet" href="{{asset('frontend/css/developer.css')}}" />
   <link href="{{asset('backend/plugins/datatable/fixedColumns.dataTables.min.css?v='.time())}}" rel="stylesheet" />
   <script src="{{asset('backend/assets/vendor/js/helpers.js')}}"></script>
   <script src="{{asset('backend/assets/js/config.js')}}"></script>

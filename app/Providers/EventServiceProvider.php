@@ -2,14 +2,19 @@
 namespace App\Providers;
 
 use Illuminate\Auth\Events\Login;
-use App\Listeners\LogUserLogin;
+use Illuminate\Auth\Events\Failed;
+use App\Listeners\LogSuccessfulLogin;
+use App\Listeners\LogFailedLogin;
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         Login::class => [
-            LogUserLogin::class,
+            LogSuccessfulLogin::class,
+        ],
+        Failed::class => [
+            LogFailedLogin::class,
         ],
     ];
 

@@ -21,6 +21,67 @@
 		<ul class="navbar-nav flex-row align-items-center ms-auto">
 		<!-- Place this tag where you want the button to render. -->
 
+		@if(Auth::check() && (Auth::user()->hasRole('Admin')))
+		@php
+			$notifications = \App\Models\GeneralNotification::where('user_id', auth()->id())
+				->orderBy('created_at', 'desc')
+				->limit(20)
+				->get();
+			$notificationCount = \App\Models\GeneralNotification::where('user_id', auth()->id())
+				->where('is_read', 0)
+				->count();
+		@endphp
+		<!-- Notification -->
+		<li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+			<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+				<i class="bx bx-bell bx-sm"></i>
+				@if($notificationCount > 0)
+				<span class="badge bg-danger rounded-pill badge-notifications">{{ $notificationCount }}</span>
+				@endif
+			</a>
+			<ul class="dropdown-menu dropdown-menu-end py-0">
+				<li class="dropdown-menu-header border-bottom">
+					<div class="dropdown-header d-flex align-items-center py-3">
+						<h5 class="text-body mb-0 me-auto">Notifications</h5>
+						<a href="javascript:void(0)" class="dropdown-notifications-all text-body" data-bs-toggle="tooltip" data-bs-placement="top" title="Mark all as read"><i class="bx fs-4 bx-envelope-open"></i></a>
+					</div>
+				</li>
+				<li class="dropdown-notifications-list scrollable-container">
+					<ul class="list-group list-group-flush">
+						@forelse($notifications as $notification)
+						<li class="list-group-item list-group-item-action dropdown-notifications-item {{ $notification->is_read ? '' : 'unread-notification' }}">
+							<div class="d-flex">
+								<div class="flex-shrink-0 me-3">
+									<div class="avatar">
+										@if($notification->related_type == 'failed_login')
+										<span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-error"></i></span>
+										@else
+										<span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-bell"></i></span>
+										@endif
+									</div>
+								</div>
+								<div class="flex-grow-1">
+									<h6 class="mb-1">{{ $notification->title }}</h6>
+									<p class="mb-0">{{ $notification->body }}</p>
+									<small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+								</div>
+
+							</div>
+						</li>
+						@empty
+						<li class="list-group-item list-group-item-action dropdown-notifications-item">
+							<div class="text-center p-3">
+								<small class="text-muted">No new notifications</small>
+							</div>
+						</li>
+						@endforelse
+					</ul>
+				</li>
+			</ul>
+		</li>
+		<!--/ Notification -->
+		@endif
+
 		<!-- User -->
 		<li class="nav-item navbar-dropdown dropdown-user dropdown">
 			<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -90,4 +151,41 @@
         // Now submit the logout form
         document.getElementById('logout-form').submit();
     }
+
+	document.addEventListener('click', function(e) {
+		const markAllBtn = e.target.closest('.dropdown-notifications-all');
+		if (markAllBtn) {
+			e.preventDefault();
+			
+			const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+			
+			fetch('{{ route("notifications.markAllAsRead") }}', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-TOKEN': csrfToken,
+					'Accept': 'application/json'
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					const items = document.querySelectorAll('.unread-notification');
+					items.forEach(item => {
+						item.classList.remove('unread-notification');
+					});
+					
+					updateNotificationCountDisplay();
+				}
+			})
+			.catch(error => console.error('Error:', error));
+		}
+	});
+
+	function updateNotificationCountDisplay() {
+		const badge = document.querySelector('.badge-notifications');
+		if (badge) {
+			badge.style.display = 'none';
+		}
+	}
 </script>

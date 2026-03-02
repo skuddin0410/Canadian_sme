@@ -361,4 +361,21 @@ class HomeController extends Controller
     return response()->json(['message' => ucfirst(str_replace('_', ' ', $key)) . ' deleted successfully']);
 }
 
+    public function markAllNotificationsAsRead()
+    {
+        \App\Models\GeneralNotification::where('user_id', auth()->id())
+            ->where('is_read', 0)
+            ->update(['is_read' => 1, 'read_at' => now()]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        \App\Models\GeneralNotification::where('user_id', auth()->id())
+            ->where('id', $id)
+            ->update(['is_read' => 1, 'read_at' => now()]);
+
+        return response()->json(['success' => true]);
+    }
 }
