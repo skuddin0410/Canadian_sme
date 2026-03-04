@@ -219,11 +219,7 @@ img.logo{width: 200px;}
         transition: transform .2s, box-shadow .2s;
     }
     .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
-    .kpi-card.kpi-views    { border-left-color: #03c3ec; }
-    .kpi-card.kpi-inquiries{ border-left-color: #71dd37; }
-    .kpi-card.kpi-favorites{ border-left-color: #ff3e1d; }
-    .kpi-card.kpi-users    { border-left-color: #8592a3; }
-    .kpi-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; color: #8592a3; margin-bottom: .35rem; }
+    .kpi-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: .35rem; }
     .kpi-value { font-size: 1.75rem; font-weight: 700; color: #566a7f; }
     .kpi-icon  { font-size: 2rem; opacity: .6; }
 
