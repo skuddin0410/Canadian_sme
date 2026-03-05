@@ -114,7 +114,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/event-guides/gallery', [EventGuideController::class, 'showGallery'])
     ->name('event-guides.showGallery');
   Route::post('/event-guides/gallery/upload', [EventGuideController::class, 'uploadGallery'])->name('event-guides.uploadGallery');
-
+  Route::post('/event-guides/gallery/approve', [EventGuideController::class, 'approveGalleryItem'])->name('event-guides.approveGalleryItem');
+  Route::post('/event-guides/gallery/approve-all', [EventGuideController::class, 'approveAllGalleryItems'])->name('event-guides.approveAllGalleryItems');
   Route::delete('event-guides/delete-gallery-image', [EventGuideController::class, 'deleteGalleryImage'])->name('event-guides.deleteGalleryImage');
 
 
@@ -226,6 +227,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::prefix('analytics')->name('admin.analytics.')->group(function () {
     Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
     Route::get('/speaker', [SpeakerAnalyticsController::class, 'speaker'])->name('speaker');
+    Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
   });
   
 });

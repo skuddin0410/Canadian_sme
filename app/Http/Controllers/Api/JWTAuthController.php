@@ -24,116 +24,116 @@ class JWTAuthController extends Controller
 {
 
     public function getUser_old() {
-    try {
-        if (! $user = JWTAuth::parseToken()->authenticate()) {
+        try {
+            if (! $user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fail to load profile',
+                    'data' => collect(),
+                ], 404);
+            }
+
+            $token = request()->bearerToken() ?? JWTAuth::refresh();
+            $user->load(['photo', 'usercompany']);
             return response()->json([
-                'success' => false,
-                'message' => 'Fail to load profile',
-                'data' => collect(),
-            ], 404);
-        }
+                'success' => true,
+                'message' => 'successful',
+                'id'        => $user->id,
+                'comet_chat_id' => $user->cometchat_id,
+                'name' => $user->full_name ?? '',
+                'first_name' => $user->name ?? '',
+                'last_name' => $user->lastname ?? '',
+                'email'     => $user->email ?? '',
+                'phone'    => $user->mobile ?? '',
+                'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
+                'company_about_page'  => config('app.url').'app/page/about',
+                'company_location_page'    => config('app.url').'app/page/location',
+                'company_privacy_policy_page' => config('app.url').'app/page/privacy',
+                'company_terms_of_service_page' => config('app.url').'app/page/terms',
+                'designation'=> $user->designation,
+                'bio'       => $user->bio,
+                'tag'      => !empty($user->tags) ? explode(',',$user->tags) : [],
+                'my_qr_code' => asset($user->qr_code),
 
-        $token = request()->bearerToken() ?? JWTAuth::refresh();
-        $user->load(['photo', 'usercompany']);
-        return response()->json([
-            'success' => true,
-            'message' => 'successful',
-            'id'        => $user->id,
-            'comet_chat_id' => $user->cometchat_id,
-            'name' => $user->full_name ?? '',
-            'first_name' => $user->name ?? '',
-            'last_name' => $user->lastname ?? '',
-            'email'     => $user->email ?? '',
-            'phone'    => $user->mobile ?? '',
-            'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
-            'company_about_page'  => config('app.url').'app/page/about',
-            'company_location_page'    => config('app.url').'app/page/location',
-            'company_privacy_policy_page' => config('app.url').'app/page/privacy',
-            'company_terms_of_service_page' => config('app.url').'app/page/terms',
-            'designation'=> $user->designation,
-            'bio'       => $user->bio,
-            'tag'      => !empty($user->tags) ? explode(',',$user->tags) : [],
-            'my_qr_code' => asset($user->qr_code),
-
-            'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : $user->company, 
-            'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : $user->email, 
-            'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile, 
-            'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : $user->website_url, 
-            'roles'     => groups($user),
-            'is_speaker_id'   => (int) ($user->access_speaker_ids ?? 0),
-            'is_exhibitor_id' => (int) ($user->access_exhibitor_ids ?? 0),
-            'is_sponsor_id'   => (int) ($user->access_sponsor_ids ?? 0),
-            
-        ]);
+                'company_name'   => !empty($user->usercompany) ? $user->usercompany->name : $user->company, 
+                'company_email'   => !empty($user->usercompany) ? $user->usercompany->email : $user->email, 
+                'company_phone'   => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile, 
+                'company_website'=>  !empty($user->usercompany) ? $user->usercompany->website : $user->website_url, 
+                'roles'     => groups($user),
+                'is_speaker_id'   => (int) ($user->access_speaker_ids ?? 0),
+                'is_exhibitor_id' => (int) ($user->access_exhibitor_ids ?? 0),
+                'is_sponsor_id'   => (int) ($user->access_sponsor_ids ?? 0),
+                
+            ]);
 
 
-    
+        
 
-    } catch (JWTException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized',
-            'data' => null,
-        ], 401);
-    }
-}
-
-public function getUser()
-{
-    try {
-        $user = JWTAuth::parseToken()->authenticate();
-
-        if (! $user) {
+        } catch (JWTException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
                 'data' => null,
             ], 401);
         }
-
-        $user->load(['photo', 'usercompany']);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'successful',
-            'id' => $user->id,
-            'comet_chat_id' => $user->cometchat_id,
-            'name' => $user->full_name ?? '',
-            'first_name' => $user->name ?? '',
-            'last_name' => $user->lastname ?? '',
-            'email' => $user->email ?? '',
-            'phone' => $user->mobile ?? '',
-            'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
-            'my_qr_code' => !empty($user->qr_code) ? asset($user->qr_code) : null,
-            'company_name' => !empty($user->usercompany) ? $user->usercompany->name : $user->company,
-            'company_email' => !empty($user->usercompany) ? $user->usercompany->email : $user->email,
-            'company_phone' => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile,
-            'company_website' => !empty($user->usercompany) ? $user->usercompany->website : $user->website_url,
-            'roles' => function_exists('groups') ? groups($user) : [],
-        ]);
-
-    } catch (TokenExpiredException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Token expired',
-            'data' => null,
-        ], 401);
-
-    } catch (TokenInvalidException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Token invalid',
-            'data' => null,
-        ], 401);
-
-    } catch (JWTException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized',
-            'data' => null,
-        ], 401);
     }
-}
+
+    public function getUser()
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (! $user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                    'data' => null,
+                ], 401);
+            }
+
+            $user->load(['photo', 'usercompany']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'successful',
+                'id' => $user->id,
+                'comet_chat_id' => $user->cometchat_id,
+                'name' => $user->full_name ?? '',
+                'first_name' => $user->name ?? '',
+                'last_name' => $user->lastname ?? '',
+                'email' => $user->email ?? '',
+                'phone' => $user->mobile ?? '',
+                'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
+                'my_qr_code' => !empty($user->qr_code) ? asset($user->qr_code) : null,
+                'company_name' => !empty($user->usercompany) ? $user->usercompany->name : $user->company,
+                'company_email' => !empty($user->usercompany) ? $user->usercompany->email : $user->email,
+                'company_phone' => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile,
+                'company_website' => !empty($user->usercompany) ? $user->usercompany->website : $user->website_url,
+                'roles' => function_exists('groups') ? groups($user) : [],
+            ]);
+
+        } catch (TokenExpiredException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token expired',
+                'data' => null,
+            ], 401);
+
+        } catch (TokenInvalidException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token invalid',
+                'data' => null,
+            ], 401);
+
+        } catch (JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+                'data' => null,
+            ], 401);
+        }
+    }
 
 
 
@@ -999,6 +999,7 @@ public function checkSession(Request $request)
     }
 
     return response()->json([
+        "success" => true,
         'message' => 'Session validated',
     ]);
 }
