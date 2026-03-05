@@ -271,11 +271,6 @@ function submitBulkAction(actionType) {
     document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
         selected.push(cb.value);
     });
-     
-    // if (selected.length === 0) {
-    //     alert("Please select at least one user.");
-    //     return;
-    // }
 
     if (selected.length === 0) {
        selected.push('all');
@@ -285,30 +280,82 @@ function submitBulkAction(actionType) {
     const notificationTemplateValue = document.getElementById('notificationTemplate').value;
 
     if (!emailTemplateValue && !notificationTemplateValue) {
-        alert('Please select an email or notification template.');
+        Swal.fire('Missing Template', 'Please select an email or notification template.', 'warning');
+        return;
     }
     
     let schedule_time = '';
-    let timezone = '';
+    let template_name = '';
+    let type = '';
 
     if(emailTemplateValue){
-      template_name = emailTemplateValue
-      type= 'email'
+      template_name = emailTemplateValue;
+      type = 'email';
       schedule_time = document.getElementById('schedule_time_email').value;
-      timezone = document.getElementById('timezone_email').value;
     }
 
     if(notificationTemplateValue){
-      template_name = notificationTemplateValue
-      type= 'notification'
+      template_name = notificationTemplateValue;
+      type = 'notification';
       schedule_time = document.getElementById('schedule_time_notif').value;
-      timezone = document.getElementById('timezone_notif').value;
     }
-   
-    document.getElementById('selectedUserIds').value = JSON.stringify(selected);
-    let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name+"&type="+type + "&schedule_time="+schedule_time + "&timezone="+timezone;
-    form.submit();
+
+    // If schedule_time is set, use AJAX to schedule instead of form submit
+    if (schedule_time) {
+        const scheduleUrl = type === 'email'
+            ? "{{ route('attendee-users.scheduleEmail') }}"
+            : "{{ route('attendee-users.scheduleNotification') }}";
+
+        Swal.fire({
+            title: 'Schedule ' + (type === 'email' ? 'Email' : 'Notification') + '?',
+            text: 'This will be scheduled for the selected time.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, schedule it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Scheduling...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                $.ajax({
+                    url: scheduleUrl,
+                    method: 'POST',
+                    data: {
+                        user_ids: JSON.stringify(selected),
+                        template_name: template_name,
+                        schedule_time: schedule_time,
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(resp) {
+                        Swal.fire('Scheduled!', resp.message, 'success');
+                        if (typeof closeModal === 'function') closeModal();
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error', xhr.responseJSON?.message || 'Failed to schedule.', 'error');
+                    }
+                });
+            }
+        });
+        return;
+    }
+
+    // Normal send now (confirm before form submit)
+    Swal.fire({
+        title: 'Send ' + (type === 'email' ? 'Email' : 'Notification') + ' Now?',
+        text: 'This will be sent to ' + (selected[0] === 'all' ? 'all users' : selected.length + ' selected user(s)') + ' immediately.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, send it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+            let form = document.getElementById('bulkActionForm');
+            form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name+"&type="+type;
+            form.submit();
+        }
+    });
 }
 
 
