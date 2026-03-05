@@ -323,6 +323,13 @@
                 </a>
             </li>
         </ul>
+        <ul class="menu-sub">
+            <li class="menu-item {{ request()->is('admin/analytics/speaker') ? 'active' : '' }}">
+                <a href="{{ route('admin.analytics.speaker') }}" class="menu-link">
+                    <div data-i18n="Session">Speaker analytics</div>
+                </a>
+            </li>
+        </ul>
     </li>
 
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">

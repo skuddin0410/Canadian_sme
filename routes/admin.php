@@ -33,7 +33,7 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\NavbarDynamicController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\AnalyticsController;
-
+use App\Http\Controllers\SpeakerAnalyticsController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
@@ -225,7 +225,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
   Route::prefix('analytics')->name('admin.analytics.')->group(function () {
     Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
+    Route::get('/speaker', [SpeakerAnalyticsController::class, 'speaker'])->name('speaker');
   });
+  
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {

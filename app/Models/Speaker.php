@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Session;
 
 class Speaker extends Model
-{       
+{
 
     use  Auditable;
     use AutoHtmlDecode;
     use SoftDeletes;
-    protected $dates = ['deleted_at']; 
+    protected $dates = ['deleted_at'];
     protected $fillable = [
         'name',
         'lastname',
@@ -55,7 +56,7 @@ class Speaker extends Model
             ->where('file_type', 'cover_photo')
             ->whereNotNull('file_name');
     }
-    
+
     public function getFullNameAttribute()
     {
         return $this->name . ' ' . $this->lastname;
@@ -64,7 +65,11 @@ class Speaker extends Model
     public function eventAndEntityLinks()
     {
         return $this->hasMany(EventAndEntityLink::class, 'entity_id', 'id')
-                    ->where('entity_type', 'speakers');
+            ->where('entity_type', 'speakers');
+    }
+    public function sessions()
+    {
+        return $this->belongsToMany(Session::class, 'session_speakers', 'speaker_id', 'session_id');
     }
 
     protected $appends = ['full_name'];
