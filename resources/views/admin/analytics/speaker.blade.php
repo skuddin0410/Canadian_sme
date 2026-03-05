@@ -5,8 +5,6 @@
 @section('content')
 
 <style>
-   
-
     .sa-wrap * {
         font-family: 'DM Sans', sans-serif;
         box-sizing: border-box;
@@ -69,19 +67,29 @@
 
     .sa-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
     }
 
     .sa-card::before {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0;
+        top: 0;
+        left: 0;
+        right: 0;
         height: 3px;
     }
 
-    .sa-card.accent-blue::before  { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-    .sa-card.accent-green::before { background: linear-gradient(90deg, #10b981, #34d399); }
-    .sa-card.accent-amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .sa-card.accent-blue::before {
+        background: linear-gradient(90deg, #696cff, #696cff);
+    }
+
+    .sa-card.accent-green::before {
+        background: linear-gradient(90deg, #696cff, #696cff);
+    }
+
+    .sa-card.accent-amber::before {
+        background: linear-gradient(90deg, #696cff, #696cff);
+    }
 
     .sa-card-label {
         font-size: 0.72rem;
@@ -142,7 +150,7 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #3b82f6;
+        background: #696cff;
         margin-right: 6px;
     }
 
@@ -229,7 +237,7 @@
         align-items: center;
         gap: 5px;
         background: #eff6ff;
-        color: #3b82f6;
+        color: #696cff;
         font-size: 0.78rem;
         font-weight: 600;
         padding: 0.3rem 0.75rem;
@@ -241,7 +249,7 @@
     .sa-bar-mini {
         display: block;
         height: 4px;
-        background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        background: linear-gradient(90deg, #696cff, #696cff);
         border-radius: 2px;
         margin-top: 6px;
         transition: width 0.6s ease;
@@ -254,21 +262,111 @@
         font-size: 0.875rem;
     }
 
+    /* Header Card */
+    .sa-header-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 22px 24px;
+        margin-bottom: 24px;
+        border: 1px solid #eef0f4;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Header Layout */
+    .sa-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Left */
+    .sa-header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .sa-breadcrumb {
+        font-size: 12px;
+        color: #9ca3af;
+        font-weight: 500;
+        letter-spacing: .04em;
+    }
+
+    .sa-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    /* Right side */
+    .sa-header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Filter */
+    .sa-filter-select {
+        padding: 7px 12px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        font-size: 13px;
+        background: #fff;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    /* Date */
+    .sa-date {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
     @media (max-width: 768px) {
-        .sa-cards { grid-template-columns: 1fr; }
-        .sa-wrap { padding: 1.25rem; }
+        .sa-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .sa-wrap {
+            padding: 1.25rem;
+        }
     }
 </style>
 
 <div class="sa-wrap">
 
+
     {{-- Header --}}
-    <div class="sa-header">
-        <div>
-            <div class="sa-breadcrumb">Analytics</div>
-            <div class="sa-title">Speakers</div>
+    <div class="sa-header-card">
+
+        <div class="sa-header-top">
+            <div class="sa-header-left">
+                <div class="sa-breadcrumb">Analytics</div>
+                <div class="sa-title">Speakers</div>
+            </div>
+
+            <div class="sa-header-right">
+
+                <form method="GET" action="{{ route('admin.analytics.speaker') }}" class="sa-filter-form">
+                    <select name="event_id" onchange="this.form.submit()" class="sa-filter-select">
+                        <option value="">All Events</option>
+
+                        @foreach($events as $event)
+                        <option value="{{ $event->id }}"
+                            {{ request('event_id') == $event->id ? 'selected' : '' }}>
+                            {{ $event->title }}
+                        </option>
+                        @endforeach
+                    </select>
+                </form>
+
+                <div class="sa-date" id="sa-date-display"></div>
+
+            </div>
         </div>
-        <div class="sa-date" id="sa-date-display"></div>
+
     </div>
 
     {{-- Summary Cards --}}
@@ -322,23 +420,23 @@
             </thead>
             <tbody>
                 @php
-                    $maxAttendees = $speakerAnalytics->max('total_attendees') ?: 1;
+                $maxAttendees = $speakerAnalytics->max('total_attendees') ?: 1;
                 @endphp
                 @forelse($speakerAnalytics as $index => $speaker)
-                    <tr>
-                        <td><span class="sa-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span></td>
-                        <td>
-                            <span class="sa-speaker-name">{{ $speaker->name }}</span>
-                            <span class="sa-bar-mini" style="width: {{ round(($speaker->total_attendees / $maxAttendees) * 100) }}%"></span>
-                        </td>
-                        <td>
-                            <span class="sa-badge">{{ number_format($speaker->total_attendees) }}</span>
-                        </td>
-                    </tr>
+                <tr>
+                    <td><span class="sa-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span></td>
+                    <td>
+                        <span class="sa-speaker-name">{{ $speaker->name }}</span>
+                        <span class="sa-bar-mini" style="width: {{ round(($speaker->total_attendees / $maxAttendees) * 100) }}%"></span>
+                    </td>
+                    <td>
+                        <span class="sa-badge">{{ number_format($speaker->total_attendees) }}</span>
+                    </td>
+                </tr>
                 @empty
-                    <tr>
-                        <td colspan="3" class="sa-empty">No speaker data available.</td>
-                    </tr>
+                <tr>
+                    <td colspan="3" class="sa-empty">No speaker data available.</td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
@@ -351,15 +449,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
 
         // Date display
         const d = new Date();
         document.getElementById('sa-date-display').textContent =
-            d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            d.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
 
-        const speakerNames   = @json($speakerAnalytics->pluck('name'));
-        const attendeeCounts = @json($speakerAnalytics->pluck('total_attendees'));
+        const speakerNames = @json($speakerAnalytics - > pluck('name'));
+        const attendeeCounts = @json($speakerAnalytics - > pluck('total_attendees'));
 
         const ctx = document.getElementById('speakerChart').getContext('2d');
 
@@ -372,10 +475,13 @@
                     data: attendeeCounts,
                     backgroundColor: function(context) {
                         const chart = context.chart;
-                        const { ctx: c, chartArea } = chart;
-                        if (!chartArea) return 'rgba(59, 130, 246, 0.7)';
+                        const {
+                            ctx: c,
+                            chartArea
+                        } = chart;
+                        if (!chartArea) return 'rgba(116, 127, 224, 0.7)';
                         const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.85)');
+                        gradient.addColorStop(0, 'rgba(87, 112, 224, 0.85');
                         gradient.addColorStop(1, 'rgba(96, 165, 250, 0.35)');
                         return gradient;
                     },
@@ -390,15 +496,24 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: false
+                    },
                     tooltip: {
                         backgroundColor: '#111827',
                         titleColor: '#f9fafb',
                         bodyColor: '#9ca3af',
                         padding: 12,
                         cornerRadius: 10,
-                        titleFont: { family: 'DM Sans', weight: '600', size: 13 },
-                        bodyFont:  { family: 'DM Sans', size: 12 },
+                        titleFont: {
+                            family: 'DM Sans',
+                            weight: '600',
+                            size: 13
+                        },
+                        bodyFont: {
+                            family: 'DM Sans',
+                            size: 12
+                        },
                         callbacks: {
                             label: function(ctx) {
                                 return '  ' + ctx.parsed.y.toLocaleString() + ' attendees';
@@ -408,11 +523,19 @@
                 },
                 scales: {
                     x: {
-                        grid: { display: false },
-                        border: { display: false },
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        },
                         ticks: {
                             color: '#9ca3af',
-                            font: { family: 'DM Sans', size: 12, weight: '500' },
+                            font: {
+                                family: 'DM Sans',
+                                size: 12,
+                                weight: '500'
+                            },
                             maxRotation: 35,
                             minRotation: 0
                         }
@@ -423,11 +546,17 @@
                             color: '#f3f4f6',
                             drawBorder: false
                         },
-                        border: { display: false, dash: [4, 4] },
+                        border: {
+                            display: false,
+                            dash: [4, 4]
+                        },
                         ticks: {
                             precision: 0,
                             color: '#9ca3af',
-                            font: { family: 'DM Mono', size: 11 },
+                            font: {
+                                family: 'DM Mono',
+                                size: 11
+                            },
                             callback: function(val) {
                                 return val >= 1000 ? (val / 1000).toFixed(1) + 'k' : val;
                             }
