@@ -288,19 +288,26 @@ function submitBulkAction(actionType) {
         alert('Please select an email or notification template.');
     }
     
+    let schedule_time = '';
+    let timezone = '';
+
     if(emailTemplateValue){
       template_name = emailTemplateValue
       type= 'email'
+      schedule_time = document.getElementById('schedule_time_email').value;
+      timezone = document.getElementById('timezone_email').value;
     }
 
     if(notificationTemplateValue){
       template_name = notificationTemplateValue
       type= 'notification'
+      schedule_time = document.getElementById('schedule_time_notif').value;
+      timezone = document.getElementById('timezone_notif').value;
     }
    
     document.getElementById('selectedUserIds').value = JSON.stringify(selected);
     let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name+"&type="+type;
+    form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name+"&type="+type + "&schedule_time="+schedule_time + "&timezone="+timezone;
     form.submit();
 }
 

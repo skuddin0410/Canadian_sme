@@ -139,10 +139,28 @@
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>No usres was selected.</strong>The email will be sent to all users.
+                            <strong>No users was selected.</strong>The email will be sent to all users.
                         </div>
                     </div>
            
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 text-start">
+                            <label for="schedule_time_email" class="form-label">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="schedule_time_email" name="schedule_time" class="form-control">
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label for="timezone_email" class="form-label">Timezone</label>
+                            <select id="timezone_email" name="timezone" class="form-control">
+                                <option value="UTC">UTC</option>
+                                <option value="America/Toronto" selected>America/Toronto</option>
+                                <option value="America/New_York">America/New_York</option>
+                                <option value="Europe/London">Europe/London</option>
+                                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                <option value="Asia/Dubai">Asia/Dubai</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -182,7 +200,25 @@
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>No usres was selected.</strong>The notification will be sent to all users.
+                            <strong>No users was selected.</strong>The notification will be sent to all users.
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 text-start">
+                            <label for="schedule_time_notif" class="form-label">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="schedule_time_notif" name="schedule_time" class="form-control">
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label for="timezone_notif" class="form-label">Timezone</label>
+                            <select id="timezone_notif" name="timezone" class="form-control">
+                                <option value="UTC">UTC</option>
+                                <option value="America/Toronto" selected>America/Toronto</option>
+                                <option value="America/New_York">America/New_York</option>
+                                <option value="Europe/London">Europe/London</option>
+                                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                <option value="Asia/Dubai">Asia/Dubai</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -228,6 +264,23 @@
                         </select>
                     </div>
 
+                    <div class="row mt-3">
+                        <div class="col-md-6 text-start">
+                            <label for="schedule_time_both" class="form-label">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="schedule_time_both" name="schedule_time" class="form-control">
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label for="timezone_both" class="form-label">Timezone</label>
+                            <select id="timezone_both" name="timezone" class="form-control">
+                                <option value="UTC">UTC</option>
+                                <option value="America/Toronto" selected>America/Toronto</option>
+                                <option value="America/New_York">America/New_York</option>
+                                <option value="Europe/London">Europe/London</option>
+                                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                <option value="Asia/Dubai">Asia/Dubai</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
@@ -437,6 +490,8 @@
 
             function resetTemplateSelections() {
                 $('#emailTemplate, #notificationTemplate, #emailTemplateBoth, #notificationTemplateBoth').val('');
+                $('#schedule_time_email, #schedule_time_notif, #schedule_time_both').val('');
+                $('#timezone_email, #timezone_notif, #timezone_both').val('America/Toronto');
             }
 
             window.openModal = function(actionType) {
@@ -482,6 +537,13 @@
 
                 if (emailTemplate) data.email_template = emailTemplate;
                 if (notificationTemplate) data.notification_template = notificationTemplate;
+
+                const scheduleTime = $('#schedule_time_both').val();
+                const timezone = $('#timezone_both').val();
+                if (scheduleTime) {
+                    data.schedule_time = scheduleTime;
+                    data.timezone = timezone;
+                }
 
                 $.ajax({
                     url: "{{ route('attendee-users.send-both') }}",
