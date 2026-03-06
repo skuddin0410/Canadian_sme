@@ -5,6 +5,11 @@
 @endsection
 
 @section('content')
+    <style>
+        .swal2-container {
+            z-index: 9999 !important;
+        }
+    </style>
     <div class="container flex-grow-1 container-p-y pt-0">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light"> Attendee/</span>Lists</h4>
         <div class="row">
@@ -14,6 +19,12 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Attendee List</h5>
                         <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                            <button type="button" class="btn btn-outline-info btn-pill" onclick="openScheduledEmailsModal()">
+                                <i class="bx bx-time me-1"></i>Scheduled Emails
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-pill" onclick="openScheduledNotificationsModal()">
+                                <i class="bx bx-bell me-1"></i>Scheduled Notifications
+                            </button>
                             <a href="{{ route('attendee-users.export') }}" class="btn btn-outline-primary btn-pill">Export
                                 Users</a>
                             <a href="#" class="btn btn-outline-primary btn-pill" id="importusers"
@@ -139,10 +150,17 @@
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>No usres was selected.</strong>The email will be sent to all users.
+                            <strong>No users was selected.</strong>The email will be sent to all users.
                         </div>
                     </div>
            
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-start">
+                            <label for="schedule_time_email" class="form-label">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="schedule_time_email" name="schedule_time" class="form-control">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -182,7 +200,14 @@
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>No usres was selected.</strong>The notification will be sent to all users.
+                            <strong>No users was selected.</strong>The notification will be sent to all users.
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-start">
+                            <label for="schedule_time_notif" class="form-label">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="schedule_time_notif" name="schedule_time" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -228,6 +253,12 @@
                         </select>
                     </div>
 
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-start">
+                            <label for="schedule_time_both" class="form-label">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="schedule_time_both" name="schedule_time" class="form-control">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
@@ -237,6 +268,84 @@
         </div>
     </div>
 
+
+    {{-- Scheduled Emails Modal --}}
+    <div class="modal fade" id="scheduledEmailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bx bx-time me-1"></i> Scheduled Emails</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center py-3" id="scheduledEmailsLoading">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Loading scheduled emails...</p>
+                    </div>
+                    <div id="scheduledEmailsContent" style="display:none;">
+                        <table class="table table-striped table-bordered" id="scheduledEmailsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Template</th>
+                                    <th>Scheduled For</th>
+                                    <th>Created At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div id="noScheduledEmails" class="text-center text-muted py-4" style="display:none;">
+                            <i class="bx bx-envelope" style="font-size: 2rem;"></i>
+                            <p class="mt-2">No scheduled emails found.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Scheduled Notifications Modal --}}
+    <div class="modal fade" id="scheduledNotificationsModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bx bx-bell me-1"></i> Scheduled Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center py-3" id="scheduledNotifsLoading">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Loading scheduled notifications...</p>
+                    </div>
+                    <div id="scheduledNotifsContent" style="display:none;">
+                        <table class="table table-striped table-bordered" id="scheduledNotifsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Message</th>
+                                    <th>Scheduled For</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div id="noScheduledNotifs" class="text-center text-muted py-4" style="display:none;">
+                            <i class="bx bx-bell-off" style="font-size: 2rem;"></i>
+                            <p class="mt-2">No scheduled notifications found.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -307,7 +416,9 @@
 
 @section('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
         // 🔹 Restore search input
         if (savedParams.search) {
@@ -437,6 +548,7 @@
 
             function resetTemplateSelections() {
                 $('#emailTemplate, #notificationTemplate, #emailTemplateBoth, #notificationTemplateBoth').val('');
+                $('#schedule_time_email, #schedule_time_notif, #schedule_time_both').val('');
             }
 
             window.openModal = function(actionType) {
@@ -470,36 +582,55 @@
                 const notificationTemplate = $('#notificationTemplateBoth').val();
 
                 if (!emailTemplate && !notificationTemplate) {
-                    alert("Please select at least one template (email or notification).");
+                    Swal.fire('Error', 'Please select at least one template (email or notification).', 'error');
                     return;
                 }
 
-                // Always send to all users
-                let data = {
-                    user_ids: 'all',
-                    _token: '{{ csrf_token() }}'
-                };
+                const scheduleTime = $('#schedule_time_both').val();
+                const confirmTitle = scheduleTime ? 'Schedule Both?' : 'Send Both Now?';
+                const confirmText = scheduleTime 
+                    ? 'This will schedule both email and notification for all users.' 
+                    : 'This will send both email and notification to all users immediately.';
 
-                if (emailTemplate) data.email_template = emailTemplate;
-                if (notificationTemplate) data.notification_template = notificationTemplate;
+                Swal.fire({
+                    title: confirmTitle,
+                    text: confirmText,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: scheduleTime ? 'Schedule' : 'Send Now',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let data = {
+                            user_ids: 'all',
+                            _token: '{{ csrf_token() }}'
+                        };
 
-                $.ajax({
-                    url: "{{ route('attendee-users.send-both') }}",
-                    method: "POST",
-                    data: data,
-                    beforeSend: function() {
-                        $('.btn-primary').prop('disabled', true).text('Sending...');
-                    },
-                    success: function(resp) {
-                        alert(resp.message || 'Emails & Notifications sent successfully!');
-                        closeModal();
-                    },
-                    error: function(xhr) {
-                        console.error(xhr.responseText);
-                        alert(xhr.responseJSON?.message || 'Unexpected error occurred.');
-                    },
-                    complete: function() {
-                        $('.btn-primary').prop('disabled', false).text('Send');
+                        if (emailTemplate) data.email_template = emailTemplate;
+                        if (notificationTemplate) data.notification_template = notificationTemplate;
+                        if (scheduleTime) {
+                            data.schedule_time = scheduleTime;
+                            data.timezone = userTimezone;
+                        }
+
+                        // Determine the correct route based on whether it is scheduled or immediate
+                        // Actually the user wants to use schedule endpoint if time is set
+                        let url = "{{ route('attendee-users.send-both') }}";
+                        
+                        Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                        $.ajax({
+                            url: url,
+                            method: "POST",
+                            data: data,
+                            success: function(resp) {
+                                Swal.fire('Success!', resp.message || 'Action completed successfully!', 'success');
+                                closeModal();
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Error', xhr.responseJSON?.message || 'Unexpected error occurred.', 'error');
+                            }
+                        });
                     }
                 });
             }
@@ -544,6 +675,192 @@
             // }
 
         });
+    </script>
+
+    <script>
+        // =============================================
+        // Scheduled Emails Modal
+        // =============================================
+        window.openScheduledEmailsModal = function() {
+            $('#scheduledEmailsModal').modal('show');
+            $('#scheduledEmailsLoading').show();
+            $('#scheduledEmailsContent').hide();
+
+            $.ajax({
+                url: "{{ route('attendee-users.scheduledEmails') }}",
+                method: 'GET',
+                success: function(data) {
+                    $('#scheduledEmailsLoading').hide();
+                    $('#scheduledEmailsContent').show();
+
+                    const tbody = $('#scheduledEmailsTable tbody');
+                    tbody.empty();
+
+                    if (data.length === 0) {
+                        $('#scheduledEmailsTable').hide();
+                        $('#noScheduledEmails').show();
+                    } else {
+                        $('#scheduledEmailsTable').show();
+                        $('#noScheduledEmails').hide();
+                        data.forEach(function(item, index) {
+                            const localScheduledAt = item.scheduled_at_iso 
+                                ? new Date(item.scheduled_at_iso).toLocaleString() 
+                                : item.scheduled_at;
+                            const localCreatedAt = item.created_at_iso 
+                                ? new Date(item.created_at_iso).toLocaleString() 
+                                : item.created_at;
+
+                            tbody.append(`
+                                <tr id="scheduled-email-row-${item.id}">
+                                    <td>${index + 1}</td>
+                                    <td>${item.template_name}</td>
+                                    <td>${localScheduledAt}</td>
+                                    <td>${localCreatedAt}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="cancelScheduledEmail(${item.id})">
+                                            <i class="bx bx-trash"></i> Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function() {
+                    $('#scheduledEmailsLoading').hide();
+                    $('#scheduledEmailsContent').show();
+                    $('#scheduledEmailsTable').hide();
+                    $('#noScheduledEmails').show();
+                }
+            });
+        };
+
+        window.cancelScheduledEmail = function(jobId) {
+            Swal.fire({
+                title: 'Cancel Scheduled Email?',
+                text: 'This scheduled email will be permanently cancelled.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, cancel it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('attendee-users.cancelScheduledEmail') }}",
+                        method: 'POST',
+                        data: {
+                            job_id: jobId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(resp) {
+                            Swal.fire('Cancelled!', resp.message, 'success');
+                            $('#scheduled-email-row-' + jobId).fadeOut(300, function() {
+                                $(this).remove();
+                                if ($('#scheduledEmailsTable tbody tr').length === 0) {
+                                    $('#scheduledEmailsTable').hide();
+                                    $('#noScheduledEmails').show();
+                                }
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to cancel.', 'error');
+                        }
+                    });
+                }
+            });
+        };
+
+        // =============================================
+        // Scheduled Notifications Modal
+        // =============================================
+        window.openScheduledNotificationsModal = function() {
+            $('#scheduledNotificationsModal').modal('show');
+            $('#scheduledNotifsLoading').show();
+            $('#scheduledNotifsContent').hide();
+
+            $.ajax({
+                url: "{{ route('attendee-users.scheduledNotifications') }}",
+                method: 'GET',
+                success: function(data) {
+                    $('#scheduledNotifsLoading').hide();
+                    $('#scheduledNotifsContent').show();
+
+                    const tbody = $('#scheduledNotifsTable tbody');
+                    tbody.empty();
+
+                    if (data.length === 0) {
+                        $('#scheduledNotifsTable').hide();
+                        $('#noScheduledNotifs').show();
+                    } else {
+                        $('#scheduledNotifsTable').show();
+                        $('#noScheduledNotifs').hide();
+                        data.forEach(function(item, index) {
+                            const shortMsg = item.message.length > 60 ? item.message.substring(0, 60) + '...' : item.message;
+                            const localScheduledAt = item.scheduled_at_iso 
+                                ? new Date(item.scheduled_at_iso).toLocaleString() 
+                                : item.scheduled_at;
+
+                            tbody.append(`
+                                <tr id="scheduled-notif-row-${item.id}">
+                                    <td>${index + 1}</td>
+                                    <td>${item.title}</td>
+                                    <td title="${item.message}">${shortMsg}</td>
+                                    <td>${localScheduledAt}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="cancelScheduledNotification('${item.id}')">
+                                            <i class="bx bx-trash"></i> Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function() {
+                    $('#scheduledNotifsLoading').hide();
+                    $('#scheduledNotifsContent').show();
+                    $('#scheduledNotifsTable').hide();
+                    $('#noScheduledNotifs').show();
+                }
+            });
+        };
+
+        window.cancelScheduledNotification = function(notificationId) {
+            Swal.fire({
+                title: 'Cancel Scheduled Notification?',
+                text: 'This scheduled notification will be permanently cancelled on OneSignal.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, cancel it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('attendee-users.cancelScheduledNotification') }}",
+                        method: 'POST',
+                        data: {
+                            notification_id: notificationId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(resp) {
+                            Swal.fire('Cancelled!', resp.message, 'success');
+                            $(`#scheduled-notif-row-${notificationId}`).fadeOut(300, function() {
+                                $(this).remove();
+                                if ($('#scheduledNotifsTable tbody tr').length === 0) {
+                                    $('#scheduledNotifsTable').hide();
+                                    $('#noScheduledNotifs').show();
+                                }
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to cancel.', 'error');
+                        }
+                    });
+                }
+            });
+        };
     </script>
 
     <script>

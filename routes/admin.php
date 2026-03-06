@@ -175,6 +175,19 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
     ->name('attendee-users.bulkAction');
 
+  Route::post('/attendee-users/schedule-email', [AttendeeUserController::class, 'scheduleEmail'])
+    ->name('attendee-users.scheduleEmail');
+  Route::post('/attendee-users/schedule-notification', [AttendeeUserController::class, 'scheduleNotification'])
+    ->name('attendee-users.scheduleNotification');
+  Route::get('/attendee-users/scheduled-emails', [AttendeeUserController::class, 'scheduledEmails'])
+    ->name('attendee-users.scheduledEmails');
+  Route::get('/attendee-users/scheduled-notifications', [AttendeeUserController::class, 'scheduledNotifications'])
+    ->name('attendee-users.scheduledNotifications');
+  Route::post('/attendee-users/cancel-scheduled-email', [AttendeeUserController::class, 'cancelScheduledEmail'])
+    ->name('attendee-users.cancelScheduledEmail');
+  Route::post('/attendee-users/cancel-scheduled-notification', [AttendeeUserController::class, 'cancelScheduledNotification'])
+    ->name('attendee-users.cancelScheduledNotification');
+
 
   Route::get('/events/{event}/sessions', [TicketTypeController::class, 'getByEvent'])->name('events.sessions');
 
