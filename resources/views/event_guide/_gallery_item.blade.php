@@ -53,6 +53,11 @@
         </div>
         
         <div class="mt-auto pt-1 border-top">
+            @if($item->event)
+            <small class="text-muted d-block text-truncate mb-1" title="{{ $item->event->title }}" style="font-size: 9px;">
+                <i class="bi bi-calendar-event"></i> {{ $item->event->title }}
+            </small>
+            @endif
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <small class="text-muted" style="font-size: 9px;">
                     <i class="bi bi-person"></i> {{ $item->user->email ?? 'Admin' }}
