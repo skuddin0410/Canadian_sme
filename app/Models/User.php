@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Booth;
 use App\Models\Company;
+use App\Models\PollAnswer;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
 use Spatie\Permission\Traits\HasRoles;
@@ -26,7 +27,7 @@ class User extends Authenticatable implements JWTSubject
      * Define the default guard for this model.
      */
     protected $guard_name = 'web'; // Set the default guard (e.g., 'api' or 'web')
-    protected $dates = ['deleted_at']; 
+    protected $dates = ['deleted_at'];
     /**
      * The attributes that are mass assignable.
      *
@@ -139,7 +140,7 @@ class User extends Authenticatable implements JWTSubject
             ->whereNotNull('file_name');
     }
 
-    
+
     public function coverphoto()
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
@@ -147,7 +148,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('file_type', 'cover_photo')
             ->whereNotNull('file_name');
     }
-    
+
     public function privateDocs()
     {
         return $this->hasMany(Drive::class, 'table_id', 'id')
@@ -155,7 +156,7 @@ class User extends Authenticatable implements JWTSubject
             ->where('file_type', 'private_docs')
             ->whereNotNull('file_name');
     }
-    
+
 
     public function bank()
     {
@@ -167,7 +168,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(\App\Models\UserLogin::class);
     }
-    
+
 
     public function usercompany()
     {
@@ -176,17 +177,21 @@ class User extends Authenticatable implements JWTSubject
 
     protected function approvalStatusLabel(): Attribute
     {
-        return Attribute::get(fn () => $this->is_approve ? 'Approved' : 'Pending Approval');
+        return Attribute::get(fn() => $this->is_approve ? 'Approved' : 'Pending Approval');
     }
 
     protected function approvalStatusClass(): Attribute
     {
-        return Attribute::get(fn () => $this->is_approve ? 'success' : 'warning');
+        return Attribute::get(fn() => $this->is_approve ? 'success' : 'warning');
     }
-    
+
     public function sessions()
     {
         return $this->belongsToMany(Session::class, 'session_speakers', 'user_id', 'session_id')->withTimestamps();
+    }
+    public function pollAnswers()
+    {
+        return $this->hasMany(PollAnswer::class);
     }
 
     public function agendas()
@@ -198,19 +203,19 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(FavoriteSession::class);
     }
-    
+
     public function connections()
     {
         return $this->belongsToMany(User::class, 'user_connections', 'user_id', 'connection_id')
-                    ->withPivot('status')
-                    ->withTimestamps();
+            ->withPivot('status')
+            ->withTimestamps();
     }
 
     public function connectedWithMe()
     {
         return $this->belongsToMany(User::class, 'user_connections', 'connection_id', 'user_id')
-                    ->withPivot('status')
-                    ->withTimestamps();
+            ->withPivot('status')
+            ->withTimestamps();
     }
 
     public function allConnections()
@@ -233,7 +238,7 @@ class User extends Authenticatable implements JWTSubject
     public function eventAndEntityLinks()
     {
         return $this->hasMany(EventAndEntityLink::class, 'entity_id', 'id')
-                    ->where('entity_type', 'users');
+            ->where('entity_type', 'users');
     }
 
     protected $appends = ['full_name'];

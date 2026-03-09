@@ -52,7 +52,7 @@
 
                   <div class="mb-2">
                     <label class="form-label">
-                      Image 
+                      Event Image 
                       <span class="text-danger">
                         (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }}) (<span class="text-danger">1920px (width) x 800px (height)</span>)
                       </span>
@@ -114,6 +114,76 @@
 
 
                         @error('image')
+                          <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label">
+                      Map Image 
+                      <span class="text-danger">
+                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
+                      </span>
+                    </label>
+
+                    <div class="row g-3 align-items-start">
+                      <!-- LEFT: Dropzone -->
+                      <div class="col-12 col-md-12">
+                        <!-- Real input (hidden) -->
+                        <input
+                          type="file"
+                          class="form-control d-none @error('map_image') is-invalid @enderror"
+                          name="map_image"
+                          id="map_image"
+                          accept="{{ $acceptList ?: 'image/*' }}"
+                          data-max-size-kb="{{ (int) config('app.blog_image_size') }}"
+                        />
+
+
+                            @php
+                              $hasMapImage = !empty($event->mapImage) && !empty($event->mapImage->file_path);
+                              $mapImgSrc = $hasMapImage ? (Str::startsWith($event->mapImage->file_path, ['http://','https://'])
+                                          ? $event->mapImage->file_path
+                                          : Storage::url($event->mapImage->file_path)) : '';
+                            @endphp
+
+                           <div id="map-image-dropzone"
+                               class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+                               style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+
+                            {{-- Placeholder --}}
+                            <div id="map-dz-placeholder" class="d-flex flex-column align-items-center gap-2 {{ $hasMapImage ? 'd-none' : '' }}">
+                              <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+                              <div>
+                                <strong>Drag & drop</strong> a map image here, or
+                                <button type="button" id="map-dz-browse" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+                              </div>
+                              <small class="text-muted d-block">Max {{ (int) config('app.blog_image_size') }} KB</small>
+                            </div>
+
+                            {{-- Inline preview --}}
+                            <img id="map-dz-image"
+                                 src="{{ $mapImgSrc }}"
+                                 alt="Preview"
+                                 class="{{ $hasMapImage ? '' : 'd-none' }} rounded"
+                                 style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+
+                            {{-- Remove button --}}
+                           
+                            <button type="button"
+                                    id="map-dz-remove"
+                                    class="btn btn-sm btn-danger position-absolute {{ $hasMapImage ? '' : 'd-none' }}"
+                                    style="top: .5rem; right: .5rem;" data-photoid=" {{!empty($event->mapImage) ? $event->mapImage->id : ''}}">
+                              <i class="bx bx-x"></i> Remove
+                            </button>
+
+                            <input type="file" id="map-dz-input" name="map_image" accept="image/*" class="d-none">
+                          </div>
+
+
+                        @error('map_image')
                           <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                       </div>
@@ -722,6 +792,58 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         error: function (xhr) {
             console.error('Error removing image:', xhr.responseText);
+        }
+      });
+  });
+
+  // Map Image Dropzone logic
+  const mapDropzone = document.getElementById('map-image-dropzone');
+  const mapImg = document.getElementById('map-dz-image');
+  const mapPlaceholder = document.getElementById('map-dz-placeholder');
+  const mapRemoveBtn = document.getElementById('map-dz-remove');
+  const mapInput = document.getElementById('map-dz-input');
+  const mapBrowse = document.getElementById('map-dz-browse');
+
+  const showMapPreview = (file) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      mapImg.src = e.target.result;
+      mapImg.classList.remove('d-none');
+      mapPlaceholder.classList.add('d-none');
+      mapRemoveBtn.classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  mapBrowse?.addEventListener('click', () => mapInput.click());
+  mapInput?.addEventListener('change', e => {
+    const file = e.target.files?.[0]; if (file) showMapPreview(file);
+  });
+
+  mapDropzone.addEventListener('dragover', e => { e.preventDefault(); });
+  mapDropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0]; if (file) { mapInput.files = e.dataTransfer.files; showMapPreview(file); }
+  });
+
+  mapRemoveBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mapImg.src = '';
+    mapImg.classList.add('d-none');
+    mapPlaceholder.classList.remove('d-none');
+    mapRemoveBtn.classList.add('d-none');
+    mapInput.value = ''; // clears chosen file
+    const photoId = mapRemoveBtn.dataset.photoid;
+      $.ajax({
+        url: `/delete/photo`, 
+        type: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        data: { photo_id: photoId },
+        success: function (res) {
+            console.log('Map Image removed successfully:', res);
+        },
+        error: function (xhr) {
+            console.error('Error removing map image:', xhr.responseText);
         }
       });
   });

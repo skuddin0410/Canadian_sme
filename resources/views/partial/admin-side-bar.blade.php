@@ -26,7 +26,7 @@
         @if(isSuperAdmin())
         <li class="menu-item {{ request()->is('admin/home-page*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-home-circle" style="font-size: 24px;"></i>
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="home_page">Home Page</div>
             </a>
             <ul class="menu-sub">
@@ -102,6 +102,15 @@
                     </ul>
                 </li>
             </ul>
+        </li>
+        @endif
+
+        @if(isSuperAdmin())
+        <li class="menu-item {{ request()->is('admin/navbar-dynamic*') ? 'active open' : '' }}">
+            <a href="{{ route('admin.navbar-dynamic.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+                <div data-i18n="navbar_dynamic">Dynamic Nav</div>
+            </a>
         </li>
         @endif
 
@@ -302,6 +311,20 @@
     @endif
 
     @if(isSuperAdmin())
+    <li class="menu-item {{ request()->is('admin/analytics*') ? 'active open' : '' }}">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+            <div data-i18n="Analytics">Analytics</div>
+        </a>
+        <ul class="menu-sub">
+            <li class="menu-item {{ request()->is('admin/analytics/session') ? 'active' : '' }}">
+                <a href="{{ route('admin.analytics.session') }}" class="menu-link">
+                    <div data-i18n="Session">Session</div>
+                </a>
+            </li>
+        </ul>
+    </li>
+
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
@@ -354,6 +377,30 @@
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="event-support">Event Support</div>
         </a>
+    </li>
+    <li class="menu-item {{ request()->routeIs('polls.index*') || request()->is('admin/poll-responses*') ? 'active open' : '' }}">
+
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons fa fa-poll" style="font-size: 20px;"></i>
+            <div>Polls</div>
+        </a>
+
+        <ul class="menu-sub">
+
+            <li class="menu-item {{ request()->routeIs('polls.index') ? 'active' : '' }}">
+                <a href="{{ route('polls.index') }}" class="menu-link">
+                    <div>List of Polls Created</div>
+                </a>
+            </li>
+
+            <li class="menu-item {{ request()->is('admin/poll-responses') ? 'active' : '' }}">
+                <a href="{{ route('polls.responses.index') }}" class="menu-link">
+                  
+                    <div>All Poll Responses</div>
+                </a>
+            </li>
+
+        </ul>
     </li>
     @endif
 

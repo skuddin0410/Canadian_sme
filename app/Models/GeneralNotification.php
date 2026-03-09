@@ -22,7 +22,7 @@
 	protected $fillable = [
 	'user_id','title','body',
 	'related_type','related_id','related_name',
-	'scheduled_at','delivered_at','read_at','meta',
+	'scheduled_at','delivered_at','read_at','meta','is_read',
 	];
 
 

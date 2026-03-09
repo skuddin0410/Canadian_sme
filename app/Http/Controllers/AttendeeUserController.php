@@ -32,6 +32,9 @@ use App\Models\Speaker;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\SendScheduledBulkEmailJob;
+use App\Jobs\SendScheduledBulkNotificationJob;
+use Carbon\Carbon as CarbonCarbon;
 
 class AttendeeUserController extends Controller
 {
@@ -53,6 +56,7 @@ class AttendeeUserController extends Controller
             
             // $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC'); //subabrata da code
             // Check if "admins" filter is applied
+
         if ($request->has('show_admins') && $request->show_admins == 'true') {
             // Filter users by the 'Admin' role
             $users = User::with('roles')
@@ -62,13 +66,16 @@ class AttendeeUserController extends Controller
                 ->orderBy('id', 'DESC');
         } else {
             if(isSuperAdmin()){
-                $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC');
+                $users = User::with('roles')
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
+                })
+                ->orderBy('id', 'DESC');
             }else{
                 $users = User::with('roles')
                 ->whereDoesntHave('roles', function ($q) {
                     $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
                 })
-                ->whereNotIn('id', [1, 2])
                 ->whereHas('eventAndEntityLinks', function ($q) {
                     $q->where('entity_type', 'users')
                     ->whereIn('event_id', function($query) {
@@ -887,42 +894,80 @@ public function sendBoth(Request $request)
     $request->validate([
         'email_template' => 'nullable|string',
         'notification_template' => 'nullable|string',
+        'schedule_time' => 'nullable|date',
+        'timezone'      => 'nullable|string',
     ]);
  
     $emailTemplateName = $request->email_template;
     $notificationTemplateName = $request->notification_template;
+    $scheduleTime = $request->schedule_time;
 
-    // Get all users, excluding ids 1 and 2, in chunks of 200
-    $usersQuery = User::whereNotIn('id', [1, 2]);
+    // Handle scheduling
+    if ($scheduleTime) {
+        $tz = $request->timezone ?? 'UTC';
+        // Parse the user's local time string using their provided timezone, then force to UTC
+        $time = CarbonCarbon::parse($scheduleTime, $tz)->utc();
 
-    if ($usersQuery->count() === 0) {
-        return redirect()->back()->withErrors('No users found to send.');
+        // Check if the time is in the future relative to server, allowing minor drift (10s)
+        if ($time->isPast() && $time->diffInSeconds(now()->utc()) > 10) {
+            return response()->json([
+                'message' => 'Schedule time must be in the future.',
+                'server_time' => now()->utc()->toDateTimeString() . ' UTC',
+                'parsed_time' => $time->toDateTimeString() . ' UTC'
+            ], 422);
+        }
+
+        if ($emailTemplateName) {
+            SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName)
+                ->delay($time)
+                ->onQueue('default');
+        }
+
+        if ($notificationTemplateName) {
+            SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName)
+                ->delay($time)
+                ->onQueue('default');
+        }
+
+        return response()->json(['message' => 'Both actions scheduled successfully.']);
     }
 
-    // Process in chunks of 200
+    // Immediate send for 'all'
+    $usersQuery = User::query();
+
+    if ($usersQuery->count() === 0) {
+        return response()->json(['message' => 'No users found to send.'], 404);
+    }
+
     $usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName) {
         foreach ($users as $user) {
             // Handle email sending
             if ($emailTemplateName) {
                 $emailTemplate = EmailTemplate::where('template_name', $emailTemplateName)->first();
                 if ($emailTemplate && $emailTemplate->type === 'email') {
-                    $subject = str_replace('{{ site_name }}', config('app.name'), $emailTemplate->subject ?? '');
+                    $subject = str_replace(['{{site_name}}', '{{ site_name }}'], config('app.name'), $emailTemplate->subject ?? '');
                     $message = $emailTemplate->message ?? '';
-
                     $qr_code_url = $user->qr_code ? asset($user->qr_code) : '';
                     $updateUrl = route('update-user', Crypt::encryptString($user->id));
 
                     $message = str_replace(
-                        ['{{ name }}', '{{ qr_code }}', '{{ profile_update_link }}'],
+                        ['{{name}}', '{{ name }}', '{{qr_code}}', '{{ qr_code }}', '{{profile_update_link}}', '{{ profile_update_link }}'],
                         [
                             $user->name ?? $user->email,
+                            $user->name ?? $user->email,
                             $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
+                            $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
+                            '<br><a href="' . $updateUrl . '">Update Profile</a>',
                             '<br><a href="' . $updateUrl . '">Update Profile</a>'
                         ],
                         $message
                     );
 
-                    Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+                    try {
+                        Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+                    } catch (\Exception $e) {
+                         Log::error("Immediate bulk email failed for user {$user->id}: " . $e->getMessage());
+                    }
                 }
             }
 
@@ -932,52 +977,61 @@ public function sendBoth(Request $request)
                 if ($notificationTemplate && $notificationTemplate->type === 'notifications') {
                     $title = 'Hi, ' . ($user->name ?? $user->email) . ',';
                     $message = str_replace(
-                        ['{{ name }}', '{{ qr_code }}', '{{ profile_update_link }}'],
+                        ['{{name}}', '{{ name }}', '{{qr_code}}', '{{ qr_code }}', '{{profile_update_link}}', '{{ profile_update_link }}'],
                         [
                             $user->name ?? $user->email,
+                            $user->name ?? $user->email,
                             $user->qr_code ?? '',
+                            $user->qr_code ?? '',
+                            route('update-user', Crypt::encryptString($user->id)),
                             route('update-user', Crypt::encryptString($user->id))
                         ],
                         $notificationTemplate->message ?? ''
                     );
 
-                    // Create notification for user
-                    $user->notifications()->create([
+                    // Create database record
+                    \App\Models\GeneralNotification::create([
+                        'user_id' => $user->id,
                         'title' => $notificationTemplate->title ?? $title,
                         'body' => $message,
-                        'read_at' => null
+                        'delivered_at' => now(),
+                        'is_read' => 0
                     ]);
 
-                    // Send OneSignal push notification if user has OneSignal ID
+                    // Send OneSignal push
                     if (!empty($user->onesignal_userid)) {
-                        $content = [
-                            "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-                            "include_player_ids" => [$user->onesignal_userid],
-                            'headings' => ['en' => $title],
-                            "contents" => ["en" => $message]
-                        ];
-
-                        $fields = json_encode($content);
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                            'Content-Type: application/json; charset=utf-8',
-                            'Authorization: Basic YOUR_ONESIGNAL_KEY'
-                        ]);
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                        curl_setopt($ch, CURLOPT_POST, TRUE);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                        curl_exec($ch);
-                        curl_close($ch);
+                        $this->sendOneSignalPushManual($user->onesignal_userid, $notificationTemplate->title ?? $title, $message);
                     }
                 }
             }
         }
     });
  
-    return redirect()->back()->with('success', 'Emails & Notifications sent successfully to all selected users.');
+    return response()->json(['message' => 'Emails & Notifications sent successfully.']);
+}
+
+protected function sendOneSignalPushManual($playerId, $title, $message)
+{
+    $fields = json_encode([
+        "app_id" => trim(env('ONESIGNAL_APP_ID')),
+        "include_player_ids" => [$playerId],
+        'headings' => ['en' => $title],
+        "contents" => ["en" => $message]
+    ]);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json; charset=utf-8',
+        'Authorization: Basic ' . trim(env('ONESIGNAL_REST_API_KEY'))
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_exec($ch);
+    curl_close($ch);
 }
 
     
@@ -1002,6 +1056,178 @@ public function generateBadge(Request $request)
     return $pdf->download('attendee_badges.pdf');
 }
 
+/**
+ * Schedule a bulk email to be sent at a future time.
+ */
+public function scheduleEmail(Request $request)
+{
+    $request->validate([
+        'template_name' => 'required|string',
+        'schedule_time' => 'required|date',
+        'timezone'      => 'nullable|string',
+    ]);
+
+    $userIds = json_decode($request->user_ids, true);
+    if (empty($userIds)) {
+        $userIds = ['all'];
+    }
+
+    $tz = $request->timezone ?? 'UTC';
+    $scheduleTime = CarbonCarbon::parse($request->schedule_time, $tz)->utc();
+
+    // Check if the time is in the future relative to server, allowing minor drift (10s)
+    if ($scheduleTime->isPast() && $scheduleTime->diffInSeconds(now()->utc()) > 10) {
+        return response()->json([
+            'message' => 'Schedule time must be in the future.',
+            'server_time' => now()->utc()->toDateTimeString() . ' UTC',
+            'parsed_time' => $scheduleTime->toDateTimeString() . ' UTC'
+        ], 422);
+    }
+
+    SendScheduledBulkEmailJob::dispatch($userIds, $request->template_name)
+        ->delay($scheduleTime)
+        ->onQueue('default');
+
+    return response()->json([
+        'message' => 'Email scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
+    ]);
+}
+
+/**
+ * Schedule a push notification via Laravel Job (handles DB write + Push).
+ */
+public function scheduleNotification(Request $request)
+{
+    $request->validate([
+        'template_name' => 'required|string',
+        'schedule_time' => 'required|date',
+        'timezone'      => 'nullable|string',
+    ]);
+
+    $userIds = json_decode($request->user_ids, true);
+    if (empty($userIds)) {
+        $userIds = ['all'];
+    }
+
+    $tz = $request->timezone ?? 'UTC';
+    $scheduleTime = CarbonCarbon::parse($request->schedule_time, $tz)->utc();
+
+    if ($scheduleTime->isPast() && $scheduleTime->diffInSeconds(now()->utc()) > 10) {
+        return response()->json([
+            'message' => 'Schedule time must be in the future.',
+            'server_time' => now()->utc()->toDateTimeString() . ' UTC',
+            'parsed_time' => $scheduleTime->toDateTimeString() . ' UTC'
+        ], 422);
+    }
+
+    SendScheduledBulkNotificationJob::dispatch($userIds, $request->template_name)
+        ->delay($scheduleTime)
+        ->onQueue('default');
+
+    return response()->json([
+        'message' => 'Notification scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
+    ]);
+}
+
+/**
+ * List scheduled emails from the jobs table.
+ * Shows all pending (unprocessed) scheduled email jobs.
+ */
+public function scheduledEmails()
+{
+    $jobs = \DB::table('jobs')
+        ->where('payload', 'like', '%SendScheduledBulkEmailJob%')
+        ->whereNull('reserved_at')
+        ->orderBy('available_at', 'asc')
+        ->get()
+        ->map(function ($job) {
+            $payload = json_decode($job->payload, true);
+            $command = null;
+            try {
+                $command = isset($payload['data']['command'])
+                    ? unserialize($payload['data']['command'])
+                    : null;
+            } catch (\Exception $e) {}
+
+            $scheduledAt = CarbonCarbon::createFromTimestamp($job->available_at);
+            $status = $scheduledAt->isFuture() ? 'Waiting' : 'Queued (pending worker)';
+
+            return [
+                'id'            => $job->id,
+                'template_name' => $command->templateName ?? ($payload['displayName'] ?? 'Unknown'),
+                'scheduled_at'  => $scheduledAt->format('Y-m-d H:i:s') . ' UTC',
+                'scheduled_at_iso' => $scheduledAt->toIso8601String(),
+                'created_at'    => CarbonCarbon::createFromTimestamp($job->created_at)->format('Y-m-d H:i:s') . ' UTC',
+                'created_at_iso' => CarbonCarbon::createFromTimestamp($job->created_at)->toIso8601String(),
+                'status'        => $status,
+            ];
+        });
+
+    return response()->json($jobs);
+}
+
+/**
+ * List scheduled notifications from the jobs table.
+ * Shows all pending (unprocessed) scheduled notification jobs.
+ */
+public function scheduledNotifications()
+{
+    $jobs = \DB::table('jobs')
+        ->where('payload', 'like', '%SendScheduledBulkNotificationJob%')
+        ->whereNull('reserved_at')
+        ->orderBy('available_at', 'asc')
+        ->get()
+        ->map(function ($job) {
+            $payload = json_decode($job->payload, true);
+            $command = null;
+            try {
+                $command = isset($payload['data']['command'])
+                    ? unserialize($payload['data']['command'])
+                    : null;
+            } catch (\Exception $e) {}
+
+            $scheduledAt = CarbonCarbon::createFromTimestamp($job->available_at);
+            $status = $scheduledAt->isFuture() ? 'Waiting' : 'Queued (pending worker)';
+
+            return [
+                'id'            => $job->id,
+                'title'         => $command->templateName ?? ($payload['displayName'] ?? 'Unknown'),
+                'message'       => $status,
+                'scheduled_at'  => $scheduledAt->format('Y-m-d H:i:s') . ' UTC',
+                'scheduled_at_iso' => $scheduledAt->toIso8601String(),
+            ];
+        });
+
+    return response()->json($jobs);
+}
+
+/**
+ * Cancel a scheduled email by deleting the job from the queue.
+ */
+public function cancelScheduledEmail(Request $request)
+{
+    $deleted = \DB::table('jobs')->where('id', $request->job_id)->delete();
+
+    if ($deleted) {
+        return response()->json(['message' => 'Scheduled email cancelled successfully.']);
+    }
+
+    return response()->json(['message' => 'Job not found or already processed.'], 404);
+}
+
+/**
+ * Cancel a scheduled notification by deleting the job.
+ */
+public function cancelScheduledNotification(Request $request)
+{
+    $deleted = \DB::table('jobs')->where('id', $request->notification_id)->delete();
+
+    if ($deleted) {
+        return response()->json(['message' => 'Scheduled notification cancelled successfully.']);
+    }
+
+    return response()->json(['message' => 'Job not found or already processed.'], 404);
+}
 
 
 }

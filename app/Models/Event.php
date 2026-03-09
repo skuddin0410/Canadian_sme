@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
 use App\Models\ContactUs;
+use App\Models\Poll;
 
 class Event extends Model
 {
@@ -62,9 +63,21 @@ class Event extends Model
             ->whereNotNull('file_name');
     }
 
+    public function mapImage()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'events')
+            ->where('file_type', 'map_image')
+            ->whereNotNull('file_name');
+    }
+
     public function sessions()
     {
         return $this->hasMany(Session::class);
+    }
+    public function polls()
+    {
+        return $this->hasMany(Poll::class);
     }
 
     public function entityLinks()

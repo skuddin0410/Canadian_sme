@@ -205,7 +205,7 @@
                 </div>
             </div>
             <div class="mb-3">
-              <label class="form-label" for="title">Image<span class="text-danger">*</span><span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }}) </span> </label>
+              <label class="form-label" for="title">Event Image<span class="text-danger">*</span><span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }}) </span> </label>
               <div class="input-group input-group-merge">
                 <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                 <input
@@ -216,6 +216,21 @@
               </div>
               @if ($errors->has('image'))
                 <span class="text-danger text-left">{{ $errors->first('image') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="map_image">Map Image<span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }}) </span> </label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-map-alt"></i></span>
+                <input
+                  type="file"
+                  class="form-control"
+                  name="map_image"
+                  id="map_image"/>
+              </div>
+              @if ($errors->has('map_image'))
+                <span class="text-danger text-left">{{ $errors->first('map_image') }}</span>
               @endif
             </div>
              

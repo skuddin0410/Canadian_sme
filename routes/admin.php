@@ -30,9 +30,19 @@ use App\Http\Controllers\LandingDemoTextController;
 use App\Http\Controllers\LandingCustomerBannerController;
 use App\Http\Controllers\LandingHomeReviewController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\NavbarDynamicController;
+use App\Http\Controllers\PollController;
+use App\Http\Controllers\AnalyticsController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+
+  Route::get('/navbar-dynamic', [NavbarDynamicController::class, 'index'])->name('admin.navbar-dynamic.index');
+  Route::get('/navbar-dynamic/create', [NavbarDynamicController::class, 'create'])->name('admin.navbar-dynamic.create');
+  Route::post('/navbar-dynamic', [NavbarDynamicController::class, 'store'])->name('admin.navbar-dynamic.store');
+  Route::get('/navbar-dynamic/{id}/edit', [NavbarDynamicController::class, 'edit'])->name('admin.navbar-dynamic.edit');
+  Route::post('/navbar-dynamic/{id}', [NavbarDynamicController::class, 'update'])->name('admin.navbar-dynamic.update');
+  Route::delete('/navbar-dynamic/{id}', [NavbarDynamicController::class, 'destroy'])->name('admin.navbar-dynamic.destroy');
 
   Route::get('/home-page/customer/banner', [LandingCustomerBannerController::class, 'index'])->name('admin.home-page.customer.banner');
   Route::post('/home-page/customer/banner', [LandingCustomerBannerController::class, 'update'])->name('admin.home-page.customer.banner.update');
@@ -104,7 +114,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/event-guides/gallery', [EventGuideController::class, 'showGallery'])
     ->name('event-guides.showGallery');
   Route::post('/event-guides/gallery/upload', [EventGuideController::class, 'uploadGallery'])->name('event-guides.uploadGallery');
-
+  Route::post('/event-guides/gallery/approve', [EventGuideController::class, 'approveGalleryItem'])->name('event-guides.approveGalleryItem');
+  Route::post('/event-guides/gallery/approve-all', [EventGuideController::class, 'approveAllGalleryItems'])->name('event-guides.approveAllGalleryItems');
   Route::delete('event-guides/delete-gallery-image', [EventGuideController::class, 'deleteGalleryImage'])->name('event-guides.deleteGalleryImage');
 
 
@@ -164,6 +175,19 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
     ->name('attendee-users.bulkAction');
 
+  Route::post('/attendee-users/schedule-email', [AttendeeUserController::class, 'scheduleEmail'])
+    ->name('attendee-users.scheduleEmail');
+  Route::post('/attendee-users/schedule-notification', [AttendeeUserController::class, 'scheduleNotification'])
+    ->name('attendee-users.scheduleNotification');
+  Route::get('/attendee-users/scheduled-emails', [AttendeeUserController::class, 'scheduledEmails'])
+    ->name('attendee-users.scheduledEmails');
+  Route::get('/attendee-users/scheduled-notifications', [AttendeeUserController::class, 'scheduledNotifications'])
+    ->name('attendee-users.scheduledNotifications');
+  Route::post('/attendee-users/cancel-scheduled-email', [AttendeeUserController::class, 'cancelScheduledEmail'])
+    ->name('attendee-users.cancelScheduledEmail');
+  Route::post('/attendee-users/cancel-scheduled-notification', [AttendeeUserController::class, 'cancelScheduledNotification'])
+    ->name('attendee-users.cancelScheduledNotification');
+
 
   Route::get('/events/{event}/sessions', [TicketTypeController::class, 'getByEvent'])->name('events.sessions');
 
@@ -209,6 +233,14 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   });
 
   Route::get('/events/{event_id}/sessions/', [CalendarController::class, 'eventSessionList']);
+
+  Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\HomeController::class, 'markAllNotificationsAsRead'])->name('notifications.markAllAsRead');
+  Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\HomeController::class, 'markNotificationAsRead'])->name('notifications.markAsRead');
+
+  Route::prefix('analytics')->name('admin.analytics.')->group(function () {
+    Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
+    Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
+  });
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -229,9 +261,34 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('speaker', SpeakerController::class);
   Route::get('/speaker/{user}/qr/download', [SpeakerController::class, 'downloadQr'])->name('speaker.qr.download');
 
+  Route::get('/polls/index', [PollController::class, 'index'])->name('polls.index');
+  Route::get('/polls/create', [PollController::class, 'create'])->name('polls.create');
 
-
-
+  Route::post('/polls', [PollController::class, 'store'])->name('polls.store');
+  Route::get('/polls/{id}', [PollController::class, 'show'])->name('polls.show');
+  Route::get('/polls/{id}/edit', [PollController::class, 'edit'])->name('polls.edit');
+  Route::put('/polls/{id}', [PollController::class, 'update'])->name('polls.update');
+  Route::delete('/polls/{id}', [PollController::class, 'destroy'])->name('polls.destroy');
+  Route::post('/polls/{poll}/toggle-status', [PollController::class, 'toggleStatus'])
+    ->name('polls.toggle-status');
+  Route::get(
+    '/poll-responses',
+    [PollController::class, 'allResponses']
+  )->name('polls.responses.index');
+  Route::get('/response/export', [PollController::class, 'export'])
+    ->name('response.export');
+  
+  Route::get(
+    '/polls/{poll}/responses',
+    [PollController::class, 'responses']
+  )->name('polls.responses');
+  Route::get(
+    '/poll/{poll}/show',
+    [PollController::class, 'getPollResponses']
+  )->name('poll.show');
+  Route::get('/question/{question}/answers', 
+    [PollController::class, 'getQuestionAnswers']
+)->name('question.answers.modal');
   Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');

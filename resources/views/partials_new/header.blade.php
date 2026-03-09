@@ -54,8 +54,29 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 @if(request()->routeIs('contact-us')) active @endif" href="{{ route('contact-us') }}"
-                            <a class="nav-link p-0"  href="/contact-us">Contact Us</a>
+                            <a class="nav-link p-0 @if(request()->routeIs('contact-us')) active @endif" href="{{ route('contact-us') }}">Contact Us</a>
+                        </li>
+
+                        <li class="nav-item dropdown mega-dropdown">
+                            <a class="nav-link p-0 dropdown-toggle" href="#" id="dynamicDrop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Dynamic Drop
+                            </a>
+                            <div class="dropdown-menu mega-menu border-0" aria-labelledby="dynamicDrop">
+                                <div class="container">
+                                    <div class="row">
+                                        @foreach($dynamicNavs as $category => $items)
+                                        <div class="col-lg-4 col-md-6 mega-col">
+                                            <h6 class="mega-heading">{{ $category }}</h6>
+                                            <ul class="mega-links">
+                                                @foreach($items as $nav)
+                                                <li><a href="{{ route('dynamic.nav', $nav->slug) }}">{{ $nav->title }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
                         </li>
 
                         <li class="nav-item">

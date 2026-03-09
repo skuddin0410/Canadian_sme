@@ -13,6 +13,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Drive;
+use App\Models\GalleryItem;
+use Illuminate\Support\Facades\Auth;
 
 
 class EventGuideController extends Controller
@@ -218,70 +220,95 @@ public function store(Request $request)
 
 public function showGallery()
 {
-    $filePath = storage_path("app/public/event_guides/gallery.json");
+    // Superadmin sees everything
+    if (isSuperAdmin()) {
+        $galleryItems = GalleryItem::with('user')->latest()->get();
+    } else {
+        // Others see only approved items OR their own pending items
+        $galleryItems = GalleryItem::with('user')
+            ->where(function($query) {
+                $query->where('is_approved', true)
+                      ->orWhere('added_by', Auth::id());
+            })
+            ->latest()
+            ->get();
+    }
 
-    $images = file_exists($filePath)
-        ? json_decode(file_get_contents($filePath), true)
-        : [];
+    return view('event_guide.gallery', compact('galleryItems'));
+}
 
-    return view('event_guide.gallery', compact('images'));
+public function approveGalleryItem(Request $request)
+{
+    if (!isSuperAdmin()) {
+        return back()->with('error', 'Unauthorized action.');
+    }
+
+    $request->validate([
+        'id' => 'required|exists:gallery_items,id',
+    ]);
+
+    $item = GalleryItem::findOrFail($request->id);
+    $item->update(['is_approved' => true]);
+
+    return redirect()->route('event-guides.showGallery')->with('success', 'File approved successfully.');
+}
+
+public function approveAllGalleryItems(Request $request)
+{
+    if (!isSuperAdmin()) {
+        return back()->with('error', 'Unauthorized action.');
+    }
+
+    GalleryItem::where('is_approved', false)->update(['is_approved' => true]);
+
+    return redirect()->route('event-guides.showGallery')->with('success', 'All pending files approved successfully.');
 }
 
 public function uploadGallery(Request $request)
 {
     $request->validate([
-        'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        'images.*' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,mp4,mov,avi,wmv|max:10240',
     ]);
 
-    $paths = [];
+    foreach ($request->file('images') as $file) {
+        $path = $file->store('event_guides', 'public');
+        $extension = strtolower($file->getClientOriginalExtension());
+        
+        $type = 'document';
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+            $type = 'image';
+        } elseif (in_array($extension, ['mp4', 'mov', 'avi', 'wmv'])) {
+            $type = 'video';
+        }
 
-    foreach ($request->file('images') as $image) {
-        // Store file in storage/app/public/event_guides
-        $path = $image->store('event_guides', 'public');
-        $paths[] = $path; // e.g. "event_guides/abc.jpg"
+        GalleryItem::create([
+            'file_path' => $path,
+            'file_name' => $file->getClientOriginalName(),
+            'file_type' => $type,
+            'added_by' => Auth::id(),
+            'is_approved' => isSuperAdmin() ? true : false,
+        ]);
     }
 
-    $filePath = storage_path("app/public/event_guides/gallery.json");
-
-    $existing = file_exists($filePath)
-        ? json_decode(file_get_contents($filePath), true)
-        : [];
-
-    $merged = array_merge($existing, $paths);
-
-    file_put_contents($filePath, json_encode($merged));
-
-    return redirect()->route('event-guides.showGallery')->with('success', 'Images uploaded successfully.');
+    return redirect()->route('event-guides.showGallery')->with('success', 'Files uploaded successfully.');
 }
 
-  
 public function deleteGalleryImage(Request $request)
 {
     $request->validate([
-        'image' => 'required|string',
+        'id' => 'required|exists:gallery_items,id',
     ]);
 
-    $image = $request->image;
-
-    $filePath = storage_path("app/public/event_guides/gallery.json");
-
-    // Load existing images
-    $images = file_exists($filePath)
-        ? json_decode(file_get_contents($filePath), true)
-        : [];
-
-    // Remove from array
-    $updated = array_filter($images, fn($img) => $img !== $image);
-
-    // Save updated JSON
-    file_put_contents($filePath, json_encode(array_values($updated)));
+    $item = GalleryItem::findOrFail($request->id);
 
     // Delete file from storage
-    if (Storage::disk('public')->exists($image)) {
-        Storage::disk('public')->delete($image);
+    if (Storage::disk('public')->exists($item->file_path)) {
+        Storage::disk('public')->delete($item->file_path);
     }
 
-    return redirect()->route('event-guides.showGallery')->with('success', 'Image deleted successfully.');
+    $item->delete();
+
+    return redirect()->route('event-guides.showGallery')->with('success', 'File deleted successfully.');
 }
 
 
