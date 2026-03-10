@@ -14,6 +14,7 @@ use DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Drive;
 use App\Models\GalleryItem;
+use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -222,10 +223,10 @@ public function showGallery()
 {
     // Superadmin sees everything
     if (isSuperAdmin()) {
-        $galleryItems = GalleryItem::with('user')->latest()->get();
+        $galleryItems = GalleryItem::with(['user', 'event'])->latest()->get();
     } else {
         // Others see only approved items OR their own pending items
-        $galleryItems = GalleryItem::with('user')
+        $galleryItems = GalleryItem::with(['user', 'event'])
             ->where(function($query) {
                 $query->where('is_approved', true)
                       ->orWhere('added_by', Auth::id());
@@ -234,7 +235,9 @@ public function showGallery()
             ->get();
     }
 
-    return view('event_guide.gallery', compact('galleryItems'));
+    $events = Event::orderBy('title')->get();
+
+    return view('event_guide.gallery', compact('galleryItems', 'events'));
 }
 
 public function approveGalleryItem(Request $request)
@@ -267,6 +270,7 @@ public function approveAllGalleryItems(Request $request)
 public function uploadGallery(Request $request)
 {
     $request->validate([
+        'event_id' => 'required|exists:events,id',
         'images.*' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,mp4,mov,avi,wmv|max:10240',
     ]);
 
@@ -287,6 +291,7 @@ public function uploadGallery(Request $request)
             'file_type' => $type,
             'added_by' => Auth::id(),
             'is_approved' => isSuperAdmin() ? true : false,
+            'event_id' => $request->event_id,
         ]);
     }
 
