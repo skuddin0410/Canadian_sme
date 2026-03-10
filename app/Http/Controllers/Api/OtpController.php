@@ -121,7 +121,8 @@ class OtpController extends Controller
 
     public function verify(Request $request)
     {  
-        log::info('OTP Verification Attempt: ' . $request->email);
+        log::info('OTP Verification Attempt: ' . $request->all());
+
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email|max:255',
                 'otp'   => 'required|digits:4',
