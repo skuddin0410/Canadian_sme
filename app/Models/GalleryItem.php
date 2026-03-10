@@ -12,10 +12,16 @@ class GalleryItem extends Model
         'file_type',
         'added_by',
         'is_approved',
+        'event_id',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'added_by');
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
     }
 }

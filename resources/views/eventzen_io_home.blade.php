@@ -14,6 +14,7 @@
     <!-- css -->
     <link rel="stylesheet" href="/frontend/css/style_new.css">
     <link rel="stylesheet" href="/frontend/css/developer.css">
+    <link rel="icon" href="{{asset('eventzen-fav-icon.png')}}" type="image/x-icon" />
  <style>
     /* ── Form Card Wrapper ── */
     

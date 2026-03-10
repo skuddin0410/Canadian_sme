@@ -56,6 +56,7 @@ class AttendeeUserController extends Controller
             
             // $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC'); //subabrata da code
             // Check if "admins" filter is applied
+
         if ($request->has('show_admins') && $request->show_admins == 'true') {
             // Filter users by the 'Admin' role
             $users = User::with('roles')
@@ -65,7 +66,11 @@ class AttendeeUserController extends Controller
                 ->orderBy('id', 'DESC');
         } else {
             if(isSuperAdmin()){
-                $users = User::with('roles')->orderBy('id', 'DESC');
+                $users = User::with('roles')
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
+                })
+                ->orderBy('id', 'DESC');
             }else{
                 $users = User::with('roles')
                 ->whereDoesntHave('roles', function ($q) {
