@@ -177,7 +177,7 @@ class OtpController extends Controller
                         'message' => 'Invalid or expired OTP',
                     ], 400);
                 }
-        }
+            }
     
         $user = User::firstOrCreate(
             ['email' => $request->email],
@@ -200,8 +200,12 @@ class OtpController extends Controller
                 'password' => $request->otp, 
             ];
 
+            Log::info('Attempting to authenticate user', ['email' => $request->email]);
+
             $token = JWTAuth::fromUser($user);
         
+            Log::info('User authenticated successfully', ['email' => $request->email, 'token' => $token]);
+            
             if (! $token ) {
                 return response()->json([
                     'success' => false,
