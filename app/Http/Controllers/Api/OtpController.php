@@ -119,6 +119,140 @@ class OtpController extends Controller
         
     }
 
+    // public function verify(Request $request)
+    // {  
+    //     // log request all
+    //     Log::info('Verify API Request', $request->all());
+
+    //         $validator = Validator::make($request->all(), [
+    //             'email' => 'required|string|email|max:255',
+    //             'otp'   => 'required|digits:4',
+    //         ]);
+            
+    //         if (User::where('email', $request->email)->doesntExist()) {
+    //             return response()->json([
+    //             'success' => false,
+    //             'message' => 'You are not approved by admin.',
+    //             ],403);  
+    //         }
+                
+    //         if (User::onlyTrashed()->where('email', $request->email)->first()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Your account is deleted or block.',
+    //             ], 403); 
+    //         }
+
+    //         if (User::where('email', $request->email)->where('is_approve', 0)->exists()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Your account is inactive.',
+    //             ], 403); 
+    //         }
+        
+    //         $allowedEmails = [
+    //             "henry.roy@example.com",
+    //             "subhabrata1@example.com"
+    //         ];
+
+            
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $validator->errors(),
+    //         ], 422);
+    //     }
+
+    //     $otp = null;
+    //         if (!in_array($request->email, $allowedEmails)) {
+    //             $otp = Otp::where('email', $request->email)
+    //                 ->where('otp', $request->otp)
+    //                 ->where('expired_at', '>', Carbon::now())
+    //                 ->first();
+            
+    //             if (!$otp) {
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Invalid or expired OTP',
+    //                 ], 400);
+    //             }
+    //         }
+    
+    //     $user = User::firstOrCreate(
+    //         ['email' => $request->email],
+    //         ['password' => Hash::make($request->otp)]
+    //     );
+        
+    //     $user->assignRole('Attendee');
+        
+    //     try {
+
+    //         if($user->is_approve == 0){
+    //         return response()->json([
+    //             'success'    => false,
+    //             'message'    => 'Your account is inactive.',
+    //         ]); 
+    //         }
+            
+    //         $credentials = [
+    //             'email'    => $request->email,
+    //             'password' => $request->otp, 
+    //         ];
+
+    //         Log::info('Attempting to authenticate user', ['email' => $request->email]);
+    //         // Log user 
+    //         Log::info('User details', ['user_id' => $user->id, 'email' => $user->email, 'is_approved' => $user->is_approve]);
+
+    //         $token = JWTAuth::fromUser($user);
+        
+    //         Log::info('User authenticated successfully', ['email' => $request->email, 'token' => $token]);
+
+    //         if (! $token ) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Invalid OTP.',
+    //             ], 401);
+    //         }
+            
+    //         $user->update([
+    //         'jwt_token' => $token
+    //         ]);
+    
+    //         $session = SessionDate::updateOrCreate(
+    //             ['user_id' => $user->id], 
+    //             ['expires_at' => now()->addMonths(2)] 
+    //         );
+            
+    //         notification($user->id);
+    //         $user = User::where('id',$user->id)->first();
+    //         if(empty($user->qr_code)){
+    //             $user->refresh();
+    //             $qrGenerated = qrCode($user->id);
+    //             if (!empty($user->qr_code) && $qrGenerated) {
+    //                 sendNotification("Welcome Email", $user);
+    //             }
+    //         }
+    //         if ($otp) {
+    //         $otp->delete();
+    //         }
+    //         return response()->json([
+    //             'success'    => true,
+    //             'message'    => 'Login successful',
+    //             'token'      => $token,
+    //             'expires_at' => $session->expires_at,
+    //         ]);
+
+    //     } catch (JWTException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Invalid OTP.',
+    //             'error'   => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function verify(Request $request)
     {  
         // log request all
@@ -195,16 +329,15 @@ class OtpController extends Controller
             ]); 
             }
             
-            $credentials = [
-                'email'    => $request->email,
-                'password' => $request->otp, 
-            ];
-
             Log::info('Attempting to authenticate user', ['email' => $request->email]);
             // Log user 
             Log::info('User details', ['user_id' => $user->id, 'email' => $user->email, 'is_approved' => $user->is_approve]);
 
-            $token = JWTAuth::fromUser($user);
+            // Ignore stale bearer token context for verify endpoint.
+            JWTAuth::unsetToken();
+
+            // OTP is already validated above, so issue a fresh token.
+            $token = auth('api')->login($user);
         
             Log::info('User authenticated successfully', ['email' => $request->email, 'token' => $token]);
 
@@ -243,14 +376,42 @@ class OtpController extends Controller
                 'expires_at' => $session->expires_at,
             ]);
 
-        } catch (JWTException $e) {
+        } catch (TokenExpiredException $e) {
+            Log::warning('OTP verify token expired', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid OTP.',
+                'message' => 'Token has expired.',
+                'error'   => $e->getMessage(),
+            ], 401);
+        } catch (JWTException $e) {
+            Log::error('OTP verify JWT error', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'JWT token generation failed.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        } catch (Throwable $e) {
+            Log::error('OTP verify unexpected error', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to complete login.',
                 'error'   => $e->getMessage(),
             ], 500);
         }
     }
-
-
 }
