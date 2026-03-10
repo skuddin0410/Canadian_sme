@@ -201,11 +201,13 @@ class OtpController extends Controller
             ];
 
             Log::info('Attempting to authenticate user', ['email' => $request->email]);
+            // Log user 
+            Log::info('User details', ['user_id' => $user->id, 'email' => $user->email, 'is_approved' => $user->is_approve]);
 
             $token = JWTAuth::fromUser($user);
         
             Log::info('User authenticated successfully', ['email' => $request->email, 'token' => $token]);
-            
+
             if (! $token ) {
                 return response()->json([
                     'success' => false,
