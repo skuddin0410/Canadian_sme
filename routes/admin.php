@@ -33,6 +33,7 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\NavbarDynamicController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\PricingController;
 
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -241,6 +242,23 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
     Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
   });
+
+  Route::get('/pricing/cms', [PricingController::class, 'cms'])->name('admin.pricing.cms');
+  Route::post('/pricing/cms', [PricingController::class, 'updateCms'])->name('admin.pricing.cms.update');
+  
+  // Pricing Features
+  Route::post('/pricing/features', [PricingController::class, 'storeFeature'])->name('admin.pricing.features.store');
+  Route::put('/pricing/features/{id}', [PricingController::class, 'updateFeature'])->name('admin.pricing.features.update');
+  Route::delete('/pricing/features/{id}', [PricingController::class, 'destroyFeature'])->name('admin.pricing.features.destroy');
+
+  Route::resource('pricing/setup', PricingController::class)->names([
+      'index' => 'admin.pricing.setup.index',
+      'create' => 'admin.pricing.setup.create',
+      'store' => 'admin.pricing.setup.store',
+      'edit' => 'admin.pricing.setup.edit',
+      'update' => 'admin.pricing.setup.update',
+      'destroy' => 'admin.pricing.setup.destroy',
+  ]);
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {

@@ -37,7 +37,7 @@
                     </button>
                     <ul class="navbar-nav mb-2 mb-md-0 gap-3 gap-lg-5 align-items-center ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('front.events', ['slug' => $event->slug ?? null]) }}">Home</a>
+                            <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('user.front.events', ['slug' => $event->slug ?? null]) }}">Home</a>
                         </li>
 
 

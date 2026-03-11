@@ -86,10 +86,10 @@
                 </div>
 
                 @if(!Auth::check())
-                <a class="heroBtn ms-3" href="{{ route('login') }}">
+                <!-- <a class="heroBtn ms-3" href="{{ route('login') }}">
                     <img class="d-xl-none" src="{{ asset('frontend/images/login.png') }}" alt="">
                     <span class="d-none d-xl-block">Login</span>
-                </a>
+                </a> -->
                 @else
                 <a class="heroBtn ms-3" @if(auth()->user()->hasRole('Admin')) href="{{ route('home') }}" @else href="{{ route('user.home') }}" @endif>
                     <img class="d-xl-none" src="{{ asset('frontend/images/home-2.png') }}" alt="">

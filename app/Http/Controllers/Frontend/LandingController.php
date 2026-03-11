@@ -65,9 +65,143 @@ class LandingController extends Controller
     //     return view('frontend.landing.index',compact('event','session','speakers','exhibitors','sponsors','attendees','schedules','location' , 'mapUrl','shareUrl'));
     // }
 
+    // public function eachEvent($slug)
+    // {
+    //     $event = Event::with(['photo'])->where('slug', $slug)->firstOrFail();
+    //     // dd($event->id);
+
+    //     // ---- Helper: fetch linked IDs by type (supports "speaker" OR "App\Models\Speaker" style) ----
+    //     $linkedIds = function (string $type) use ($event) {
+    //         $type = Str::lower($type);
+
+    //         return DB::table('event_and_entity_link')
+    //             ->where('event_id', $event->id)
+    //             ->where(function ($q) use ($type) {
+    //                 $q->whereRaw('LOWER(entity_type) = ?', [$type])
+    //                     ->orWhereRaw('LOWER(entity_type) LIKE ?', ['%\\' . $type]); // supports class names
+    //             })
+    //             ->pluck('entity_id')
+    //             ->unique()
+    //             ->values()
+    //             ->all();
+    //     };
+
+    //     // ---- Sessions for this event only ----
+    //     // $sessionIds = $linkedIds('session');
+
+    //     $session = Session::with(['photo', 'speakers', 'exhibitors', 'sponsors', 'attendees'])
+    //         // ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+    //         ->where('event_id', $event->id) // direct filter by event_id
+    //         ->where('start_time', '>=', now())
+    //         ->orderBy('start_time', 'ASC')
+    //         ->first();
+
+    //     $schedules = Session::query()
+    //         // ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
+    //         ->where('event_id', $event->id) // direct filter by event_id
+    //         ->where('start_time', '>=', now())
+    //         ->orderBy('start_time', 'ASC')
+    //         ->take(6)
+    //         ->get();
+
+    //     // ---- Speakers for this event only ----
+    //     $speakerIds = $linkedIds('speakers');
+    //     // dd($speakerIds);
+
+    //     $speakers = Speaker::query()
+    //         ->whereIn('id', $speakerIds)   // ONLY these IDs
+    //         ->with(['photo'])
+    //         ->take(10)
+    //         ->get();
+
+    //     // ---- Exhibitors for this event only (Company model, is_sponsor = 0) ----
+    //     $exhibitorIds = $linkedIds('companies');
+    //     // dd($exhibitorIds);
+
+    //     $exhibitors = Company::query()
+    //         ->where('is_sponsor', 0)
+    //         ->whereIn('id', $exhibitorIds)   // ONLY these IDs
+    //         ->take(6)
+    //         ->get();
+
+    //     // ---- Sponsors for this event only (Company model, is_sponsor = 1) ----
+    //     $sponsorIds = $linkedIds('companies');
+    //     // dd($sponsorIds);
+
+    //     $sponsors = Company::with(['category'])
+    //         ->where('is_sponsor', 1)
+    //         ->whereIn('id', $sponsorIds)   // ONLY these IDs
+    //         ->take(6)
+    //         ->get();
+
+    //     // ---- Attendees for this event only ----
+    //     $attendeeIds = $linkedIds('users');
+    //     // dd($attendeeIds);
+
+    //     $attendees = User::with(['photo', 'roles'])
+    //         ->whereIn('id', $attendeeIds)   // ONLY these IDs
+    //         ->whereHas('roles', function ($q) {
+    //             $q->where('name', 'Attendee');
+    //         })
+    //         ->whereNotNull('name')
+    //         ->whereNotNull('slug')
+    //         ->take(5)
+    //         ->get();
+    //     // dd($attendees);
+
+    //     // ---- Share URL (use slug route if you have it) ----
+    //     // If your route is events.show = /events/{slug}, use $event->slug
+    //     // If your route is /events/{id}, use $event->id
+    //     $shareUrl = route('events.show', $event->slug);
+
+    //     // ---- Map ----
+    //     $location = !empty($event->location) ? $event->location : null;
+
+    //     $googleApiKey = config('services.google_maps.key');
+    //     $mapUrl = $location && $googleApiKey
+    //         ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
+    //         : null;
+
+    //     return view(
+    //         'frontend.landing.index',
+    //         compact('event', 'session', 'speakers', 'exhibitors', 'sponsors', 'attendees', 'schedules', 'location', 'mapUrl', 'shareUrl')
+    //     );
+    // }
+
     public function eachEvent($slug)
     {
-        $event = Event::with(['photo'])->where('slug', $slug)->firstOrFail();
+        $user = auth()->user();
+        $userId = $user?->id;
+
+        $eventQuery = Event::with(['photo'])->where('slug', $slug);
+
+        if ($user && $user->hasRole('Admin')) {
+            $eventQuery->select('*')->selectRaw('1 as is_registered');
+        } else {
+            $eventQuery->withExists([
+                'entityLinks as is_registered' => function ($q) use ($userId) {
+                    $q->where('entity_type', 'users')
+                        ->where('entity_id', $userId);
+                }
+            ]);
+        }
+
+        $event = $eventQuery->firstOrFail();
+
+        if (!$user?->hasRole('Admin') && empty($event->is_registered)) {
+            $previousUrl = url()->previous();
+            $redirectToAllEvents = str_contains($previousUrl, '/all-events')
+                ? $previousUrl
+                : route('front.allEvents');
+
+            auth()->logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect()
+                ->to($redirectToAllEvents)
+                ->with('error', 'You are not registered for this event.');
+        }
         // dd($event->id);
 
         // ---- Helper: fetch linked IDs by type (supports "speaker" OR "App\Models\Speaker" style) ----
