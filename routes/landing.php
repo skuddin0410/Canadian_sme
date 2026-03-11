@@ -65,7 +65,13 @@ Route::get('/support/{slug}' , [ContactUsController::class,'index'])->name('supp
 Route::post('/support-submit/{slug}', [ContactUsController::class, 'store'])
      ->name('support.store');
 Route::get('/pricing', function () {
-    return view('new_pricing_page');
+    $pricings = \App\Models\Pricing::where('status', 1)->orderBy('order_by', 'asc')->get();
+    $cms = \App\Models\PricingCms::first();
+    $features = \App\Models\PricingFeature::with('values')
+                ->where('status', 1)
+                ->orderBy('order_by', 'asc')
+                ->get();
+    return view('new_pricing_page', compact('pricings', 'cms', 'features'));
 })->name('pricing');
 
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');

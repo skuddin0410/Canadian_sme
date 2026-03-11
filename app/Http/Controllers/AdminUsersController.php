@@ -11,6 +11,7 @@ use DataTables;
 use DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Pricing;
 
 
 class AdminUsersController extends Controller
@@ -65,7 +66,8 @@ class AdminUsersController extends Controller
      */
     public function create()
     {
-        return view('users.admin_users.create');
+        $pricings = Pricing::where('status', 1)->get();
+        return view('users.admin_users.create', compact('pricings'));
     }
 
     /**
@@ -79,6 +81,7 @@ class AdminUsersController extends Controller
             'email' => 'required|string|max:255|email|unique:users,email',
             'mobile' => 'required|string|unique:users,mobile',
             'bio'    => 'required|string|max:500',
+            'pricing_plan_id' => 'nullable|exists:pricing,id',
 
         ]);
         if ($validator->fails()) {
@@ -95,11 +98,12 @@ class AdminUsersController extends Controller
         $user->tags = $request->tags;
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
-        $user->instagram_url = $request->linkedin_url;
+        $user->instagram_url = $request->instagram_url;
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->pricing_plan_id = $request->pricing_plan_id;
         $user->save();
         $user->assignRole('Admin');
         if ($request->hasFile('image')) {
@@ -127,7 +131,8 @@ class AdminUsersController extends Controller
     {  
        $user = User::where('id',$id)->first(); 
        $user->load('photo');
-       return view('users.admin_users.create',compact('user'));
+       $pricings = Pricing::where('status', 1)->get();
+       return view('users.admin_users.create',compact('user','pricings'));
     }
 
     /**
@@ -141,6 +146,7 @@ class AdminUsersController extends Controller
             'email' => 'required|string|max:255|email|unique:users,email,'. $id,
             'mobile' => 'required|string|unique:users,mobile,'. $id,
             'bio'    => 'required|string|max:500',
+            'pricing_plan_id' => 'nullable|exists:pricing,id',
         ]);
 
         if ($validator->fails()) {
@@ -156,11 +162,12 @@ class AdminUsersController extends Controller
         $user->tags = $request->tags;
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
-        $user->instagram_url = $request->linkedin_url;
+        $user->instagram_url = $request->instagram_url;
         $user->facebook_url = $request->facebook_url;
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->pricing_plan_id = $request->pricing_plan_id;
         $user->save();
         $user->assignRole('Admin');
         if ($request->hasFile('image')) {
