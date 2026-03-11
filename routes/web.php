@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\User;
+use App\Http\Controllers\Frontend\LandingController;
 
 
 Route::get('/login', function () {
@@ -89,6 +90,8 @@ Route::prefix('user')->name('user.')->middleware(['webauth'])->group(function ()
     Route::put('/profile', [App\Http\Controllers\UserHomeController::class, 'updateProfile'])->name('profile.update');
     Route::put('/company-details', [App\Http\Controllers\UserHomeController::class, 'updateCompanyDetails'])->name('company.update');
     Route::post('/company-details/file-delete', [App\Http\Controllers\UserHomeController::class, 'deleteCompanyFile'])->name('company.file.delete');
+
+    Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
 });
 
 Route::get('/login', function () {

@@ -73,7 +73,8 @@ class OtpController extends Controller
                 if (!$isMapped) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'User is not mapped with this event.',
+                        // 'message' => 'User is not mapped with this event.',
+                        'message' => 'you are not registered for this event.',
                     ], 403);
                 }
             }

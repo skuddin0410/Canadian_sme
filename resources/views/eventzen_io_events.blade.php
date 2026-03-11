@@ -60,7 +60,7 @@
                     <div class="row explore-event-page-row">
                         @forelse($ongoing as $event)
                             <div class="col-md-6 col-lg-4">
-                                <a @if($event->is_registered) href="{{ route('front.events', $event->slug) }}" @else href="javascript:void(0)" onclick="alert('You are not a memeber in this event'); return false;" @endif  class="explore-event-page-col">
+                                <a href="{{ route('user.front.events', $event->slug) }}"  class="explore-event-page-col">
                                     <figure>
                                         <img
                                         src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
@@ -94,7 +94,7 @@
                     <div class="row explore-event-page-row">
                         @forelse($upcoming as $event)
                             <div class="col-md-6 col-lg-4">
-                                <a @if($event->is_registered) href="{{ route('front.events', $event->slug) }}" @else href="javascript:void(0)" onclick="alert('You are not a memeber in this event'); return false;" @endif class="explore-event-page-col">
+                                <a href="{{ route('user.front.events', $event->slug) }}" class="explore-event-page-col">
                                     <figure>
                                         <img
                                         src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
@@ -128,7 +128,7 @@
                     <div class="row explore-event-page-row">
                         @forelse($past as $event)
                             <div class="col-md-6 col-lg-4">
-                                <a @if($event->is_registered) href="{{ route('front.events', $event->slug) }}" @else href="javascript:void(0)" onclick="alert('You are not a memeber in this event'); return false;" @endif class="explore-event-page-col">
+                                <a href="{{ route('user.front.events', $event->slug) }}" class="explore-event-page-col">
                                     <figure>
                                         <img
                                         src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
@@ -174,8 +174,22 @@
         crossorigin="anonymous"></script>
     <!-- Swiper JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- add js file -->
     <script src="./frontend/js/script_new.js"></script>
+
+    @if(session('error'))
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'error',
+            title: 'Access denied',
+            text: @json(session('error')),
+            confirmButtonText: 'OK'
+        });
+    });
+    </script>
+    @endif
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
