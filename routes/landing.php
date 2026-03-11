@@ -9,7 +9,7 @@ use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\DemoController;
 
 Route::get('/', [LandingController::class, 'index'])->name('front.landing');
-Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
+// Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
 Route::get('/all-events', [LandingController::class, 'allEvents'])->name('front.allEvents');
 Route::get('/search', [LandingController::class, 'search'])->name('front.landing.search');
 Route::get('/nav/{slug}', [LandingController::class, 'dynamicNav'])->name('dynamic.nav');
