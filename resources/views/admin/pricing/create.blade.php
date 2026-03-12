@@ -24,8 +24,8 @@ Admin | Add New Pricing
                                 <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Basic Plan" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" for="amount">Amount</label>
-                                <input type="text" class="form-control" id="amount" name="amount" placeholder="e.g., $99.00" />
+                                <label class="form-label" for="amount">Amount ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="amount" name="amount" placeholder="e.g., 99.00" />
                             </div>
                         </div>
 
@@ -35,8 +35,8 @@ Admin | Add New Pricing
                                 <input type="number" class="form-control" id="attendee_count" name="attendee_count" placeholder="e.g., 50" />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" for="timespan">Timespan</label>
-                                <input type="text" class="form-control" id="timespan" name="timespan" placeholder="e.g., 2 months" />
+                                <label class="form-label" for="timespan">Timespan (Months)</label>
+                                <input type="number" class="form-control" id="timespan" name="timespan" placeholder="e.g., 2" />
                             </div>
                         </div>
 

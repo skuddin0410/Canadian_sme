@@ -25,8 +25,8 @@ Admin | Edit Pricing
                                 <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $pricing->name) }}" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" for="amount">Amount</label>
-                                <input type="text" class="form-control" id="amount" name="amount" value="{{ old('amount', $pricing->amount) }}" />
+                                <label class="form-label" for="amount">Amount ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="amount" name="amount" value="{{ old('amount', $pricing->amount) }}" />
                             </div>
                         </div>
 
@@ -36,8 +36,8 @@ Admin | Edit Pricing
                                 <input type="number" class="form-control" id="attendee_count" name="attendee_count" value="{{ old('attendee_count', $pricing->attendee_count) }}" />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" for="timespan">Timespan</label>
-                                <input type="text" class="form-control" id="timespan" name="timespan" value="{{ old('timespan', $pricing->timespan) }}" />
+                                <label class="form-label" for="timespan">Timespan (Months)</label>
+                                <input type="number" class="form-control" id="timespan" name="timespan" value="{{ old('timespan', $pricing->timespan) }}" />
                             </div>
                         </div>
 
