@@ -29,7 +29,9 @@ class Pricing extends Model
      * @var array
      */
     protected $casts = [
+        'amount' => 'decimal:2',
         'attendee_count' => 'integer',
+        'timespan' => 'integer',
         'mostpopular' => 'boolean',
         'event_no' => 'integer',
         'status' => 'boolean',
