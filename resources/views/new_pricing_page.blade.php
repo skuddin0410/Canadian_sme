@@ -33,25 +33,25 @@
         <div class="container">
             <div class="global-heading text-center">
                 <h2>
-                    {{ $cms->main_heading }}
+                    {{ $cms->main_heading ?? 'Pricing Plans' }}
                 </h2>
                 <p>
-                    {{ $cms->main_description }}
+                    {{ $cms->main_description ?? 'Choose the plan that fits your business needs.' }}
                 </p>
             </div>
 
-            <!-- <div class="d-flex justify-content-center mt-3 mt-lg-4 mt-xl-5">
+            <div class="d-flex justify-content-center mt-3 mt-lg-4 mt-xl-5">
                 <div class="form-switch-outer">
 
-                    <span>Monthly</span>
+                    <span>Single Event</span>
 
                     <div class="form-check form-switch m-0">
                         <input class="form-check-input" type="checkbox" id="billingSwitch">
                     </div>
 
-                    <span class="yearly">Yearly</span>
+                    <span class="yearly">Multiple Events</span>
 
-                    Discount Badge
+                    <!-- Discount Badge -->
                     <div class="discount-badge-outer d-flex align-items-center gap-2">
                         <img src="./images/green-left-arrow.png" alt="">
                         <span class="badge discount-badge">
@@ -60,10 +60,10 @@
                     </div>
 
                 </div>
-            </div> -->
+            </div>
 
             <div class="row pricing-card-row justify-content-center">
-                @foreach($pricings as $pricing)
+                @forelse($pricings as $pricing)
                 <div class="col-md-6 col-lg-4">
                     <div class="pricing-card {{ $pricing->mostpopular ? 'most-popular position-relative' : '' }}">
                         @if($pricing->mostpopular)
@@ -78,13 +78,14 @@
                             </div>
                             <p></p>
                             <h4>
-                                {{ $pricing->amount }}
-                                <span class="per text-grey">/{{ $pricing->timespan }}</span>
+                                ${{ number_format($pricing->amount ?? 0, (floor($pricing->amount ?? 0) == ($pricing->amount ?? 0)) ? 0 : 2) }}
+                                <span class="per text-grey">/{{ $pricing->timespan ?? '0' }} months</span>
                             </h4>
                             <h5>
                                 Includes:
                             </h5>
                             <ul class="ul">
+                                <li><i class="fa-solid fa-circle-check"></i> {{ $pricing->attendee_count ?? '0' }} attendee credit included</li>
                                 @php
                                     $descriptionPoints = explode("\n", $pricing->description);
                                 @endphp
@@ -101,7 +102,11 @@
 
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <div class="col-12 text-center py-5">
+                    <p>No pricing plans available at the moment.</p>
+                </div>
+                @endforelse
             </div>
 
         </div>
@@ -110,14 +115,15 @@
     <!-- pricing end -->
 
     <!-- pricing-table-section start -->
+    @if(count($pricings) > 0)
     <section class="pricing-table-section section">
         <div class="container">
             <div class="global-heading text-center">
                 <h2>
-                    {{ $cms->Feature_heading }}
+                    {{ $cms->Feature_heading ?? 'Compare Features' }}
                 </h2>
                 <p>
-                    {{ $cms->Feature_description }}
+                    {{ $cms->Feature_description ?? 'A detailed breakdown of what you get with each plan.' }}
                 </p>
             </div>
             <div class="pricing-table-wrapper">
@@ -158,6 +164,7 @@
             </div>
         </div>
     </section>
+    @endif
     <!-- pricing-table-section end -->
 
     <!-- faq start -->
