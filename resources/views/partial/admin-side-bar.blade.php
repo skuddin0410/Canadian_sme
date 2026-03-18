@@ -330,6 +330,13 @@
                 </a>
             </li>
         </ul>
+        <ul class="menu-sub">
+            <li class="menu-item {{ request()->is('admin/analytics/email') ? 'active' : '' }}">
+                <a href="{{ route('admin.analytics.email') }}" class="menu-link">
+                    <div data-i18n="Session">Email analytics</div>
+                </a>
+            </li>
+        </ul>
     </li>
 
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
@@ -402,7 +409,7 @@
 
             <li class="menu-item {{ request()->is('admin/poll-responses') ? 'active' : '' }}">
                 <a href="{{ route('polls.responses.index') }}" class="menu-link">
-                  
+
                     <div>All Poll Responses</div>
                 </a>
             </li>

@@ -34,6 +34,7 @@ use App\Http\Controllers\NavbarDynamicController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\SpeakerAnalyticsController;
+use App\Http\Controllers\EmailTrackingController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
@@ -291,6 +292,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/question/{question}/answers', 
     [PollController::class, 'getQuestionAnswers']
 )->name('question.answers.modal');
+
+Route::get('/analytics/email', [EmailTrackingController::class, 'index'])->name('admin.analytics.email');
   Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
@@ -302,3 +305,4 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/landing-page-settings', [LandingPageSettingController::class, 'index'])->name('landing-page-settings');
   Route::post('/landing-page-settings', [LandingPageSettingController::class, 'update'])->name('landing-page-settings');
 });
+

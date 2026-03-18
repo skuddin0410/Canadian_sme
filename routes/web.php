@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\User;
+use App\Http\Controllers\EmailTrackingController;
 
 
 Route::get('/login', function () {
@@ -63,7 +64,7 @@ Route::get('/clear-cache', function () {
 
 require __DIR__ . '/landing.php';
 
-Route::get('/email/open/{id}', function ($id) {
+Route::get('/email/open/track/{id}', function ($id) {
     $email = Email::find($id);
     if ($email && !$email->opened_at) {
         $email->opened_at = now();
@@ -78,7 +79,9 @@ Route::get('/email/open/{id}', function ($id) {
     )->header('Content-Type', 'image/gif');
 });
 
+Route::get('/email/img/{id}', [EmailTrackingController::class, 'trackOpen'])->name('email.track.open');
 
+Route::get('/email/click/{id}', [EmailTrackingController::class, 'trackClick'])->name('email.track.click');
 
 
 Auth::routes();
