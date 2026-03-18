@@ -73,7 +73,8 @@ class OtpController extends Controller
                 if (!$isMapped) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'User is not mapped with this event.',
+                        // 'message' => 'User is not mapped with this event.',
+                        'message' => 'you are not registered for this event.',
                     ], 403);
                 }
             }
@@ -121,6 +122,9 @@ class OtpController extends Controller
 
     public function verify(Request $request)
     {  
+        // log request all
+        // Log::info('Verify API Request', $request->all());
+
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email|max:255',
                 'otp'   => 'required|digits:4',
@@ -174,7 +178,7 @@ class OtpController extends Controller
                         'message' => 'Invalid or expired OTP',
                     ], 400);
                 }
-        }
+            }
     
         $user = User::firstOrCreate(
             ['email' => $request->email],
@@ -197,8 +201,14 @@ class OtpController extends Controller
                 'password' => $request->otp, 
             ];
 
+            // Log::info('Attempting to authenticate user', ['email' => $request->email]);
+            // Log user 
+            // Log::info('User details', ['user_id' => $user->id, 'email' => $user->email, 'is_approved' => $user->is_approve]);
+
             $token = JWTAuth::fromUser($user);
         
+            // Log::info('User authenticated successfully', ['email' => $request->email, 'token' => $token]);
+
             if (! $token ) {
                 return response()->json([
                     'success' => false,
@@ -242,6 +252,5 @@ class OtpController extends Controller
             ], 500);
         }
     }
-
 
 }

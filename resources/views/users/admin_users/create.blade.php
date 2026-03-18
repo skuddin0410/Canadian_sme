@@ -199,6 +199,25 @@
                   @endif
                 </div>
               </div>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="pricing_plan_id">Pricing Plan</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bx-list-ul"></i></span>
+                    <select name="pricing_plan_id" id="pricing_plan_id" class="form-select">
+                        <option value="">Select Pricing Plan</option>
+                        @foreach($pricings as $pricing)
+                            <option value="{{ $pricing->id }}" {{ (isset($user) && $user->pricing_plan_id == $pricing->id) || old('pricing_plan_id') == $pricing->id ? 'selected' : '' }}>
+                                {{ $pricing->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                  </div>
+                  @if ($errors->has('pricing_plan_id'))
+                  <span class="text-danger">{{ $errors->first('pricing_plan_id') }}</span>
+                  @endif
+                </div>
+              </div>
           <div class="col-12">
             <div class="mb-3">
               <div class="d-flex pt-3 justify-content-end">

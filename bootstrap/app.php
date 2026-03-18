@@ -40,11 +40,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Render a custom JSON response for AuthenticationException
         $exceptions->renderable(function (AuthenticationException $e, Request $request) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthenticated.',
-                'data' => null,
-            ], 401);
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'Unauthenticated.',
+            //     'data' => null,
+            // ], 401);
         });
     })
     ->create();

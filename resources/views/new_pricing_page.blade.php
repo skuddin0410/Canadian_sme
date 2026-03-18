@@ -33,24 +33,23 @@
         <div class="container">
             <div class="global-heading text-center">
                 <h2>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                    {{ $cms->main_heading ?? 'Pricing Plans' }}
                 </h2>
                 <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus eum quis nihil architecto cumque
-                    dignissimos.
+                    {{ $cms->main_description ?? 'Choose the plan that fits your business needs.' }}
                 </p>
             </div>
 
             <div class="d-flex justify-content-center mt-3 mt-lg-4 mt-xl-5">
                 <div class="form-switch-outer">
 
-                    <span>Monthly</span>
+                    <span>Single Event</span>
 
                     <div class="form-check form-switch m-0">
                         <input class="form-check-input" type="checkbox" id="billingSwitch">
                     </div>
 
-                    <span class="yearly">Yearly</span>
+                    <span class="yearly">Multiple Events</span>
 
                     <!-- Discount Badge -->
                     <div class="discount-badge-outer d-flex align-items-center gap-2">
@@ -64,107 +63,50 @@
             </div>
 
             <div class="row pricing-card-row justify-content-center">
+                @forelse($pricings as $pricing)
                 <div class="col-md-6 col-lg-4">
-                    <div class="pricing-card">
+                    <div class="pricing-card {{ $pricing->mostpopular ? 'most-popular position-relative' : '' }}">
+                        @if($pricing->mostpopular)
+                            <div class="most-popular-badge">Most Popular</div>
+                        @endif
                         <div class="pricing-card-top">
                             <div class="d-flex align-items-center gap-2 gap-lg-3">
                                 <div class="pricing-card-img-wrapper">
-                                    <img src="./images/free-plan.png" alt="">
+                                    <img src="/images/standard-plan.png" alt="">
                                 </div>
-                                <h3>Free plan</h3>
+                                <h3>{{ $pricing->name }}</h3>
                             </div>
-                            <p>Lorem ipsum dolor sit amet consectetur. Viverra sit.</p>
+                            <p></p>
                             <h4>
-                                $00
-                                <span class="per text-grey">/month</span>
+                                ${{ number_format($pricing->amount ?? 0, (floor($pricing->amount ?? 0) == ($pricing->amount ?? 0)) ? 0 : 2) }}
+                                <span class="per text-grey">/{{ $pricing->timespan ?? '0' }} months</span>
                             </h4>
                             <h5>
                                 Includes:
                             </h5>
                             <ul class="ul">
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
+                                <li><i class="fa-solid fa-circle-check"></i> {{ $pricing->attendee_count ?? '0' }} attendee credit included</li>
+                                @php
+                                    $descriptionPoints = explode("\n", $pricing->description);
+                                @endphp
+                                @foreach($descriptionPoints as $point)
+                                    @if(trim($point))
+                                        <li><i class="fa-solid fa-circle-check"></i> {{ trim($point) }}</li>
+                                    @endif
+                                @endforeach
                             </ul>
                         </div>
                         <div class="pricing-card-bottom">
-                            <button class="btn pricing-card-btn w-100">Free Plan</button>
+                            <button class="btn pricing-card-btn w-100">{{ $pricing->name }}</button>
                         </div>
 
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="pricing-card">
-                        <div class="pricing-card-top">
-                            <div class="d-flex align-items-center gap-2 gap-lg-3">
-                                <div class="pricing-card-img-wrapper">
-                                    <img src="./images/standard-plan.png" alt="">
-                                </div>
-                                <h3>Standard plan</h3>
-                            </div>
-                            <p>Lorem ipsum dolor sit amet consectetur. Dignissim purus odio sit odio integer consequat
-                                ac.</p>
-                            <h4>
-                                $XX
-                                <span class="per text-grey">/month</span>
-                            </h4>
-                            <h5>
-                                Includes:
-                            </h5>
-                            <ul class="ul">
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                            </ul>
-                        </div>
-                        <div class="pricing-card-bottom">
-                            <button class="btn pricing-card-btn w-100">Free Plan</button>
-                        </div>
-
-                    </div>
+                @empty
+                <div class="col-12 text-center py-5">
+                    <p>No pricing plans available at the moment.</p>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="pricing-card most-popular position-relative">
-                        <div class="most-popular-badge">Most Popular</div>
-                        <div class="pricing-card-top">
-                            <div class="d-flex align-items-center gap-2 gap-lg-3">
-                                <div class="pricing-card-img-wrapper">
-                                    <img src="./images/standard-plan.png" alt="">
-                                </div>
-                                <h3>Elite plan</h3>
-                            </div>
-                            <p>Lorem ipsum dolor sit amet consectetur. Ullamcorper quis mollis venenatis id donec</p>
-                            <h4>
-                                $XX
-                                <span class="per text-grey">/month</span>
-                            </h4>
-                            <h5>
-                                Includes:
-                            </h5>
-                            <ul class="ul">
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                                <li><i class="fa-solid fa-circle-check"></i>Lorem ipsum dolor sit amet.</li>
-                            </ul>
-                        </div>
-                        <div class="pricing-card-bottom">
-                            <button class="btn pricing-card-btn w-100">Free Plan</button>
-                        </div>
-
-                    </div>
-                </div>
+                @endforelse
             </div>
 
         </div>
@@ -173,15 +115,15 @@
     <!-- pricing end -->
 
     <!-- pricing-table-section start -->
+    @if(count($pricings) > 0)
     <section class="pricing-table-section section">
         <div class="container">
             <div class="global-heading text-center">
                 <h2>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                    {{ $cms->Feature_heading ?? 'Compare Features' }}
                 </h2>
                 <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus eum quis nihil architecto cumque
-                    dignissimos.
+                    {{ $cms->Feature_description ?? 'A detailed breakdown of what you get with each plan.' }}
                 </p>
             </div>
             <div class="pricing-table-wrapper">
@@ -189,48 +131,44 @@
                     <thead>
                         <tr>
                             <th class="Features">Features</th>
-                            <th class="text-center">Free</th>
-                            <th class="text-center">Standard</th>
-                            <th class="text-center text-theme">Elite</th>
+                            @foreach($pricings as $plan)
+                                <th class="text-center @if($loop->last) text-theme @endif">
+                                    {{ $plan->name }}
+                                </th>
+                            @endforeach
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td valign="middle">Lorem ipsum dolor sit amet.</td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/red-cross.png"
-                                    alt=""></td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/green-check.png"
-                                    alt=""></td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/red-cross.png"
-                                    alt=""></td>
-                        </tr>
-                        <tr>
-                            <td valign="middle">Lorem ipsum dolor sit amet.</td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/green-check.png"
-                                    alt=""></td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/green-check.png"
-                                    alt=""></td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/red-cross.png"
-                                    alt=""></td>
-                        </tr>
-                        <tr>
-                            <td valign="middle">Lorem ipsum dolor sit amet.</td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/green-check.png"
-                                    alt=""></td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/green-check.png"
-                                    alt=""></td>
-                            <td class="align-middle text-center"><img class="check-cross" src="./images/green-check.png"
-                                    alt=""></td>
-                        </tr>
+                        @forelse($features as $feature)
+                            <tr>
+                                <td valign="middle">{{ $feature->name }}</td>
+                                @foreach($pricings as $plan)
+                                    <td class="align-middle text-center">
+                                        @if($feature->getValueForPlan($plan->id))
+                                            <img class="check-cross" src="/images/green-check.png" alt="Yes">
+                                        @else
+                                            <img class="check-cross" src="/images/red-cross.png" alt="No">
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="{{ count($pricings) + 1 }}" class="text-center py-4">
+                                    Feature comparison data coming soon.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </section>
+    @endif
     <!-- pricing-table-section end -->
 
     <!-- faq start -->
-    <section class="faq section">
+    <!-- <section class="faq section">
         <div class="container">
             <div class="global-heading text-center">
                 <h2>
@@ -299,7 +237,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
     <!-- faq end -->
 
     <!-- footer -->

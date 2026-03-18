@@ -9,7 +9,7 @@ use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\DemoController;
 
 Route::get('/', [LandingController::class, 'index'])->name('front.landing');
-Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
+// Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
 Route::get('/all-events', [LandingController::class, 'allEvents'])->name('front.allEvents');
 Route::get('/search', [LandingController::class, 'search'])->name('front.landing.search');
 Route::get('/nav/{slug}', [LandingController::class, 'dynamicNav'])->name('dynamic.nav');
@@ -65,7 +65,13 @@ Route::get('/support/{slug}' , [ContactUsController::class,'index'])->name('supp
 Route::post('/support-submit/{slug}', [ContactUsController::class, 'store'])
      ->name('support.store');
 Route::get('/pricing', function () {
-    return view('new_pricing_page');
+    $pricings = \App\Models\Pricing::where('status', 1)->orderBy('order_by', 'asc')->get();
+    $cms = \App\Models\PricingCms::first();
+    $features = \App\Models\PricingFeature::with('values')
+                ->where('status', 1)
+                ->orderBy('order_by', 'asc')
+                ->get();
+    return view('new_pricing_page', compact('pricings', 'cms', 'features'));
 })->name('pricing');
 
 Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
