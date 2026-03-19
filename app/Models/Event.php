@@ -37,6 +37,7 @@ class Event extends Model
         'privacy_policy',
         'about',
         'help_support',
+        'subscription_id'
     ];
 
     protected $casts = [
@@ -49,6 +50,10 @@ class Event extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
     }
 
     public function category()
