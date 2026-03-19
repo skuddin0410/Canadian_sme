@@ -16,15 +16,17 @@ class UserWelcome extends Mailable implements ShouldQueue
     public $user;
     public $bodyText;
     public $subjectLine;
+    public $mailLogId;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $subject = null, $bodyText = null)
+    public function __construct($user, $subject = null, $bodyText = null, $mailLogId = null)
     {
         $this->user = $user;
         $this->bodyText = $bodyText;
         $this->subjectLine = $subject;
+        $this->mailLogId = $mailLogId;
     }
 
     /**
@@ -43,7 +45,12 @@ class UserWelcome extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.welcome',
+            view: 'emails.new_email',
+             with: [
+                'user' => $this->user,
+                'bodyText' => $this->bodyText,
+                'mailLogId' => $this->mailLogId,
+            ]
         );
     }
 

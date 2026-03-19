@@ -14,6 +14,7 @@ use DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Drive;
 use App\Models\EventAndEntityLink;
+use App\Models\Subscription;
 
 class EventController extends Controller
 {
@@ -23,43 +24,43 @@ class EventController extends Controller
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
 
-       if($request->ajax() && $request->ajax_request == true){
-        $events = Event::with(['category','photo','mapImage'])->orderBy('id','DESC');
+        if ($request->ajax() && $request->ajax_request == true) {
+            $events = Event::with(['category', 'photo', 'mapImage'])->orderBy('id', 'DESC');
 
-        $events = isSuperAdmin() ? $events : $events->where('created_by',auth()->id());
-        
-        if($request->search){
-            $events = $events->where(function($query) use($request){
-                    $query->where('name', 'LIKE', '%'. $request->search .'%');
+            $events = isSuperAdmin() ? $events : $events->where('created_by', auth()->id());
+
+            if ($request->search) {
+                $events = $events->where(function ($query) use ($request) {
+                    $query->where('name', 'LIKE', '%' . $request->search . '%');
                 });
-        }
+            }
 
-        if($request->category){
-            $events = $events->where(function($query) use($request){
-                $query->where('category', $request->category);
-            });
-        }
+            if ($request->category) {
+                $events = $events->where(function ($query) use ($request) {
+                    $query->where('category', $request->category);
+                });
+            }
 
-        $eventsCount = clone $events;
-        $totalRecords = $eventsCount->count(DB::raw('DISTINCT(events.id)'));  
-        $events = $events->offset($offset)->limit($perPage)->get();       
-        $events = new LengthAwarePaginator($events, $totalRecords, $perPage, $pageNo, [
-                  'path'  => $request->url(),
-                  'query' => $request->query(),
-                ]);
-        $data['offset'] = $offset;
-        $data['pageNo'] = $pageNo;
-        $events->setPath(route('events.index'));
-        $data['html'] = view('events.table', compact('events', 'perPage'))
-                  ->with('i', $pageNo * $perPage)
-                  ->render();
+            $eventsCount = clone $events;
+            $totalRecords = $eventsCount->count(DB::raw('DISTINCT(events.id)'));
+            $events = $events->offset($offset)->limit($perPage)->get();
+            $events = new LengthAwarePaginator($events, $totalRecords, $perPage, $pageNo, [
+                'path'  => $request->url(),
+                'query' => $request->query(),
+            ]);
+            $data['offset'] = $offset;
+            $data['pageNo'] = $pageNo;
+            $events->setPath(route('events.index'));
+            $data['html'] = view('events.table', compact('events', 'perPage'))
+                ->with('i', $pageNo * $perPage)
+                ->render();
 
-         return response($data);                                              
+            return response($data);
         }
         $catgories = Category::orderBy(DB::raw("ISNULL(categories.order), categories.order"), 'ASC')
-                   ->orderBy('created_at','DESC')->get();   
-                   
-        return view('events.index',["catgories"=>$catgories]);
+            ->orderBy('created_at', 'DESC')->get();
+
+        return view('events.index', ["catgories" => $catgories]);
     }
 
     public function create()
@@ -84,30 +85,62 @@ class EventController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:draft,published,cancelled',
             'youtube_link' => [
-            'nullable',
-            'url',
-            'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
-        ],
+                'nullable',
+                'url',
+                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
+            ],
             'visibility' => 'required|in:public,private,unlisted',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
             'meta_keywords' => 'nullable|string|max:1000',
-            'tags'=>'nullable|string|max:1000',
-            'image'=>'required|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size'),
-            'map_image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.user_image_size')
+            'tags' => 'nullable|string|max:1000',
+            'image' => 'required|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size')
         ]);
+        $admin = auth()->user();
+
+        //  Get active subscription
+        $subscription = Subscription::active()
+            ->where('user_id', $admin->id)
+            ->latest()
+            ->first();
+
+        //  No subscription
+        if (!$subscription) {
+            return back()->withErrors(['error' => 'No active subscription or subscription expired'])->withInput();
+        }
+
+        //  Extra safety expiry check (optional but good)
+        if ($subscription->expired_at && $subscription->expired_at < now()) {
+            return back()->withErrors(['error' => 'Subscription expired'])->withInput();
+        }
+
+        //  Check event limit
+        $eventCount = Event::where('created_by', $admin->id)->count();
+
+        if ($eventCount >= $subscription->event_count) {
+            return back()->withErrors([
+                'error' => "Event limit reached! Allowed: {$subscription->event_count}"
+            ])->withInput();
+        }
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
         $validated['created_by'] = auth()->id(); // or any default user
+        $validated['subscription_id'] = $subscription->id;
 
-        $event = Event::create($validated);
-        $uploadPath = 'events';
-        if($request->file("image")){
-         $this->imageUpload($request->file("image"),$uploadPath,$event->id,'events','photo'); 
+        if (!$subscription) {
+            return back()->withErrors(['error' => 'No active subscription']);
         }
 
-        if($request->file("map_image")){
-         $this->imageUpload($request->file("map_image"),$uploadPath,$event->id,'events','map_image'); 
+        $event = Event::create($validated);
+
+        $uploadPath = 'events';
+        if ($request->file("image")) {
+            $this->imageUpload($request->file("image"), $uploadPath, $event->id, 'events', 'photo');
+        }
+
+        if ($request->file("map_image")) {
+            $this->imageUpload($request->file("map_image"), $uploadPath, $event->id, 'events', 'map_image');
         }
 
         return redirect()->route('events.index')->with('success', 'Event created.');
@@ -150,7 +183,7 @@ class EventController extends Controller
 
         // Clone the event
         $clonedEvent = $event->replicate();
-        
+
         // Modify the title to indicate it's a clone
         $clonedEvent->title = $event->title . ' Clone';
 
@@ -177,24 +210,24 @@ class EventController extends Controller
         // Save the cloned event
         $clonedEvent->save();
 
-        if($event->photo){
-         Drive::create([
-            'table_id' => $clonedEvent->id,
-            'table_type' => 'events',
-            'file_type' => 'photo',
-            'file_name' => $event->photo->file_name,
-            'is_local_file' => $event->photo->is_local_file,
-         ]);
+        if ($event->photo) {
+            Drive::create([
+                'table_id' => $clonedEvent->id,
+                'table_type' => 'events',
+                'file_type' => 'photo',
+                'file_name' => $event->photo->file_name,
+                'is_local_file' => $event->photo->is_local_file,
+            ]);
         }
 
-        if($event->mapImage){
-         Drive::create([
-            'table_id' => $clonedEvent->id,
-            'table_type' => 'events',
-            'file_type' => 'map_image',
-            'file_name' => $event->mapImage->file_name,
-            'is_local_file' => $event->mapImage->is_local_file,
-         ]);
+        if ($event->mapImage) {
+            Drive::create([
+                'table_id' => $clonedEvent->id,
+                'table_type' => 'events',
+                'file_type' => 'map_image',
+                'file_name' => $event->mapImage->file_name,
+                'is_local_file' => $event->mapImage->is_local_file,
+            ]);
         }
 
         // Clone the related records from `event_and_entity_link`
@@ -233,13 +266,13 @@ class EventController extends Controller
     }
 
     public function edit(Event $event)
-    {   
-        $availableTags = Category::where('type','event')->pluck('name');
-        return view('events.edit', compact('event','availableTags'));
+    {
+        $availableTags = Category::where('type', 'event')->pluck('name');
+        return view('events.edit', compact('event', 'availableTags'));
     }
 
     public function update(Request $request, Event $event)
-    {   
+    {
         // dd($request->all());
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -253,16 +286,16 @@ class EventController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'youtube_link' => [
-            'nullable',
-            'url',
-            'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
-        ],
+                'nullable',
+                'url',
+                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
+            ],
             'status' => 'required|in:draft,published,cancelled',
             'visibility' => 'required|in:listed,unlisted',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255', // each tag must be a string (optional but safer)
-            'image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size'),
-            'map_image'=>'nullable|file|mimetypes:'.config('app.image_mime_types').'|max:'.config('app.banner_image_size')
+            'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
+            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size')
         ]);
 
         $validated['tags'] = $request->has('tags') && !empty($request->tags) ? implode(',', $request->tags) : '';
@@ -281,27 +314,28 @@ class EventController extends Controller
         $event->terms_condition = $validated['terms_condition'] ?? null;
         $event->help_support = $validated['help_support'] ?? null;
         $event->save();
-        if($request->file("image")){
-          $this->imageUpload($request->file("image"),'events',$event->id,'events','photo',$idForUpdate=$event->id);   
+        if ($request->file("image")) {
+            $this->imageUpload($request->file("image"), 'events', $event->id, 'events', 'photo', $idForUpdate = $event->id);
         }
 
-        if($request->file("map_image")){
-          $this->imageUpload($request->file("map_image"),'events',$event->id,'events','map_image',$idForUpdate=$event->id);   
+        if ($request->file("map_image")) {
+            $this->imageUpload($request->file("map_image"), 'events', $event->id, 'events', 'map_image', $idForUpdate = $event->id);
         }
-     
-        return redirect()->route('events.edit',['event'=>$event->id])->with('success', 'Event updated successfully');
+
+        return redirect()->route('events.edit', ['event' => $event->id])->with('success', 'Event updated successfully');
     }
 
     public function destroy(Event $event)
-    {   
+    {
         // Delete related records in event_and_entity_link first
         EventAndEntityLink::where('event_id', $event->id)->delete();
         $event->delete();
         return redirect()->route('events.index')->with('success', 'Event deleted.');
     }
 
-    public function removePhoto(Request $request){
-        $drive = Drive::where('id',$request->photo_id)->first();
+    public function removePhoto(Request $request)
+    {
+        $drive = Drive::where('id', $request->photo_id)->first();
         if ($drive) {
             $drive->delete();
         }

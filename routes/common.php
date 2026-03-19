@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; 
+use App\Http\Controllers\EmailTrackingController;
 
 Route::get('account-information', [App\Http\Controllers\HomeController::class, 'accountInfo'])->name('change.account.information');
 Route::post('account-information', [App\Http\Controllers\HomeController::class, 'accountInformation'])->name('change.account.information.post');
