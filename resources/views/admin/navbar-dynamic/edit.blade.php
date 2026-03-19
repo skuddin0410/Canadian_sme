@@ -6,7 +6,7 @@ Admin | Edit Navbar Item
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Admin / Dynamic Nav /</span> Edit</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Admin / Highlights /</span> Edit</h4>
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">

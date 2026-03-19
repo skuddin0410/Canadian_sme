@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('title')
-Admin | Dynamic Nav
+Admin | Highlights
 @endsection
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Admin /</span> Dynamic Nav</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Admin /</span> Highlights</h4>
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Navbar Item List</h5>
+                    <h5 class="mb-0">Highlights List</h5>
                     <a href="{{ route('admin.navbar-dynamic.create') }}" class="btn btn-primary btn-sm">
                         <i class="bx bx-plus me-1"></i> Add New Item
                     </a>

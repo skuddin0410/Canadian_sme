@@ -300,7 +300,7 @@
                         @endif
                     </div>
                 </div>
-                @if($heroBanner->mainImage)
+                @if($heroBanner->mainImage && $heroBanner->mainImage->file_path)
                 <div class="col-md-6 d-none d-md-block">
                     <div>
                         <img class="img-fluid banner-right-img" src="{{ $heroBanner->mainImage->file_path }}" alt="{{ $heroBanner->title }}">
@@ -336,23 +336,23 @@
             <div class="row align-items-center about-us-row">
                 <div class="col-xl-6">
                     <div class="about-us-img-wrapper">
-                        @if($about->bgBanner)
-                        <div class="about-us-img-box about-us-img-box-1">
-                            <img src="{{ $about->bannerImage->file_path }}" alt="">
-                        </div>
-                        @endif
-                        @if($about->bannerImage)
-                        <div class="about-us-img-box about-us-img-box-2">
-                            <img src="{{ $about->frontImage->file_path }}" alt="">
-                        </div>
-                        @endif
-                        @if($about->frontImage)
+                        @if($about->bgBanner && $about->bgBanner->file_path)
                         <div class="about-us-img-box about-us-img-box-3">
                             <img src="{{ $about->bgBanner->file_path }}" alt="">
                         </div>
                         @endif
-                        @if($about->bannerButtonImage)
-                        <button onclick="window.location.href='{{ $about->banner_button_link }}'" class="about-us-img-box about-us-img-box-4">
+                        @if($about->bannerImage && $about->bannerImage->file_path)
+                        <div class="about-us-img-box about-us-img-box-1">
+                            <img src="{{ $about->bannerImage->file_path }}" alt="">
+                        </div>
+                        @endif
+                        @if($about->frontImage && $about->frontImage->file_path)
+                        <div class="about-us-img-box about-us-img-box-2">
+                            <img src="{{ $about->frontImage->file_path }}" alt="">
+                        </div>
+                        @endif
+                        @if($about->bannerButtonImage && $about->bannerButtonImage->file_path)
+                        <button onclick="window.location.href='{{ $about->banner_button_link ?? '#' }}'" class="about-us-img-box about-us-img-box-4">
                             <img src="{{ $about->bannerButtonImage->file_path }}" alt="">
                         </button>
                         @endif
@@ -381,7 +381,7 @@
                             </ul>
                             @if($about->exp_year || $about->exp_text)
                             <div class="years-of-exp">
-                                @if($about->expImage)
+                                @if($about->expImage && $about->expImage->file_path)
                                 <img src="{{ $about->expImage->file_path }}" alt="">
                                 @endif
                                 @if($about->exp_year)
@@ -536,7 +536,7 @@
                         </ul>
                         @endif
                     </div>
-                    @if($card->cardIcon)
+                    @if($card->cardIcon && $card->cardIcon->file_path)
                     <div>
                         <img class="apart-col-right-img" src="{{ $card->cardIcon->file_path }}" alt="{{ $card->heading }}">
                     </div>
@@ -723,7 +723,7 @@
                         @foreach($homeReviews as $review)
                         <div class="swiper-slide {{ $loop->first ? 'active' : '' }}">
                             <div class="img-box">
-                                @if($review->profileImage)
+                                @if($review->profileImage && $review->profileImage->file_path)
                                 <img src="{{ $review->profileImage->file_path }}" alt="{{ $review->customer_name }}">
                                 @endif
                             </div>
@@ -733,7 +733,7 @@
                         @foreach($homeReviews as $review)
                         <div class="swiper-slide">
                             <div class="img-box">
-                                @if($review->profileImage)
+                                @if($review->profileImage && $review->profileImage->file_path)
                                 <img src="{{ $review->profileImage->file_path }}" alt="{{ $review->customer_name }}">
                                 @endif
                             </div>

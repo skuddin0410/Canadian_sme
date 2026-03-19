@@ -106,10 +106,10 @@
         @endif
 
         @if(isSuperAdmin())
-        <li class="menu-item {{ request()->is('admin/navbar-dynamic*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/navbar-highlights*') ? 'active open' : '' }}">
             <a href="{{ route('admin.navbar-dynamic.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
-                <div data-i18n="navbar_dynamic">Dynamic Nav</div>
+                <div data-i18n="navbar_dynamic">Highlights</div>
             </a>
         </li>
         @endif

@@ -39,12 +39,12 @@ use App\Http\Controllers\EmailTrackingController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
-  Route::get('/navbar-dynamic', [NavbarDynamicController::class, 'index'])->name('admin.navbar-dynamic.index');
-  Route::get('/navbar-dynamic/create', [NavbarDynamicController::class, 'create'])->name('admin.navbar-dynamic.create');
-  Route::post('/navbar-dynamic', [NavbarDynamicController::class, 'store'])->name('admin.navbar-dynamic.store');
-  Route::get('/navbar-dynamic/{id}/edit', [NavbarDynamicController::class, 'edit'])->name('admin.navbar-dynamic.edit');
-  Route::post('/navbar-dynamic/{id}', [NavbarDynamicController::class, 'update'])->name('admin.navbar-dynamic.update');
-  Route::delete('/navbar-dynamic/{id}', [NavbarDynamicController::class, 'destroy'])->name('admin.navbar-dynamic.destroy');
+  Route::get('/navbar-highlights', [NavbarDynamicController::class, 'index'])->name('admin.navbar-dynamic.index');
+  Route::get('/navbar-highlights/create', [NavbarDynamicController::class, 'create'])->name('admin.navbar-dynamic.create');
+  Route::post('/navbar-highlights', [NavbarDynamicController::class, 'store'])->name('admin.navbar-dynamic.store');
+  Route::get('/navbar-highlights/{id}/edit', [NavbarDynamicController::class, 'edit'])->name('admin.navbar-dynamic.edit');
+  Route::post('/navbar-highlights/{id}', [NavbarDynamicController::class, 'update'])->name('admin.navbar-dynamic.update');
+  Route::delete('/navbar-highlights/{id}', [NavbarDynamicController::class, 'destroy'])->name('admin.navbar-dynamic.destroy');
 
   Route::get('/home-page/customer/banner', [LandingCustomerBannerController::class, 'index'])->name('admin.home-page.customer.banner');
   Route::post('/home-page/customer/banner', [LandingCustomerBannerController::class, 'update'])->name('admin.home-page.customer.banner.update');
