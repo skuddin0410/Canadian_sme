@@ -14,6 +14,7 @@ use DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Drive;
 use App\Models\EventAndEntityLink;
+use App\Models\Subscription;
 
 class EventController extends Controller
 {
