@@ -48,14 +48,14 @@ class SubscriptionController extends Controller
         }
 
         // Prevent duplicate active subscription
-        // $exists = Subscription::where('user_id', $request->user_id)
-        //     ->where('price_id', $request->price_id)
-        //     ->where('status', 'active')
-        //     ->exists();
+        $exists = Subscription::where('user_id', $request->user_id)
+            ->where('price_id', $request->price_id)
+            ->where('status', 'active')
+            ->exists();
 
-        // if ($exists) {
-        //     return back()->withErrors(['error' => 'Active subscription already exists'])->withInput();
-        // }
+        if ($exists) {
+            return back()->withErrors(['error' => 'Active subscription already exists'])->withInput();
+        }
 
         Subscription::create([
             'user_id' => $request->user_id,
