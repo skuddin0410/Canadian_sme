@@ -199,7 +199,7 @@
                   @endif
                 </div>
               </div>
-              <div class="col-6">
+              <!-- <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label" for="pricing_plan_id">Pricing Plan</label>
                   <div class="input-group input-group-merge">
@@ -217,7 +217,7 @@
                   <span class="text-danger">{{ $errors->first('pricing_plan_id') }}</span>
                   @endif
                 </div>
-              </div>
+              </div> -->
           <div class="col-12">
             <div class="mb-3">
               <div class="d-flex pt-3 justify-content-end">

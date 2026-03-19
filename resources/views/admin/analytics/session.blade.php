@@ -11,7 +11,7 @@
             <h4 class="mb-1"><i class="fas fa-chart-line me-2" style="color:#696cff;"></i>Session Analytics</h4>
             <p class="text-muted mb-0">Track session attendance and popularity metrics</p>
         </div>
-    </div>
+    </div> 
 
     {{-- KPI Row --}}
     <div class="kpi-row">

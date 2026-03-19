@@ -8,6 +8,7 @@ use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
 use App\Models\ContactUs;
 use App\Models\Poll;
+use App\Models\Subscription;
 
 class Event extends Model
 {
@@ -54,7 +55,10 @@ class Event extends Model
     {
         return $this->belongsTo(Category::class);
     }
-
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
     public function photo()
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')

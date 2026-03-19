@@ -53,77 +53,75 @@ class AttendeeUserController extends Controller
             // $users = User::with("roles")->whereHas("roles", function ($q) {
             //   $q->whereIn("name", ['Attendee']);
             // })->orderBy('id', 'DESC');
-            
+
             // $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC'); //subabrata da code
             // Check if "admins" filter is applied
 
-        if ($request->has('show_admins') && $request->show_admins == 'true') {
-            // Filter users by the 'Admin' role
-            $users = User::with('roles')
-                ->whereHas('roles', function($query) {
-                    $query->where('name', 'Admin');  // Filter by Admin role
-                })
-                ->orderBy('id', 'DESC');
-        } else {
-            if(isSuperAdmin()){
+            if ($request->has('show_admins') && $request->show_admins == 'true') {
+                // Filter users by the 'Admin' role
                 $users = User::with('roles')
-                ->whereDoesntHave('roles', function ($q) {
-                    $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
-                })
-                ->orderBy('id', 'DESC');
-            }else{
-                $users = User::with('roles')
-                ->whereDoesntHave('roles', function ($q) {
-                    $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
-                })
-                ->whereHas('eventAndEntityLinks', function ($q) {
-                    $q->where('entity_type', 'users')
-                    ->whereIn('event_id', function($query) {
-                        $query->select('id')
-                                ->from('events')
-                                ->where('created_by', auth()->id());
+                    ->whereHas('roles', function ($query) {
+                        $query->where('name', 'Admin');  // Filter by Admin role
+                    })
+                    ->orderBy('id', 'DESC');
+            } else {
+                if (isSuperAdmin()) {
+                    $users = User::with('roles')
+                        ->whereDoesntHave('roles', function ($q) {
+                            $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
+                        })
+                        ->orderBy('id', 'DESC');
+                } else {
+                    $users = User::with('roles')
+                        ->whereDoesntHave('roles', function ($q) {
+                            $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
+                        })
+                        ->whereHas('eventAndEntityLinks', function ($q) {
+                            $q->where('entity_type', 'users')
+                                ->whereIn('event_id', function ($query) {
+                                    $query->select('id')
+                                        ->from('events')
+                                        ->where('created_by', auth()->id());
+                                });
+                        })
+                        ->orderBy('id', 'DESC');
+                }
+
+                // dd($users->get());
+
+                if ($request->filled('search')) {
+                    $users = $users->where(function ($query) use ($request) {
+                        $query->where('name', 'LIKE', '%' . $request->search . '%')
+                            ->orWhere('email', 'LIKE', '%' . $request->search . '%')
+                            ->orWhere('lastname', 'LIKE', '%' . $request->search . '%')
+                            ->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', "%{$request->search}%")
+                            ->orWhere('designation', 'LIKE', '%' . $request->search . '%')
+                            ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
+                            ->orWhere('company', 'LIKE', '%' . $request->search . '%');
                     });
-                })
-                ->orderBy('id', 'DESC');
-            }
-            
-            // dd($users->get());
- 
-            if ($request->filled('search')) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('email', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('lastname', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', "%{$request->search}%")
-                          ->orWhere('designation', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
-                          ->orWhere('company', 'LIKE', '%' . $request->search . '%');
+                }
 
-                          
-                });
-            }
+                if ($request->filled('event_id')) {
+                    $users->whereHas('eventAndEntityLinks', function ($q) use ($request) {
+                        $q->where('event_id', $request->event_id)
+                            ->where('entity_type', 'users');
+                    });
+                }
 
-            if ($request->filled('event_id')) {
-                $users->whereHas('eventAndEntityLinks', function ($q) use ($request) {
-                    $q->where('event_id', $request->event_id)
-                    ->where('entity_type', 'users');
-                });
+                // Filters (triggered by filter button, add your filter logic here)
+                if ($request->filled('start_at') && $request->filled('end_at')) {
+                    $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
+                }
+
+                if ($request->has('exhibitor_id')) {
+                    $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
+                }
+
+                if ($request->has('onsignal') && $request->onsignal == 1) {
+                    $users = $users->whereNotNull('onesignal_userid');
+                }
             }
 
-            // Filters (triggered by filter button, add your filter logic here)
-            if ($request->filled('start_at') && $request->filled('end_at')) {
-                $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
-            }
-            
-            if ($request->has('exhibitor_id')) {
-                $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
-            }
-
-            if ($request->has('onsignal') && $request->onsignal == 1) {
-                $users = $users->whereNotNull('onesignal_userid');
-            }
-        }             
-         
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
             $totalAppUsers = (clone $usersCount)
@@ -143,38 +141,37 @@ class AttendeeUserController extends Controller
             $data['totalAppUsers'] = $totalAppUsers;
             $data['offset'] = $offset;
             $data['pageNo'] = $pageNo;
-            $range=$data['range'] = "$startRange-$endRange"; 
+            $range = $data['range'] = "$startRange-$endRange";
 
             $users->setPath(route('attendee-users.index'));
-            $data['html'] = view('users.attendee_users.table', compact('users', 'perPage','range','totalRecords','totalAppUsers'))
+            $data['html'] = view('users.attendee_users.table', compact('users', 'perPage', 'range', 'totalRecords', 'totalAppUsers'))
                 ->with('i', $pageNo * $perPage)
                 ->render();
 
             return response($data);
         }
 
-        $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+        $events = DB::table('events')->select('id', 'title')->where('created_by', auth()->id())->get();
 
         return view('users.attendee_users.index', ["kyc" => "", "events" => $events]);
-
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {   
-        $speakers = Speaker::select('id','name','lastname')->orderBy('created_at', 'DESC')->get();
+    {
+        $speakers = Speaker::select('id', 'name', 'lastname')->orderBy('created_at', 'DESC')->get();
 
-        $exhibitors = Company::select('id','name')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
+        $exhibitors = Company::select('id', 'name')->where('is_sponsor', 0)->orderBy('created_at', 'DESC')->get();
 
-        $sponsors = Company::select('id','name')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
+        $sponsors = Company::select('id', 'name')->where('is_sponsor', 1)->orderBy('created_at', 'DESC')->get();
 
         $groups = config('roles.groups');
 
-        $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+        $events = DB::table('events')->select('id', 'title')->where('created_by', auth()->id())->get();
 
-        return view('users.attendee_users.create',compact('groups','exhibitors','sponsors','speakers','events'));
+        return view('users.attendee_users.create', compact('groups', 'exhibitors', 'sponsors', 'speakers', 'events'));
     }
 
     /**
@@ -182,29 +179,29 @@ class AttendeeUserController extends Controller
      */
     public function store(Request $request)
     {
-   
+
         $validator = Validator::make($request->all(), [
-         
+
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
-            'designation' => 'nullable|string|max:255' ,
-            'tags' => 'nullable|string|max:255'  ,
+            'designation' => 'nullable|string|max:255',
+            'tags' => 'nullable|string|max:255',
             'website_url' => 'nullable|url',
             'linkedin_url' => 'nullable|url',
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            'mobile' =>'nullable|string',
+            'mobile' => 'nullable|string',
             'bio' => 'nullable|string',
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'], 
-            'tags'   => ['nullable','array'],
-            'tags.*' => ['string'], 
+            'secondary_group'   => ['nullable', 'array'],
+            'secondary_group.*' => ['string'],
+            'tags'   => ['nullable', 'array'],
+            'tags.*' => ['string'],
 
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'],  
-            'primary_group' => 'required|string',               
+            'secondary_group'   => ['nullable', 'array'],
+            'secondary_group.*' => ['string'],
+            'primary_group' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -215,15 +212,15 @@ class AttendeeUserController extends Controller
         $user = new User();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
-        $user->slug = createUniqueSlug('users', $request->first_name.'_'.$request->last_name);
+        $user->slug = createUniqueSlug('users', $request->first_name . '_' . $request->last_name);
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
-        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
+        $user->secondary_group = !empty($request->secondary_group) ? implode(',', $request->secondary_group) : '';
         $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags =  !empty($request->tags)? implode(',',$request->tags) : '';
+        $user->tags =  !empty($request->tags) ? implode(',', $request->tags) : '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->instagram_url;
@@ -233,7 +230,7 @@ class AttendeeUserController extends Controller
         $user->bio = $request->bio ?? null;
         $user->is_approve = true;
         $user->access_speaker_ids = $request->access_speaker_ids ?? '';
-        $user->access_exhibitor_ids =$request->access_exhibitor_ids??  '';
+        $user->access_exhibitor_ids = $request->access_exhibitor_ids ??  '';
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
@@ -241,53 +238,52 @@ class AttendeeUserController extends Controller
         $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
         $user->cometchat_id = $cometChatID['uid'];
         $user->save();
-       
+
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
             $user->givePermissionTo('Edit Company');
         }
-        
-        $primaryGroupArray= [];
-        $secondaryGroupArray=[];
-         
-        if(!empty($request->primary_group)) {
-          $primaryGroupArray = explode(',', $request->primary_group);   
+
+        $primaryGroupArray = [];
+        $secondaryGroupArray = [];
+
+        if (!empty($request->primary_group)) {
+            $primaryGroupArray = explode(',', $request->primary_group);
         }
-        if(!empty($request->secondary_group)) {
-          $secondaryGroupArray = $request->secondary_group ?? [];
+        if (!empty($request->secondary_group)) {
+            $secondaryGroupArray = $request->secondary_group ?? [];
         }
-          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
-          $combinedGroups = array_unique($combinedGroups); 
-        
-        if(!empty($combinedGroups)){
-          $user->syncRoles($combinedGroups);  
+        $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
+        $combinedGroups = array_unique($combinedGroups);
+
+        if (!empty($combinedGroups)) {
+            $user->syncRoles($combinedGroups);
         }
 
         if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+            $this->imageUpload($request->file("image"), "users", $user->id, 'users', 'photo', $user->id);
         }
 
         if ($request->hasFile('cover_image')) {
-          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+            $this->imageUpload($request->file("cover_image"), "users", $user->id, 'users', 'cover_photo', $user->id);
         }
 
         if (!empty($request->private_docs)) {
 
-          foreach($request->private_docs as $img){
-             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
-          }  
-          
+            foreach ($request->private_docs as $img) {
+                $this->imageUpload($img, "users", $user->id, 'users', 'private_docs');
+            }
         }
-        
-        $user = User::where('id',$user->id)->first(); 
-        
-        if($user){  
-          sendNotification("Welcome Email",$user);
-          qrCode($user->id);
+
+        $user = User::where('id', $user->id)->first();
+
+        if ($user) {
+            sendNotification("Welcome Email", $user);
+            qrCode($user->id);
         }
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
     }
-    
+
 
 
     private function createCometChatUser($userId, $name, $email, $mobile)
@@ -295,10 +291,10 @@ class AttendeeUserController extends Controller
         $appID = env('COMETCHAT_APP_ID');
         $apiKey = env('COMETCHAT_API_KEY');
         $region = env('COMETCHAT_REGION');
- 
+
         $user = User::find($userId);
         $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/default.png');
- 
+
         $data = [
             'uid' => "SME_CometChat_{$userId}",
             'name' => $name,
@@ -315,7 +311,7 @@ class AttendeeUserController extends Controller
             'tags' => [],
             'withAuthToken' => true
         ];
- 
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'apikey' => $apiKey,
@@ -323,7 +319,7 @@ class AttendeeUserController extends Controller
             "https://{$appID}.api-{$region}.cometchat.io/v3/users",
             $data
         );
- 
+
         if ($response->successful()) {
             $responseData = $response->json();
             // Return relevant data
@@ -333,20 +329,18 @@ class AttendeeUserController extends Controller
                 'authToken' => $responseData['data']['authToken']
             ];
         }
- 
+
         return null;
     }
- 
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-     
+
         $user = User::findOrFail($id); // ensures fresh data
         return view('users.attendee_users.view', compact('user'));
-
-
     }
 
     /**
@@ -354,54 +348,53 @@ class AttendeeUserController extends Controller
      */
     public function edit(string $id)
     {
-        
-    $user = User::findOrFail($id);
-    $speakers = Speaker::select('id','name','lastname')->orderBy('created_at', 'DESC')->get();
 
-    $exhibitors = Company::select('id','name')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
+        $user = User::findOrFail($id);
+        $speakers = Speaker::select('id', 'name', 'lastname')->orderBy('created_at', 'DESC')->get();
 
-    $sponsors = Company::select('id','name')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
+        $exhibitors = Company::select('id', 'name')->where('is_sponsor', 0)->orderBy('created_at', 'DESC')->get();
 
-    $groups = config('roles.groups');
+        $sponsors = Company::select('id', 'name')->where('is_sponsor', 1)->orderBy('created_at', 'DESC')->get();
 
-    $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+        $groups = config('roles.groups');
 
-    $perticipantEvents = $user->eventAndEntityLinks()
-                            ->where('entity_type', 'users')
-                            ->where('entity_id', $user->id)
-                            ->pluck('event_id')
-                            ->toArray();
-    // dd($perticipantEvents);
+        $events = DB::table('events')->select('id', 'title')->where('created_by', auth()->id())->get();
 
-    return view('users.attendee_users.edit', compact('user','groups','exhibitors','sponsors','speakers','events','perticipantEvents'));
+        $perticipantEvents = $user->eventAndEntityLinks()
+            ->where('entity_type', 'users')
+            ->where('entity_id', $user->id)
+            ->pluck('event_id')
+            ->toArray();
+        // dd($perticipantEvents);
 
+        return view('users.attendee_users.edit', compact('user', 'groups', 'exhibitors', 'sponsors', 'speakers', 'events', 'perticipantEvents'));
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {    
+    {
         $user = User::findOrFail($id);
         $validator = Validator::make($request->all(), [
-            
+
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email,' . $user->id,
-            'designation' => 'nullable|string|max:255' ,
-            'tags' => 'nullable|string|max:255'  ,
+            'designation' => 'nullable|string|max:255',
+            'tags' => 'nullable|string|max:255',
             'website_url' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'nullable|string',
             'bio' => 'nullable|string',
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'], 
-            'tags'   => ['nullable','array'],
-            'tags.*' => ['string'], 
+            'secondary_group'   => ['nullable', 'array'],
+            'secondary_group.*' => ['string'],
+            'tags'   => ['nullable', 'array'],
+            'tags.*' => ['string'],
 
-            'secondary_group'   => ['nullable','array'],
-            'secondary_group.*' => ['string'],  
-            'primary_group' => 'required|string',         
+            'secondary_group'   => ['nullable', 'array'],
+            'secondary_group.*' => ['string'],
+            'primary_group' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -411,15 +404,15 @@ class AttendeeUserController extends Controller
 
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
-        $user->slug = createUniqueSlug('users', $request->first_name.'_'.$request->last_name,'slug',$user->id);
+        $user->slug = createUniqueSlug('users', $request->first_name . '_' . $request->last_name, 'slug', $user->id);
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
-        $user->secondary_group = !empty($request->secondary_group) ? implode(',',$request->secondary_group) : '';
+        $user->secondary_group = !empty($request->secondary_group) ? implode(',', $request->secondary_group) : '';
         $user->status = $request->status;
         $user->gdpr_consent = $request->gdpr_consent;
         $user->designation = $request->designation;
-        $user->tags =  !empty($request->tags)? implode(',',$request->tags) : '';
+        $user->tags =  !empty($request->tags) ? implode(',', $request->tags) : '';
         $user->website_url = $request->website_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->instagram_url = $request->linkedin_url;
@@ -430,53 +423,50 @@ class AttendeeUserController extends Controller
         $user->is_approve = true;
 
         $user->access_speaker_ids = $request->access_speaker_ids ?? '';
-        $user->access_exhibitor_ids =$request->access_exhibitor_ids??  '';
+        $user->access_exhibitor_ids = $request->access_exhibitor_ids ??  '';
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
 
-        if ( $request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
+        if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
             $user->givePermissionTo('Edit Company');
-        }else{
-            $user->revokePermissionTo('Edit Company'); 
+        } else {
+            $user->revokePermissionTo('Edit Company');
         }
 
-    
-        $primaryGroupArray= [];
-        $secondaryGroupArray=[];
-         
-        if(!empty($request->primary_group)) {
-          $primaryGroupArray = explode(',', $request->primary_group);   
+
+        $primaryGroupArray = [];
+        $secondaryGroupArray = [];
+
+        if (!empty($request->primary_group)) {
+            $primaryGroupArray = explode(',', $request->primary_group);
         }
-        if(!empty($request->secondary_group)) {
-          $secondaryGroupArray = $request->secondary_group ?? [];
+        if (!empty($request->secondary_group)) {
+            $secondaryGroupArray = $request->secondary_group ?? [];
         }
-          $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
-          $combinedGroups = array_unique($combinedGroups); 
-        
-        if(!empty($combinedGroups)){
-          $user->syncRoles($combinedGroups);  
+        $combinedGroups = array_merge($primaryGroupArray, $secondaryGroupArray);
+        $combinedGroups = array_unique($combinedGroups);
+
+        if (!empty($combinedGroups)) {
+            $user->syncRoles($combinedGroups);
         }
 
         if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"users",$user->id,'users','photo',$user->id);
+            $this->imageUpload($request->file("image"), "users", $user->id, 'users', 'photo', $user->id);
         }
 
-         if ($request->hasFile('cover_image')) {
-          $this->imageUpload($request->file("cover_image"),"users",$user->id,'users','cover_photo',$user->id);
+        if ($request->hasFile('cover_image')) {
+            $this->imageUpload($request->file("cover_image"), "users", $user->id, 'users', 'cover_photo', $user->id);
         }
 
         if (!empty($request->private_docs)) {
 
-          foreach($request->private_docs as $img){
-             $this->imageUpload($img,"users",$user->id,'users','private_docs'); 
-          }  
-          
+            foreach ($request->private_docs as $img) {
+                $this->imageUpload($img, "users", $user->id, 'users', 'private_docs');
+            }
         }
-        
-        return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');   
-    
 
+        return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
     }
 
     /**
@@ -491,9 +481,9 @@ class AttendeeUserController extends Controller
         return redirect()
             ->route('attendee-users.index')
             ->withSuccess('Attendee user deleted successfully.');
-
     }
-    public function toggleBlock(User $user){
+    public function toggleBlock(User $user)
+    {
         $currentUser = auth()->user();
         if ($currentUser->hasRole(['Admin'])) {
             $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
@@ -516,320 +506,409 @@ class AttendeeUserController extends Controller
         $user = User::with('roles')->findOrFail($id);
 
 
-        if($user->is_approve == 1){
-           $user->is_approve = 0;
-           $message = "App access allowed successfully";
-        }else{
+        if ($user->is_approve == 1) {
+            $user->is_approve = 0;
+            $message = "App access allowed successfully";
+        } else {
             $user->is_approve = 1;
             $message = "App access removed successfully";
-        } 
+        }
         $user->save();
         return back()->withSuccess($message);
-
-  }
-
-public function sendMail(Request $request, $id)
-{
-    $request->validate([
-        'subject' => 'required|string|max:255',
-        'message' => 'required|string',
-    ]);
-
-    $user = User::with('roles')
-        ->whereHas('roles', function ($q) {
-            $q->where('name', 'Attendee');
-        })
-        ->findOrFail($id);
-
-    Mail::to($user->email)->send(new CustomSpeakerMail($user,$request->subject, $request->message));
-    MailLog::create([
-        'user_id' => $user->id,
-        'email'   => $user->email,
-        'subject' => $request->subject,
-        'message' => $request->message,
-        'status'  => 'sent',
-        'send_by'  => auth()->id(),
-    ]);
-    return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
-}
-
-public function bulkAction(Request $request)
-{
-    // dd($request->all());
-
-    $userIds = json_decode($request->user_ids, true);
-
-
-    $type = $request->query('type'); // email or notification
-    if (in_array('all', $userIds, true)) {
-       $users = User::get();
-    }else{
-      $users = User::whereIn('id', $userIds)->get();  
     }
-    
-    $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
-    $subject = $emailTemplate->subject ?? '';
-    $subject = str_replace('{{site_name}}', config('app.name'), $subject);
-    $subject = str_replace('{{site_name}}', config('app.name'), $subject);
 
-    if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
-        foreach ($users as $user) {
-            $qr_code_url = asset($user->qr_code);
-            $message = $emailTemplate->message ?? '';
-            $message = str_replace('{{name}}', $user->full_name, $message);
-            $message = str_replace('{{site_name}}', config('app.name'), $message);
-            if (strpos($message, '{{qr_code}}') !== false) {
-              $message = str_replace('{{qr_code}}', '<br><img src="' . $qr_code_url . '" alt="QR Code" />', $message);
-            }
+    public function sendMail(Request $request, $id)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
 
-            if (strpos($message, '{{profile_update_link}}') !== false) {
-              $updateUrl = route('update-user',  Crypt::encryptString($user->id));  
-              $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
-            }
-          
-            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+        $user = User::with('roles')
+            ->whereHas('roles', function ($q) {
+                $q->where('name', 'Attendee');
+            })
+            ->findOrFail($id);
+
+        // Mail::to($user->email)->send(new CustomSpeakerMail($user,$request->subject, $request->message));
+        $mailLog = MailLog::create([
+            'user_id' => $user->id,
+            'email'   => $user->email,
+            'subject' => $request->subject,
+            'message' => $request->message,
+            'status'  => 'sent',
+            'send_by'  => auth()->id(),
+        ]);
+        Mail::to($user->email)->send(
+            new CustomSpeakerMail($user, $request->subject, $request->message, $mailLog->id)
+        );
+        return back()->withSuccess('Welcome Mail sent successfully to ' . $user->name);
+    }
+    private function convertLinksToTracking($message, $mailLogId)
+    {
+        return preg_replace_callback(
+            '/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>/i',
+            function ($matches) use ($mailLogId) {
+
+                $originalUrl = $matches[1];
+
+                $trackingUrl = url('/email/click/' . $mailLogId . '?url=' . urlencode($originalUrl));
+
+                return str_replace($originalUrl, $trackingUrl, $matches[0]);
+            },
+            $message
+        );
+    }
+
+    public function bulkAction(Request $request)
+    {
+        // dd($request->all());
+
+        $userIds = json_decode($request->user_ids, true);
+
+
+        $type = $request->query('type'); // email or notification
+        if (in_array('all', $userIds, true)) {
+            $users = User::get();
+        } else {
+            $users = User::whereIn('id', $userIds)->get();
         }
-    } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
-        // dd('notification block');
-         foreach ($users as $user) {
-            $message = $emailTemplate->message ?? '';
-            $message = str_replace('{{name}}', $user->full_name, $message);
-            $message = str_replace('{{site_name}}', config('app.name'), $message);
 
-            $message = $message; // dynamic message from database
-            $notificationMessage = trim(
-                preg_replace('/\s+/', ' ',
-                    strip_tags(
-                        html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
+        $subject = $emailTemplate->subject ?? '';
+        $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+        $subject = str_replace('{{site_name}}', config('app.name'), $subject);
+
+        if (!empty($emailTemplate) && $emailTemplate->type === 'email') {
+
+            foreach ($users as $user) {
+
+                $qr_code_url = asset($user->qr_code);
+
+                $message = $emailTemplate->message ?? '';
+
+                // Replace variables
+                $message = str_replace('{{name}}', $user->full_name, $message);
+                $message = str_replace('{{site_name}}', config('app.name'), $message);
+
+                if (strpos($message, '{{qr_code}}') !== false) {
+                    $message = str_replace(
+                        '{{qr_code}}',
+                        '<br><img src="' . $qr_code_url . '" alt="QR Code" style="max-width:150px;">',
+                        $message
+                    );
+                }
+
+                if (strpos($message, '{{profile_update_link}}') !== false) {
+                    $updateUrl = route('update-user', Crypt::encryptString($user->id));
+
+                    $message = str_replace(
+                        '{{profile_update_link}}',
+                        '<br><a href="' . $updateUrl . '" target="_blank">Update Profile</a>',
+                        $message
+                    );
+                }
+
+                // Convert plain text line breaks
+                $message = nl2br($message);
+
+                // Create Mail Log
+                $mailLog = MailLog::create([
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'subject' => $subject,
+                    'message' => $message,
+                    'status' => 'sent',
+                    'send_by' => auth()->id(),
+                    'opened' => false,
+                    'click_count' => 0
+                ]);
+
+                // Convert links to click tracking links
+                $message = $this->convertLinksToTracking($message, $mailLog->id);
+
+               $pixelUrl = rtrim(config('app.url'), '/') . '/email/img/' . $mailLog->id . '?t=' . time();
+
+                // Tracking Pixel (hidden properly)
+               $pixel = '<img src="' . $pixelUrl . '" width="1" height="1" 
+    style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
+    alt="" border="0">';
+
+                // Email HTML
+               $htmlBody = '
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>' . $subject . '</title>
+</head>
+<body style="font-family:Arial, sans-serif; line-height:1.6; color:#333;">
+
+    <h3>Hi ' . $user->full_name . ',</h3>
+
+    <div>
+        ' . $message . '
+    </div>
+
+    <!-- Tracking pixel: 1x1, no display:none, loads on email open -->
+    <img src="' . $pixelUrl . '" width="1" height="1" 
+         style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
+         alt="" border="0">
+
+</body>
+</html>
+';
+
+                Mail::send([], [], function ($mail) use ($user, $subject, $htmlBody) {
+
+                    $mail->to($user->email)
+                        ->subject($subject)
+                        ->html($htmlBody);
+                });
+            }
+        } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
+            // dd('notification block');
+            foreach ($users as $user) {
+                $message = $emailTemplate->message ?? '';
+                $message = str_replace('{{name}}', $user->full_name, $message);
+                $message = str_replace('{{site_name}}', config('app.name'), $message);
+
+                $message = $message; // dynamic message from database
+                $notificationMessage = trim(
+                    preg_replace(
+                        '/\s+/',
+                        ' ',
+                        strip_tags(
+                            html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                        )
                     )
-                )
-            );
-            Log::info(''. $notificationMessage .'');
-            
-            $title = 'Hi, ' . ($user->full_name ?? '') . ',' ;
+                );
+                Log::info('' . $notificationMessage . '');
 
-            notification($user->id,$type='push_notification',null, $title ,$message);
+                $title = 'Hi, ' . ($user->full_name ?? '') . ',';
 
-            // if(!empty($user->onesignal_userid)){
-                
-            //         $content = [
-            //             // "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-            //             "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-            //             // "include_player_ids" => [$user->onesignal_userid],
-            //             "include_subscription_ids" => [$user->onesignal_userid], //new addition
-            //             'headings' => ['en' => $title],
-            //             "contents" => ["en" => $message],
-            //             "target_channel" => "push", //new addition
-            //         ];
-                 
-            //         // $fields = json_encode($content);
-                 
-            //         // $ch = curl_init();
-            //         // // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-            //         // curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
-            //         // curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            //         //     'Content-Type: application/json; charset=utf-8',
-            //         //     // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
-            //         //     'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xczta2fjjcewqyuyz4kuwhcc7isatc64afnmopzvmnkd7tw6i5qmu3vdzcl3qh5ittn3xgwpad43g5rd4y',
-            //         //     // 'target_channel: push'
-            //         // ]);
-            //         // curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            //         // curl_setopt($ch, CURLOPT_HEADER, FALSE);
-            //         // curl_setopt($ch, CURLOPT_POST, TRUE);
-            //         // curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-            //         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                 
-            //         // $response = curl_exec($ch);
-            //         // curl_close($ch);
+                notification($user->id, $type = 'push_notification', null, $title, $message);
 
-            //         $curl = curl_init();
- 
-            //         curl_setopt_array($curl, [
-            //         CURLOPT_URL => "https://api.onesignal.com/notifications?c=push",
-            //         CURLOPT_RETURNTRANSFER => true,
-            //         CURLOPT_ENCODING => "",
-            //         CURLOPT_MAXREDIRS => 10,
-            //         CURLOPT_TIMEOUT => 30,
-            //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //         CURLOPT_CUSTOMREQUEST => "POST",
-            //         CURLOPT_POSTFIELDS => json_encode([
-            //             'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
-            //             'contents' => [
-            //                 'en' => $notificationMessage
-            //             ],
-            //             'include_aliases' => [
-            //                 'external_id' => [
-            //                         '<string>'
-            //                 ]
-            //             ],
-            //             'target_channel' => 'push',
-            //             'include_subscription_ids' => [
-            //                 $user->onesignal_userid
-            //             ],
-            //             'included_segments' => [
-            //                 '<string>'
-            //             ],
-            //             'excluded_segments' => [
-            //                 '<string>'
-            //             ],
-            //             'filters' => [
-            //                 [
-            //                         'field' => 'tag',
-            //                         'relation' => '=',
-            //                         'key' => '<string>',
-            //                         'value' => '<string>'
-            //                 ]
-            //             ],
-            //             'headings' => [
-            //                 'en' => '<string>'
-            //             ],
-            //             'subtitle' => [
-            //                 'en' => '<string>'
-            //             ],
-            //             'name' => '<string>',
-            //             'template_id' => '<string>',
-            //             'custom_data' => [
-            //             ],
-            //             'ios_attachments' => [
-            //                 'id' => '<string>'
-            //             ],
-            //             'big_picture' => '<string>',
-            //             'huawei_big_picture' => '<string>',
-            //             'adm_big_picture' => '<string>',
-            //             'chrome_web_image' => '<string>',
-            //             'small_icon' => '<string>',
-            //             'huawei_small_icon' => '<string>',
-            //             'adm_small_icon' => '<string>',
-            //             'large_icon' => '<string>',
-            //             'huawei_large_icon' => '<string>',
-            //             'adm_large_icon' => '<string>',
-            //             'chrome_web_icon' => '<string>',
-            //             'firefox_icon' => '<string>',
-            //             'chrome_web_badge' => '<string>',
-            //             'android_channel_id' => '<string>',
-            //             'existing_android_channel_id' => '<string>',
-            //             'huawei_channel_id' => '<string>',
-            //             'huawei_existing_channel_id' => '<string>',
-            //             'huawei_category' => 'MARKETING',
-            //             'huawei_msg_type' => 'message',
-            //             'huawei_bi_tag' => '<string>',
-            //             'priority' => 10,
-            //             'ios_interruption_level' => 'active',
-            //             'ios_sound' => '<string>',
-            //             'ios_badgeType' => 'None',
-            //             'ios_badgeCount' => 123,
-            //             'android_accent_color' => '<string>',
-            //             'huawei_accent_color' => '<string>',
-            //             'url' => '<string>',
-            //             'app_url' => '<string>',
-            //             'web_url' => '<string>',
-            //             'target_content_identifier' => '<string>',
-            //             'buttons' => [
-            //                 [
-            //                         'id' => '<string>',
-            //                         'text' => '<string>',
-            //                         'icon' => '<string>'
-            //                 ]
-            //             ],
-            //             'web_buttons' => [
-            //                 [
-            //                         'id' => '<string>',
-            //                         'text' => '<string>',
-            //                         'url' => '<string>'
-            //                 ]
-            //             ],
-            //             'thread_id' => '<string>',
-            //             'ios_relevance_score' => 123,
-            //             'android_group' => '<string>',
-            //             'adm_group' => '<string>',
-            //             'ttl' => 259200,
-            //             'collapse_id' => '<string>',
-            //             'web_push_topic' => '<string>',
-            //             'data' => [
-            //             ],
-            //             'content_available' => true,
-            //             'ios_category' => '<string>',
-            //             'apns_push_type_override' => '<string>',
-            //             'isIos' => true,
-            //             'isAndroid' => true,
-            //             'isHuawei' => true,
-            //             'isAnyWeb' => true,
-            //             'isChromeWeb' => true,
-            //             'isFirefox' => true,
-            //             'isSafari' => true,
-            //             'isWP_WNS' => true,
-            //             'isAdm' => true,
-            //             'send_after' => '<string>',
-            //             'delayed_option' => '<string>',
-            //             'delivery_time_of_day' => '<string>',
-            //             'throttle_rate_per_minute' => 123,
-            //             'enable_frequency_cap' => true,
-            //             'idempotency_key' => '<string>'
-            //         ]),
-            //         CURLOPT_HTTPHEADER => [
-            //             "Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztcxchozkwy3ev3mhwmznaa7gq66vcthhiacbc7j3tsa5zdrffpripuvqpm5glloxdiumcg4yhkmzfla",
-            //             "Content-Type: application/json"
-            //         ],
-            //         ]);
-                    
-            //         $response = curl_exec($curl);
-            //         $err = curl_error($curl);
-                    
-            //         curl_close($curl);
-                    
-            //         if($err)
-            //         Log::info("". $err);
+                // if(!empty($user->onesignal_userid)){
 
-            //         // if ($err) {
-            //         // echo "cURL Error #:" . $err;
-            //         // } else {
-            //         // echo $response;
-            //         // }
+                //         $content = [
+                //             // "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+                //             "app_id" => "53dd6ba7-9382-469d-8ada-7256eddc5998",
+                //             // "include_player_ids" => [$user->onesignal_userid],
+                //             "include_subscription_ids" => [$user->onesignal_userid], //new addition
+                //             'headings' => ['en' => $title],
+                //             "contents" => ["en" => $message],
+                //             "target_channel" => "push", //new addition
+                //         ];
 
-            // }
+                //         // $fields = json_encode($content);
+
+                //         // $ch = curl_init();
+                //         // // curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                //         // curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
+                //         // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                //         //     'Content-Type: application/json; charset=utf-8',
+                //         //     // 'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztb4tfmbonf7ewyffzeqt5vujo22nbbneafdpruklh6rfzrfs6hqwfmc465icn75e3mx3k53i2zfn7yq'
+                //         //     'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xczta2fjjcewqyuyz4kuwhcc7isatc64afnmopzvmnkd7tw6i5qmu3vdzcl3qh5ittn3xgwpad43g5rd4y',
+                //         //     // 'target_channel: push'
+                //         // ]);
+                //         // curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                //         // curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                //         // curl_setopt($ch, CURLOPT_POST, TRUE);
+                //         // curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                //         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+                //         // $response = curl_exec($ch);
+                //         // curl_close($ch);
+
+                //         $curl = curl_init();
+
+                //         curl_setopt_array($curl, [
+                //         CURLOPT_URL => "https://api.onesignal.com/notifications?c=push",
+                //         CURLOPT_RETURNTRANSFER => true,
+                //         CURLOPT_ENCODING => "",
+                //         CURLOPT_MAXREDIRS => 10,
+                //         CURLOPT_TIMEOUT => 30,
+                //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                //         CURLOPT_CUSTOMREQUEST => "POST",
+                //         CURLOPT_POSTFIELDS => json_encode([
+                //             'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+                //             'contents' => [
+                //                 'en' => $notificationMessage
+                //             ],
+                //             'include_aliases' => [
+                //                 'external_id' => [
+                //                         '<string>'
+                //                 ]
+                //             ],
+                //             'target_channel' => 'push',
+                //             'include_subscription_ids' => [
+                //                 $user->onesignal_userid
+                //             ],
+                //             'included_segments' => [
+                //                 '<string>'
+                //             ],
+                //             'excluded_segments' => [
+                //                 '<string>'
+                //             ],
+                //             'filters' => [
+                //                 [
+                //                         'field' => 'tag',
+                //                         'relation' => '=',
+                //                         'key' => '<string>',
+                //                         'value' => '<string>'
+                //                 ]
+                //             ],
+                //             'headings' => [
+                //                 'en' => '<string>'
+                //             ],
+                //             'subtitle' => [
+                //                 'en' => '<string>'
+                //             ],
+                //             'name' => '<string>',
+                //             'template_id' => '<string>',
+                //             'custom_data' => [
+                //             ],
+                //             'ios_attachments' => [
+                //                 'id' => '<string>'
+                //             ],
+                //             'big_picture' => '<string>',
+                //             'huawei_big_picture' => '<string>',
+                //             'adm_big_picture' => '<string>',
+                //             'chrome_web_image' => '<string>',
+                //             'small_icon' => '<string>',
+                //             'huawei_small_icon' => '<string>',
+                //             'adm_small_icon' => '<string>',
+                //             'large_icon' => '<string>',
+                //             'huawei_large_icon' => '<string>',
+                //             'adm_large_icon' => '<string>',
+                //             'chrome_web_icon' => '<string>',
+                //             'firefox_icon' => '<string>',
+                //             'chrome_web_badge' => '<string>',
+                //             'android_channel_id' => '<string>',
+                //             'existing_android_channel_id' => '<string>',
+                //             'huawei_channel_id' => '<string>',
+                //             'huawei_existing_channel_id' => '<string>',
+                //             'huawei_category' => 'MARKETING',
+                //             'huawei_msg_type' => 'message',
+                //             'huawei_bi_tag' => '<string>',
+                //             'priority' => 10,
+                //             'ios_interruption_level' => 'active',
+                //             'ios_sound' => '<string>',
+                //             'ios_badgeType' => 'None',
+                //             'ios_badgeCount' => 123,
+                //             'android_accent_color' => '<string>',
+                //             'huawei_accent_color' => '<string>',
+                //             'url' => '<string>',
+                //             'app_url' => '<string>',
+                //             'web_url' => '<string>',
+                //             'target_content_identifier' => '<string>',
+                //             'buttons' => [
+                //                 [
+                //                         'id' => '<string>',
+                //                         'text' => '<string>',
+                //                         'icon' => '<string>'
+                //                 ]
+                //             ],
+                //             'web_buttons' => [
+                //                 [
+                //                         'id' => '<string>',
+                //                         'text' => '<string>',
+                //                         'url' => '<string>'
+                //                 ]
+                //             ],
+                //             'thread_id' => '<string>',
+                //             'ios_relevance_score' => 123,
+                //             'android_group' => '<string>',
+                //             'adm_group' => '<string>',
+                //             'ttl' => 259200,
+                //             'collapse_id' => '<string>',
+                //             'web_push_topic' => '<string>',
+                //             'data' => [
+                //             ],
+                //             'content_available' => true,
+                //             'ios_category' => '<string>',
+                //             'apns_push_type_override' => '<string>',
+                //             'isIos' => true,
+                //             'isAndroid' => true,
+                //             'isHuawei' => true,
+                //             'isAnyWeb' => true,
+                //             'isChromeWeb' => true,
+                //             'isFirefox' => true,
+                //             'isSafari' => true,
+                //             'isWP_WNS' => true,
+                //             'isAdm' => true,
+                //             'send_after' => '<string>',
+                //             'delayed_option' => '<string>',
+                //             'delivery_time_of_day' => '<string>',
+                //             'throttle_rate_per_minute' => 123,
+                //             'enable_frequency_cap' => true,
+                //             'idempotency_key' => '<string>'
+                //         ]),
+                //         CURLOPT_HTTPHEADER => [
+                //             "Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztcxchozkwy3ev3mhwmznaa7gq66vcthhiacbc7j3tsa5zdrffpripuvqpm5glloxdiumcg4yhkmzfla",
+                //             "Content-Type: application/json"
+                //         ],
+                //         ]);
+
+                //         $response = curl_exec($curl);
+                //         $err = curl_error($curl);
+
+                //         curl_close($curl);
+
+                //         if($err)
+                //         Log::info("". $err);
+
+                //         // if ($err) {
+                //         // echo "cURL Error #:" . $err;
+                //         // } else {
+                //         // echo $response;
+                //         // }
+
+                // }
 
 
-            if(!empty($user->onesignal_userid)){
-                $payload = [
-                    // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
-                    'app_id' => env('ONESIGNAL_APP_ID'),
-                    'contents' => [
-                        'en' => $notificationMessage ?? 'Default message.',
-                    ],
-                    'headings' => [
-                        'en' => $title ?? 'Notification',
-                    ],
-                    'target_channel' => 'push',
-                    'include_subscription_ids' => [
-                        $user->onesignal_userid,
-                    ],
-                ];
+                if (!empty($user->onesignal_userid)) {
+                    $payload = [
+                        // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+                        'app_id' => env('ONESIGNAL_APP_ID'),
+                        'contents' => [
+                            'en' => $notificationMessage ?? 'Default message.',
+                        ],
+                        'headings' => [
+                            'en' => $title ?? 'Notification',
+                        ],
+                        'target_channel' => 'push',
+                        'include_subscription_ids' => [
+                            $user->onesignal_userid,
+                        ],
+                    ];
 
-                $response = Http::withHeaders([
-                        'Authorization' => 'Key '.env('ONESIGNAL_REST_API_KEY'),
+                    $response = Http::withHeaders([
+                        'Authorization' => 'Key ' . env('ONESIGNAL_REST_API_KEY'),
                         'Content-Type'  => 'application/json',
                     ])
-                    ->post('https://api.onesignal.com/notifications?c=push', $payload);
+                        ->post('https://api.onesignal.com/notifications?c=push', $payload);
 
-                if ($response->failed()) {
-                    Log::error('OneSignal push failed', [
-                        'status' => $response->status(),
-                        'body'   => $response->body(),
-                    ]);
+                    if ($response->failed()) {
+                        Log::error('OneSignal push failed', [
+                            'status' => $response->status(),
+                            'body'   => $response->body(),
+                        ]);
+                    }
                 }
+
+
+                // $this->sendOneSignalPushByExternalId(
+                //     (string) $user->id,
+                //     $title,
+                //     $notificationMessage
+                // );
             }
-
-
-            // $this->sendOneSignalPushByExternalId(
-            //     (string) $user->id,
-            //     $title,
-            //     $notificationMessage
-            // );
         }
-    }
 
-    return redirect()->back()->with('success', ucfirst($type) . " sent successfully to selected users.");
-}
+        return redirect()->back()->with('success', ucfirst($type) . " sent successfully to selected users.");
+    }
 
     // private function sendOneSignalPushByExternalId(string $externalId, string $title, string $content): void
     // {
@@ -869,365 +948,364 @@ public function bulkAction(Request $request)
     //     }
     // }
 
-public function generateQrCodeManually(){
+    public function generateQrCodeManually()
+    {
         $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
-        if(!empty($users)){
-           foreach ($users as $user) {
-            if(empty($user->qr_code)){
-               qrCode($user->id, 'user'); 
-            } 
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                if (empty($user->qr_code)) {
+                    qrCode($user->id, 'user');
+                }
 
-            if (!$user->hasRole('Attendee')) {
-              $user->assignRole('Attendee');
-            } 
-           } 
-
-           
+                if (!$user->hasRole('Attendee')) {
+                    $user->assignRole('Attendee');
+                }
+            }
         }
 
-        return redirect()->back()->with('success',"Qr Code generated sent successfully.");   
+        return redirect()->back()->with('success', "Qr Code generated sent successfully.");
     }
 
 
-public function sendBoth(Request $request)
-{   
-    $request->validate([
-        'email_template' => 'nullable|string',
-        'notification_template' => 'nullable|string',
-        'schedule_time' => 'nullable|date',
-        'timezone'      => 'nullable|string',
-    ]);
- 
-    $emailTemplateName = $request->email_template;
-    $notificationTemplateName = $request->notification_template;
-    $scheduleTime = $request->schedule_time;
+    public function sendBoth(Request $request)
+    {
+        $request->validate([
+            'email_template' => 'nullable|string',
+            'notification_template' => 'nullable|string',
+            'schedule_time' => 'nullable|date',
+            'timezone'      => 'nullable|string',
+        ]);
 
-    // Handle scheduling
-    if ($scheduleTime) {
+        $emailTemplateName = $request->email_template;
+        $notificationTemplateName = $request->notification_template;
+        $scheduleTime = $request->schedule_time;
+
+        // Handle scheduling
+        if ($scheduleTime) {
+            $tz = $request->timezone ?? 'UTC';
+            // Parse the user's local time string using their provided timezone, then force to UTC
+            $time = CarbonCarbon::parse($scheduleTime, $tz)->utc();
+
+            // Check if the time is in the future relative to server, allowing minor drift (10s)
+            if ($time->isPast() && $time->diffInSeconds(now()->utc()) > 10) {
+                return response()->json([
+                    'message' => 'Schedule time must be in the future.',
+                    'server_time' => now()->utc()->toDateTimeString() . ' UTC',
+                    'parsed_time' => $time->toDateTimeString() . ' UTC'
+                ], 422);
+            }
+
+            if ($emailTemplateName) {
+                SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName)
+                    ->delay($time)
+                    ->onQueue('default');
+            }
+
+            if ($notificationTemplateName) {
+                SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName)
+                    ->delay($time)
+                    ->onQueue('default');
+            }
+
+            return response()->json(['message' => 'Both actions scheduled successfully.']);
+        }
+
+        // Immediate send for 'all'
+        $usersQuery = User::query();
+
+        if ($usersQuery->count() === 0) {
+            return response()->json(['message' => 'No users found to send.'], 404);
+        }
+
+        $usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName) {
+            foreach ($users as $user) {
+                // Handle email sending
+                if ($emailTemplateName) {
+                    $emailTemplate = EmailTemplate::where('template_name', $emailTemplateName)->first();
+                    if ($emailTemplate && $emailTemplate->type === 'email') {
+                        $subject = str_replace(['{{site_name}}', '{{ site_name }}'], config('app.name'), $emailTemplate->subject ?? '');
+                        $message = $emailTemplate->message ?? '';
+                        $qr_code_url = $user->qr_code ? asset($user->qr_code) : '';
+                        $updateUrl = route('update-user', Crypt::encryptString($user->id));
+
+                        $message = str_replace(
+                            ['{{name}}', '{{ name }}', '{{qr_code}}', '{{ qr_code }}', '{{profile_update_link}}', '{{ profile_update_link }}'],
+                            [
+                                $user->name ?? $user->email,
+                                $user->name ?? $user->email,
+                                $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
+                                $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
+                                '<br><a href="' . $updateUrl . '">Update Profile</a>',
+                                '<br><a href="' . $updateUrl . '">Update Profile</a>'
+                            ],
+                            $message
+                        );
+
+                        try {
+                            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+                        } catch (\Exception $e) {
+                            Log::error("Immediate bulk email failed for user {$user->id}: " . $e->getMessage());
+                        }
+                    }
+                }
+
+                // Handle notification sending
+                if ($notificationTemplateName) {
+                    $notificationTemplate = EmailTemplate::where('template_name', $notificationTemplateName)->first();
+                    if ($notificationTemplate && $notificationTemplate->type === 'notifications') {
+                        $title = 'Hi, ' . ($user->name ?? $user->email) . ',';
+                        $message = str_replace(
+                            ['{{name}}', '{{ name }}', '{{qr_code}}', '{{ qr_code }}', '{{profile_update_link}}', '{{ profile_update_link }}'],
+                            [
+                                $user->name ?? $user->email,
+                                $user->name ?? $user->email,
+                                $user->qr_code ?? '',
+                                $user->qr_code ?? '',
+                                route('update-user', Crypt::encryptString($user->id)),
+                                route('update-user', Crypt::encryptString($user->id))
+                            ],
+                            $notificationTemplate->message ?? ''
+                        );
+
+                        // Create database record
+                        \App\Models\GeneralNotification::create([
+                            'user_id' => $user->id,
+                            'title' => $notificationTemplate->title ?? $title,
+                            'body' => $message,
+                            'delivered_at' => now(),
+                            'is_read' => 0
+                        ]);
+
+                        // Send OneSignal push
+                        if (!empty($user->onesignal_userid)) {
+                            $this->sendOneSignalPushManual($user->onesignal_userid, $notificationTemplate->title ?? $title, $message);
+                        }
+                    }
+                }
+            }
+        });
+
+        return response()->json(['message' => 'Emails & Notifications sent successfully.']);
+    }
+
+    protected function sendOneSignalPushManual($playerId, $title, $message)
+    {
+        $fields = json_encode([
+            "app_id" => trim(env('ONESIGNAL_APP_ID')),
+            "include_player_ids" => [$playerId],
+            'headings' => ['en' => $title],
+            "contents" => ["en" => $message]
+        ]);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json; charset=utf-8',
+            'Authorization: Basic ' . trim(env('ONESIGNAL_REST_API_KEY'))
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+
+    public function generateBadge(Request $request)
+    {
+        $request->validate([
+            'badge_id' => 'required|exists:badges,id',
+            'user_ids' => 'required',
+        ]);
+
+        $badge = Badge::findOrFail($request->badge_id);
+        $userIds = json_decode($request->user_ids, true);
+
+        if (empty($userIds)) {
+            return back()->with('error', 'No users selected.');
+        }
+
+        $users = User::whereIn('id', $userIds)->get();
+
+        // Generate PDF (or redirect to view)
+        $pdf = PDF::loadView('badges.pdf', compact('badge', 'users'));
+        return $pdf->download('attendee_badges.pdf');
+    }
+
+    /**
+     * Schedule a bulk email to be sent at a future time.
+     */
+    public function scheduleEmail(Request $request)
+    {
+        $request->validate([
+            'template_name' => 'required|string',
+            'schedule_time' => 'required|date',
+            'timezone'      => 'nullable|string',
+        ]);
+
+        $userIds = json_decode($request->user_ids, true);
+        if (empty($userIds)) {
+            $userIds = ['all'];
+        }
+
         $tz = $request->timezone ?? 'UTC';
-        // Parse the user's local time string using their provided timezone, then force to UTC
-        $time = CarbonCarbon::parse($scheduleTime, $tz)->utc();
+        $scheduleTime = CarbonCarbon::parse($request->schedule_time, $tz)->utc();
 
         // Check if the time is in the future relative to server, allowing minor drift (10s)
-        if ($time->isPast() && $time->diffInSeconds(now()->utc()) > 10) {
+        if ($scheduleTime->isPast() && $scheduleTime->diffInSeconds(now()->utc()) > 10) {
             return response()->json([
                 'message' => 'Schedule time must be in the future.',
                 'server_time' => now()->utc()->toDateTimeString() . ' UTC',
-                'parsed_time' => $time->toDateTimeString() . ' UTC'
+                'parsed_time' => $scheduleTime->toDateTimeString() . ' UTC'
             ], 422);
         }
 
-        if ($emailTemplateName) {
-            SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName)
-                ->delay($time)
-                ->onQueue('default');
-        }
+        SendScheduledBulkEmailJob::dispatch($userIds, $request->template_name)
+            ->delay($scheduleTime)
+            ->onQueue('default');
 
-        if ($notificationTemplateName) {
-            SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName)
-                ->delay($time)
-                ->onQueue('default');
-        }
-
-        return response()->json(['message' => 'Both actions scheduled successfully.']);
-    }
-
-    // Immediate send for 'all'
-    $usersQuery = User::query();
-
-    if ($usersQuery->count() === 0) {
-        return response()->json(['message' => 'No users found to send.'], 404);
-    }
-
-    $usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName) {
-        foreach ($users as $user) {
-            // Handle email sending
-            if ($emailTemplateName) {
-                $emailTemplate = EmailTemplate::where('template_name', $emailTemplateName)->first();
-                if ($emailTemplate && $emailTemplate->type === 'email') {
-                    $subject = str_replace(['{{site_name}}', '{{ site_name }}'], config('app.name'), $emailTemplate->subject ?? '');
-                    $message = $emailTemplate->message ?? '';
-                    $qr_code_url = $user->qr_code ? asset($user->qr_code) : '';
-                    $updateUrl = route('update-user', Crypt::encryptString($user->id));
-
-                    $message = str_replace(
-                        ['{{name}}', '{{ name }}', '{{qr_code}}', '{{ qr_code }}', '{{profile_update_link}}', '{{ profile_update_link }}'],
-                        [
-                            $user->name ?? $user->email,
-                            $user->name ?? $user->email,
-                            $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
-                            $qr_code_url ? '<br><img src="' . $qr_code_url . '" alt="QR Code" />' : '',
-                            '<br><a href="' . $updateUrl . '">Update Profile</a>',
-                            '<br><a href="' . $updateUrl . '">Update Profile</a>'
-                        ],
-                        $message
-                    );
-
-                    try {
-                        Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
-                    } catch (\Exception $e) {
-                         Log::error("Immediate bulk email failed for user {$user->id}: " . $e->getMessage());
-                    }
-                }
-            }
-
-            // Handle notification sending
-            if ($notificationTemplateName) {
-                $notificationTemplate = EmailTemplate::where('template_name', $notificationTemplateName)->first();
-                if ($notificationTemplate && $notificationTemplate->type === 'notifications') {
-                    $title = 'Hi, ' . ($user->name ?? $user->email) . ',';
-                    $message = str_replace(
-                        ['{{name}}', '{{ name }}', '{{qr_code}}', '{{ qr_code }}', '{{profile_update_link}}', '{{ profile_update_link }}'],
-                        [
-                            $user->name ?? $user->email,
-                            $user->name ?? $user->email,
-                            $user->qr_code ?? '',
-                            $user->qr_code ?? '',
-                            route('update-user', Crypt::encryptString($user->id)),
-                            route('update-user', Crypt::encryptString($user->id))
-                        ],
-                        $notificationTemplate->message ?? ''
-                    );
-
-                    // Create database record
-                    \App\Models\GeneralNotification::create([
-                        'user_id' => $user->id,
-                        'title' => $notificationTemplate->title ?? $title,
-                        'body' => $message,
-                        'delivered_at' => now(),
-                        'is_read' => 0
-                    ]);
-
-                    // Send OneSignal push
-                    if (!empty($user->onesignal_userid)) {
-                        $this->sendOneSignalPushManual($user->onesignal_userid, $notificationTemplate->title ?? $title, $message);
-                    }
-                }
-            }
-        }
-    });
- 
-    return response()->json(['message' => 'Emails & Notifications sent successfully.']);
-}
-
-protected function sendOneSignalPushManual($playerId, $title, $message)
-{
-    $fields = json_encode([
-        "app_id" => trim(env('ONESIGNAL_APP_ID')),
-        "include_player_ids" => [$playerId],
-        'headings' => ['en' => $title],
-        "contents" => ["en" => $message]
-    ]);
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json; charset=utf-8',
-        'Authorization: Basic ' . trim(env('ONESIGNAL_REST_API_KEY'))
-    ]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_exec($ch);
-    curl_close($ch);
-}
-
-    
-public function generateBadge(Request $request)
-{
-    $request->validate([
-        'badge_id' => 'required|exists:badges,id',
-        'user_ids' => 'required',
-    ]);
- 
-    $badge = Badge::findOrFail($request->badge_id);
-    $userIds = json_decode($request->user_ids, true);
- 
-    if (empty($userIds)) {
-        return back()->with('error', 'No users selected.');
-    }
- 
-    $users = User::whereIn('id', $userIds)->get();
- 
-    // Generate PDF (or redirect to view)
-    $pdf = PDF::loadView('badges.pdf', compact('badge', 'users'));
-    return $pdf->download('attendee_badges.pdf');
-}
-
-/**
- * Schedule a bulk email to be sent at a future time.
- */
-public function scheduleEmail(Request $request)
-{
-    $request->validate([
-        'template_name' => 'required|string',
-        'schedule_time' => 'required|date',
-        'timezone'      => 'nullable|string',
-    ]);
-
-    $userIds = json_decode($request->user_ids, true);
-    if (empty($userIds)) {
-        $userIds = ['all'];
-    }
-
-    $tz = $request->timezone ?? 'UTC';
-    $scheduleTime = CarbonCarbon::parse($request->schedule_time, $tz)->utc();
-
-    // Check if the time is in the future relative to server, allowing minor drift (10s)
-    if ($scheduleTime->isPast() && $scheduleTime->diffInSeconds(now()->utc()) > 10) {
         return response()->json([
-            'message' => 'Schedule time must be in the future.',
-            'server_time' => now()->utc()->toDateTimeString() . ' UTC',
-            'parsed_time' => $scheduleTime->toDateTimeString() . ' UTC'
-        ], 422);
+            'message' => 'Email scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
+        ]);
     }
 
-    SendScheduledBulkEmailJob::dispatch($userIds, $request->template_name)
-        ->delay($scheduleTime)
-        ->onQueue('default');
+    /**
+     * Schedule a push notification via Laravel Job (handles DB write + Push).
+     */
+    public function scheduleNotification(Request $request)
+    {
+        $request->validate([
+            'template_name' => 'required|string',
+            'schedule_time' => 'required|date',
+            'timezone'      => 'nullable|string',
+        ]);
 
-    return response()->json([
-        'message' => 'Email scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
-    ]);
-}
+        $userIds = json_decode($request->user_ids, true);
+        if (empty($userIds)) {
+            $userIds = ['all'];
+        }
 
-/**
- * Schedule a push notification via Laravel Job (handles DB write + Push).
- */
-public function scheduleNotification(Request $request)
-{
-    $request->validate([
-        'template_name' => 'required|string',
-        'schedule_time' => 'required|date',
-        'timezone'      => 'nullable|string',
-    ]);
+        $tz = $request->timezone ?? 'UTC';
+        $scheduleTime = CarbonCarbon::parse($request->schedule_time, $tz)->utc();
 
-    $userIds = json_decode($request->user_ids, true);
-    if (empty($userIds)) {
-        $userIds = ['all'];
-    }
+        if ($scheduleTime->isPast() && $scheduleTime->diffInSeconds(now()->utc()) > 10) {
+            return response()->json([
+                'message' => 'Schedule time must be in the future.',
+                'server_time' => now()->utc()->toDateTimeString() . ' UTC',
+                'parsed_time' => $scheduleTime->toDateTimeString() . ' UTC'
+            ], 422);
+        }
 
-    $tz = $request->timezone ?? 'UTC';
-    $scheduleTime = CarbonCarbon::parse($request->schedule_time, $tz)->utc();
+        SendScheduledBulkNotificationJob::dispatch($userIds, $request->template_name)
+            ->delay($scheduleTime)
+            ->onQueue('default');
 
-    if ($scheduleTime->isPast() && $scheduleTime->diffInSeconds(now()->utc()) > 10) {
         return response()->json([
-            'message' => 'Schedule time must be in the future.',
-            'server_time' => now()->utc()->toDateTimeString() . ' UTC',
-            'parsed_time' => $scheduleTime->toDateTimeString() . ' UTC'
-        ], 422);
+            'message' => 'Notification scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
+        ]);
     }
 
-    SendScheduledBulkNotificationJob::dispatch($userIds, $request->template_name)
-        ->delay($scheduleTime)
-        ->onQueue('default');
+    /**
+     * List scheduled emails from the jobs table.
+     * Shows all pending (unprocessed) scheduled email jobs.
+     */
+    public function scheduledEmails()
+    {
+        $jobs = \DB::table('jobs')
+            ->where('payload', 'like', '%SendScheduledBulkEmailJob%')
+            ->whereNull('reserved_at')
+            ->orderBy('available_at', 'asc')
+            ->get()
+            ->map(function ($job) {
+                $payload = json_decode($job->payload, true);
+                $command = null;
+                try {
+                    $command = isset($payload['data']['command'])
+                        ? unserialize($payload['data']['command'])
+                        : null;
+                } catch (\Exception $e) {
+                }
 
-    return response()->json([
-        'message' => 'Notification scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
-    ]);
-}
+                $scheduledAt = CarbonCarbon::createFromTimestamp($job->available_at);
+                $status = $scheduledAt->isFuture() ? 'Waiting' : 'Queued (pending worker)';
 
-/**
- * List scheduled emails from the jobs table.
- * Shows all pending (unprocessed) scheduled email jobs.
- */
-public function scheduledEmails()
-{
-    $jobs = \DB::table('jobs')
-        ->where('payload', 'like', '%SendScheduledBulkEmailJob%')
-        ->whereNull('reserved_at')
-        ->orderBy('available_at', 'asc')
-        ->get()
-        ->map(function ($job) {
-            $payload = json_decode($job->payload, true);
-            $command = null;
-            try {
-                $command = isset($payload['data']['command'])
-                    ? unserialize($payload['data']['command'])
-                    : null;
-            } catch (\Exception $e) {}
+                return [
+                    'id'            => $job->id,
+                    'template_name' => $command->templateName ?? ($payload['displayName'] ?? 'Unknown'),
+                    'scheduled_at'  => $scheduledAt->format('Y-m-d H:i:s') . ' UTC',
+                    'scheduled_at_iso' => $scheduledAt->toIso8601String(),
+                    'created_at'    => CarbonCarbon::createFromTimestamp($job->created_at)->format('Y-m-d H:i:s') . ' UTC',
+                    'created_at_iso' => CarbonCarbon::createFromTimestamp($job->created_at)->toIso8601String(),
+                    'status'        => $status,
+                ];
+            });
 
-            $scheduledAt = CarbonCarbon::createFromTimestamp($job->available_at);
-            $status = $scheduledAt->isFuture() ? 'Waiting' : 'Queued (pending worker)';
-
-            return [
-                'id'            => $job->id,
-                'template_name' => $command->templateName ?? ($payload['displayName'] ?? 'Unknown'),
-                'scheduled_at'  => $scheduledAt->format('Y-m-d H:i:s') . ' UTC',
-                'scheduled_at_iso' => $scheduledAt->toIso8601String(),
-                'created_at'    => CarbonCarbon::createFromTimestamp($job->created_at)->format('Y-m-d H:i:s') . ' UTC',
-                'created_at_iso' => CarbonCarbon::createFromTimestamp($job->created_at)->toIso8601String(),
-                'status'        => $status,
-            ];
-        });
-
-    return response()->json($jobs);
-}
-
-/**
- * List scheduled notifications from the jobs table.
- * Shows all pending (unprocessed) scheduled notification jobs.
- */
-public function scheduledNotifications()
-{
-    $jobs = \DB::table('jobs')
-        ->where('payload', 'like', '%SendScheduledBulkNotificationJob%')
-        ->whereNull('reserved_at')
-        ->orderBy('available_at', 'asc')
-        ->get()
-        ->map(function ($job) {
-            $payload = json_decode($job->payload, true);
-            $command = null;
-            try {
-                $command = isset($payload['data']['command'])
-                    ? unserialize($payload['data']['command'])
-                    : null;
-            } catch (\Exception $e) {}
-
-            $scheduledAt = CarbonCarbon::createFromTimestamp($job->available_at);
-            $status = $scheduledAt->isFuture() ? 'Waiting' : 'Queued (pending worker)';
-
-            return [
-                'id'            => $job->id,
-                'title'         => $command->templateName ?? ($payload['displayName'] ?? 'Unknown'),
-                'message'       => $status,
-                'scheduled_at'  => $scheduledAt->format('Y-m-d H:i:s') . ' UTC',
-                'scheduled_at_iso' => $scheduledAt->toIso8601String(),
-            ];
-        });
-
-    return response()->json($jobs);
-}
-
-/**
- * Cancel a scheduled email by deleting the job from the queue.
- */
-public function cancelScheduledEmail(Request $request)
-{
-    $deleted = \DB::table('jobs')->where('id', $request->job_id)->delete();
-
-    if ($deleted) {
-        return response()->json(['message' => 'Scheduled email cancelled successfully.']);
+        return response()->json($jobs);
     }
 
-    return response()->json(['message' => 'Job not found or already processed.'], 404);
-}
+    /**
+     * List scheduled notifications from the jobs table.
+     * Shows all pending (unprocessed) scheduled notification jobs.
+     */
+    public function scheduledNotifications()
+    {
+        $jobs = \DB::table('jobs')
+            ->where('payload', 'like', '%SendScheduledBulkNotificationJob%')
+            ->whereNull('reserved_at')
+            ->orderBy('available_at', 'asc')
+            ->get()
+            ->map(function ($job) {
+                $payload = json_decode($job->payload, true);
+                $command = null;
+                try {
+                    $command = isset($payload['data']['command'])
+                        ? unserialize($payload['data']['command'])
+                        : null;
+                } catch (\Exception $e) {
+                }
 
-/**
- * Cancel a scheduled notification by deleting the job.
- */
-public function cancelScheduledNotification(Request $request)
-{
-    $deleted = \DB::table('jobs')->where('id', $request->notification_id)->delete();
+                $scheduledAt = CarbonCarbon::createFromTimestamp($job->available_at);
+                $status = $scheduledAt->isFuture() ? 'Waiting' : 'Queued (pending worker)';
 
-    if ($deleted) {
-        return response()->json(['message' => 'Scheduled notification cancelled successfully.']);
+                return [
+                    'id'            => $job->id,
+                    'title'         => $command->templateName ?? ($payload['displayName'] ?? 'Unknown'),
+                    'message'       => $status,
+                    'scheduled_at'  => $scheduledAt->format('Y-m-d H:i:s') . ' UTC',
+                    'scheduled_at_iso' => $scheduledAt->toIso8601String(),
+                ];
+            });
+
+        return response()->json($jobs);
     }
 
-    return response()->json(['message' => 'Job not found or already processed.'], 404);
-}
+    /**
+     * Cancel a scheduled email by deleting the job from the queue.
+     */
+    public function cancelScheduledEmail(Request $request)
+    {
+        $deleted = \DB::table('jobs')->where('id', $request->job_id)->delete();
 
+        if ($deleted) {
+            return response()->json(['message' => 'Scheduled email cancelled successfully.']);
+        }
 
+        return response()->json(['message' => 'Job not found or already processed.'], 404);
+    }
+
+    /**
+     * Cancel a scheduled notification by deleting the job.
+     */
+    public function cancelScheduledNotification(Request $request)
+    {
+        $deleted = \DB::table('jobs')->where('id', $request->notification_id)->delete();
+
+        if ($deleted) {
+            return response()->json(['message' => 'Scheduled notification cancelled successfully.']);
+        }
+
+        return response()->json(['message' => 'Job not found or already processed.'], 404);
+    }
 }

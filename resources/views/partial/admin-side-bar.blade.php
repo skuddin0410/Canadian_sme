@@ -417,12 +417,17 @@
         </ul>
     </li>
 
-    <li class="menu-item {{ request()->is('admin/pricing*') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->routeIs('subscription.*') || request()->is('admin/pricing*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="pricing">Pricing</div>
         </a>
         <ul class="menu-sub">
+             <li class="menu-item {{ request()->routeIs('subscription.index') ? 'active' : '' }}">
+                <a href="{{ route('subscription.index') }}" class="menu-link">
+                    <div data-i18n="cms">Subscription</div>
+                </a>
+            </li>
             <li class="menu-item {{ request()->is('admin/pricing/cms') ? 'active' : '' }}">
                 <a href="{{ route('admin.pricing.cms') }}" class="menu-link">
                     <div data-i18n="cms">CMS</div>
