@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Mail\KycMail;
 use App\Models\Booth;
 use App\Models\Drive;
+use App\Models\Subscription;
 
 use App\Models\Company;
 use App\Exports\UsersExport;
@@ -208,8 +209,33 @@ class AttendeeUserController extends Controller
             return redirect(route('attendee-users.create'))->withInput()
                 ->withErrors($validator);
         }
+        $admin = auth()->user();
+
+        //  STEP 2: Get active subscription
+        $subscription = Subscription::active()
+            ->where('user_id', $admin->id)
+            ->latest()
+            ->first();
+
+        //  No active subscription
+        if (!$subscription) {
+            return back()->withErrors([
+                'error' => 'No active subscription found or subscription expired'
+            ])->withInput();
+        }
+
+        //  STEP 3: Count existing attendees created by admin
+        $currentCount = User::where('created_by', $admin->id)->count();
+
+        // STEP 4: Check limit
+        if ($currentCount >= $subscription->attendee_count) {
+            return back()->withErrors([
+                'error' => "Attendee limit reached! Allowed: {$subscription->attendee_count}"
+            ])->withInput();
+        }
 
         $user = new User();
+        $user->created_by = auth()->id();
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
         $user->slug = createUniqueSlug('users', $request->first_name . '_' . $request->last_name);
@@ -627,15 +653,15 @@ class AttendeeUserController extends Controller
                 // Convert links to click tracking links
                 $message = $this->convertLinksToTracking($message, $mailLog->id);
 
-               $pixelUrl = rtrim(config('app.url'), '/') . '/email/img/' . $mailLog->id . '?t=' . time();
+                $pixelUrl = rtrim(config('app.url'), '/') . '/email/img/' . $mailLog->id . '?t=' . time();
 
                 // Tracking Pixel (hidden properly)
-               $pixel = '<img src="' . $pixelUrl . '" width="1" height="1" 
+                $pixel = '<img src="' . $pixelUrl . '" width="1" height="1" 
     style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
     alt="" border="0">';
 
                 // Email HTML
-               $htmlBody = '
+                $htmlBody = '
 <!DOCTYPE html>
 <html>
 <head>

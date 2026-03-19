@@ -21,6 +21,7 @@ use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\HeadingRowImport;
 use Carbon;
+use App\Models\Subscription;
 
 use App\Models\Email;
 use App\Mail\TrackedEmail;
@@ -41,7 +42,7 @@ class UserController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $users = User::with("roles")
                 ->whereHas("roles", function ($q) {
-                    $q->whereIn("name", ["Admin",'Admin','Representative','Attendee','Speaker','Support Staff Or Helpdesk','Registration Desk']);
+                    $q->whereIn("name", ["Admin", 'Admin', 'Representative', 'Attendee', 'Speaker', 'Support Staff Or Helpdesk', 'Registration Desk']);
                 })->orderBy('created_at', 'DESC');
 
             if ($request->search) {
@@ -57,7 +58,6 @@ class UserController extends Controller
                 $users = $users->where(function ($query) use ($request) {
                     $query->whereDate('created_at', '>=', $request->start_at);
                     $query->whereDate('created_at', '<=', $request->end_at);
-                    
                 });
             }
 
@@ -110,7 +110,7 @@ class UserController extends Controller
             'state' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
             // 'password' => 'required|string|min:8',
-            
+
 
         ]);
         if ($validator->fails()) {
@@ -136,7 +136,7 @@ class UserController extends Controller
         $user->save();
         $user->assignRole($request->user_type);
 
-     
+
         return redirect(route('users.index'))
             ->withSuccess('User data has been saved successfully');
     }
@@ -154,7 +154,7 @@ class UserController extends Controller
             return view('users.pending.view', ['user' => $user]);
         };
         $user->load('loginLogs');
-                              
+
         return view('users.view', compact('user'));
     }
 
@@ -233,9 +233,9 @@ class UserController extends Controller
             ->withSuccess('User deleted successfully');
     }
 
-    public function export() 
+    public function export()
     {
-        return Excel::download(new UsersExport, 'users_'.Carbon\Carbon::now()->timestamp.'.xlsx');
+        return Excel::download(new UsersExport, 'users_' . Carbon\Carbon::now()->timestamp . '.xlsx');
     }
 
     // public function importUser(Request $request){
@@ -246,7 +246,7 @@ class UserController extends Controller
     //     if (!$file->isValid()) {
     //      return back()->withErrors(['file' => 'Uploaded file is not valid']);
     //     }
-        
+
     //     // Get original extension
     //     $extension = strtolower($file->getClientOriginalExtension());
 
@@ -271,6 +271,32 @@ class UserController extends Controller
     //   }
     // }
 
+    // public function importUser(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|file|mimes:csv,xls,xlsx',
+    //     ]);
+
+    //     $file = $request->file('file');
+
+    //     if (!$file->isValid()) {
+    //         return back()->withErrors(['file' => 'Uploaded file is not valid']);
+    //     }
+
+    //     $ext = strtolower($file->getClientOriginalExtension());
+    //     $path = $file->getRealPath();
+
+    //     // Count rows excluding header
+    //     $dataRows = $this->countDataRows($path, $ext); // excluding header row
+
+    //     if ($dataRows > 100) {
+    //         return back()->withErrors(['file' => "File has {$dataRows} rows. Max 100 rows allowed."]);
+    //     }
+
+    //     Excel::import(new UsersImport, $file);
+
+    //     return back()->with('success', "Imported successfully. Rows detected: {$dataRows}");
+    // }
     public function importUser(Request $request)
     {
         $request->validate([
@@ -286,18 +312,51 @@ class UserController extends Controller
         $ext = strtolower($file->getClientOriginalExtension());
         $path = $file->getRealPath();
 
-        // Count rows excluding header
-        $dataRows = $this->countDataRows($path, $ext); // excluding header row
+        // Count rows
+        $dataRows = $this->countDataRows($path, $ext);
 
         if ($dataRows > 100) {
-            return back()->withErrors(['file' => "File has {$dataRows} rows. Max 100 rows allowed."]);
+            return back()->withErrors(['file' => "Max 100 rows allowed."]);
         }
 
+        //  STEP 1: Get logged-in admin
+        $user = auth()->user();
+
+        //  STEP 2: Get subscription
+        $subscription = Subscription::where('user_id', $user->id)
+            ->latest()
+            ->first();
+
+        //  No subscription
+        if (!$subscription) {
+            return back()->withErrors(['file' => 'No subscription found for this user']);
+        }
+
+        //  Inactive subscription
+        if ($subscription->status !== 'active') {
+            return back()->withErrors(['file' => 'Subscription is inactive']);
+        }
+
+        //  Expired subscription
+        if ($subscription->expired_at && $subscription->expired_at < now()) {
+            return back()->withErrors(['file' => 'Subscription has expired']);
+        }
+
+        //  STEP 3: Check attendee limit
+        $currentCount = User::where('created_by', $user->id)->count();
+        $allowed = $subscription->attendee_count;
+
+        if (($currentCount + $dataRows) > $allowed) {
+            return back()->withErrors([
+                'file' => "Limit exceeded! Allowed: {$allowed}, Existing: {$currentCount}, Trying: {$dataRows}"
+            ]);
+        }
+
+        //  STEP 4: Import
         Excel::import(new UsersImport, $file);
 
-        return back()->with('success', "Imported successfully. Rows detected: {$dataRows}");
+        return back()->with('success', "Imported successfully. Rows: {$dataRows}");
     }
-
     private function countDataRows(string $path, string $ext): int
     {
         if ($ext === 'csv') {
@@ -325,22 +384,22 @@ class UserController extends Controller
     }
 
     public function representativeIndex()
-{
-    $users = User::role('Representative')
-        ->where('created_by', auth()->id())
-        ->get();
+    {
+        $users = User::role('Representative')
+            ->where('created_by', auth()->id())
+            ->get();
 
-    return view('users.representative_users.index', compact('users'));
-}
+        return view('users.representative_users.index', compact('users'));
+    }
 
-public function attendeeIndex()
-{
-    $users = User::role('attendee')
-        ->where('created_by', auth()->id())
-        ->get();
+    public function attendeeIndex()
+    {
+        $users = User::role('attendee')
+            ->where('created_by', auth()->id())
+            ->get();
 
-    return view('users.attendee_users.index', compact('users'));
-}
+        return view('users.attendee_users.index', compact('users'));
+    }
 
 
     public function sendTrackedEmail(Request $request)
@@ -356,7 +415,7 @@ public function attendeeIndex()
                 ->withErrors($validator);
         }
 
-        $user = User::where('id',$request->user_id)->first();
+        $user = User::where('id', $request->user_id)->first();
 
         $email = Email::create([
             'user_id' => $user->id,
@@ -367,43 +426,43 @@ public function attendeeIndex()
         $emailId = $user->email;
         //$emailId = 'subhabrata06.dapl@gmail.com';
         Mail::to($emailId)->send(new TrackedEmail($email));
-        
+
         return redirect(route('users.index'))
             ->withSuccess('Email sent successfully');
     }
     // Admin blocks a user
 
 
-// public function blockUser($id)
-// {
-//     $user = User::findOrFail($id);
+    // public function blockUser($id)
+    // {
+    //     $user = User::findOrFail($id);
 
-//     // Prevent blocking yourself
-//     if ($user->id === Auth::id()) {
-//         return redirect()->back()->with('error', 'You cannot block your own account.');
-//     }
+    //     // Prevent blocking yourself
+    //     if ($user->id === Auth::id()) {
+    //         return redirect()->back()->with('error', 'You cannot block your own account.');
+    //     }
 
-//     $user->is_block = true;
-//     $user->save();
+    //     $user->is_block = true;
+    //     $user->save();
 
-//     return redirect()->back()->with('success', 'User has been blocked successfully.');
-// }
+    //     return redirect()->back()->with('success', 'User has been blocked successfully.');
+    // }
 
-// // Helpdesk (or Admin) unblocks a user
-// public function unblockUser($id)
-// {
-//     $user = User::findOrFail($id);
+    // // Helpdesk (or Admin) unblocks a user
+    // public function unblockUser($id)
+    // {
+    //     $user = User::findOrFail($id);
 
-//     // If Helpdesk role, restrict to specific roles
-//     if (Auth::user()->hasRole('Support Staff Or Helpdesk')) {
-//         if (! $user->hasAnyRole(['Admin', 'Representative', 'Attendee', 'Speaker'])) {
-//             return redirect()->back()->with('error', 'You are not allowed to unblock this role.');
-//         }
-//     }
+    //     // If Helpdesk role, restrict to specific roles
+    //     if (Auth::user()->hasRole('Support Staff Or Helpdesk')) {
+    //         if (! $user->hasAnyRole(['Admin', 'Representative', 'Attendee', 'Speaker'])) {
+    //             return redirect()->back()->with('error', 'You are not allowed to unblock this role.');
+    //         }
+    //     }
 
-//     $user->is_block = false;
-//     $user->save();
+    //     $user->is_block = false;
+    //     $user->save();
 
-//     return redirect()->back()->with('success', 'User has been unblocked successfully.');
-// }
+    //     return redirect()->back()->with('success', 'User has been unblocked successfully.');
+    // }
 }
