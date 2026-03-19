@@ -26,6 +26,7 @@
         --radius-sm: 10px;
         --radius-xs: 6px;
     }
+    
 
     .edit-wrapper {
         font-family: 'DM Sans', sans-serif;
@@ -411,10 +412,10 @@
                     {{-- User --}}
                     <div class="field">
                         <label for="user_id">User</label>
-                        <select name="user_id" id="user_id" class="field-select">
+                        <select name="user_id" id="user_id" class="field-select searchable">
                             @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ $subscription->user_id == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }}
+                                {{ $user->name }} {{ $user->lastname }}
                             </option>
                             @endforeach
                         </select>
@@ -423,7 +424,7 @@
                     {{-- Pricing --}}
                     <div class="field">
                         <label for="price_id">Pricing Plan</label>
-                        <select name="price_id" id="price_id" class="field-select">
+                        <select name="price_id" id="price_id" class="field-select searchable">
                             @foreach($pricings as $pricing)
                             <option value="{{ $pricing->id }}" {{ $subscription->price_id == $pricing->id ? 'selected' : '' }}>
                                 {{ $pricing->name }}
@@ -514,4 +515,23 @@
 
 </div>
 
+@endsection
+@section('scripts')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.searchable').select2({
+        placeholder: "Search...",
+        allowClear: true,
+        width: '100%'
+    });
+});
+</script>
 @endsection

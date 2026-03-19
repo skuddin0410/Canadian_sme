@@ -2,7 +2,6 @@
 @section('content')
 
 <style>
-  
     :root {
         --ink: #0d0d12;
         --surface: #f5f4f0;
@@ -18,7 +17,7 @@
         --muted-light: #9ca3af;
         --input-bg: #fafaf8;
         --input-focus: #f0f4ff;
-        --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, .08);
         --radius: 14px;
         --radius-sm: 8px;
         --radius-xs: 6px;
@@ -37,7 +36,7 @@
         align-items: center;
         gap: 1rem;
         margin-bottom: 2rem;
-        
+
     }
 
     .back-btn {
@@ -144,8 +143,13 @@
         color: var(--danger);
     }
 
-    .error-alert li { margin-bottom: .2rem; }
-    .error-alert li:last-child { margin-bottom: 0; }
+    .error-alert li {
+        margin-bottom: .2rem;
+    }
+
+    .error-alert li:last-child {
+        margin-bottom: 0;
+    }
 
     /* ── Form grid ── */
     .form-grid {
@@ -155,12 +159,21 @@
     }
 
     @media (max-width: 680px) {
-        .form-grid { grid-template-columns: 1fr; }
-        .create-wrapper { padding: 1.5rem 1rem; }
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .create-wrapper {
+            padding: 1.5rem 1rem;
+        }
     }
 
     /* ── Field ── */
-    .field { display: flex; flex-direction: column; gap: .45rem; }
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+    }
 
     .field label {
         font-family: 'Syne', sans-serif;
@@ -202,14 +215,21 @@
         box-shadow: 0 0 0 3px rgba(45, 91, 227, .12);
     }
 
-    .field-input::placeholder { color: var(--muted-light); }
+    .field-input::placeholder {
+        color: var(--muted-light);
+    }
 
     /* number spinner hide */
     .field-input[type="number"]::-webkit-inner-spin-button,
-    .field-input[type="number"]::-webkit-outer-spin-button { opacity: 1; }
+    .field-input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
 
     /* ── Input with icon wrapper ── */
-    .input-icon-wrap { position: relative; }
+    .input-icon-wrap {
+        position: relative;
+    }
+
     .input-icon-wrap svg {
         position: absolute;
         left: .9rem;
@@ -218,7 +238,10 @@
         color: var(--muted-light);
         pointer-events: none;
     }
-    .input-icon-wrap .field-input { padding-left: 2.4rem; }
+
+    .input-icon-wrap .field-input {
+        padding-left: 2.4rem;
+    }
 
     /* ── Helper text ── */
     .field-hint {
@@ -298,9 +321,17 @@
         animation: cardIn .35s ease both;
     }
 
+
     @keyframes cardIn {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 
@@ -310,7 +341,7 @@
     <div class="create-header">
         <a href="{{ route('subscription.index') }}" class="back-btn" title="Back to list">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
         <div class="create-header-text">
@@ -332,8 +363,8 @@
             <div class="error-alert">
                 <div class="error-alert-title">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M7 4v3.5M7 10h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5" />
+                        <path d="M7 4v3.5M7 10h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
                     Please fix the following errors:
                 </div>
@@ -352,7 +383,7 @@
                     {{-- User --}}
                     <div class="field">
                         <label for="user_id">User<span class="text-danger">*</span></label>
-                        <select name="user_id" id="user_id" class="field-select" required>
+                        <select name="user_id" id="user_id" class="field-select searchable" required>
                             <option value="">Select a user…</option>
                             @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
@@ -365,7 +396,7 @@
                     {{-- Pricing --}}
                     <div class="field">
                         <label for="price_id">Pricing Plan<span class="text-danger">*</span></label>
-                        <select name="price_id" id="price_id" class="field-select" required>
+                        <select name="price_id" id="price_id" class="field-select searchable" required>
                             <option value="">Select a plan…</option>
                             @foreach($pricings as $pricing)
                             <option value="{{ $pricing->id }}" {{ old('price_id') == $pricing->id ? 'selected' : '' }}>
@@ -382,9 +413,9 @@
                         <label for="attendee_count">Attendee Count<span class="text-danger">*</span></label>
                         <div class="input-icon-wrap">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <circle cx="5.5" cy="4" r="2.5" stroke="currentColor" stroke-width="1.4"/>
-                                <path d="M1 12c0-2.21 2.015-4 4.5-4s4.5 1.79 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                                <path d="M10.5 6.5v4M8.5 8.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                                <circle cx="5.5" cy="4" r="2.5" stroke="currentColor" stroke-width="1.4" />
+                                <path d="M1 12c0-2.21 2.015-4 4.5-4s4.5 1.79 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                                <path d="M10.5 6.5v4M8.5 8.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
                             </svg>
                             <input type="number" name="attendee_count" id="attendee_count"
                                 class="field-input" min="1" value="{{ old('attendee_count', 1) }}" required>
@@ -396,8 +427,8 @@
                         <label for="event_count">Event Count<span class="text-danger">*</span></label>
                         <div class="input-icon-wrap">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <rect x="1.5" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/>
-                                <path d="M4.5 1v3M9.5 1v3M1.5 6h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                                <rect x="1.5" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.4" />
+                                <path d="M4.5 1v3M9.5 1v3M1.5 6h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
                             </svg>
                             <input type="number" name="event_count" id="event_count"
                                 class="field-input" min="1" value="{{ old('event_count', 1) }}" required>
@@ -409,8 +440,8 @@
                         <label for="expired_at">Expiry Duration<span class="text-danger">*</span></label>
                         <div class="input-icon-wrap">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/>
-                                <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4" />
+                                <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             <input type="number" name="expired_at" id="expired_at"
                                 class="field-input" min="1"
@@ -425,7 +456,7 @@
                         <label for="status">Status<span class="text-danger">*</span></label>
                         <select name="status" id="status" class="field-select" required>
                             <option value="">Select status…</option>
-                            <option value="active"   {{ old('status') == 'active'   ? 'selected' : '' }}>Active</option>
+                            <option value="active" {{ old('status') == 'active'   ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                     </div>
@@ -436,7 +467,7 @@
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <path d="M2 7.5l3.5 3.5 6.5-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 7.5l3.5 3.5 6.5-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         Create
                     </button>
@@ -449,4 +480,24 @@
     </div>
 
 </div>
+@endsection
+@section('scripts')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery (required) -->
+
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.searchable').select2({
+            placeholder: "Search...",
+            allowClear: true,
+            width: '100%',
+            minimumResultsForSearch: 0
+        });
+    });
+</script>
 @endsection

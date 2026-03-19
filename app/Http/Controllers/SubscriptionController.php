@@ -24,7 +24,8 @@ class SubscriptionController extends Controller
     {
         $users = User::whereHas("roles", function ($q) {
             $q->whereIn("name", ["Admin"]);
-        })->get();
+        })->where('id', '!=', 1)
+        ->get();
         $events = Event::all();
         $pricings = Pricing::all();
         return view('subscription.create', compact('users', 'events', 'pricings'));
@@ -80,7 +81,8 @@ class SubscriptionController extends Controller
 
         $users = User::whereHas("roles", function ($q) {
             $q->whereIn("name", ["Admin"]);
-        })->get();
+        })->where('id', '!=', 1)
+        ->get();
 
         $pricings = Pricing::all();
 
