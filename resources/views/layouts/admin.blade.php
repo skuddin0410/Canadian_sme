@@ -95,58 +95,41 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
   <script type="text/javascript">
     tinymce.init({
-      selector: '#description',
+      selector: '#description, .description-cls, .editor2',
       readonly: false,
       width: '100%',
-      height: 300,
-      plugins: 'code image link lists table preview',
-      toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
-      menubar: false,
+      min_height: 400,
+      plugins: [
+        'advlist', 'autolink', 'link', 'image', 'lists', 'charmap', 'preview', 'anchor', 'pagebreak',
+        'searchreplace', 'wordcount', 'visualblocks', 'visualchars', 'code', 'fullscreen', 'insertdatetime',
+        'media', 'table', 'emoticons', 'template', 'help'
+      ],
+      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist outdent indent | link image media table | print preview fullscreen | ' +
+        'emoticons template help',
+      font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+      font_family_formats: 'Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats',
+      menu: {
+        favs: { title: 'My Favorites', items: 'code visualblocks | searchreplace | emoticons' }
+      },
+      menubar: 'favs file edit view insert format tools table help',
       branding: false,
-      images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject('Upload failed');
-        reader.readAsDataURL(blobInfo.blob());
-      })
-    });
-
-    tinymce.init({
-      selector: '#description, .description-cls',
-      readonly: false,
-      width: '100%',
-      height: 300,
-      plugins: 'code image link lists table preview',
-      toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
-      menubar: false,
-      branding: false,
+      promotion: false,
+      image_advtab: true,
+      image_caption: true,
+      image_dimensions: true,
+      image_class_list: [
+        {title: 'None', value: ''},
+        {title: 'Responsive', value: 'img-fluid'},
+        {title: 'Rounded', value: 'rounded'},
+        {title: 'Shadow', value: 'shadow-sm'}
+      ],
       setup: function (editor) {
           editor.on('change', function () {
               editor.save();
           });
       },
-      images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject('Upload failed');
-        reader.readAsDataURL(blobInfo.blob());
-      })
-    });
-
-    tinymce.init({
-      selector: '.editor2',
-      readonly: false,
-      width: '100%',
-      height: 300,
-      plugins: 'code image link lists table preview',
-      toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | media| code preview',
-      menubar: false,
-      branding: false,
-      setup: function (editor) {
-          editor.on('change', function () {
-              editor.save();
-          });
-      },
+      content_style: 'body { font-family:Public Sans,Helvetica,Arial,sans-serif; font-size:14px } img { max-width: 100%; height: auto; }',
       images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
