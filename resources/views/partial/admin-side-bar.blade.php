@@ -106,10 +106,10 @@
         @endif
 
         @if(isSuperAdmin())
-        <li class="menu-item {{ request()->is('admin/navbar-dynamic*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/navbar-highlights*') ? 'active open' : '' }}">
             <a href="{{ route('admin.navbar-dynamic.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
-                <div data-i18n="navbar_dynamic">Dynamic Nav</div>
+                <div data-i18n="navbar_dynamic">Highlights</div>
             </a>
         </li>
         @endif
@@ -330,6 +330,13 @@
                 </a>
             </li>
         </ul>
+        <ul class="menu-sub">
+            <li class="menu-item {{ request()->is('admin/analytics/email') ? 'active' : '' }}">
+                <a href="{{ route('admin.analytics.email') }}" class="menu-link">
+                    <div data-i18n="Session">Email analytics</div>
+                </a>
+            </li>
+        </ul>
     </li>
 
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
@@ -402,7 +409,7 @@
 
             <li class="menu-item {{ request()->is('admin/poll-responses') ? 'active' : '' }}">
                 <a href="{{ route('polls.responses.index') }}" class="menu-link">
-                  
+
                     <div>All Poll Responses</div>
                 </a>
             </li>
@@ -410,12 +417,17 @@
         </ul>
     </li>
 
-    <li class="menu-item {{ request()->is('admin/pricing*') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->routeIs('subscription.*') || request()->is('admin/pricing*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="pricing">Pricing</div>
         </a>
         <ul class="menu-sub">
+             <li class="menu-item {{ request()->routeIs('subscription.index') ? 'active' : '' }}">
+                <a href="{{ route('subscription.index') }}" class="menu-link">
+                    <div data-i18n="cms">Subscription</div>
+                </a>
+            </li>
             <li class="menu-item {{ request()->is('admin/pricing/cms') ? 'active' : '' }}">
                 <a href="{{ route('admin.pricing.cms') }}" class="menu-link">
                     <div data-i18n="cms">CMS</div>

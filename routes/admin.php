@@ -35,15 +35,17 @@ use App\Http\Controllers\PollController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\SpeakerAnalyticsController;
+use App\Http\Controllers\EmailTrackingController;
+use App\Http\Controllers\SubscriptionController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
 
-  Route::get('/navbar-dynamic', [NavbarDynamicController::class, 'index'])->name('admin.navbar-dynamic.index');
-  Route::get('/navbar-dynamic/create', [NavbarDynamicController::class, 'create'])->name('admin.navbar-dynamic.create');
-  Route::post('/navbar-dynamic', [NavbarDynamicController::class, 'store'])->name('admin.navbar-dynamic.store');
-  Route::get('/navbar-dynamic/{id}/edit', [NavbarDynamicController::class, 'edit'])->name('admin.navbar-dynamic.edit');
-  Route::post('/navbar-dynamic/{id}', [NavbarDynamicController::class, 'update'])->name('admin.navbar-dynamic.update');
-  Route::delete('/navbar-dynamic/{id}', [NavbarDynamicController::class, 'destroy'])->name('admin.navbar-dynamic.destroy');
+  Route::get('/navbar-highlights', [NavbarDynamicController::class, 'index'])->name('admin.navbar-dynamic.index');
+  Route::get('/navbar-highlights/create', [NavbarDynamicController::class, 'create'])->name('admin.navbar-dynamic.create');
+  Route::post('/navbar-highlights', [NavbarDynamicController::class, 'store'])->name('admin.navbar-dynamic.store');
+  Route::get('/navbar-highlights/{id}/edit', [NavbarDynamicController::class, 'edit'])->name('admin.navbar-dynamic.edit');
+  Route::post('/navbar-highlights/{id}', [NavbarDynamicController::class, 'update'])->name('admin.navbar-dynamic.update');
+  Route::delete('/navbar-highlights/{id}', [NavbarDynamicController::class, 'destroy'])->name('admin.navbar-dynamic.destroy');
 
   Route::get('/home-page/customer/banner', [LandingCustomerBannerController::class, 'index'])->name('admin.home-page.customer.banner');
   Route::post('/home-page/customer/banner', [LandingCustomerBannerController::class, 'update'])->name('admin.home-page.customer.banner.update');
@@ -243,24 +245,31 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/speaker', [SpeakerAnalyticsController::class, 'speaker'])->name('speaker');
     Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
   });
+  Route::get('subscriptions/index', [SubscriptionController::class, 'index'])->name('subscription.index');
+  Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('subscription.create');
+  Route::get('subscriptions/{id}', [SubscriptionController::class, 'show'])->name('subscription.show');
 
+  Route::get('subscriptions/{id}/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
+
+  Route::put('subscriptions/{id}', [SubscriptionController::class, 'update'])->name('subscription.update');
+  Route::post('subscriptions/store', [SubscriptionController::class, 'store'])->name('subscription.store');
+  Route::delete('subscriptions/{id}', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
   Route::get('/pricing/cms', [PricingController::class, 'cms'])->name('admin.pricing.cms');
   Route::post('/pricing/cms', [PricingController::class, 'updateCms'])->name('admin.pricing.cms.update');
-  
+
   // Pricing Features
   Route::post('/pricing/features', [PricingController::class, 'storeFeature'])->name('admin.pricing.features.store');
   Route::put('/pricing/features/{id}', [PricingController::class, 'updateFeature'])->name('admin.pricing.features.update');
   Route::delete('/pricing/features/{id}', [PricingController::class, 'destroyFeature'])->name('admin.pricing.features.destroy');
 
   Route::resource('pricing/setup', PricingController::class)->names([
-      'index' => 'admin.pricing.setup.index',
-      'create' => 'admin.pricing.setup.create',
-      'store' => 'admin.pricing.setup.store',
-      'edit' => 'admin.pricing.setup.edit',
-      'update' => 'admin.pricing.setup.update',
-      'destroy' => 'admin.pricing.setup.destroy',
+    'index' => 'admin.pricing.setup.index',
+    'create' => 'admin.pricing.setup.create',
+    'store' => 'admin.pricing.setup.store',
+    'edit' => 'admin.pricing.setup.edit',
+    'update' => 'admin.pricing.setup.update',
+    'destroy' => 'admin.pricing.setup.destroy',
   ]);
-  
 });
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -297,7 +306,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   )->name('polls.responses.index');
   Route::get('/response/export', [PollController::class, 'export'])
     ->name('response.export');
-  
+
   Route::get(
     '/polls/{poll}/responses',
     [PollController::class, 'responses']
@@ -306,9 +315,12 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     '/poll/{poll}/show',
     [PollController::class, 'getPollResponses']
   )->name('poll.show');
-  Route::get('/question/{question}/answers', 
+  Route::get(
+    '/question/{question}/answers',
     [PollController::class, 'getQuestionAnswers']
-)->name('question.answers.modal');
+  )->name('question.answers.modal');
+
+  Route::get('/analytics/email', [EmailTrackingController::class, 'index'])->name('admin.analytics.email');
   Route::patch('/users/{user}/toggle-block', [ExhibitorUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [RepresentativeUserController::class, 'toggleBlock'])->name('users.toggleBlock');
   Route::patch('/users/{user}/toggle-block', [AttendeeUserController::class, 'toggleBlock'])->name('users.toggleBlock');

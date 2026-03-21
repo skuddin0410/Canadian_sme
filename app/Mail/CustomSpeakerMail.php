@@ -15,15 +15,17 @@ class CustomSpeakerMail extends Mailable
     public $user;
     public $subjectLine;
     public $messageContent;
+    public $mailLogId;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user,$subjectLine,$messageContent)
+    public function __construct($user,$subjectLine,$messageContent , $mailLogId)
     {   
         $this->user = $user;
         $this->subjectLine = $subjectLine;
         $this->messageContent = $messageContent;
+         $this->mailLogId = $mailLogId;
     }
 
     public function build()
@@ -33,6 +35,7 @@ class CustomSpeakerMail extends Mailable
                     ->with([
                         'user' => $this->user,
                         'messageContent' => $this->messageContent,
+                        'mailLogId' => $this->mailLogId
                     ]);
     }
 }

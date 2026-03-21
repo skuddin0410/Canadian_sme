@@ -605,7 +605,7 @@
                     <div class="pd-item span2">
                         <div class="pd-label">Status</div>
                         <div class="pd-value" style="margin-top:.15rem">
-                            @php $now = now(); @endphp
+                            @php $now = \Carbon\Carbon::now(); @endphp
                             @if(!$poll->is_active)
                             <span class="st-badge st-inactive">Inactive</span>
                             @elseif($poll->start_date && $now->lt($poll->start_date))
