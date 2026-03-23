@@ -59,7 +59,7 @@
 
                         <li class="nav-item dropdown mega-dropdown">
                             <a class="nav-link p-0 dropdown-toggle" href="#" id="dynamicDrop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Dynamic Drop
+                                Highlights
                             </a>
                             <div class="dropdown-menu mega-menu border-0" aria-labelledby="dynamicDrop">
                                 <div class="container">
