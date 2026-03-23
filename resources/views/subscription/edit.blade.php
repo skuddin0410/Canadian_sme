@@ -501,7 +501,7 @@
 
                     {{-- Extend months --}}
                     <div class="field">
-                        <label for="expired_at">Extend Expiry</label>
+                        <label for="expired_at"> Expired at (months)</label>
                         <div class="input-icon-wrap">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                 <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4" />
