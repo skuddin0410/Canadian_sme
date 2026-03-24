@@ -22,7 +22,7 @@ class PollController extends Controller
             ], 401);
         }
 
-      
+
         if (!$poll->is_active) {
             return response()->json([
                 'success' => false,
@@ -30,7 +30,7 @@ class PollController extends Controller
             ], 403);
         }
 
-    
+
         if ($poll->start_date && now()->lt($poll->start_date)) {
             return response()->json([
                 'success' => false,
@@ -57,7 +57,7 @@ class PollController extends Controller
 
         try {
 
-           
+
             $alreadySubmitted = PollAnswer::whereHas('question', function ($q) use ($poll) {
                 $q->where('poll_id', $poll->id);
             })
@@ -118,24 +118,18 @@ class PollController extends Controller
         }
 
       
-        $latestAnswer = PollAnswer::with('question.poll')
-            ->where('user_id', $user->id)
-            ->whereHas('question.poll', function ($q) use ($event) {
-                $q->where('event_id', $event->id);
-            })
+        $poll = Poll::where('event_id', $event->id)
             ->latest()
             ->first();
 
-        if (!$latestAnswer) {
+        if (!$poll) {
             return response()->json([
                 'success' => false,
-                'message' => 'No poll submitted for this event.'
+                'message' => 'No poll found for this event.'
             ], 404);
         }
 
-        $poll = $latestAnswer->question->poll;
-
-        
+       
         $answers = PollAnswer::with('question')
             ->where('user_id', $user->id)
             ->whereHas('question', function ($q) use ($poll) {
@@ -143,8 +137,40 @@ class PollController extends Controller
             })
             ->get();
 
+      
+        if ($answers->count() > 0) {
+            return response()->json([
+                'success' => true,
+                'type' => 'answers',
+                'event' => [
+                    'id' => $event->id,
+                    'title' => $event->title,
+                ],
+                'poll' => [
+                    'id' => $poll->id,
+                    'title' => $poll->title,
+                    'start_date' => $poll->start_date,
+                    'end_date' => $poll->end_date,
+                    'is_active' => $poll->is_active,
+                ],
+                'answers' => $answers->map(function ($answer) {
+                    return [
+                        'question_id' => $answer->question->id,
+                        'question' => $answer->question->question,
+                        'text_answer' => $answer->text_answer,
+                        'yes_no_answer' => $answer->yes_no_answer,
+                        'rating_answer' => $answer->rating_answer,
+                    ];
+                })
+            ]);
+        }
+
+      
+        $questions = PollQuestion::where('poll_id', $poll->id)->get();
+
         return response()->json([
             'success' => true,
+            'type' => 'questions', 
             'event' => [
                 'id' => $event->id,
                 'title' => $event->title,
@@ -156,15 +182,74 @@ class PollController extends Controller
                 'end_date' => $poll->end_date,
                 'is_active' => $poll->is_active,
             ],
-            'answers' => $answers->map(function ($answer) {
+            'questions' => $questions->map(function ($q) {
                 return [
-                    'question_id' => $answer->question->id,
-                    'question' => $answer->question->question,
-                    'text_answer' => $answer->text_answer,
-                    'yes_no_answer' => $answer->yes_no_answer,
-                    'rating_answer' => $answer->rating_answer,
+                    'question_id' => $q->id,
+                    'question' => $q->question,
+                    'type' => $q->type,
                 ];
             })
         ]);
     }
+    // public function latestSubmittedPollByEvent(Request $request, Event $event)
+    // {
+    //     $user = $request->user();
+
+    //     if (!$user) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Unauthenticated.'
+    //         ], 401);
+    //     }
+
+
+    //     $latestAnswer = PollAnswer::with('question.poll')
+    //         ->where('user_id', $user->id)
+    //         ->whereHas('question.poll', function ($q) use ($event) {
+    //             $q->where('event_id', $event->id);
+    //         })
+    //         ->latest()
+    //         ->first();
+
+    //     if (!$latestAnswer) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'No poll submitted for this event.'
+    //         ], 404);
+    //     }
+
+    //     $poll = $latestAnswer->question->poll;
+
+
+    //     $answers = PollAnswer::with('question')
+    //         ->where('user_id', $user->id)
+    //         ->whereHas('question', function ($q) use ($poll) {
+    //             $q->where('poll_id', $poll->id);
+    //         })
+    //         ->get();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'event' => [
+    //             'id' => $event->id,
+    //             'title' => $event->title,
+    //         ],
+    //         'poll' => [
+    //             'id' => $poll->id,
+    //             'title' => $poll->title,
+    //             'start_date' => $poll->start_date,
+    //             'end_date' => $poll->end_date,
+    //             'is_active' => $poll->is_active,
+    //         ],
+    //         'answers' => $answers->map(function ($answer) {
+    //             return [
+    //                 'question_id' => $answer->question->id,
+    //                 'question' => $answer->question->question,
+    //                 'text_answer' => $answer->text_answer,
+    //                 'yes_no_answer' => $answer->yes_no_answer,
+    //                 'rating_answer' => $answer->rating_answer,
+    //             ];
+    //         })
+    //     ]);
+    // }
 }
