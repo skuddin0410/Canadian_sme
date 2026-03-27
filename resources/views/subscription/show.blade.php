@@ -368,7 +368,7 @@
                             <rect x="1" y="1.5" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
                             <path d="M3 1v1.5M7 1v1.5M1 4h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
                         </svg>
-                        #{{ $subscription->id }}
+                        ID:{{ $subscription->id }}
                     </span>
                     <span class="status-hero-badge {{ $subscription->status == 'active' ? 'active' : 'inactive' }}">
                         <span class="status-dot"></span>

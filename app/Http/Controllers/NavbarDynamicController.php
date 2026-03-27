@@ -55,7 +55,7 @@ class NavbarDynamicController extends Controller
             'status' => 'required|in:active,inactive',
             'order_by' => 'required|integer',
             'category' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
+            'content' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -74,4 +74,63 @@ class NavbarDynamicController extends Controller
 
         return redirect(route('admin.navbar-dynamic.index'))->withSuccess('Navbar item deleted successfully!');
     }
+    public function uploadImage(Request $request)
+{
+    try {
+        // ✅ Ensure request expects JSON (avoids HTML validation errors)
+        if (!$request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Invalid request type'
+            ], 400);
+        }
+
+        // ✅ Validate
+        $validator = \Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'error' => $validator->errors()->first()
+            ], 422);
+        }
+
+        // ✅ Check file exists
+        if (!$request->hasFile('image')) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No file uploaded'
+            ], 400);
+        }
+
+        $file = $request->file('image');
+
+        // ✅ Generate unique filename
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        // ✅ Store file
+        $path = $file->storeAs('uploads', $filename, 'public');
+
+        // ✅ Generate URL
+        $url = asset('storage/' . $path);
+
+        return response()->json([
+            'success' => true,
+            'url' => $url
+        ]);
+
+    } catch (\Throwable $e) {
+
+        // ✅ Log error (VERY IMPORTANT for debugging)
+        \Log::error('Image Upload Error: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'error' => 'Upload failed. Please try again.'
+        ], 500);
+    }
+}
+    
 }
