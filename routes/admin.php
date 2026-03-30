@@ -46,7 +46,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/navbar-highlights/{id}/edit', [NavbarDynamicController::class, 'edit'])->name('admin.navbar-dynamic.edit');
   Route::post('/navbar-highlights/{id}', [NavbarDynamicController::class, 'update'])->name('admin.navbar-dynamic.update');
   Route::delete('/navbar-highlights/{id}', [NavbarDynamicController::class, 'destroy'])->name('admin.navbar-dynamic.destroy');
-
+  Route::post('/upload-image', [NavbarDynamicController::class, 'uploadImage'])->name('admin.upload-image');
   Route::get('/home-page/customer/banner', [LandingCustomerBannerController::class, 'index'])->name('admin.home-page.customer.banner');
   Route::post('/home-page/customer/banner', [LandingCustomerBannerController::class, 'update'])->name('admin.home-page.customer.banner.update');
 
