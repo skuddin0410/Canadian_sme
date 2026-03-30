@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Poll;
 use App\Models\PollAnswer;
+use App\Models\PollQuestionOption;
 
 class PollQuestion extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'poll_id',
@@ -36,5 +37,9 @@ class PollQuestion extends Model
     public function answers()
     {
         return $this->hasMany(PollAnswer::class);
+    }
+    public function options()
+    {
+        return $this->hasMany(PollQuestionOption::class);
     }
 }

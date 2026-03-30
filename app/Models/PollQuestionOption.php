@@ -5,25 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\PollQuestion;
-use App\Models\User;
-use App\Models\PollQuestionOption;
+use App\Models\PollAnswer;
 
-class PollAnswer extends Model
+
+class PollQuestionOption extends Model
 {
-    use HasFactory;
-
+    protected $table = 'poll_question_options';
     protected $fillable = [
         'poll_question_id',
-        'user_id',
-        'text_answer',
-        'yes_no_answer',
-        'rating_answer',
-        'option_id',
-    ];
-
-    protected $casts = [
-        'yes_no_answer' => 'boolean',
-        'rating_answer' => 'integer',
+        'option_text',
     ];
 
     /*
@@ -32,17 +22,14 @@ class PollAnswer extends Model
     |--------------------------------------------------------------------------
     */
 
+   
     public function question()
     {
         return $this->belongsTo(PollQuestion::class, 'poll_question_id');
     }
 
-    public function user()
+    public function answers()
     {
-        return $this->belongsTo(User::class);
-    }
-    public function options()
-    {
-        return $this->hasMany(PollQuestionOption::class);
+        return $this->hasMany(PollAnswer::class, 'option_id');
     }
 }
