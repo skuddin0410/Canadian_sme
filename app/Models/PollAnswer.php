@@ -36,6 +36,10 @@ class PollAnswer extends Model
     {
         return $this->belongsTo(PollQuestion::class, 'poll_question_id');
     }
+    public function option()
+{
+    return $this->belongsTo(PollQuestionOption::class, 'option_id');
+}
 
     public function user()
     {

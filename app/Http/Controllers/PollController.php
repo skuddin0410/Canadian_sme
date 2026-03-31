@@ -39,58 +39,58 @@ class PollController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-        'event_id' => 'required|exists:events,id',
-        'event_session_id' => 'nullable|exists:sessions,id',
-        'title' => 'required|string|max:255',
-        'start_date' => 'nullable|date',
-        'end_date' => 'nullable|date|after_or_equal:start_date',
+            'event_id' => 'required|exists:events,id',
+            'event_session_id' => 'nullable|exists:sessions,id',
+            'title' => 'required|string|max:255',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
 
-        'questions' => 'required|array|min:1',
-        'questions.*.question' => 'required|string',
-        'questions.*.type' => ['required', Rule::in(['text','yes_no','rating','option'])],
+            'questions' => 'required|array|min:1',
+            'questions.*.question' => 'required|string',
+            'questions.*.type' => ['required', Rule::in(['text', 'yes_no', 'rating', 'option'])],
 
-        // rating
-        'questions.*.rating_scale' => 'nullable|required_if:questions.*.type,rating|integer|in:5',
+            // rating
+            'questions.*.rating_scale' => 'nullable|required_if:questions.*.type,rating|integer|in:5',
 
-        // options (MCQ)
-        'questions.*.options' => 'nullable|required_if:questions.*.type,option|array|min:2',
-        'questions.*.options.*' => 'required_if:questions.*.type,option|string',
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-        $poll = Poll::create([
-            'event_id' => $validated['event_id'],
-            'event_session_id' => $validated['event_session_id'],
-            'title' => $validated['title'],
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'],
-            'is_active' => true,
+            // options (MCQ)
+            'questions.*.options' => 'nullable|required_if:questions.*.type,option|array|min:2',
+            'questions.*.options.*' => 'required_if:questions.*.type,option|string',
         ]);
 
-        foreach ($validated['questions'] as $question) {
+        DB::beginTransaction();
 
-            $q = PollQuestion::create([
-                'poll_id' => $poll->id,
-                'question' => $question['question'],
-                'type' => $question['type'],
-                'rating_scale' => $question['type'] === 'rating'
-                    ? $question['rating_scale']
-                    : null,
+        try {
+            $poll = Poll::create([
+                'event_id' => $validated['event_id'],
+                'event_session_id' => $validated['event_session_id'],
+                'title' => $validated['title'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
+                'is_active' => true,
             ]);
 
-            // ✅ MCQ options safely saved (already validated)
-            if ($question['type'] === 'option') {
-                foreach ($question['options'] as $opt) {
-                    $q->options()->create([
-                        'option_text' => $opt
-                    ]);
+            foreach ($validated['questions'] as $question) {
+
+                $q = PollQuestion::create([
+                    'poll_id' => $poll->id,
+                    'question' => $question['question'],
+                    'type' => $question['type'],
+                    'rating_scale' => $question['type'] === 'rating'
+                        ? $question['rating_scale']
+                        : null,
+                ]);
+
+                // ✅ MCQ options safely saved (already validated)
+                if ($question['type'] === 'option') {
+                    foreach ($question['options'] as $opt) {
+                        $q->options()->create([
+                            'option_text' => $opt
+                        ]);
+                    }
                 }
             }
-        }
 
-        DB::commit();
+            DB::commit();
 
             return redirect()
                 ->route('polls.index')
@@ -116,103 +116,102 @@ class PollController extends Controller
         return view('polls.create', compact('poll', 'events'));
     }
 
-   public function update(Request $request, $id)
-{
-    $poll = Poll::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $poll = Poll::findOrFail($id);
 
-    $validated = $request->validate([
-        'event_id' => 'required|exists:events,id',
-        'event_session_id' => 'nullable|exists:sessions,id',
-        'title' => 'required|string|max:255',
+        $validated = $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'event_session_id' => 'nullable|exists:sessions,id',
+            'title' => 'required|string|max:255',
 
-        'start_date' => 'nullable|date',
-        'end_date' => 'nullable|date|after_or_equal:start_date',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
 
-        'questions' => 'required|array|min:1',
-        'questions.*.id' => 'nullable|exists:poll_questions,id',
-        'questions.*.question' => 'required|string',
-        'questions.*.type' => ['required', Rule::in(['text','yes_no','rating','option'])],
+            'questions' => 'required|array|min:1',
+            'questions.*.id' => 'nullable|exists:poll_questions,id',
+            'questions.*.question' => 'required|string',
+            'questions.*.type' => ['required', Rule::in(['text', 'yes_no', 'rating', 'option'])],
 
-        // rating
-        'questions.*.rating_scale' => 'nullable|required_if:questions.*.type,rating|integer|in:5',
+            // rating
+            'questions.*.rating_scale' => 'nullable|required_if:questions.*.type,rating|integer|in:5',
 
-        // mcq
-        'questions.*.options' => 'nullable|required_if:questions.*.type,option|array|min:2',
-        'questions.*.options.*' => 'required_if:questions.*.type,option|string',
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-
-        // ---------------- Update poll ----------------
-        $poll->update([
-            'event_id' => $validated['event_id'],
-            'event_session_id' => $validated['event_session_id'],
-            'title' => $validated['title'],
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'],
+            // mcq
+            'questions.*.options' => 'nullable|required_if:questions.*.type,option|array|min:2',
+            'questions.*.options.*' => 'required_if:questions.*.type,option|string',
         ]);
 
-        $keptQuestionIds = [];
+        DB::beginTransaction();
 
-        foreach ($validated['questions'] as $qData) {
+        try {
 
-            // -------- Update or Create Question --------
-            $question = isset($qData['id'])
-                ? PollQuestion::where('id', $qData['id'])
+            // ---------------- Update poll ----------------
+            $poll->update([
+                'event_id' => $validated['event_id'],
+                'event_session_id' => $validated['event_session_id'],
+                'title' => $validated['title'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
+            ]);
+
+            $keptQuestionIds = [];
+
+            foreach ($validated['questions'] as $qData) {
+
+                // -------- Update or Create Question --------
+                $question = isset($qData['id'])
+                    ? PollQuestion::where('id', $qData['id'])
                     ->where('poll_id', $poll->id)
                     ->first()
-                : new PollQuestion(['poll_id' => $poll->id]);
+                    : new PollQuestion(['poll_id' => $poll->id]);
 
-            $question->question = $qData['question'];
-            $question->type = $qData['type'];
-            $question->rating_scale = $qData['type'] === 'rating'
-                ? $qData['rating_scale']
-                : null;
+                $question->question = $qData['question'];
+                $question->type = $qData['type'];
+                $question->rating_scale = $qData['type'] === 'rating'
+                    ? $qData['rating_scale']
+                    : null;
 
-            $question->save();
+                $question->save();
 
-            $keptQuestionIds[] = $question->id;
+                $keptQuestionIds[] = $question->id;
 
-            // -------- Handle MCQ Options --------
-            if ($qData['type'] === 'option') {
+                // -------- Handle MCQ Options --------
+                if ($qData['type'] === 'option') {
 
-                $existingOptionIds = [];
+                    $existingOptionIds = [];
 
-                foreach ($qData['options'] as $optText) {
-                    $opt = $question->options()->create([
-                        'option_text' => $optText
-                    ]);
-                    $existingOptionIds[] = $opt->id;
+                    foreach ($qData['options'] as $optText) {
+                        $opt = $question->options()->create([
+                            'option_text' => $optText
+                        ]);
+                        $existingOptionIds[] = $opt->id;
+                    }
+
+                    // remove old options not in new list
+                    $question->options()
+                        ->whereNotIn('id', $existingOptionIds)
+                        ->delete();
+                } else {
+                    // if type changed from option → others, delete old options
+                    $question->options()->delete();
                 }
-
-                // remove old options not in new list
-                $question->options()
-                    ->whereNotIn('id', $existingOptionIds)
-                    ->delete();
-            } else {
-                // if type changed from option → others, delete old options
-                $question->options()->delete();
             }
+
+            // -------- Delete removed questions --------
+            PollQuestion::where('poll_id', $poll->id)
+                ->whereNotIn('id', $keptQuestionIds)
+                ->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('polls.index')
+                ->with('success', 'Poll updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors($e->getMessage());
         }
-
-        // -------- Delete removed questions --------
-        PollQuestion::where('poll_id', $poll->id)
-            ->whereNotIn('id', $keptQuestionIds)
-            ->delete();
-
-        DB::commit();
-
-        return redirect()
-            ->route('polls.index')
-            ->with('success', 'Poll updated successfully.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->withErrors($e->getMessage());
     }
-}
     public function destroy($id)
     {
         $poll = Poll::findOrFail($id);
@@ -240,7 +239,7 @@ class PollController extends Controller
     }
     public function responses(Request $request, Poll $poll)
     {
-        $query = PollAnswer::with(['question.poll', 'user'])
+        $query = PollAnswer::with(['question.poll', 'question.options', 'user'])
             ->whereHas('question.poll', function ($q) use ($poll) {
                 $q->where('id', $poll->id);
             });
@@ -277,6 +276,7 @@ class PollController extends Controller
 
         $polls = Poll::with([
             'event',
+            'questions.options',
             'questions.answers.user'
         ])
             ->whereHas('questions.answers')
@@ -294,7 +294,8 @@ class PollController extends Controller
     {
         $poll->load([
             'event',
-            'questions.answers.user'
+            'questions.answers.user',
+            'questions.options'
         ]);
 
         return response()->json([
@@ -304,7 +305,10 @@ class PollController extends Controller
     }
     public function getQuestionAnswers(PollQuestion $question)
     {
-        $question->load('answers.user');
+        $question->load([
+            'answers.user',
+            'answers.option'
+        ]);
 
         return response()->json([
             'success' => true,

@@ -16,6 +16,10 @@
         --amber-bg: #fffbeb;
         --amber-fg: #d97706;
         --subtle: #f8f9fb;
+        --red-bg: #fff1f2;
+        --red-fg: #e11d48;
+        --purple-bg: #f5f3ff;
+        --purple-fg: #7c3aed;
     }
 
     /* ── Layout ── */
@@ -316,10 +320,11 @@
         display: inline-flex;
         align-items: center;
         gap: .3rem;
-        padding: .22rem .65rem;
+        padding: .25rem .65rem;
         border-radius: 7px;
         font-size: .75rem;
         font-weight: 600;
+        line-height: 1.4;
     }
 
     .ap-ans-badge.yes {
@@ -328,8 +333,8 @@
     }
 
     .ap-ans-badge.no {
-        background: #fff1f2;
-        color: #e11d48;
+        background: var(--red-bg);
+        color: var(--red-fg);
     }
 
     .ap-ans-badge.star {
@@ -343,8 +348,12 @@
         font-weight: 400;
         max-width: 180px;
         white-space: normal;
-        border-radius: 7px;
         line-height: 1.35;
+    }
+
+    .ap-ans-badge.opt {
+        background: var(--purple-bg);
+        color: var(--purple-fg);
     }
 
     /* ── User ── */
@@ -453,173 +462,421 @@
         color: var(--muted);
     }
 
-    /* ══ MODAL ══ */
+    /* ══════════════════════════════════════════
+       MODAL — redesigned
+    ══════════════════════════════════════════ */
     .ap-modal .modal-content {
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, .13);
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 24px 72px rgba(0, 0, 0, .18);
         overflow: hidden;
+        background: var(--surface);
     }
 
+    /* Header */
     .ap-modal .modal-header {
-        background: var(--subtle);
+        background: var(--surface);
         border-bottom: 1px solid var(--border);
-        padding: 1.1rem 1.4rem;
+        padding: 1.15rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    .am-header-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--accent-lt);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
     .ap-modal .modal-title {
         font-weight: 700;
-        font-size: 1rem;
+        font-size: .95rem;
         color: var(--text);
+        flex: 1;
+        margin: 0;
+        line-height: 1.3;
     }
 
+    .am-title-sub {
+        font-size: .72rem;
+        color: var(--muted);
+        font-weight: 400;
+        margin-top: 1px;
+    }
+
+    .ap-modal .btn-close {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        opacity: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s;
+        flex-shrink: 0;
+        font-size: .65rem;
+    }
+
+    .ap-modal .btn-close:hover {
+        background: var(--border);
+    }
+
+    /* Body */
     .ap-modal .modal-body {
-        padding: 1.4rem;
+        padding: 0;
+        background: var(--bg);
+        max-height: 68vh;
+        overflow-y: auto;
     }
 
-    .modal-poll-title {
-        font-size: 1.05rem;
+    /* Poll info strip */
+    .am-poll-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 1.5rem;
+    }
+
+    .am-poll-strip-title {
+        font-size: .92rem;
         font-weight: 700;
         color: var(--text);
         margin-bottom: .25rem;
     }
 
-    .modal-poll-event {
+    .am-poll-strip-event {
         display: inline-flex;
         align-items: center;
         gap: .35rem;
-        font-size: .78rem;
+        font-size: .77rem;
         color: var(--muted);
     }
 
-    .modal-divider {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 1rem 0;
+    /* Stats bar */
+    .am-stats-bar {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .7rem 1.5rem;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
     }
 
-    .modal-question {
-        background: var(--bg);
-        border-radius: 10px;
-        padding: .65rem 1rem;
-        margin-bottom: .6rem;
-        font-size: .82rem;
-        font-weight: 700;
-        color: var(--text);
+    .am-stat-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .25rem .7rem;
+        border-radius: 7px;
+        font-size: .72rem;
+        font-weight: 600;
+    }
+
+    .am-stat-chip.total {
+        background: var(--accent-lt);
+        color: var(--accent);
+    }
+
+    .am-stat-chip.qcount {
+        background: var(--green-bg);
+        color: var(--green-fg);
+    }
+
+    /* Questions list */
+    .am-body-wrap {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Question block */
+    .am-question-block {
+        margin-bottom: 1.25rem;
+    }
+
+    .am-question-block:last-child {
+        margin-bottom: 0;
+    }
+
+    .am-q-head {
         display: flex;
         align-items: flex-start;
-        gap: .5rem;
+        gap: .6rem;
+        padding: .8rem 1rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px 10px 0 0;
+        border-bottom: none;
     }
 
-    .modal-question-num {
-        flex-shrink: 0;
+    .am-q-num {
         width: 22px;
         height: 22px;
         border-radius: 6px;
         background: var(--accent);
         color: #fff;
-        font-size: .64rem;
+        font-size: .65rem;
         font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
     }
 
-    .modal-answer {
+    .am-q-text {
+        font-size: .84rem;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.45;
+        flex: 1;
+    }
+
+    .am-q-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        padding: .18rem .55rem;
+        border-radius: 5px;
+        font-size: .68rem;
+        font-weight: 600;
+        background: var(--purple-bg);
+        color: var(--purple-fg);
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    /* Answer rows under question */
+    .am-answers-list {
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+        background: var(--surface);
+    }
+
+    .am-answer {
         display: flex;
         align-items: flex-start;
         gap: .75rem;
-        padding: .75rem 1rem;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        margin-bottom: .5rem;
+        padding: .8rem 1rem;
+        border-bottom: 1px solid var(--border);
+        transition: background .1s;
     }
 
-    .modal-avatar {
-        width: 30px;
-        height: 30px;
+    .am-answer:last-child {
+        border-bottom: none;
+    }
+
+    .am-answer:hover {
+        background: var(--subtle);
+    }
+
+    /* Avatar */
+    .am-avatar {
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
-        background: var(--accent);
         color: #fff;
-        font-size: .64rem;
+        font-size: .66rem;
         font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         text-transform: uppercase;
+        letter-spacing: .03em;
     }
 
-    .modal-avatar.guest {
+    .am-avatar.guest {
         background: #e5e7eb;
         color: var(--muted);
     }
 
-    .modal-answer-user {
-        font-size: .78rem;
+    .am-avatar.av-1 {
+        background: #6366f1;
+    }
+
+    .am-avatar.av-2 {
+        background: #8b5cf6;
+    }
+
+    .am-avatar.av-3 {
+        background: #ec4899;
+    }
+
+    .am-avatar.av-4 {
+        background: #14b8a6;
+    }
+
+    .am-avatar.av-5 {
+        background: #f59e0b;
+    }
+
+    .am-avatar.av-6 {
+        background: #10b981;
+    }
+
+    .am-answer-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .am-user {
+        font-size: .8rem;
         font-weight: 600;
         color: var(--text);
-        margin-bottom: .2rem;
+        margin-bottom: .25rem;
     }
 
-    .modal-answer-val {
-        font-size: .81rem;
+    .am-val {
+        margin-bottom: .25rem;
     }
 
-    .modal-badge {
-        display: inline-flex;
+    .am-time {
+        font-size: .7rem;
+        color: var(--muted);
+        display: flex;
         align-items: center;
         gap: .3rem;
-        padding: .2rem .6rem;
-        border-radius: 6px;
-        font-size: .74rem;
-        font-weight: 600;
     }
 
-    .modal-badge.yes {
+    /* Modal answer badges */
+    .am-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .25rem .65rem;
+        border-radius: 7px;
+        font-size: .76rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .am-badge.yes {
         background: var(--green-bg);
         color: var(--green-fg);
     }
 
-    .modal-badge.no {
-        background: #fff1f2;
-        color: #e11d48;
+    .am-badge.no {
+        background: var(--red-bg);
+        color: var(--red-fg);
     }
 
-    .modal-badge.star {
+    .am-badge.star {
         background: var(--amber-bg);
         color: var(--amber-fg);
+        gap: .2rem;
     }
 
-    .modal-badge.txt {
+    .am-badge.txt {
         background: var(--accent-lt);
         color: var(--accent);
         font-weight: 400;
+        word-break: break-word;
+        white-space: normal;
+        font-size: .8rem;
     }
 
-    .modal-loading {
+    .am-badge.opt {
+        background: var(--purple-bg);
+        color: var(--purple-fg);
+    }
+
+    /* No-answers inside question block */
+    .am-no-answers {
+        padding: 1.5rem;
+        text-align: center;
+        font-size: .8rem;
+        color: var(--muted);
+    }
+
+    /* Loading */
+    .am-loading {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: .6rem;
-        padding: 3rem;
+        gap: .75rem;
+        padding: 4rem 1rem;
         color: var(--muted);
-        font-size: .88rem;
+        font-size: .85rem;
     }
 
-    .modal-spinner {
-        width: 18px;
-        height: 18px;
+    .am-spinner {
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        border: 2px solid var(--border);
+        border: 2.5px solid var(--border);
         border-top-color: var(--accent);
-        animation: spin .7s linear infinite;
+        animation: am-spin .7s linear infinite;
     }
 
-    @keyframes spin {
+    @keyframes am-spin {
         to {
             transform: rotate(360deg);
         }
+    }
+
+    /* Full empty state */
+    .am-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+    }
+
+    .am-empty-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: .9rem;
+    }
+
+    .am-empty-icon svg {
+        opacity: .35;
+    }
+
+    .am-empty-title {
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: .3rem;
+        font-size: .92rem;
+    }
+
+    .am-empty-sub {
+        font-size: .8rem;
+        color: var(--muted);
+    }
+
+    /* Row entrance */
+    @keyframes amIn {
+        from {
+            opacity: 0;
+            transform: translateY(4px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    .am-answer {
+        animation: amIn .16s ease both;
     }
 
     @media (max-width: 600px) {
@@ -631,6 +888,10 @@
         .ap-select {
             width: 100%;
             min-width: unset;
+        }
+
+        .am-body-wrap {
+            padding: .75rem;
         }
     }
 </style>
@@ -715,21 +976,27 @@
                         @php
                         $name = $answer->user->name ?? 'Guest';
                         $isGuest = !$answer->user;
-                        $initials = $isGuest ? '?' : collect(explode(' ', $name))->map(fn($w) => mb_strtoupper(mb_substr($w,0,1)))->take(2)->implode('');
-
-                        if ($answer->text_answer) {
-                        $ansType = 'txt';
-                        $ansLabel = $answer->text_answer;
-                        } elseif (!is_null($answer->yes_no_answer)) {
-                        $ansType = $answer->yes_no_answer ? 'yes' : 'no';
-                        $ansLabel = $answer->yes_no_answer ? 'Yes' : 'No';
-                        } elseif ($answer->rating_answer) {
-                        $ansType = 'star';
-                        $ansLabel = '⭐ ' . $answer->rating_answer;
-                        } else {
-                        $ansType = '';
-                        $ansLabel = '—';
-                        }
+                        $initials = $isGuest
+                        ? '?'
+                        : collect(explode(' ', $name))
+                        ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1)))
+                        ->take(2)
+                        ->implode('');
+                        $type = $question->type;
+                        $ansLabel = match($type) {
+                        'text' => $answer->text_answer,
+                        'yes_no' => ($answer->yes_no_answer ? 'Yes' : 'No'),
+                        'rating' => $answer->rating_answer . ' / ' . $question->rating_scale,
+                        'option' => $question->options->firstWhere('id', $answer->option_id)->option_text ?? 'N/A',
+                        default => null,
+                        };
+                        $badgeClass = match($type) {
+                        'text' => 'txt',
+                        'yes_no' => ($answer->yes_no_answer ? 'yes' : 'no'),
+                        'rating' => 'star',
+                        'option' => 'opt',
+                        default => '',
+                        };
                         @endphp
                         <tr>
                             <td style="text-align:center">
@@ -755,8 +1022,13 @@
                             </td>
 
                             <td>
-                                @if($ansType)
-                                <span class="ap-ans-badge {{ $ansType }}">{{ $ansLabel }}</span>
+                                @if($ansLabel !== null && $badgeClass !== '')
+                                <span class="ap-ans-badge {{ $badgeClass }}">
+                                    @if($type === 'rating')
+                                    ⭐
+                                    @endif
+                                    {{ $ansLabel }}
+                                </span>
                                 @else
                                 <span style="color:#d1d5db">—</span>
                                 @endif
@@ -812,19 +1084,36 @@
 </div>
 
 {{-- Modal --}}
-<div class="modal fade ap-modal" id="responsesModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal fade ap-modal" id="responsesModal" tabindex="-1" aria-labelledby="responsesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
+
+            {{-- Header --}}
             <div class="modal-header">
-                <h5 class="modal-title">Poll Responses</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="am-header-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                </div>
+                <div style="flex:1;">
+                    <h5 class="modal-title" id="responsesModalLabel">Poll Responses</h5>
+                    <div class="am-title-sub" id="am-modal-sub">Loading…</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M1 1l12 12M13 1L1 13" />
+                    </svg>
+                </button>
             </div>
+
+            {{-- Body --}}
             <div class="modal-body" id="modalContent">
-                <div class="modal-loading">
-                    <div class="modal-spinner"></div>
+                <div class="am-loading">
+                    <div class="am-spinner"></div>
                     Loading responses…
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -835,15 +1124,79 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
+        const avatarColors = ['av-1', 'av-2', 'av-3', 'av-4', 'av-5', 'av-6'];
+
+        function initials(name) {
+            return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function avatarClass(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return avatarColors[Math.abs(hash) % avatarColors.length];
+        }
+
+        function formatDate(str) {
+            const d = new Date(str);
+            return d.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                }) +
+                ' · ' +
+                d.toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+        }
+
+        function answerBadge(answer, question) {
+
+            if (question.type === 'text' && answer.text_answer) {
+                return `<span class="am-badge txt">${answer.text_answer}</span>`;
+            }
+
+            if (question.type === 'yes_no' && answer.yes_no_answer !== null) {
+                return answer.yes_no_answer ?
+                    `<span class="am-badge yes">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    Yes</span>` :
+                    `<span class="am-badge no">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    No</span>`;
+            }
+
+            if (question.type === 'rating' && answer.rating_answer) {
+                const scale = question.rating_scale ?? 5;
+                const val = answer.rating_answer;
+                let stars = '';
+                for (let i = 1; i <= scale; i++) {
+                    stars += `<svg width="11" height="11" viewBox="0 0 24 24" fill="${i <= val ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>`;
+                }
+                return `<span class="am-badge star">${stars}<span style="margin-left:3px;">${val} / ${scale}</span></span>`;
+            }
+
+            if (question.type === 'option') {
+                const opt = question.options ? question.options.find(o => o.id === answer.option_id) : null;
+                return `<span class="am-badge opt">${opt?.option_text ?? 'N/A'}</span>`;
+            }
+
+            return `<span style="color:#d1d5db;font-size:.8rem;">—</span>`;
+        }
+
         document.querySelectorAll('.view-responses-btn').forEach(button => {
             button.addEventListener('click', function() {
 
                 const pollId = this.getAttribute('data-id');
                 const modalContent = document.getElementById('modalContent');
+                const modalSubtitle = document.getElementById('am-modal-sub');
 
+                modalSubtitle.textContent = 'Loading…';
                 modalContent.innerHTML = `
-                <div class="modal-loading">
-                    <div class="modal-spinner"></div>
+                <div class="am-loading">
+                    <div class="am-spinner"></div>
                     Loading responses…
                 </div>`;
 
@@ -855,83 +1208,128 @@
                     .then(data => {
 
                         if (!data.success) {
-                            modalContent.innerHTML = `<p class="text-center text-muted py-4">Could not load responses.</p>`;
+                            modalSubtitle.textContent = 'Error';
+                            modalContent.innerHTML = `
+                            <div class="am-empty">
+                                <div class="am-empty-icon">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                                </div>
+                                <div class="am-empty-title">Could not load responses</div>
+                                <div class="am-empty-sub">Please try again or refresh the page.</div>
+                            </div>`;
                             return;
                         }
 
                         const poll = data.poll;
 
-                        function initials(name) {
-                            return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        }
+                        // Count total answers
+                        let totalAnswers = 0;
+                        let answeredQuestions = 0;
+                        poll.questions.forEach(q => {
+                            if (q.answers && q.answers.length) {
+                                totalAnswers += q.answers.length;
+                                answeredQuestions++;
+                            }
+                        });
 
-                        function answerBadge(answer) {
-                            if (answer.text_answer)
-                                return `<span class="modal-badge txt">${answer.text_answer}</span>`;
-                            if (answer.yes_no_answer !== null && answer.yes_no_answer !== undefined)
-                                return answer.yes_no_answer ?
-                                    `<span class="modal-badge yes">✓ Yes</span>` :
-                                    `<span class="modal-badge no">✗ No</span>`;
-                            if (answer.rating_answer)
-                                return `<span class="modal-badge star">⭐ ${answer.rating_answer} / 5</span>`;
-                            return `<span style="color:#d1d5db">—</span>`;
-                        }
+                        modalSubtitle.textContent = poll.event?.title ?? 'No event';
 
                         let html = `
-                        <div class="modal-poll-title">${poll.title}</div>
-                        <span class="modal-poll-event">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                            ${poll.event?.title ?? 'No event'}
-                        </span>
-                        <hr class="modal-divider">
-                    `;
+                        <!-- Poll strip -->
+                        <div class="am-poll-strip">
+                            <div class="am-poll-strip-title">${poll.title}</div>
+                            <span class="am-poll-strip-event">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.55;flex-shrink:0;">
+                                    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                                </svg>
+                                ${poll.event?.title ?? 'No event'}
+                            </span>
+                        </div>
+
+                        <!-- Stats bar -->
+                        <div class="am-stats-bar">
+                            <span class="am-stat-chip total">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                                ${totalAnswers} ${totalAnswers === 1 ? 'Response' : 'Responses'}
+                            </span>
+                            <span class="am-stat-chip qcount">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                                ${poll.questions.length} ${poll.questions.length === 1 ? 'Question' : 'Questions'}
+                            </span>
+                        </div>
+
+                        <!-- Questions -->
+                        <div class="am-body-wrap">`;
 
                         let hasAny = false;
 
                         poll.questions.forEach((question, qi) => {
-                            if (!question.answers.length) return;
                             hasAny = true;
+                            const qType = question.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
                             html += `
-                            <div class="modal-question">
-                                <div class="modal-question-num">${qi + 1}</div>
-                                <div>${question.question}</div>
-                            </div>
-                        `;
-
-                            question.answers.forEach(answer => {
-                                const name = answer.user?.name ?? 'Guest';
-                                const isGuest = !answer.user;
-                                const ini = isGuest ? '?' : initials(name);
-
-                                html += `
-                                <div class="modal-answer">
-                                    <div class="modal-avatar ${isGuest ? 'guest' : ''}">${ini}</div>
-                                    <div>
-                                        <div class="modal-answer-user">${name}</div>
-                                        <div class="modal-answer-val">${answerBadge(answer)}</div>
-                                    </div>
+                            <div class="am-question-block">
+                                <div class="am-q-head">
+                                    <div class="am-q-num">${qi + 1}</div>
+                                    <div class="am-q-text">${question.question}</div>
+                                    <div class="am-q-badge">${qType}</div>
                                 </div>
-                            `;
-                            });
+                                <div class="am-answers-list">`;
+
+                            if (!question.answers || !question.answers.length) {
+                                html += `<div class="am-no-answers">No responses for this question yet.</div>`;
+                            } else {
+                                question.answers.forEach((answer, ai) => {
+                                    const name = answer.user?.name ?? 'Guest';
+                                    const isGuest = !answer.user;
+                                    const ini = isGuest ? '?' : initials(name);
+                                    const avClass = isGuest ? 'guest' : avatarClass(name);
+                                    const dateStr = formatDate(answer.created_at);
+
+                                    html += `
+                                    <div class="am-answer" style="animation-delay:${ai * 25}ms;">
+                                        <div class="am-avatar ${avClass}">${ini}</div>
+                                        <div class="am-answer-body">
+                                            <div class="am-user">${name}</div>
+                                            <div class="am-val">${answerBadge(answer, question)}</div>
+                                            <div class="am-time">
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.55;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                                ${dateStr}
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                });
+                            }
+
+                            html += `</div></div>`; // close am-answers-list + am-question-block
                         });
 
                         if (!hasAny) {
                             html += `
-                            <div class="ap-empty">
-                                <div class="ap-empty-icon" style="margin:0 auto 1rem">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            <div class="am-empty">
+                                <div class="am-empty-icon">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                                 </div>
-                                <div class="ap-empty-title">No answers yet</div>
-                                <div class="ap-empty-sub">This poll hasn't received any responses.</div>
+                                <div class="am-empty-title">No responses yet</div>
+                                <div class="am-empty-sub">This poll hasn't received any answers.</div>
                             </div>`;
                         }
+
+                        html += `</div>`; // close am-body-wrap
 
                         modalContent.innerHTML = html;
                     })
                     .catch(err => {
                         console.error('Fetch error:', err);
-                        modalContent.innerHTML = `<p class="text-center text-muted py-4">Something went wrong.</p>`;
+                        modalSubtitle.textContent = 'Error';
+                        modalContent.innerHTML = `
+                        <div class="am-empty">
+                            <div class="am-empty-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                            </div>
+                            <div class="am-empty-title">Something went wrong</div>
+                            <div class="am-empty-sub">Unable to fetch responses. Please try again.</div>
+                        </div>`;
                     });
             });
         });
