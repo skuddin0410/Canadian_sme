@@ -5,7 +5,7 @@
 @section('content')
 <style>
     .poll-shell {
-        width:100%;
+        width: 100%;
         margin: 0 auto;
     }
 
@@ -76,6 +76,7 @@
     }
 
     @media (max-width: 576px) {
+
         .poll-card .card-header,
         .poll-card .card-body {
             padding-left: 1rem;
@@ -103,7 +104,18 @@
 
                     @csrf
                     @if(isset($poll))
-                    @method('PUT')
+                        @method('PUT')
+                    @endif
+
+                    {{-- Validation errors --}}
+                    @if($errors->any())
+                    <div class="alert alert-danger mb-4">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                     @endif
 
                     <div class="poll-section mb-4">
@@ -111,13 +123,30 @@
 
                         {{-- Event --}}
                         <div class="mb-3">
-                            <label class="form-label">Event</label>
+                            <label class="form-label">Event <span class="text-danger">*</span></label>
                             <select name="event_id" class="form-select" required>
                                 <option value="">Select Event</option>
                                 @foreach($events as $event)
                                 <option value="{{ $event->id }}"
-                                    {{ isset($poll) && $poll->event_id == $event->id ? 'selected' : '' }}>
+                                    {{ (isset($poll) && $poll->event_id == $event->id) || old('event_id') == $event->id ? 'selected' : '' }}>
                                     {{ $event->title }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{--
+                            FIX: store() accepts event_session_id (nullable|exists:sessions,id)
+                            — field was missing from the blade entirely
+                        --}}
+                        <div class="mb-3">
+                            <label class="form-label">Session <span class="text-muted">(optional)</span></label>
+                            <select name="event_session_id" class="form-select">
+                                <option value="">Select Session</option>
+                                @foreach($sessions ?? [] as $session)
+                                <option value="{{ $session->id }}"
+                                    {{ (isset($poll) && $poll->event_session_id == $session->id) || old('event_session_id') == $session->id ? 'selected' : '' }}>
+                                    {{ $session->title }}
                                 </option>
                                 @endforeach
                             </select>
@@ -125,12 +154,12 @@
 
                         {{-- Poll Title --}}
                         <div class="mb-3">
-                            <label class="form-label">Poll Title</label>
+                            <label class="form-label">Poll Title <span class="text-danger">*</span></label>
                             <input type="text"
                                 name="title"
                                 class="form-control"
                                 placeholder="Enter a clear poll title"
-                                value="{{ isset($poll) ? $poll->title : '' }}"
+                                value="{{ old('title', isset($poll) ? $poll->title : '') }}"
                                 required>
                         </div>
 
@@ -141,9 +170,7 @@
                                 <input type="datetime-local"
                                     name="start_date"
                                     class="form-control"
-                                    value="{{ isset($poll) && $poll->start_date
-                                            ? $poll->start_date->format('Y-m-d\TH:i')
-                                            : '' }}">
+                                    value="{{ old('start_date', isset($poll) && $poll->start_date ? $poll->start_date->format('Y-m-d\TH:i') : '') }}">
                             </div>
 
                             <div class="col-md-6">
@@ -151,16 +178,14 @@
                                 <input type="datetime-local"
                                     name="end_date"
                                     class="form-control"
-                                    value="{{ isset($poll) && $poll->end_date
-                                            ? $poll->end_date->format('Y-m-d\TH:i')
-                                            : '' }}">
+                                    value="{{ old('end_date', isset($poll) && $poll->end_date ? $poll->end_date->format('Y-m-d\TH:i') : '') }}">
                             </div>
                         </div>
                     </div>
 
                     <div class="poll-section">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h6 class="mb-0">Questions</h6>
+                            <h6 class="mb-0">Questions <span class="text-danger">*</span></h6>
                             <button type="button" id="add-question" class="btn btn-secondary">
                                 <i class="fas fa-plus me-1"></i>Add Question
                             </button>
@@ -169,94 +194,125 @@
                         <div id="questions-wrapper">
                             @if(isset($poll) && $poll->questions->count())
 
-                            @foreach($poll->questions as $index => $question)
-                            <div class="question-item card mb-3 p-3">
-                                <div class="question-meta">
-                                    <span class="question-badge question-number">{{ $index + 1 }}</span>
-                                    <span class="text-muted small fw-semibold">Question Block</span>
-                                    <button type="button"
-                                        class="btn btn-sm btn-danger remove-question ms-auto"
-                                        aria-label="Remove question">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                                @foreach($poll->questions as $index => $question)
+                                <div class="question-item card mb-3 p-3" data-index="{{ $index }}">
 
-                                <input type="hidden"
-                                    name="questions[{{ $index }}][id]"
-                                    value="{{ $question->id }}">
+                                    <div class="question-meta">
+                                        <span class="question-badge question-number">{{ $index + 1 }}</span>
+                                        <button type="button" class="btn btn-sm btn-danger remove-question ms-auto">&times;</button>
+                                    </div>
 
-                                <div class="mb-2">
-                                    <label class="form-label">Question</label>
-                                    <input type="text"
-                                        name="questions[{{ $index }}][question]"
-                                        value="{{ $question->question }}"
-                                        class="form-control"
-                                        required>
-                                </div>
+                                    {{-- FIX: preserve question id for update --}}
+                                    <input type="hidden" name="questions[{{ $index }}][id]" value="{{ $question->id }}">
 
-                                <div class="mb-2">
-                                    <label class="form-label">Type</label>
-                                    <select name="questions[{{ $index }}][type]"
-                                        class="form-select type-select">
-                                        <option value="text" {{ $question->type=='text'?'selected':'' }}>Text</option>
-                                        <option value="yes_no" {{ $question->type=='yes_no'?'selected':'' }}>Yes / No</option>
-                                        <option value="rating" {{ $question->type=='rating'?'selected':'' }}>Rating</option>
-                                    </select>
-                                </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Question</label>
+                                        <input type="text"
+                                            class="form-control question-input"
+                                            name="questions[{{ $index }}][question]"
+                                            value="{{ old('questions.'.$index.'.question', $question->question) }}"
+                                            required>
+                                    </div>
 
-                                <div class="mb-0 rating-wrapper"
-                                    style="{{ $question->type == 'rating' ? '' : 'display:none;' }}">
-                                    <label class="form-label">Rating Scale</label>
-                                    <input type="number"
-                                        name="questions[{{ $index }}][rating_scale]"
-                                        value="{{ $question->rating_scale }}"
-                                        class="form-control"
-                                        placeholder="e.g. 5">
+                                    <div class="mb-2">
+                                        <label class="form-label">Type</label>
+                                        <select class="form-select type-select"
+                                            name="questions[{{ $index }}][type]">
+                                            <option value="text"    {{ $question->type == 'text'    ? 'selected' : '' }}>Text</option>
+                                            <option value="yes_no"  {{ $question->type == 'yes_no'  ? 'selected' : '' }}>Yes / No</option>
+                                            <option value="option"  {{ $question->type == 'option'  ? 'selected' : '' }}>MCQ</option>
+                                            <option value="rating"  {{ $question->type == 'rating'  ? 'selected' : '' }}>Rating</option>
+                                        </select>
+                                    </div>
+
+                                    {{--
+                                        FIX: store() validates rating_scale as integer|in:5
+                                        — value locked to 5, input is readonly to match validation
+                                    --}}
+                                    <div class="rating-wrapper mb-2" style="{{ $question->type == 'rating' ? '' : 'display:none' }}">
+                                        <label class="form-label">Rating Scale</label>
+                                        <input type="number"
+                                            class="form-control rating-input"
+                                            name="questions[{{ $index }}][rating_scale]"
+                                            value="5"
+                                            readonly>
+                                        <small class="text-muted">Scale is fixed at 5 stars.</small>
+                                    </div>
+
+                                    {{--
+                                        FIX: options validated as array|min:2
+                                        — at least 2 options must be present for MCQ
+                                    --}}
+                                    <div class="option-wrapper" style="{{ $question->type == 'option' ? '' : 'display:none' }}">
+                                        <label class="form-label">Options <span class="text-danger">*</span> <small class="text-muted">(min 2)</small></label>
+                                        <div class="options-container">
+                                            @foreach($question->options as $opt)
+                                            <div class="input-group mb-2 option-input">
+                                                <input type="text"
+                                                    class="form-control option-text"
+                                                    name="questions[{{ $index }}][options][]"
+                                                    value="{{ $opt->option_text }}"
+                                                    placeholder="Option text"
+                                                    required>
+                                                <button type="button" class="btn btn-danger remove-option">&times;</button>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-primary add-option mt-2">
+                                            + Add Option
+                                        </button>
+                                    </div>
+
                                 </div>
-                            </div>
-                            @endforeach
+                                @endforeach
 
                             @else
-
-                            {{-- Default First Question --}}
-                            <div class="question-item card mb-3 p-3">
+                            {{--
+                                FIX: default first question now has proper name attributes
+                                so form submission works even without JS adding extra questions
+                            --}}
+                            <div class="question-item card mb-3 p-3" data-index="0">
                                 <div class="question-meta">
                                     <span class="question-badge question-number">1</span>
-                                    <span class="text-muted small fw-semibold">Question Block</span>
-                                    <button type="button"
-                                        class="btn btn-sm btn-danger remove-question ms-auto"
-                                        aria-label="Remove question">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger remove-question ms-auto">&times;</button>
                                 </div>
 
                                 <div class="mb-2">
                                     <label class="form-label">Question</label>
                                     <input type="text"
+                                        class="form-control question-input"
                                         name="questions[0][question]"
-                                        class="form-control"
                                         required>
                                 </div>
 
                                 <div class="mb-2">
                                     <label class="form-label">Type</label>
-                                    <select name="questions[0][type]"
-                                        class="form-select type-select">
+                                    <select class="form-select type-select" name="questions[0][type]">
                                         <option value="text">Text</option>
                                         <option value="yes_no">Yes / No</option>
+                                        <option value="option">MCQ</option>
                                         <option value="rating">Rating</option>
                                     </select>
                                 </div>
 
-                                <div class="mb-0 rating-wrapper" style="display:none;">
+                                <div class="rating-wrapper mb-2" style="display:none">
                                     <label class="form-label">Rating Scale</label>
                                     <input type="number"
+                                        class="form-control rating-input"
                                         name="questions[0][rating_scale]"
-                                        class="form-control"
-                                        placeholder="e.g. 5">
+                                        value="5"
+                                        readonly>
+                                    <small class="text-muted">Scale is fixed at 5 stars.</small>
+                                </div>
+
+                                <div class="option-wrapper" style="display:none">
+                                    <label class="form-label">Options <span class="text-danger">*</span> <small class="text-muted">(min 2)</small></label>
+                                    <div class="options-container"></div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary add-option mt-2">
+                                        + Add Option
+                                    </button>
                                 </div>
                             </div>
-
                             @endif
                         </div>
                     </div>
@@ -278,94 +334,180 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const wrapper = document.getElementById('questions-wrapper');
-        const addBtn = document.getElementById('add-question');
-        let questionIndex = wrapper.querySelectorAll('.question-item').length;
+document.addEventListener('DOMContentLoaded', function () {
 
-        function refreshQuestionNumbers() {
-            const items = wrapper.querySelectorAll('.question-item');
-            items.forEach((item, idx) => {
-                const number = item.querySelector('.question-number');
-                if (number) {
-                    number.textContent = idx + 1;
-                }
+    const wrapper = document.getElementById('questions-wrapper');
+    const addBtn  = document.getElementById('add-question');
+
+    // ---------- Helpers ----------
+
+    function questionItems() {
+        return wrapper.querySelectorAll('.question-item');
+    }
+
+    function refreshNumbers() {
+        questionItems().forEach((q, i) => {
+            q.querySelector('.question-number').innerText = i + 1;
+        });
+    }
+
+    function toggleUI(item, type) {
+        item.querySelector('.rating-wrapper').style.display =
+            type === 'rating' ? 'block' : 'none';
+        item.querySelector('.option-wrapper').style.display =
+            type === 'option' ? 'block' : 'none';
+    }
+
+    // ---------- Question Template ----------
+
+    function questionHTML(index) {
+        return `
+        <div class="question-item card mb-3 p-3" data-index="${index}">
+            <div class="question-meta d-flex align-items-center">
+                <span class="question-badge question-number"></span>
+                <button type="button" class="btn btn-sm btn-danger remove-question ms-auto">&times;</button>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Question</label>
+                <input type="text"
+                       class="form-control question-input"
+                       name="questions[${index}][question]"
+                       required>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Type</label>
+                <select class="form-select type-select"
+                        name="questions[${index}][type]">
+                    <option value="text">Text</option>
+                    <option value="yes_no">Yes / No</option>
+                    <option value="option">MCQ</option>
+                    <option value="rating">Rating</option>
+                </select>
+            </div>
+
+            <div class="rating-wrapper mb-2" style="display:none">
+                <label class="form-label">Rating Scale</label>
+                <input type="number"
+                       class="form-control rating-input"
+                       name="questions[${index}][rating_scale]"
+                       value="5"
+                       readonly>
+                <small class="text-muted">Scale is fixed at 5 stars.</small>
+            </div>
+
+            <div class="option-wrapper" style="display:none">
+                <label class="form-label">Options <span class="text-danger">*</span> <small class="text-muted">(min 2)</small></label>
+                <div class="options-container"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary add-option mt-2">
+                    + Add Option
+                </button>
+            </div>
+        </div>`;
+    }
+
+    // ---------- Reindex All ----------
+
+    function reIndexAllQuestions() {
+        questionItems().forEach((item, i) => {
+
+            item.dataset.index = i;
+
+            item.querySelector('.question-input')
+                .setAttribute('name', `questions[${i}][question]`);
+
+            item.querySelector('.type-select')
+                .setAttribute('name', `questions[${i}][type]`);
+
+            item.querySelector('.rating-input')
+                .setAttribute('name', `questions[${i}][rating_scale]`);
+
+            item.querySelectorAll('.option-text').forEach(opt => {
+                opt.setAttribute('name', `questions[${i}][options][]`);
             });
+
+            // preserve hidden id field if present (edit mode)
+            const idField = item.querySelector('input[name^="questions"][name$="[id]"]');
+            if (idField) {
+                idField.setAttribute('name', `questions[${i}][id]`);
+            }
+        });
+
+        refreshNumbers();
+    }
+
+    // ---------- Add Question ----------
+
+    addBtn.addEventListener('click', () => {
+        const index = questionItems().length;
+        wrapper.insertAdjacentHTML('beforeend', questionHTML(index));
+        refreshNumbers();
+    });
+
+    // ---------- Remove Question ----------
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.remove-question')) {
+
+            if (questionItems().length <= 1) {
+                alert('At least one question is required.');
+                return;
+            }
+
+            e.target.closest('.question-item').remove();
+            reIndexAllQuestions();
+        }
+    });
+
+    // ---------- Type Change ----------
+
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('type-select')) {
+            toggleUI(
+                e.target.closest('.question-item'),
+                e.target.value
+            );
+        }
+    });
+
+    // ---------- Add / Remove Option ----------
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target.classList.contains('add-option')) {
+            const questionItem = e.target.closest('.question-item');
+            const index        = questionItem.dataset.index;
+            const box          = questionItem.querySelector('.options-container');
+
+            box.insertAdjacentHTML('beforeend', `
+                <div class="input-group mb-2 option-input">
+                    <input type="text"
+                           class="form-control option-text"
+                           name="questions[${index}][options][]"
+                           placeholder="Option text"
+                           required>
+                    <button type="button" class="btn btn-danger remove-option">&times;</button>
+                </div>
+            `);
         }
 
-        // Add Question
-        addBtn.addEventListener('click', function() {
-            const html = `
-            <div class="question-item card mb-3 p-3">
-                <div class="question-meta">
-                    <span class="question-badge question-number">${wrapper.querySelectorAll('.question-item').length + 1}</span>
-                    <span class="text-muted small fw-semibold">Question Block</span>
-                    <button type="button"
-                        class="btn btn-sm btn-danger remove-question ms-auto"
-                        aria-label="Remove question">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label">Question</label>
-                    <input type="text"
-                        name="questions[${questionIndex}][question]"
-                        class="form-control"
-                        required>
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label">Type</label>
-                    <select name="questions[${questionIndex}][type]"
-                        class="form-select type-select">
-                        <option value="text">Text</option>
-                        <option value="yes_no">Yes / No</option>
-                        <option value="rating">Rating</option>
-                    </select>
-                </div>
-
-                <div class="mb-0 rating-wrapper" style="display:none;">
-                    <label class="form-label">Rating Scale</label>
-                    <input type="number"
-                        name="questions[${questionIndex}][rating_scale]"
-                        class="form-control"
-                        placeholder="e.g. 5">
-                </div>
-            </div>`;
-
-            wrapper.insertAdjacentHTML('beforeend', html);
-            questionIndex++;
-            refreshQuestionNumbers();
-        });
-
-        // Remove Question
-        document.addEventListener('click', function(e) {
-            const removeBtn = e.target.closest('.remove-question');
-            if (removeBtn) {
-                const items = wrapper.querySelectorAll('.question-item');
-                if (items.length <= 1) {
-                    alert('At least one question is required.');
-                    return;
-                }
-                removeBtn.closest('.question-item').remove();
-                refreshQuestionNumbers();
+        if (e.target.classList.contains('remove-option')) {
+            const container = e.target.closest('.option-wrapper')
+                                      .querySelector('.options-container');
+            // FIX: prevent removing below min:2 for MCQ
+            if (container.querySelectorAll('.option-input').length <= 2) {
+                alert('MCQ requires at least 2 options.');
+                return;
             }
-        });
-
-        // Toggle rating field
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('type-select')) {
-                const ratingWrapper = e.target
-                    .closest('.question-item')
-                    .querySelector('.rating-wrapper');
-
-                ratingWrapper.style.display =
-                    e.target.value === 'rating' ? 'block' : 'none';
-            }
-        });
-
-        refreshQuestionNumbers();
+            e.target.closest('.option-input').remove();
+        }
     });
+
+    // ---------- Initial Load ----------
+
+    refreshNumbers();
+
+});
 </script>
 @endsection

@@ -16,6 +16,7 @@ class NavbarDynamic extends Model
         'content',
         'status',
         'order_by',
+        'image'
     ];
 
     protected static function boot()

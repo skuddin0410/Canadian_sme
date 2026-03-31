@@ -25,7 +25,7 @@ class SubscriptionController extends Controller
         $users = User::whereHas("roles", function ($q) {
             $q->whereIn("name", ["Admin"]);
         })->where('id', '!=', 1)
-        ->get();
+            ->get();
         $events = Event::all();
         $pricings = Pricing::all();
         return view('subscription.create', compact('users', 'events', 'pricings'));
@@ -82,11 +82,22 @@ class SubscriptionController extends Controller
         $users = User::whereHas("roles", function ($q) {
             $q->whereIn("name", ["Admin"]);
         })->where('id', '!=', 1)
-        ->get();
+            ->get();
+        $monthsRemaining = null;
+
+        if ($subscription->expired_at) {
+            $monthsRemaining = round(now()->diffInMonths($subscription->expired_at, false));
+
+            // If expired already → set 0
+            if ($monthsRemaining < 0) {
+                $monthsRemaining = 0;
+            }
+        }
+
 
         $pricings = Pricing::all();
 
-        return view('subscription.edit', compact('subscription', 'users', 'pricings'));
+        return view('subscription.edit', compact('subscription', 'users', 'pricings', 'monthsRemaining'));
     }
     public function update(Request $request, $id)
     {
