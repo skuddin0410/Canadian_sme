@@ -5,6 +5,10 @@ Admin | Edit Navbar Item
 @endsection
 
 @section('content')
+@php
+    $previewHeaderHtml = view('partials_new.header', ['dynamicNavs' => $dynamicNavs ?? []])->render();
+    $previewFooterHtml = view('partials_new.footer')->render();
+@endphp
 <div class="container-xxl container-p-y">
 
     <h4 class="mb-4">Edit Page Builder</h4>
@@ -50,10 +54,10 @@ Admin | Edit Navbar Item
                     <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
                         <h5 class="mb-0">Page Builder</h5>
                         <div class="d-flex gap-2 flex-wrap">
-                            <button type="button" class="btn btn-sm btn-primary"   onclick="addSection('hero')">+ Hero</button>
+                            <!-- <button type="button" class="btn btn-sm btn-primary"   onclick="addSection('hero')">+ Hero</button> -->
                             <button type="button" class="btn btn-sm btn-secondary" onclick="addSection('text')">+ Text</button>
                             <button type="button" class="btn btn-sm btn-success"   onclick="addSection('image')">+ Image</button>
-                            <button type="button" class="btn btn-sm btn-warning"   onclick="addSection('cards')">+ Cards</button>
+                            <button type="button" class="btn btn-sm btn-warning"   onclick="addSection('cards')">+ Section</button>
                         </div>
                     </div>
 
@@ -79,11 +83,6 @@ Admin | Edit Navbar Item
                     Drag sections &amp; cards to reorder
                 </span>
             </span>
-            <div class="preview-device-toggle">
-                <button class="device-btn active" onclick="setDevice('desktop',this)" title="Desktop"><i class="fas fa-desktop"></i></button>
-                <button class="device-btn"        onclick="setDevice('tablet',this)"  title="Tablet"><i class="fas fa-tablet-alt"></i></button>
-                <button class="device-btn"        onclick="setDevice('mobile',this)"  title="Mobile"><i class="fas fa-mobile-alt"></i></button>
-            </div>
             <button class="btn btn-sm btn-link text-white" onclick="closePreviewModal()"><i class="fas fa-times"></i></button>
         </div>
         <div class="preview-modal-body">
@@ -101,12 +100,7 @@ Admin | Edit Navbar Item
 .preview-modal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:#1e1e2e;border-bottom:1px solid #2a2a3e;flex-shrink:0;height:52px;}
 .preview-modal-body{flex:1;display:flex;align-items:flex-start;justify-content:center;background:#1a1a2a;padding:20px;overflow:auto;}
 .preview-frame-wrap{width:100%;height:calc(100vh - 92px);display:flex;transition:max-width .3s ease;}
-.preview-frame-wrap.tablet{max-width:768px;margin:0 auto;}
-.preview-frame-wrap.mobile{max-width:390px;margin:0 auto;}
 #preview-modal-frame{width:100%;height:100%;border:none;border-radius:8px;box-shadow:0 8px 48px rgba(0,0,0,.5);background:#fff;}
-.preview-device-toggle{display:flex;gap:4px;}
-.device-btn{background:transparent;border:1px solid #3a3a5c;color:#94a3b8;border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:12px;transition:all .15s;display:flex;align-items:center;justify-content:center;}
-.device-btn:hover,.device-btn.active{background:#4361ee;border-color:#4361ee;color:#fff;}
 .preview-panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#e2e8f0;}
 .preview-dnd-tip{font-size:11px;font-weight:400;color:#64748b;}
 .preview-dot{width:8px;height:8px;border-radius:50%;background:#22d3ee;box-shadow:0 0 6px #22d3ee;animation:pulse-dot 2s infinite;}
@@ -153,6 +147,11 @@ let sections = @json(
 
 if (!Array.isArray(sections)) sections = [];
 let previewDebounce = null;
+const previewHeaderHtml = @json($previewHeaderHtml);
+const previewFooterHtml = @json($previewFooterHtml);
+const SECTION_WIDTH_OPTIONS = ['25', '30', '40', '50', '60', '70', '75', '100', 'auto'];
+const CARD_WIDTH_OPTIONS = ['25', '30', '40', '50', '60', '70', '75', '100', 'auto'];
+const HEIGHT_OPTIONS = ['auto', ...Array.from({ length: 20 }, (_, index) => `${(index + 1) * 50}px`)];
 
 function escHtml(str) {
     if (!str) return '';
@@ -172,6 +171,41 @@ function escPreview(str) {
         .replace(/"/g, '&quot;');
 }
 
+function normalizeWidthValue(value, fallback = '100') {
+    if (value === 'auto') return 'auto';
+    let normalized = parseFloat(value);
+    if (Number.isFinite(normalized)) return String(normalized);
+    return fallback;
+}
+
+function normalizeHeightValue(value, fallback = 'auto') {
+    if (!value || value === 'auto') return 'auto';
+    if (/^\d+px$/.test(String(value))) return String(value);
+    let normalized = parseInt(value, 10);
+    return Number.isFinite(normalized) ? `${normalized}px` : fallback;
+}
+
+function formatWidthStyle(value, fallback = '100') {
+    let normalized = normalizeWidthValue(value, fallback);
+    return normalized === 'auto' ? 'auto' : `${normalized}%`;
+}
+
+function renderWidthOptions(selectedValue, options = SECTION_WIDTH_OPTIONS) {
+    let normalized = normalizeWidthValue(selectedValue);
+    return options.map(option => {
+        let label = option === 'auto' ? 'Auto' : `${option}%`;
+        return `<option value="${option}" ${normalized === option ? 'selected' : ''}>${label}</option>`;
+    }).join('');
+}
+
+function renderHeightOptions(selectedValue) {
+    let normalized = normalizeHeightValue(selectedValue);
+    return HEIGHT_OPTIONS.map(option => {
+        let label = option === 'auto' ? 'Auto' : option;
+        return `<option value="${option}" ${normalized === option ? 'selected' : ''}>${label}</option>`;
+    }).join('');
+}
+
 function normalizeSections() {
     sections = sections.map(section => {
         section.data = section.data || {};
@@ -181,21 +215,23 @@ function normalizeSections() {
             section.data.textColor = section.data.textColor || '#1a1a2e';
             section.data.subtitleColor = section.data.subtitleColor || '#6b7280';
             section.data.alignment = section.data.alignment || 'center';
-            section.data.height = section.data.height || 'auto';
+            section.data.height = normalizeHeightValue(section.data.height || 'auto');
             section.data.btnText = section.data.btnText || '';
-            section.data.btnLink = section.data.btnLink || '#';
+            section.data.btnLink = section.data.btnLink || '';
             section.data.btnColor = section.data.btnColor || '#4361ee';
             section.data.btnTextColor = section.data.btnTextColor || '#ffffff';
             section.data.title = section.data.title || '';
             section.data.subtitle = section.data.subtitle || '';
+            section.data.sectionWidth = normalizeWidthValue(section.data.sectionWidth || '100');
         }
 
         if (section.type === 'text') {
             section.data.bg = section.data.bg || '#ffffff';
             section.data.textColor = section.data.textColor || '#374151';
             section.data.alignment = section.data.alignment || 'left';
-            section.data.height = section.data.height || 'auto';
+            section.data.height = normalizeHeightValue(section.data.height || 'auto');
             section.data.content = section.data.content || '';
+            section.data.sectionWidth = normalizeWidthValue(section.data.sectionWidth || '100');
         }
 
         if (section.type === 'image') {
@@ -204,8 +240,8 @@ function normalizeSections() {
             section.data.caption = section.data.caption || '';
             section.data.captionColor = section.data.captionColor || '#6b7280';
             section.data.alignment = section.data.alignment || 'center';
-            section.data.height = section.data.height || 'auto';
-            section.data.sectionWidth = parseInt(section.data.sectionWidth || 100, 10);
+            section.data.height = normalizeHeightValue(section.data.height || 'auto');
+            section.data.sectionWidth = normalizeWidthValue(section.data.sectionWidth || '100');
         }
 
         if (section.type === 'cards') {
@@ -213,9 +249,9 @@ function normalizeSections() {
             section.data.sectionTitle = section.data.sectionTitle || '';
             section.data.sectionTitleColor = section.data.sectionTitleColor || '#1a1a2e';
             section.data.columns = parseInt(section.data.columns || 3, 10);
-            section.data.sectionWidth = parseInt(section.data.sectionWidth || 100, 10);
+            section.data.sectionWidth = normalizeWidthValue(section.data.sectionWidth || '100');
             section.data.alignment = section.data.alignment || 'left';
-            section.data.height = section.data.height || 'auto';
+            section.data.height = normalizeHeightValue(section.data.height || 'auto');
             section.data.cards = Array.isArray(section.data.cards) ? section.data.cards : [];
 
             section.data.cards = section.data.cards.map(card => ({
@@ -229,12 +265,12 @@ function normalizeSections() {
                 caption: card.caption || '',
                 captionColor: card.captionColor || '#6b7280',
                 btnText: card.btnText || '',
-                btnLink: card.btnLink || '#',
+                btnLink: card.btnLink || '',
                 btnColor: card.btnColor || '#4361ee',
                 btnTextColor: card.btnTextColor || '#ffffff',
                 cardBg: card.cardBg || '#ffffff',
-                width: parseFloat(card.width || 33.333),
-                height: card.height || 'auto',
+                width: normalizeWidthValue(card.width || '33.333', '33.333'),
+                height: normalizeHeightValue(card.height || 'auto'),
                 alignment: card.alignment || 'left'
             }));
         }
@@ -341,7 +377,7 @@ function getDefaultCard(type) {
             caption: '',
             captionColor: '#6b7280',
             cardBg: '#ffffff',
-            width: 33.333,
+            width: '33.333',
             height: 'auto',
             alignment: 'center'
         };
@@ -356,11 +392,11 @@ function getDefaultCard(type) {
         description: '',
         descColor: '#6b7280',
         btnText: '',
-        btnLink: '#',
+        btnLink: '',
         btnColor: '#4361ee',
         btnTextColor: '#ffffff',
         cardBg: '#ffffff',
-        width: 33.333,
+        width: '33.333',
         height: 'auto',
         alignment: 'left'
     };
@@ -375,10 +411,11 @@ function addSection(type) {
             subtitle: '',
             subtitleColor: '#6b7280',
             btnText: '',
-            btnLink: '#',
+            btnLink: '',
             btnColor: '#4361ee',
             btnTextColor: '#ffffff',
-            bg: '#f8f9fa'
+            bg: '#f8f9fa',
+            sectionWidth: '100'
         });
     }
 
@@ -386,7 +423,8 @@ function addSection(type) {
         Object.assign(defaults, {
             content: '',
             alignment: 'left',
-            textColor: '#374151'
+            textColor: '#374151',
+            sectionWidth: '100'
         });
     }
 
@@ -395,7 +433,7 @@ function addSection(type) {
             image: '',
             caption: '',
             captionColor: '#6b7280',
-            sectionWidth: 100
+            sectionWidth: '100'
         });
     }
 
@@ -405,7 +443,7 @@ function addSection(type) {
             sectionTitle: '',
             sectionTitleColor: '#1a1a2e',
             columns: 3,
-            sectionWidth: 100,
+            sectionWidth: '100',
             cards: [],
             alignment: 'left'
         });
@@ -429,6 +467,8 @@ function removeSection(id) {
 function updateSection(id, key, value) {
     let sec = sections.find(s => s.id === id);
     if (!sec) return;
+    if (key === 'sectionWidth') value = normalizeWidthValue(value);
+    if (key === 'height') value = normalizeHeightValue(value);
     sec.data[key] = value;
     saveJSON();
     schedulePreviewSync();
@@ -458,6 +498,8 @@ function updateCard(sectionId, cardId, key, value) {
     if (!sec) return;
     let card = sec.data.cards.find(c => c.id === cardId);
     if (!card) return;
+    if (key === 'width') value = normalizeWidthValue(value, '33.333');
+    if (key === 'height') value = normalizeHeightValue(value);
     card[key] = value;
     saveJSON();
     schedulePreviewSync();
@@ -607,7 +649,7 @@ function renderCardsEditor(sectionId) {
                     </div>
                     <div>
                         <label>Button Link</label>
-                        <input type="url" value="${escHtml(card.btnLink || '#')}" oninput="updateCard(${sectionId},${card.id},'btnLink',this.value)" placeholder="https://...">
+                        <input type="url" value="${escHtml(card.btnLink || '')}" oninput="updateCard(${sectionId},${card.id},'btnLink',this.value)" placeholder="https://...">
                     </div>
                     <div>
                         <label>Button Background</label>
@@ -624,22 +666,14 @@ function renderCardsEditor(sectionId) {
                 </div>
                 <div>
                     <label>Width</label>
-                    <select class="ctrl-select" onchange="updateCard(${sectionId},${card.id},'width',parseFloat(this.value))">
-                        <option value="25" ${Math.abs((card.width || 33.333) - 25) < 0.01 ? 'selected' : ''}>25%</option>
-                        <option value="33.333" ${Math.abs((card.width || 33.333) - 33.333) < 0.01 ? 'selected' : ''}>33%</option>
-                        <option value="50" ${Math.abs((card.width || 33.333) - 50) < 0.01 ? 'selected' : ''}>50%</option>
-                        <option value="66.666" ${Math.abs((card.width || 33.333) - 66.666) < 0.01 ? 'selected' : ''}>66%</option>
-                        <option value="100" ${Math.abs((card.width || 33.333) - 100) < 0.01 ? 'selected' : ''}>100%</option>
+                    <select class="ctrl-select" onchange="updateCard(${sectionId},${card.id},'width',this.value)">
+                        ${renderWidthOptions(card.width || '33.333', CARD_WIDTH_OPTIONS)}
                     </select>
                 </div>
                 <div>
                     <label>Height</label>
                     <select class="ctrl-select" onchange="updateCard(${sectionId},${card.id},'height',this.value)">
-                        <option value="auto" ${(card.height || 'auto') === 'auto' ? 'selected' : ''}>Auto</option>
-                        <option value="180px" ${card.height === '180px' ? 'selected' : ''}>180px</option>
-                        <option value="240px" ${card.height === '240px' ? 'selected' : ''}>240px</option>
-                        <option value="320px" ${card.height === '320px' ? 'selected' : ''}>320px</option>
-                        <option value="400px" ${card.height === '400px' ? 'selected' : ''}>400px</option>
+                        ${renderHeightOptions(card.height || 'auto')}
                     </select>
                 </div>
                 <div>
@@ -727,7 +761,7 @@ function buildSectionEditorHTML(sec) {
         <div class="section-header">
             <div style="display:flex;align-items:center">
                 <span class="drag-handle" title="Drag to reorder">⠿</span>
-                <span class="section-badge" style="${badgeColors[sec.type] || ''}">${sec.type.toUpperCase()}</span>
+                <span class="section-badge" style="${badgeColors[sec.type] || ''}">${sec.type === 'cards' ? 'SECTION' : sec.type.toUpperCase()}</span>
             </div>
             <button type="button" onclick="removeSection(${sec.id})" class="btn btn-sm btn-danger">✕ Delete</button>
         </div>`;
@@ -745,13 +779,14 @@ function buildSectionEditorHTML(sec) {
                         <option value="right" ${d.alignment === 'right' ? 'selected' : ''}>Right</option>
                     </select>
                 </div>
+                <div><span class="ctrl-label">Section Width</span>
+                    <select class="ctrl-select" onchange="updateSection(${sec.id},'sectionWidth',this.value)">
+                        ${renderWidthOptions(d.sectionWidth || '100')}
+                    </select>
+                </div>
                 <div><span class="ctrl-label">Height</span>
                     <select class="ctrl-select" onchange="updateSection(${sec.id},'height',this.value)">
-                        <option value="auto" ${(d.height || 'auto') === 'auto' ? 'selected' : ''}>Auto</option>
-                        <option value="300px" ${d.height === '300px' ? 'selected' : ''}>300px</option>
-                        <option value="400px" ${d.height === '400px' ? 'selected' : ''}>400px</option>
-                        <option value="500px" ${d.height === '500px' ? 'selected' : ''}>500px</option>
-                        <option value="600px" ${d.height === '600px' ? 'selected' : ''}>600px</option>
+                        ${renderHeightOptions(d.height || 'auto')}
                     </select>
                 </div>
             </div>
@@ -761,7 +796,7 @@ function buildSectionEditorHTML(sec) {
             <input class="form-control mt-1 mb-2" value="${escHtml(d.subtitle || '')}" oninput="updateSection(${sec.id},'subtitle',this.value)">
             <div class="controls-grid mt-2">
                 <div><label class="ctrl-label">Button Text</label><input type="text" class="form-control" value="${escHtml(d.btnText || '')}" oninput="updateSection(${sec.id},'btnText',this.value)"></div>
-                <div><label class="ctrl-label">Button Link</label><input type="url" class="form-control" value="${escHtml(d.btnLink || '#')}" oninput="updateSection(${sec.id},'btnLink',this.value)"></div>
+                <div><label class="ctrl-label">Button Link</label><input type="url" class="form-control" value="${escHtml(d.btnLink || '')}" oninput="updateSection(${sec.id},'btnLink',this.value)"></div>
                 <div><span class="ctrl-label">Button Background</span><input type="color" class="color-swatch" value="${d.btnColor || '#4361ee'}" oninput="updateSection(${sec.id},'btnColor',this.value)"></div>
                 <div><span class="ctrl-label">Button Text Color</span><input type="color" class="color-swatch" value="${d.btnTextColor || '#ffffff'}" oninput="updateSection(${sec.id},'btnTextColor',this.value)"></div>
             </div>`;
@@ -779,12 +814,14 @@ function buildSectionEditorHTML(sec) {
                         <option value="right" ${d.alignment === 'right' ? 'selected' : ''}>Right</option>
                     </select>
                 </div>
+                <div><span class="ctrl-label">Section Width</span>
+                    <select class="ctrl-select" onchange="updateSection(${sec.id},'sectionWidth',this.value)">
+                        ${renderWidthOptions(d.sectionWidth || '100')}
+                    </select>
+                </div>
                 <div><span class="ctrl-label">Height</span>
                     <select class="ctrl-select" onchange="updateSection(${sec.id},'height',this.value)">
-                        <option value="auto" ${(d.height || 'auto') === 'auto' ? 'selected' : ''}>Auto</option>
-                        <option value="200px" ${d.height === '200px' ? 'selected' : ''}>200px</option>
-                        <option value="300px" ${d.height === '300px' ? 'selected' : ''}>300px</option>
-                        <option value="400px" ${d.height === '400px' ? 'selected' : ''}>400px</option>
+                        ${renderHeightOptions(d.height || 'auto')}
                     </select>
                 </div>
             </div>
@@ -804,18 +841,13 @@ function buildSectionEditorHTML(sec) {
                 </select>
             </div>
             <div><span class="ctrl-label">Section Width</span>
-                <select class="ctrl-select" onchange="updateSection(${sec.id},'sectionWidth',parseInt(this.value,10))">
-                    <option value="50" ${(parseInt(d.sectionWidth || 100, 10) === 50) ? 'selected' : ''}>50%</option>
-                    <option value="75" ${(parseInt(d.sectionWidth || 100, 10) === 75) ? 'selected' : ''}>75%</option>
-                    <option value="100" ${(parseInt(d.sectionWidth || 100, 10) === 100) ? 'selected' : ''}>100%</option>
+                <select class="ctrl-select" onchange="updateSection(${sec.id},'sectionWidth',this.value)">
+                    ${renderWidthOptions(d.sectionWidth || '100')}
                 </select>
             </div>
             <div><span class="ctrl-label">Height</span>
                 <select class="ctrl-select" onchange="updateSection(${sec.id},'height',this.value)">
-                    <option value="auto" ${(d.height || 'auto') === 'auto' ? 'selected' : ''}>Auto</option>
-                    <option value="220px" ${d.height === '220px' ? 'selected' : ''}>220px</option>
-                    <option value="300px" ${d.height === '300px' ? 'selected' : ''}>300px</option>
-                    <option value="420px" ${d.height === '420px' ? 'selected' : ''}>420px</option>
+                    ${renderHeightOptions(d.height || 'auto')}
                 </select>
             </div>
         </div>
@@ -843,10 +875,8 @@ function buildSectionEditorHTML(sec) {
                     </select>
                 </div>
                 <div><span class="ctrl-label">Section Width</span>
-                    <select class="ctrl-select" onchange="updateSection(${sec.id},'sectionWidth',parseInt(this.value,10))">
-                        <option value="50" ${(parseInt(d.sectionWidth || 100, 10) === 50) ? 'selected' : ''}>50%</option>
-                        <option value="75" ${(parseInt(d.sectionWidth || 100, 10) === 75) ? 'selected' : ''}>75%</option>
-                        <option value="100" ${(parseInt(d.sectionWidth || 100, 10) === 100) ? 'selected' : ''}>100%</option>
+                    <select class="ctrl-select" onchange="updateSection(${sec.id},'sectionWidth',this.value)">
+                        ${renderWidthOptions(d.sectionWidth || '100')}
                     </select>
                 </div>
                 <div><span class="ctrl-label">Alignment</span>
@@ -858,10 +888,7 @@ function buildSectionEditorHTML(sec) {
                 </div>
                 <div><span class="ctrl-label">Height</span>
                     <select class="ctrl-select" onchange="updateSection(${sec.id},'height',this.value)">
-                        <option value="auto" ${(d.height || 'auto') === 'auto' ? 'selected' : ''}>Auto</option>
-                        <option value="240px" ${d.height === '240px' ? 'selected' : ''}>240px</option>
-                        <option value="320px" ${d.height === '320px' ? 'selected' : ''}>320px</option>
-                        <option value="420px" ${d.height === '420px' ? 'selected' : ''}>420px</option>
+                        ${renderHeightOptions(d.height || 'auto')}
                     </select>
                 </div>
                 <div><span class="ctrl-label">Section Title</span>
@@ -923,6 +950,96 @@ function attachBuilderSortable() {
         }
     });
 }
+function uploadTinyMceImage(blobInfo) {
+    return new Promise((resolve, reject) => {
+        let fd = new FormData();
+        fd.append('image', blobInfo.blob(), blobInfo.filename());
+
+        fetch('/admin/upload-image', {
+            method: 'POST',
+            body: fd,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(async response => {
+            let text = await response.text();
+            try {
+                return JSON.parse(text);
+            } catch (error) {
+                throw new Error('Invalid JSON response');
+            }
+        })
+        .then(data => {
+            if (!data.success || !data.url) {
+                reject(data.error || 'Image upload failed');
+                return;
+            }
+
+            resolve(data.url);
+        })
+        .catch(error => reject(error.message || 'Image upload failed'));
+    });
+}
+
+function getTinyMceConfig(selector, height, onContentChange) {
+    return {
+        selector,
+        height,
+        min_height: height,
+        promotion: false,
+        branding: false,
+        menubar: 'file edit view insert format table tools help',
+        statusbar: true,
+        resize: true,
+        elementpath: true,
+        browser_spellcheck: true,
+        contextmenu: 'undo redo | inserttable | cell row column deletetable | link image',
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount',
+            'emoticons', 'quickbars', 'autoresize'
+        ],
+        toolbar: [
+            'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor',
+            'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | blockquote',
+            'link image media table | hr emoticons charmap | removeformat code preview fullscreen'
+        ],
+        quickbars_selection_toolbar: 'bold italic underline | blocks | forecolor backcolor | quicklink blockquote',
+        quickbars_insert_toolbar: 'image media table hr',
+        block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre',
+        font_size_formats: '12px 14px 16px 18px 20px 24px 30px 36px 48px',
+        line_height_formats: '1 1.2 1.4 1.6 1.8 2 2.4',
+        image_title: true,
+        automatic_uploads: true,
+        images_upload_handler: uploadTinyMceImage,
+        paste_data_images: true,
+        link_default_target: '_blank',
+        link_assume_external_targets: true,
+        convert_urls: false,
+        relative_urls: false,
+        remove_script_host: false,
+        toolbar_sticky: true,
+        content_style: `
+            body { font-family: DM Sans, sans-serif; font-size: 15px; line-height: 1.7; }
+            p { margin: 0 0 12px; }
+            img { max-width: 100%; height: auto; }
+        `,
+        setup: function(editor) {
+            editor.on('init', function() {
+                const source = document.querySelector(selector);
+                editor.setContent(source ? (source.value || '') : '');
+            });
+
+            editor.on('change input undo redo keyup SetContent', function() {
+                onContentChange(editor.getContent());
+            });
+        }
+    };
+}
+
 function initCardDescriptionEditors(sectionId = null) {
     const selector = sectionId
         ? `textarea[id^="card_desc_${sectionId}_"]`
@@ -931,45 +1048,24 @@ function initCardDescriptionEditors(sectionId = null) {
     document.querySelectorAll(selector).forEach(el => {
         if (tinymce.get(el.id)) return;
 
-        tinymce.init({
-            selector: `#${el.id}`,
-            height: 220,
-            plugins: 'lists link code',
-            toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link | code',
-            menubar: false,
-            branding: false,
-            setup: function(editor) {
-                editor.on('init', function() {
-                    editor.setContent(el.value || '');
-                });
-
-                editor.on('keyup change input undo redo', function() {
-                    const parts = editor.id.split('_');
-                    const sectionId = parseInt(parts[2], 10);
-                    const cardId = parseInt(parts[3], 10);
-                    updateCard(sectionId, cardId, 'description', editor.getContent());
-                });
-            }
-        });
+        tinymce.init(getTinyMceConfig(`#${el.id}`, 320, function(content) {
+            const parts = el.id.split('_');
+            const targetSectionId = parseInt(parts[2], 10);
+            const targetCardId = parseInt(parts[3], 10);
+            updateCard(targetSectionId, targetCardId, 'description', content);
+        }));
     });
 }
 
 function initEditor() {
     sections.forEach(sec => {
         if (sec.type === 'text') {
-            tinymce.init({
-                selector: `#text_${sec.id}`,
-                height: 250,
-                plugins: 'lists link image table code',
-                toolbar: 'undo redo | bold italic underline | forecolor backcolor | alignleft aligncenter alignright | bullist numlist | link image | code',
-                menubar: false,
-                branding: false,
-                setup: function(editor) {
-                    editor.on('keyup change', function() {
-                        updateSection(sec.id, 'content', editor.getContent());
-                    });
-                }
-            });
+            let selector = `#text_${sec.id}`;
+            if (!document.querySelector(selector) || tinymce.get(`text_${sec.id}`)) return;
+
+            tinymce.init(getTinyMceConfig(selector, 420, function(content) {
+                updateSection(sec.id, 'content', content);
+            }));
         }
 
         if (sec.type === 'cards') {
@@ -1005,16 +1101,6 @@ function syncPreviewModal() {
     doc.close();
 }
 
-function setDevice(device, btn) {
-    document.querySelectorAll('.preview-modal-header .device-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    let wrap = document.getElementById('preview-frame-wrap');
-    wrap.className = 'preview-frame-wrap';
-    if (device === 'tablet') wrap.classList.add('tablet');
-    if (device === 'mobile') wrap.classList.add('mobile');
-}
-
 function schedulePreviewSync() {
     clearTimeout(previewDebounce);
     previewDebounce = setTimeout(() => {
@@ -1028,26 +1114,26 @@ function buildPreviewHTML(sections) {
 
     sections.forEach(sec => {
         let d = sec.data || {};
-        let sectionWidth = parseInt(d.sectionWidth || 100, 10);
+        let sectionWidth = formatWidthStyle(d.sectionWidth || '100');
         let sectionHeight = d.height || 'auto';
         let sectionAlign = d.alignment || 'left';
         let sectionJustify = sectionAlign === 'center' ? 'center' : sectionAlign === 'right' ? 'flex-end' : 'flex-start';
 
         if (sec.type === 'hero') {
             sectionsHTML += `
-            <div class="pb-section" data-section-id="${sec.id}" style="width:100%;">
+            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
                 <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> HERO</div>
                 <section style="background:${d.bg || '#f8f9fa'};padding:70px 20px;text-align:${sectionAlign};min-height:${sectionHeight};display:flex;flex-direction:column;justify-content:center;align-items:${sectionJustify};">
                     <h1 style="font-size:2.2rem;font-weight:800;color:${d.textColor || '#1a1a2e'};margin:0 0 12px;line-height:1.2;">${escPreview(d.title || 'Hero Title')}</h1>
                     ${d.subtitle ? `<p style="font-size:1.05rem;color:${d.subtitleColor || '#6b7280'};max-width:560px;margin:0 0 24px;line-height:1.7;text-align:${sectionAlign};">${escPreview(d.subtitle)}</p>` : ''}
-                    ${d.btnText ? `<a href="${escPreview(d.btnLink || '#')}" style="display:inline-block;padding:12px 28px;border-radius:8px;font-size:.95rem;font-weight:600;text-decoration:none;background:${d.btnColor || '#4361ee'};color:${d.btnTextColor || '#fff'};">${escPreview(d.btnText)}</a>` : ''}
+                    ${d.btnText ? `<a href="${escPreview(d.btnLink || 'javascript:void(0)')}" style="display:inline-block;padding:12px 28px;border-radius:10px;font-size:.95rem;font-weight:600;text-decoration:none;background:${d.btnColor || '#4361ee'};color:${d.btnTextColor || '#fff'};">${escPreview(d.btnText)}</a>` : ''}
                 </section>
             </div>`;
         }
 
         if (sec.type === 'text') {
             sectionsHTML += `
-            <div class="pb-section" data-section-id="${sec.id}" style="width:100%;">
+            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
                 <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> TEXT</div>
                 <section style="background:${d.bg || '#ffffff'};padding:50px 20px;min-height:${sectionHeight};display:flex;justify-content:${sectionJustify};align-items:flex-start;">
                     <div style="max-width:800px;width:100%;font-size:1rem;line-height:1.8;color:${d.textColor || '#374151'};text-align:${sectionAlign};">
@@ -1058,8 +1144,9 @@ function buildPreviewHTML(sections) {
         }
 
        if (sec.type === 'image') {
+    let fullWidthImage = parseFloat(d.sectionWidth || '100') >= 100;
     sectionsHTML += `
-    <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth}%;margin:0 auto;">
+    <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
         <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> IMAGE</div>
         <section style="
             background:${d.bg || '#ffffff'};
@@ -1080,12 +1167,12 @@ function buildPreviewHTML(sections) {
                         src="${d.image}"
                         style="
                             display:block;
-                            width:auto;
-                            max-width:70%;
+                            width:${fullWidthImage ? '100%' : 'auto'};
+                            max-width:${fullWidthImage ? '100%' : '70%'};
                             max-height:${sectionHeight === 'auto' ? '520px' : sectionHeight};
-                            border-radius:12px;
+                            border-radius:18px;
                             box-shadow:0 6px 28px rgba(0,0,0,.10);
-                            object-fit:contain;
+                            object-fit:${fullWidthImage ? 'cover' : 'contain'};
                         "
                     >
                 </div>
@@ -1101,7 +1188,7 @@ function buildPreviewHTML(sections) {
                         margin:12px 0 0;
                         font-size:.875rem;
                         color:${d.captionColor || '#6b7280'};
-                        max-width:70%;
+                        max-width:${fullWidthImage ? '100%' : '70%'};
                         text-align:${sectionAlign};
                     ">
                         ${escPreview(d.caption)}
@@ -1120,16 +1207,18 @@ function buildPreviewHTML(sections) {
             let defaultWidth = cols === 1 ? '100%' : `calc(${(100 / cols).toFixed(4)}% - 14px)`;
 
             let cardsHTML = cards.length === 0
-                ? `<div class="pb-cards-empty">No items yet</div>`
+                ? `<div class="pb-cards-empty">This section is empty. Add a card or image from the section controls.</div>`
                 : cards.map(card => {
-                    let itemWidth = card.width ? `calc(${card.width}% - 14px)` : defaultWidth;
+                    let normalizedCardWidth = normalizeWidthValue(card.width || '33.333', '33.333');
+                    let isImage = card.type === 'image';
+                    let isFullWidthImage = isImage && normalizedCardWidth !== 'auto' && parseFloat(normalizedCardWidth) >= 100;
+                    let itemWidth = normalizedCardWidth === 'auto' ? 'auto' : (isFullWidthImage ? '100%' : `calc(${normalizedCardWidth}% - 14px)`);
                     let itemHeight = card.height || 'auto';
                     let itemAlign = card.alignment || 'left';
                     let itemJustify = itemAlign === 'center' ? 'center' : itemAlign === 'right' ? 'flex-end' : 'flex-start';
-                    let isImage = card.type === 'image';
 
                     return `
-                    <div class="pb-card" data-card-id="${card.id}" data-section-id="${sec.id}" style="width:${itemWidth};flex:0 0 ${itemWidth};">
+                    <div class="pb-card" data-card-id="${card.id}" data-section-id="${sec.id}" style="width:${itemWidth};flex:0 0 ${itemWidth};border-radius:18px;overflow:hidden;">
                         <div class="pb-card-handle"><span class="pb-grip">⠿⠿</span> ${isImage ? 'IMAGE' : 'CARD'}</div>
                         <div class="pb-card-body" style="background:${card.cardBg || '#fff'};min-height:${itemHeight};text-align:${itemAlign};">
                             ${card.image ? `
@@ -1138,16 +1227,16 @@ function buildPreviewHTML(sections) {
                                     display:flex;
                                     align-items:center;
                                     justify-content:${itemJustify};
-                                    padding:12px;
+                                    padding:${isFullWidthImage ? '0' : '12px'};
                                     background:${card.cardBg || '#fff'};
                                 ">
                                     <img src="${card.image}" alt="" style="
-                                        width:auto;
+                                        width:${isFullWidthImage ? '100%' : 'auto'};
                                         max-width:100%;
                                         max-height:100%;
-                                        object-fit:contain;
+                                        object-fit:${isFullWidthImage ? 'cover' : 'contain'};
                                         display:block;
-                                        border-radius:10px;
+                                        border-radius:18px;
                                     ">
                                 </div>
                             ` : ''}
@@ -1157,7 +1246,7 @@ function buildPreviewHTML(sections) {
                                     ${card.title ? `<h3 style="color:${card.titleColor || '#1a1a2e'};">${escPreview(card.title)}</h3>` : ''}
                                     ${card.description ? `<div style="color:${card.descColor || '#6b7280'};">${card.description}</div>` : ''}
 
-                                    ${card.btnText ? `<a href="${escPreview(card.btnLink || '#')}" class="pb-card-btn" style="background:${card.btnColor || '#4361ee'};color:${card.btnTextColor || '#fff'};">${escPreview(card.btnText)}</a>` : ''}
+                                    ${card.btnText ? `<a href="${escPreview(card.btnLink || 'javascript:void(0)')}" class="pb-card-btn" style="background:${card.btnColor || '#4361ee'};color:${card.btnTextColor || '#fff'};">${escPreview(card.btnText)}</a>` : ''}
                                    </div>`
                             }
                         </div>
@@ -1165,8 +1254,8 @@ function buildPreviewHTML(sections) {
                 }).join('');
 
             sectionsHTML += `
-            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth}%;margin:0 auto;">
-                <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> CARDS</div>
+            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
+                <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> SECTION</div>
                 <section style="background:${d.bg || '#f8f9fa'};padding:60px 20px;min-height:${sectionHeight};text-align:${sectionAlign};">
                     ${d.sectionTitle ? `<h2 style="text-align:${sectionAlign};font-size:1.8rem;font-weight:800;color:${d.sectionTitleColor || '#1a1a2e'};margin:0 0 40px;">${escPreview(d.sectionTitle)}</h2>` : ''}
                     <div class="pb-cards-grid" data-section-id="${sec.id}">
@@ -1183,38 +1272,66 @@ function buildPreviewHTML(sections) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Preview</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/frontend/css/style.css">
+<link rel="stylesheet" href="/frontend/css/style_new.css">
+<link rel="stylesheet" href="/frontend/css/developer.css">
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"><\/script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#fff;overflow-x:hidden;padding-bottom:40px}
 img{max-width:100%}
-.pb-section{position:relative;border:2px solid transparent;transition:border-color .15s;margin-bottom:20px}
-.pb-section:hover{border-color:rgba(67,97,238,.18)}
+.pb-section{position:relative;border:2px solid transparent;outline:2px solid transparent;outline-offset:4px;transition:border-color .15s,outline-color .15s,box-shadow .15s;margin-bottom:20px;border-radius:22px}
+.pb-section:hover{border-color:rgba(67,97,238,.22);outline-color:rgba(67,97,238,.55);box-shadow:0 0 0 6px rgba(67,97,238,.12)}
 .pb-drag-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 16px;background:#4361ee;color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;cursor:grab;user-select:none;opacity:0;transition:opacity .15s;position:relative;z-index:30}
 .pb-section:hover .pb-drag-bar{opacity:1}
 .pb-grip{font-size:15px;letter-spacing:-3px}
 .pb-cards-grid{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
 .pb-cards-empty{width:100%;padding:32px;border:2px dashed #e2e8f0;border-radius:12px;text-align:center;color:#94a3b8;font-size:14px}
-.pb-card{display:flex;flex-direction:column;position:relative;border-radius:12px;border:2px solid transparent;transition:border-color .15s,box-shadow .15s;min-width:0}
-.pb-card:hover{border-color:rgba(67,97,238,.30);box-shadow:0 4px 20px rgba(67,97,238,.10)}
-.pb-card-handle{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;background:#4361ee;color:#fff;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:10px 10px 0 0;cursor:grab;user-select:none;opacity:1;flex-shrink:0;position:relative;z-index:20;touch-action:none}
-.pb-card-body{border-radius:0 0 10px 10px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);display:flex;flex-direction:column;flex:1}
+.pb-card{display:flex;flex-direction:column;position:relative;border-radius:18px;border:2px solid transparent;transition:border-color .15s,box-shadow .15s;min-width:0}
+.pb-card:hover{border-color:transparent !important;box-shadow:none !important}
+.pb-section .pb-card{border-color:transparent !important;box-shadow:none !important}
+.pb-card-handle{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;background:#4361ee;color:#fff;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:16px 16px 0 0;cursor:grab;user-select:none;opacity:0;transition:opacity .15s ease;flex-shrink:0;position:relative;z-index:20;touch-action:none}
+.pb-card:hover .pb-card-handle{opacity:1}
+.pb-card-body{border-radius:0 0 16px 16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);display:flex;flex-direction:column;flex:1}
 .pb-card-img{width:100%;overflow:hidden;flex-shrink:0}
 .pb-card-img img{display:block}
 .pb-card-content{padding:18px;display:flex;flex-direction:column;flex:1}
 .pb-card-content h3{font-size:1rem;font-weight:700;margin:0 0 8px;line-height:1.3}
 .pb-card-content p{font-size:.875rem;line-height:1.65;flex:1;margin:0 0 14px}
-.pb-card-btn{display:inline-block;padding:8px 18px;border-radius:8px;font-size:.8rem;font-weight:600;text-decoration:none}
+.pb-card-content ul,
+.pb-card-body ul,
+.pb-section ul{margin:0;padding:0}
+.pb-card-content li,
+.pb-card-body li,
+.pb-section li{position:relative;padding-left:32px;margin-bottom:12px;list-style:none}
+.pb-card-content li::before,
+.pb-card-body li::before,
+.pb-section li::before{content:"\\f00c";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:5px;left:0;width:20px;height:20px;border-radius:50%;background:#004fb8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1}
+.pb-card-content a,
+.pb-card-body a,
+.pb-section a{display:inline-flex;align-items:center;justify-content:center;padding:10px 22px;border-radius:10px;background:#004fb8;color:#fff !important;font-size:inherit;font-weight:inherit;line-height:inherit;text-decoration:none !important;transition:background .2s,transform .15s}
+.pb-card-content a:hover,
+.pb-card-body a:hover,
+.pb-section a:hover{background:#005fdb;color:#fff !important;transform:translateY(-1px)}
+.pb-card-btn{display:inline-block;padding:8px 18px;border-radius:10px;font-size:.8rem;font-weight:600;text-decoration:none}
 .pb-ghost-section{opacity:.2;outline:3px dashed #4361ee;background:#eef0ff !important}
 .pb-chosen-section{outline:2px solid #4361ee;box-shadow:0 8px 32px rgba(67,97,238,.2)}
-.pb-ghost-card{opacity:.25;background:#eef0ff !important;border:2px dashed #4361ee !important;border-radius:12px}
+.pb-ghost-card{opacity:.25;background:#eef0ff !important;border:2px dashed #4361ee !important;border-radius:18px}
 .pb-chosen-card{outline:2px solid #4361ee;box-shadow:0 6px 24px rgba(67,97,238,.18)}
-.sortable-fallback{opacity:.85 !important;box-shadow:0 12px 40px rgba(67,97,238,.35) !important;border-radius:12px !important;z-index:99999 !important;pointer-events:none !important}
+.sortable-fallback{opacity:.85 !important;box-shadow:0 12px 40px rgba(67,97,238,.35) !important;border-radius:18px !important;z-index:99999 !important;pointer-events:none !important}
 </style>
 </head>
 <body>
+${previewHeaderHtml}
+<main class="pb-preview-main">
 <div id="pb-wrapper">${sectionsHTML}</div>
+</main>
+${previewFooterHtml}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"><\/script>
+<script src="/frontend/js/script_new.js"><\/script>
 <script>
 (function(){
     var wrapper = document.getElementById('pb-wrapper');
@@ -1281,6 +1398,3 @@ img{max-width:100%}
 render();
 </script>
 @endsection
-
-
-
