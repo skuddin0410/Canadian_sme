@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Models\Event;
@@ -8,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\GalleryItem;
 
 class EventController extends Controller
 {
@@ -32,7 +34,7 @@ class EventController extends Controller
         // }
         // $userId = $requester->id;
         // // dd($userId);
-        
+
         // $query = Event::query()
         //     ->withExists([
         //         'entityLinks as is_registered' => function ($q) use ($userId) {
@@ -81,4 +83,120 @@ class EventController extends Controller
         $event->delete();
         return response()->json(['message' => 'Event deleted successfully.']);
     }
+    public function eventGallery(Request $request, $eventId)
+    {
+        $type     = $request->query('type');   
+        $page     = $request->query('page');   
+        $perPage  = $request->query('per_page', 10);
+
+        $query = GalleryItem::where('event_id', $eventId)
+            ->where('is_approved', true);
+
+        //  Optional type filter
+        if ($type && in_array($type, ['image', 'video', 'document'])) {
+            $query->where('file_type', $type);
+        }
+
+        $query->latest();
+
+        
+        if ($page) {
+
+            $items = $query->paginate($perPage);
+
+            $data = $items->getCollection()->map(function ($item) {
+                return [
+                    'id'          => $item->id,
+                    'file_name'   => $item->file_name,
+                    'file_type'   => $item->file_type,
+                    'file_url'    => asset('storage/' . $item->file_path),
+                    'uploaded_by' => optional($item->user)->name,
+                    'uploaded_at' => $item->created_at->toDateTimeString(),
+                ];
+            });
+
+            return response()->json([
+                'success'    => true,
+                'event_id'   => (int) $eventId,
+                'filter'     => $type ?? 'all',
+                'pagination' => [
+                    'current_page' => $items->currentPage(),
+                    'per_page'     => $items->perPage(),
+                    'total'        => $items->total(),
+                    'last_page'    => $items->lastPage(),
+                ],
+                'data' => $data,
+            ]);
+        }
+
+        
+        $items = $query->get();
+
+        if ($items->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No gallery items found.'
+            ], 404);
+        }
+
+        $data = $items->map(function ($item) {
+            return [
+                'id'          => $item->id,
+                'file_name'   => $item->file_name,
+                'file_type'   => $item->file_type,
+                'file_url'    => asset('storage/' . $item->file_path),
+                'uploaded_by' => optional($item->user)->name,
+                'uploaded_at' => $item->created_at->toDateTimeString(),
+            ];
+        });
+
+        return response()->json([
+            'success'  => true,
+            'event_id' => (int) $eventId,
+            'filter'   => $type ?? 'all',
+            'total'    => $data->count(),
+            'data'     => $data,
+        ]);
+    }
+
+    // public function eventGallery(Request $request, $eventId)
+    // {
+    //     $type = $request->query('type'); 
+
+    //     $query = GalleryItem::where('event_id', $eventId)
+    //         ->where('is_approved', true);
+
+
+    //     if ($type && in_array($type, ['image', 'video', 'document'])) {
+    //         $query->where('file_type', $type);
+    //     }
+
+    //     $items = $query->latest()->get();
+
+    //     if ($items->isEmpty()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'No gallery items found.'
+    //         ], 404);
+    //     }
+
+    //     $data = $items->map(function ($item) {
+    //         return [
+    //             'id'          => $item->id,
+    //             'file_name'   => $item->file_name,
+    //             'file_type'   => $item->file_type,
+    //             'file_url'    => asset('storage/' . $item->file_path),
+    //             'uploaded_by' => optional($item->user)->name,
+    //             'uploaded_at' => $item->created_at->toDateTimeString(),
+    //         ];
+    //     });
+
+    //     return response()->json([
+    //         'success'  => true,
+    //         'event_id' => (int) $eventId,
+    //         'filter'   => $type ?? 'all',
+    //         'total'    => $data->count(),
+    //         'data'     => $data,
+    //     ]);
+    // }
 }

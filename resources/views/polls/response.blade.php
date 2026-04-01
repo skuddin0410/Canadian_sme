@@ -5,19 +5,19 @@
 <style>
     /* ── Variables ── */
     :root {
-        --pr-bg:        #f0f2f5;
-        --pr-surface:   #ffffff;
-        --pr-border:    #e2e6ea;
-        --pr-accent:    #4f46e5;
+        --pr-bg: #f0f2f5;
+        --pr-surface: #ffffff;
+        --pr-border: #e2e6ea;
+        --pr-accent: #4f46e5;
         --pr-accent-lt: #eef2ff;
-        --pr-text:      #1a1d23;
-        --pr-muted:     #6b7280;
-        --pr-yes-bg:    #ecfdf5;
-        --pr-yes-fg:    #059669;
-        --pr-no-bg:     #fff1f2;
-        --pr-no-fg:     #e11d48;
-        --pr-star-bg:   #fffbeb;
-        --pr-star-fg:   #d97706;
+        --pr-text: #1a1d23;
+        --pr-muted: #6b7280;
+        --pr-yes-bg: #ecfdf5;
+        --pr-yes-fg: #059669;
+        --pr-no-bg: #fff1f2;
+        --pr-no-fg: #e11d48;
+        --pr-star-bg: #fffbeb;
+        --pr-star-fg: #d97706;
     }
 
     /* ── Page wrapper ── */
@@ -51,7 +51,9 @@
         gap: .4rem;
     }
 
-    .pr-breadcrumb svg { opacity: .5; }
+    .pr-breadcrumb svg {
+        opacity: .5;
+    }
 
     .pr-heading {
         font-size: 1.45rem;
@@ -98,7 +100,7 @@
         border: 1px solid var(--pr-border);
         border-radius: 14px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .04);
     }
 
     /* ── Table ── */
@@ -221,9 +223,20 @@
         white-space: nowrap;
     }
 
-    .pr-badge.yes  { background: var(--pr-yes-bg); color: var(--pr-yes-fg); }
-    .pr-badge.no   { background: var(--pr-no-bg);  color: var(--pr-no-fg);  }
-    .pr-badge.star { background: var(--pr-star-bg); color: var(--pr-star-fg); }
+    .pr-badge.yes {
+        background: var(--pr-yes-bg);
+        color: var(--pr-yes-fg);
+    }
+
+    .pr-badge.no {
+        background: var(--pr-no-bg);
+        color: var(--pr-no-fg);
+    }
+
+    .pr-badge.star {
+        background: var(--pr-star-bg);
+        color: var(--pr-star-fg);
+    }
 
     .pr-badge.txt {
         background: var(--pr-accent-lt);
@@ -272,7 +285,9 @@
         justify-content: center;
     }
 
-    .pr-empty-icon svg { opacity: .4; }
+    .pr-empty-icon svg {
+        opacity: .4;
+    }
 
     .pr-empty-title {
         font-weight: 700;
@@ -297,83 +312,122 @@
 
     /* ── Row fade-in ── */
     @keyframes prFade {
-        from { opacity: 0; transform: translateY(5px); }
-        to   { opacity: 1; transform: none; }
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
     }
 
-    .pr-table tbody tr { animation: prFade .2s ease both; }
-    .pr-table tbody tr:nth-child(1)  { animation-delay:   0ms; }
-    .pr-table tbody tr:nth-child(2)  { animation-delay:  25ms; }
-    .pr-table tbody tr:nth-child(3)  { animation-delay:  50ms; }
-    .pr-table tbody tr:nth-child(4)  { animation-delay:  75ms; }
-    .pr-table tbody tr:nth-child(5)  { animation-delay: 100ms; }
-    .pr-table tbody tr:nth-child(6)  { animation-delay: 125ms; }
-    .pr-table tbody tr:nth-child(7)  { animation-delay: 150ms; }
-    .pr-table tbody tr:nth-child(8)  { animation-delay: 175ms; }
-    .pr-table tbody tr:nth-child(9)  { animation-delay: 200ms; }
-    .pr-table tbody tr:nth-child(10) { animation-delay: 225ms; }
+    .pr-table tbody tr {
+        animation: prFade .2s ease both;
+    }
+
+    .pr-table tbody tr:nth-child(1) {
+        animation-delay: 0ms;
+    }
+
+    .pr-table tbody tr:nth-child(2) {
+        animation-delay: 25ms;
+    }
+
+    .pr-table tbody tr:nth-child(3) {
+        animation-delay: 50ms;
+    }
+
+    .pr-table tbody tr:nth-child(4) {
+        animation-delay: 75ms;
+    }
+
+    .pr-table tbody tr:nth-child(5) {
+        animation-delay: 100ms;
+    }
+
+    .pr-table tbody tr:nth-child(6) {
+        animation-delay: 125ms;
+    }
+
+    .pr-table tbody tr:nth-child(7) {
+        animation-delay: 150ms;
+    }
+
+    .pr-table tbody tr:nth-child(8) {
+        animation-delay: 175ms;
+    }
+
+    .pr-table tbody tr:nth-child(9) {
+        animation-delay: 200ms;
+    }
+
+    .pr-table tbody tr:nth-child(10) {
+        animation-delay: 225ms;
+    }
 </style>
 
 <div class="pr-page">
-<div class="pr-inner">
+    <div class="pr-inner">
 
-    {{-- Top bar --}}
-    <div class="pr-topbar">
-        <div>
-            <div class="pr-breadcrumb">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-                Polls &rsaquo; Responses
+        {{-- Top bar --}}
+        <div class="pr-topbar">
+            <div>
+                <div class="pr-breadcrumb">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Polls &rsaquo; Responses
+                </div>
+                <h1 class="pr-heading">
+                    Responses for: <em>{{ $poll->title }}</em>
+                </h1>
             </div>
-            <h1 class="pr-heading">
-                Responses for: <em>{{ $poll->title }}</em>
-            </h1>
+
+            <div class="pr-stats">
+                <span class="pr-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+                    </svg>
+                    Total: <strong>{{ $answers->total() }}</strong>
+                </span>
+                <span class="pr-pill">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M3 9h18M9 21V9" />
+                    </svg>
+                    Page <strong>{{ $answers->currentPage() }}</strong> of <strong>{{ $answers->lastPage() }}</strong>
+                </span>
+            </div>
         </div>
 
-        <div class="pr-stats">
-            <span class="pr-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                </svg>
-                Total: <strong>{{ $answers->total() }}</strong>
-            </span>
-            <span class="pr-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <path d="M3 9h18M9 21V9"/>
-                </svg>
-                Page <strong>{{ $answers->currentPage() }}</strong> of <strong>{{ $answers->lastPage() }}</strong>
-            </span>
-        </div>
-    </div>
-
-    {{-- Card --}}
-    <div class="pr-card">
-        <div class="pr-scroll">
-            <table class="pr-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Question</th>
-                        <th>Answer</th>
-                        <th>Submitted At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($answers as $answer)
+        {{-- Card --}}
+        <div class="pr-card">
+            <div class="pr-scroll">
+                <table class="pr-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Question</th>
+                            <th>Answer</th>
+                            <th>Submitted At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($answers as $answer)
                         @php
-                            $name     = $answer->user->name ?? 'Guest';
-                            $isGuest  = !$answer->user;
-                            $initials = $isGuest
-                                ? '?'
-                                : collect(explode(' ', $name))
-                                    ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1)))
-                                    ->take(2)
-                                    ->implode('');
+                        $name = $answer->user->name ?? 'Guest';
+                        $isGuest = !$answer->user;
+                        $initials = $isGuest
+                        ? '?'
+                        : collect(explode(' ', $name))
+                        ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1)))
+                        ->take(2)
+                        ->implode('');
                         @endphp
                         <tr>
                             {{-- Index --}}
@@ -396,24 +450,43 @@
 
                             {{-- Answer --}}
                             <td>
-                                @if($answer->text_answer)
-                                    <span class="pr-badge txt">{{ $answer->text_answer }}</span>
-                                @elseif(!is_null($answer->yes_no_answer))
-                                    @if($answer->yes_no_answer)
-                                        <span class="pr-badge yes">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
-                                            Yes
-                                        </span>
-                                    @else
-                                        <span class="pr-badge no">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                                            No
-                                        </span>
-                                    @endif
-                                @elseif($answer->rating_answer)
-                                    <span class="pr-badge star">⭐ {{ $answer->rating_answer }} / 5</span>
+                                @php
+                                $type = $answer->question->type;
+                                @endphp
+
+                                @if($type === 'text')
+                                <span class="pr-badge txt">
+                                    {{ $answer->text_answer }}
+                                </span>
+
+                                @elseif($type === 'yes_no')
+                                @if($answer->yes_no_answer)
+                                <span class="pr-badge yes">
+                                    ✔ Yes
+                                </span>
                                 @else
-                                    <span class="pr-dash">—</span>
+                                <span class="pr-badge no">
+                                    ✖ No
+                                </span>
+                                @endif
+
+                                @elseif($type === 'rating')
+                                <span class="pr-badge star">
+                                    ⭐ {{ $answer->rating_answer }} / {{ $answer->question->rating_scale ?? 5 }}
+                                </span>
+
+                                @elseif($type === 'option')
+                                @php
+                                $opt = $answer->question->options
+                                ->firstWhere('id', $answer->option_id);
+                                @endphp
+
+                                <span class="pr-badge opt">
+                                    {{ $opt->option_text ?? 'N/A' }}
+                                </span>
+
+                                @else
+                                <span class="pr-dash">—</span>
                                 @endif
                             </td>
 
@@ -425,13 +498,13 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
+                        @empty
                         <tr>
                             <td colspan="5">
                                 <div class="pr-empty">
                                     <div class="pr-empty-icon">
                                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
                                     <div class="pr-empty-title">No responses yet</div>
@@ -439,19 +512,19 @@
                                 </div>
                             </td>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-        @if($answers->hasPages())
+            @if($answers->hasPages())
             <div class="pr-pager">
                 {{ $answers->links() }}
             </div>
-        @endif
-    </div>
+            @endif
+        </div>
 
-</div>
+    </div>
 </div>
 
 @endsection

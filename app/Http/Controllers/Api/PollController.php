@@ -23,7 +23,7 @@ class PollController extends Controller
         //     ], 401);
         // }
         $user = $request->user();
-        if(!$user) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated.'
@@ -166,10 +166,10 @@ class PollController extends Controller
 
         // Yes/No stats
         $yesNoStats = PollAnswer::selectRaw('poll_question_id, yes_no_answer, COUNT(*) as votes')
-        ->whereIn('poll_question_id', $questionIds)
-        ->groupBy('poll_question_id', 'yes_no_answer')
-        ->get()
-        ->groupBy('poll_question_id');
+            ->whereIn('poll_question_id', $questionIds)
+            ->groupBy('poll_question_id', 'yes_no_answer')
+            ->get()
+            ->groupBy('poll_question_id');
 
         // User answers
         $userAnswers = PollAnswer::where('user_id', $user->id)
@@ -267,7 +267,7 @@ class PollController extends Controller
                 'is_active' => $poll->is_active,
             ],
             'questions' => $questions
-            
+
         ]);
     }
     // public function latestSubmittedPollByEvent(Request $request, Event $event)

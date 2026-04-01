@@ -344,72 +344,188 @@
         color: var(--muted);
     }
 
-    /* ── Modal ── */
+    /* ══════════════════════════════════════════
+       MODAL — redesigned
+    ══════════════════════════════════════════ */
     .pd-modal .modal-content {
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, .13);
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 24px 72px rgba(0, 0, 0, .18);
         overflow: hidden;
+        background: var(--surface);
     }
 
+    /* Header */
     .pd-modal .modal-header {
-        background: var(--subtle);
+        background: #fff;
         border-bottom: 1px solid var(--border);
-        padding: 1.1rem 1.4rem;
+        padding: 1.15rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    .pm-header-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--accent-lt);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
     .pd-modal .modal-title {
         font-weight: 700;
-        font-size: 1rem;
+        font-size: .95rem;
         color: var(--text);
+        flex: 1;
+        margin: 0;
+        line-height: 1.3;
     }
 
+    .pm-title-sub {
+        font-size: .72rem;
+        color: var(--muted);
+        font-weight: 400;
+        margin-top: 1px;
+    }
+
+    .pd-modal .btn-close {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        opacity: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s;
+        flex-shrink: 0;
+        font-size: .65rem;
+    }
+
+    .pd-modal .btn-close:hover {
+        background: var(--border);
+    }
+
+    /* Body */
     .pd-modal .modal-body {
-        padding: 1.4rem;
+        padding: 0;
+        background: var(--bg);
+        max-height: 68vh;
+        overflow-y: auto;
     }
 
-    .pm-q-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: .25rem;
-    }
-
-    .pm-divider {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 1rem 0;
-    }
-
-    /* answer card */
-    .pm-answer {
+    /* Question context strip */
+    .pm-q-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 1.5rem;
         display: flex;
         align-items: flex-start;
         gap: .75rem;
-        padding: .8rem 1rem;
-        border-radius: 10px;
+    }
+
+    .pm-q-strip-num {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        background: var(--accent);
+        color: #fff;
+        font-size: .68rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .pm-q-strip-text {
+        font-size: .88rem;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    /* Stats bar */
+    .pm-stats-bar {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .75rem 1.5rem;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+
+    .pm-stat-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .25rem .7rem;
+        border-radius: 7px;
+        font-size: .72rem;
+        font-weight: 600;
+    }
+
+    .pm-stat-chip.total {
+        background: var(--accent-lt);
+        color: var(--accent);
+    }
+
+    .pm-stat-chip.type-chip {
+        background: var(--purple-bg);
+        color: var(--purple-fg);
+    }
+
+    /* Answers list wrapper */
+    .pm-answers-wrap {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Answer row */
+    .pm-answer {
+        display: flex;
+        align-items: flex-start;
+        gap: .875rem;
+        padding: .9rem 1.1rem;
+        border-radius: 12px;
         border: 1px solid var(--border);
-        margin-bottom: .5rem;
-        transition: background .1s;
+        margin-bottom: .625rem;
+        background: var(--surface);
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+    .pm-answer:last-child {
+        margin-bottom: 0;
     }
 
     .pm-answer:hover {
-        background: var(--subtle);
+        border-color: #c7d2fe;
+        box-shadow: 0 2px 10px rgba(79, 70, 229, .07);
     }
 
+    /* Avatar */
     .pm-avatar {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         background: var(--accent);
         color: #fff;
-        font-size: .67rem;
+        font-size: .68rem;
         font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         text-transform: uppercase;
+        letter-spacing: .03em;
     }
 
     .pm-avatar.guest {
@@ -417,27 +533,68 @@
         color: var(--muted);
     }
 
+    /* Avatar color variants */
+    .pm-avatar.av-1 {
+        background: #6366f1;
+    }
+
+    .pm-avatar.av-2 {
+        background: #8b5cf6;
+    }
+
+    .pm-avatar.av-3 {
+        background: #ec4899;
+    }
+
+    .pm-avatar.av-4 {
+        background: #14b8a6;
+    }
+
+    .pm-avatar.av-5 {
+        background: #f59e0b;
+    }
+
+    .pm-avatar.av-6 {
+        background: #10b981;
+    }
+
+    .pm-answer-body {
+        flex: 1;
+        min-width: 0;
+    }
+
     .pm-user {
-        font-size: .8rem;
+        font-size: .82rem;
         font-weight: 600;
         color: var(--text);
-        margin-bottom: .2rem;
+        margin-bottom: .3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .pm-answer-val {
+        margin-bottom: .3rem;
     }
 
     .pm-time {
-        font-size: .72rem;
+        font-size: .7rem;
         color: var(--muted);
-        margin-top: .2rem;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
     }
 
+    /* Answer badges */
     .pm-badge {
         display: inline-flex;
         align-items: center;
-        gap: .3rem;
-        padding: .22rem .65rem;
-        border-radius: 6px;
+        gap: .35rem;
+        padding: .28rem .7rem;
+        border-radius: 7px;
         font-size: .76rem;
         font-weight: 600;
+        line-height: 1.4;
     }
 
     .pm-badge.yes {
@@ -459,32 +616,81 @@
         background: var(--accent-lt);
         color: var(--accent);
         font-weight: 400;
+        word-break: break-word;
+        white-space: normal;
+        border-radius: 7px;
+        font-size: .8rem;
+        line-height: 1.5;
     }
 
-    /* spinner */
+    .pm-badge.option {
+        background: var(--purple-bg);
+        color: var(--purple-fg);
+    }
+
+    /* Loading state */
     .pm-loading {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: .6rem;
-        padding: 3rem;
+        gap: .75rem;
+        padding: 4rem 1rem;
         color: var(--muted);
-        font-size: .88rem;
+        font-size: .85rem;
     }
 
     .pm-spinner {
-        width: 18px;
-        height: 18px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        border: 2px solid var(--border);
+        border: 2.5px solid var(--border);
         border-top-color: var(--accent);
-        animation: spin .7s linear infinite;
+        animation: pm-spin .7s linear infinite;
     }
 
-    @keyframes spin {
+    @keyframes pm-spin {
         to {
             transform: rotate(360deg);
         }
+    }
+
+    /* Empty state inside modal */
+    .pm-no-answers {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+    }
+
+    .pm-no-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: .9rem;
+    }
+
+    .pm-no-icon svg {
+        opacity: .35;
+    }
+
+    .pm-no-title {
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: .3rem;
+        font-size: .92rem;
+    }
+
+    .pm-no-sub {
+        font-size: .8rem;
+        color: var(--muted);
     }
 
     /* row entrance */
@@ -528,6 +734,22 @@
         animation-delay: 175ms;
     }
 
+    @keyframes pmIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    .pm-answer {
+        animation: pmIn .18s ease both;
+    }
+
     @media (max-width: 576px) {
         .pd-wrap {
             padding: 1rem 1rem 3rem;
@@ -539,6 +761,10 @@
 
         .pd-item.span2 {
             grid-column: auto;
+        }
+
+        .pm-answers-wrap {
+            padding: .75rem;
         }
     }
 </style>
@@ -686,19 +912,36 @@
 </div>
 
 {{-- Modal --}}
-<div class="modal fade pd-modal" id="questionAnswersModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal fade pd-modal" id="questionAnswersModal" tabindex="-1" aria-labelledby="questionAnswersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
+ 
+            {{-- Header --}}
             <div class="modal-header">
-                <h5 class="modal-title">Question Responses</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="pm-header-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                </div>
+                <div style="flex:1;">
+                    <h5 class="modal-title" id="questionAnswersModalLabel">Question Responses</h5>
+                    <div class="pm-title-sub" id="pm-modal-sub">Loading…</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M1 1l12 12M13 1L1 13"/>
+                    </svg>
+                </button>
             </div>
+ 
+            {{-- Body (scrollable) --}}
             <div class="modal-body" id="questionModalContent">
                 <div class="pm-loading">
                     <div class="pm-spinner"></div>
                     Loading responses…
                 </div>
             </div>
+ 
         </div>
     </div>
 </div>
@@ -707,92 +950,183 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-        document.querySelectorAll('.question-click').forEach(item => {
-            item.addEventListener('click', function() {
-
-                const qId = this.getAttribute('data-id');
-                const modalContent = document.getElementById('questionModalContent');
-
-                modalContent.innerHTML = `
+document.addEventListener('DOMContentLoaded', function () {
+ 
+    const avatarColors = ['av-1','av-2','av-3','av-4','av-5','av-6'];
+ 
+    function initials(name) {
+        return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    }
+ 
+    function avatarClass(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        return avatarColors[Math.abs(hash) % avatarColors.length];
+    }
+ 
+    function formatDate(str) {
+        const d = new Date(str);
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+             + ' · '
+             + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+ 
+    function answerBadge(answer, questionType) {
+ 
+        // TEXT
+        if (questionType === 'text' && answer.text_answer) {
+            return `<span class="pm-badge txt">${answer.text_answer}</span>`;
+        }
+ 
+        // YES / NO
+        if (questionType === 'yes_no' && answer.yes_no_answer !== null) {
+            return answer.yes_no_answer
+                ? `<span class="pm-badge yes">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    Yes</span>`
+                : `<span class="pm-badge no">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    No</span>`;
+        }
+ 
+        // RATING
+        if (questionType === 'rating' && answer.rating_answer) {
+            const scale = answer.question?.rating_scale ?? '?';
+            const stars = Math.round(answer.rating_answer);
+            let starHtml = '';
+            for (let i = 1; i <= scale; i++) {
+                starHtml += `<svg width="11" height="11" viewBox="0 0 24 24" fill="${i <= stars ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>`;
+            }
+            return `<span class="pm-badge star" style="gap:.2rem;">${starHtml}<span style="margin-left:3px;">${answer.rating_answer} / ${scale}</span></span>`;
+        }
+ 
+        // OPTION (MCQ)
+        if (questionType === 'option' && answer.option) {
+            return `<span class="pm-badge option">${answer.option.option_text}</span>`;
+        }
+ 
+        return `<span style="color:#d1d5db;font-size:.8rem;">—</span>`;
+    }
+ 
+    /* ── Click handler ── */
+    document.querySelectorAll('.question-click').forEach(item => {
+        item.addEventListener('click', function () {
+ 
+            const qId = this.getAttribute('data-id');
+            const modalContent  = document.getElementById('questionModalContent');
+            const modalSubtitle = document.getElementById('pm-modal-sub');
+ 
+            // Reset
+            modalSubtitle.textContent = 'Loading…';
+            modalContent.innerHTML = `
                 <div class="pm-loading">
                     <div class="pm-spinner"></div>
                     Loading responses…
                 </div>`;
-
-                const modal = new bootstrap.Modal(document.getElementById('questionAnswersModal'));
-                modal.show();
-
-                fetch(`/admin/question/${qId}/answers`)
-                    .then(r => r.json())
-                    .then(data => {
-
-                        if (!data.success) {
-                            modalContent.innerHTML = `<p class="text-center text-muted py-4">Could not load responses.</p>`;
-                            return;
-                        }
-
-                        const question = data.question;
-
-                        function initials(name) {
-                            return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        }
-
-                        function answerBadge(answer) {
-                            if (answer.text_answer)
-                                return `<span class="pm-badge txt">${answer.text_answer}</span>`;
-                            if (answer.yes_no_answer !== null && answer.yes_no_answer !== undefined)
-                                return answer.yes_no_answer ?
-                                    `<span class="pm-badge yes"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> Yes</span>` :
-                                    `<span class="pm-badge no"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg> No</span>`;
-                            if (answer.rating_answer)
-                                return `<span class="pm-badge star">⭐ ${answer.rating_answer} / 5</span>`;
-                            return `<span style="color:#d1d5db">—</span>`;
-                        }
-
-                        let html = `
-                        <div class="pm-q-title">${question.question}</div>
-                        <hr class="pm-divider">
-                    `;
-
-                        if (!question.answers.length) {
-                            html += `
-                            <div style="text-align:center;padding:2.5rem 1rem;">
-                                <div style="width:48px;height:48px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;opacity:.5;">
+ 
+            const modal = new bootstrap.Modal(document.getElementById('questionAnswersModal'));
+            modal.show();
+ 
+            fetch(`/admin/question/${qId}/answers`)
+                .then(r => r.json())
+                .then(data => {
+ 
+                    if (!data.success) {
+                        modalSubtitle.textContent = 'Error loading data';
+                        modalContent.innerHTML = `
+                            <div class="pm-no-answers">
+                                <div class="pm-no-icon">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                                </div>
+                                <div class="pm-no-title">Could not load responses</div>
+                                <div class="pm-no-sub">Please try again or refresh the page.</div>
+                            </div>`;
+                        return;
+                    }
+ 
+                    const question = data.question;
+                    const totalResponses = question.answers.length;
+                    const questionType   = question.type;
+ 
+                    // Update modal subtitle
+                    modalSubtitle.textContent = `${totalResponses} ${totalResponses === 1 ? 'response' : 'responses'}`;
+ 
+                    // Build inner HTML
+                    let html = `
+                        <!-- Question strip -->
+                        <div class="pm-q-strip">
+                            <div class="pm-q-strip-num">Q</div>
+                            <div class="pm-q-strip-text">${question.question}</div>
+                        </div>
+ 
+                        <!-- Stats bar -->
+                        <div class="pm-stats-bar">
+                            <span class="pm-stat-chip total">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                                ${totalResponses} ${totalResponses === 1 ? 'Response' : 'Responses'}
+                            </span>
+                            <span class="pm-stat-chip type-chip">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                                ${questionType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                            </span>
+                        </div>
+ 
+                        <!-- Answers list -->
+                        <div class="pm-answers-wrap">`;
+ 
+                    if (!totalResponses) {
+                        html += `
+                            <div class="pm-no-answers">
+                                <div class="pm-no-icon">
                                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                                 </div>
-                                <div style="font-weight:700;color:var(--text);margin-bottom:.3rem">No responses yet</div>
-                                <div style="font-size:.82rem;color:var(--muted)">This question hasn't been answered.</div>
+                                <div class="pm-no-title">No responses yet</div>
+                                <div class="pm-no-sub">This question hasn't received any answers.</div>
                             </div>`;
-                        } else {
-                            question.answers.forEach(answer => {
-                                const name = answer.user?.name ?? 'Guest';
-                                const isGuest = !answer.user;
-                                const ini = isGuest ? '?' : initials(name);
-                                const date = new Date(answer.created_at).toLocaleString();
-
-                                html += `
-                                <div class="pm-answer">
-                                    <div class="pm-avatar ${isGuest ? 'guest' : ''}">${ini}</div>
-                                    <div style="flex:1;min-width:0;">
+                    } else {
+                        question.answers.forEach((answer, idx) => {
+                            const name     = answer.user?.name ?? 'Guest';
+                            const isGuest  = !answer.user;
+                            const ini      = isGuest ? '?' : initials(name);
+                            const avClass  = isGuest ? 'guest' : avatarClass(name);
+                            const dateStr  = formatDate(answer.created_at);
+ 
+                            html += `
+                                <div class="pm-answer" style="animation-delay:${idx * 30}ms;">
+                                    <div class="pm-avatar ${avClass}">${ini}</div>
+                                    <div class="pm-answer-body">
                                         <div class="pm-user">${name}</div>
-                                        <div>${answerBadge(answer)}</div>
-                                        <div class="pm-time">${date}</div>
+                                        <div class="pm-answer-val">${answerBadge(answer, questionType)}</div>
+                                        <div class="pm-time">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.55;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            ${dateStr}
+                                        </div>
                                     </div>
                                 </div>`;
-                            });
-                        }
-
-                        modalContent.innerHTML = html;
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        modalContent.innerHTML = `<p class="text-center text-muted py-4">Something went wrong.</p>`;
-                    });
-            });
+                        });
+                    }
+ 
+                    html += `</div>`; // close pm-answers-wrap
+ 
+                    modalContent.innerHTML = html;
+                })
+                .catch(err => {
+                    console.error(err);
+                    modalSubtitle.textContent = 'Error';
+                    modalContent.innerHTML = `
+                        <div class="pm-no-answers">
+                            <div class="pm-no-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                            </div>
+                            <div class="pm-no-title">Something went wrong</div>
+                            <div class="pm-no-sub">Unable to fetch responses. Try again.</div>
+                        </div>`;
+                });
         });
-
     });
+ 
+});
 </script>
 @endsection
