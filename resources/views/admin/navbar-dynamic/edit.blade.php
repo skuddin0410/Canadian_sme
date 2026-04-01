@@ -958,18 +958,52 @@ function initEditor() {
     sections.forEach(sec => {
         if (sec.type === 'text') {
             tinymce.init({
-                selector: `#text_${sec.id}`,
-                height: 250,
-                plugins: 'lists link image table code',
-                toolbar: 'undo redo | bold italic underline | forecolor backcolor | alignleft aligncenter alignright | bullist numlist | link image | code',
-                menubar: false,
-                branding: false,
-                setup: function(editor) {
-                    editor.on('keyup change', function() {
-                        updateSection(sec.id, 'content', editor.getContent());
-                    });
-                }
-            });
+    selector: `#text_${sec.id}`,
+    height: 420,
+
+    menubar: 'file edit view insert format tools table help',
+
+    plugins: [
+        'advlist autolink lists link image charmap preview anchor',
+        'searchreplace visualblocks visualchars code fullscreen',
+        'insertdatetime media table paste wordcount help',
+        'emoticons directionality'
+    ],
+
+    toolbar: [
+        // Row 1 (like screenshot)
+        'undo redo | blocks | fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor |',
+        
+        // Row 2
+        'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |',
+        
+        // Row 3
+        'link image media table emoticons charmap | code preview fullscreen'
+    ],
+
+    toolbar_mode: 'wrap',   // allows multiple rows like screenshot
+    branding: false,
+    statusbar: true,
+
+    font_family_formats: `
+        Andale Mono=andale mono,times;
+        Arial=arial,helvetica,sans-serif;
+        Public Sans=Public Sans,sans-serif;
+        Courier New=courier new,courier;
+        Georgia=georgia,palatino;
+        Tahoma=tahoma,arial,helvetica,sans-serif;
+        Times New Roman=times new roman,times;
+        Verdana=verdana,geneva;
+    `,
+
+    fontsize_formats: '8px 10px 12px 14px 18px 24px 36px 48px',
+
+    setup: function (editor) {
+        editor.on('keyup change', function () {
+            updateSection(sec.id, 'content', editor.getContent());
+        });
+    }
+});
         }
 
         if (sec.type === 'cards') {
