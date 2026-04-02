@@ -56,6 +56,18 @@ class TicketType extends Model
         return $this->hasMany(EventTicket::class);
     }
 
+    public function ticketPurchases()
+    {
+        return $this->hasMany(TicketPurchase::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'ticket_purchases', 'ticket_type_id', 'user_id')
+            ->withTimestamps()
+            ->distinct();
+    }
+
     // Scopes
     public function scopeActive($query)
     {
