@@ -9,6 +9,7 @@ use App\Traits\AutoHtmlDecode;
 use App\Models\ContactUs;
 use App\Models\Poll;
 use App\Models\Subscription;
+use App\Models\Form;
 
 class Event extends Model
 {
@@ -59,6 +60,10 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function forms()
+    {
+        return $this->hasMany(Form::class);
     }
     public function subscriptions()
     {

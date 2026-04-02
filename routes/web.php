@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Artisan;
 use App\Models\User;
 use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\EmailTrackingController;
+use App\Http\Controllers\EventUserAuthController;
 
-
-Route::get('/login', function () {
-    return redirect()->route('login');
-});
+// Route::get('/login', function () {
+//     return redirect()->route('login');
+// });
 
 Route::get('/run/command', function () {
     Artisan::call('db:seed', [
@@ -84,7 +84,18 @@ Route::get('/email/img/{id}', [EmailTrackingController::class, 'trackOpen'])->na
 
 Route::get('/email/click/{id}', [EmailTrackingController::class, 'trackClick'])->name('email.track.click');
 
+Route::prefix('events/{event}')->group(function () {
 
+    Route::get('/login', [EventUserAuthController::class, 'showLogin'])
+        ->name('event.user.login');
+
+    Route::post('/login', [EventUserAuthController::class, 'login'])
+        ->name('event.user.login.submit');
+
+    Route::get('/register', [EventUserAuthController::class, 'showRegister'])
+        ->name('event.user.register');
+
+});
 Auth::routes();
 
 Route::prefix('user')->name('user.')->middleware(['webauth'])->group(function () {
@@ -110,6 +121,8 @@ Route::get('/login', function () {
 
     return view('auth.login');
 })->name('login');
+
+
 
 Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
 
