@@ -176,6 +176,18 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    public function ticketPurchases()
+    {
+        return $this->hasMany(TicketPurchase::class);
+    }
+
+    public function ticketTypes()
+    {
+        return $this->belongsToMany(TicketType::class, 'ticket_purchases', 'user_id', 'ticket_type_id')
+            ->withTimestamps()
+            ->distinct();
+    }
+
     protected function approvalStatusLabel(): Attribute
     {
         return Attribute::get(fn() => $this->is_approve ? 'Approved' : 'Pending Approval');

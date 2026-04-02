@@ -34,7 +34,7 @@ class JWTAuthController extends Controller
             }
 
             $token = request()->bearerToken() ?? JWTAuth::refresh();
-            $user->load(['photo', 'usercompany']);
+            $user->load(['photo', 'usercompany', 'ticketTypes:id,name']);
             return response()->json([
                 'success' => true,
                 'message' => 'successful',
@@ -110,6 +110,7 @@ class JWTAuthController extends Controller
                 'company_phone' => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile,
                 'company_website' => !empty($user->usercompany) ? $user->usercompany->website : $user->website_url,
                 'roles' => function_exists('groups') ? groups($user) : [],
+                'ticket_tag' => $user->ticketTypes->pluck('name')->filter()->unique()->values(),
             ]);
 
         } catch (TokenExpiredException $e) {
