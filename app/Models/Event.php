@@ -37,7 +37,8 @@ class Event extends Model
         'privacy_policy',
         'about',
         'help_support',
-        'subscription_id'
+        'subscription_id',
+        'section_order'
     ];
 
     protected $casts = [
@@ -45,6 +46,7 @@ class Event extends Model
         'is_featured' => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        // 'section_order' => 'array', // handled manually via json_decode/json_encode due to AutoHtmlDecode trait
     ];
 
     public function creator()
