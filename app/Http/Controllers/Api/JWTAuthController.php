@@ -78,7 +78,7 @@ class JWTAuthController extends Controller
         }
     }
 
-    public function getUser()
+    public function getUser(Request $request)
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
@@ -91,7 +91,17 @@ class JWTAuthController extends Controller
                 ], 401);
             }
 
-            $user->load(['photo', 'usercompany']);
+            $user->load([
+                'photo',
+                'usercompany',
+                'ticketPurchases' => function ($query) use ($request) {
+                    $query->with('ticketType:id,name');
+
+                    if ($request->filled('event_id')) {
+                        $query->where('event_id', $request->event_id);
+                    }
+                },
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -110,7 +120,11 @@ class JWTAuthController extends Controller
                 'company_phone' => !empty($user->usercompany) ? $user->usercompany->phone : $user->mobile,
                 'company_website' => !empty($user->usercompany) ? $user->usercompany->website : $user->website_url,
                 'roles' => function_exists('groups') ? groups($user) : [],
-                'ticket_tag' => $user->ticketTypes->pluck('name')->filter()->unique()->values(),
+                'ticket_tag' => $user->ticketPurchases
+                    ->pluck('ticketType.name')
+                    ->filter()
+                    ->unique()
+                    ->values(),
             ]);
 
         } catch (TokenExpiredException $e) {
