@@ -26,7 +26,10 @@ Route::get('app/page/{slug}', [PageController::class, 'appPage'])->name('public.
 // Route::prefix('form-builder')->group(function () {
   Route::post('/forms/{id}/submit', [FormBuilderController::class, 'submitForm'])->name('forms.submit');
 // });
-Route::get('/tickets/available', [FormBuilderController::class, 'available'])->name('tickets.available');
+Route::get(
+    '/events/{event}/tickets/available',
+    [FormBuilderController::class, 'available']
+)->name('tickets.available');
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');

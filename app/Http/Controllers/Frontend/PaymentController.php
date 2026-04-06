@@ -9,12 +9,16 @@ use App\Models\User;
 use App\Models\TicketType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Event;
 use Stripe\Stripe;
 use Stripe\Checkout\Session as CheckoutSession;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+
 
 class PaymentController extends Controller
 {
-     public function checkout(Request $request)
+    public function checkout(Request $request)
     {
         $ticketPurchaseId = $request->ticket_purchase_id;
 
@@ -47,36 +51,46 @@ class PaymentController extends Controller
         return redirect($session->url);
     }
 
+
+
     public function success(Request $request)
     {
-        $ticketPurchase = TicketPurchase::findOrFail($request->ticket_purchase_id);
+        $ticketPurchase = TicketPurchase::with('ticketType')
+            ->findOrFail($request->ticket_purchase_id);
 
+        // 1. Mark payment completed
         $ticketPurchase->update([
             'status' => 'completed',
-            'payment_reference' => now()->timestamp, // you can store Stripe session ID too
+            'payment_reference' => now()->timestamp,
         ]);
 
-        $user = $ticketPurchase->user;
+        $user  = $ticketPurchase->user;
+        $event = Event::findOrFail($ticketPurchase->event_id);
 
-        // Send notifications / QR code
+        // 2. Send notifications / QR
         notification($user->id);
         if (qrCode($user->id)) {
             sendNotification("Welcome Email", $user);
         }
 
-        return redirect()->route('registration')->with('success', 'Payment successful! Your registration is confirmed.');
+        // 3. Logout and destroy session completely
+        Auth::logout();
+        Session::flush();
+        Session::regenerateToken();
+
+        // 4. Redirect to EVENT LOGIN page (very important)
+        return redirect()
+            ->route('event.user.login', $event->id)
+            ->with('success', 'Payment successful! Please login to continue.');
     }
 
     public function cancel(Request $request)
     {
         $ticketPurchase = TicketPurchase::findOrFail($request->ticket_purchase_id);
 
-        // Optional: delete pending purchase if needed
-        $ticketPurchase->update([
-            'status' => 'cancelled',
-        ]);
+        $ticketPurchase->update(['status' => 'cancelled']);
 
-        return redirect()->route('form.show', ['id' => $ticketPurchase->form_id])
-                         ->with('error', 'Payment cancelled. Please try again.');
+        return redirect()->route('event.user.register', $ticketPurchase->event_id)
+            ->with('error', 'Payment cancelled. Please try again.');
     }
 }

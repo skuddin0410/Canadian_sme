@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
+use App\Models\Event;
 
 class Form extends Model
 {
@@ -31,5 +32,8 @@ class Form extends Model
     {
         return $this->hasMany(FormSubmission::class);
     }
-    
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }
