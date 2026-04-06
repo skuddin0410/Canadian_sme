@@ -626,7 +626,7 @@ use Illuminate\Support\Str;
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                 </svg>
-                Registration Form
+                Registration Form for {{ $event->title }}
             </div>
             <h1 class="df-title">{{ $form->title }}</h1>
             @if(!empty($form->description))
@@ -878,7 +878,7 @@ use Illuminate\Support\Str;
         </div>
 
         <div class="df-footer-link">
-            Already have an account? <a href="{{ route('login', ['event_id' => session('event_id')]) }}">
+            Already have an account? <a href="{{ route('event.user.login', $event->id) }}">
                 Sign in
             </a>
         </div>
