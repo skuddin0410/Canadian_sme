@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Models\UserTicket;
 use App\Models\Event;
+use App\Models\EventAndEntityLink;
+
 
 
 class FormBuilderController extends Controller
@@ -157,7 +159,7 @@ class FormBuilderController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-      
+
 
         if ($data['registration_type'] === 'paid') {
             $ticket = TicketType::findOrFail($data['selected_ticket_id']);
@@ -188,6 +190,11 @@ class FormBuilderController extends Controller
                 ]);
 
                 $user->assignRole('Attendee');
+                EventAndEntityLink::create([
+                    'event_id'    => $eventId,
+                    'entity_type' => 'users',
+                    'entity_id'   => $user->id,
+                ]);
 
                 DB::commit();
 
@@ -225,6 +232,11 @@ class FormBuilderController extends Controller
                 ]);
 
                 $user->assignRole('Attendee');
+                EventAndEntityLink::create([
+                    'event_id'    => $eventId,
+                    'entity_type' => 'users',
+                    'entity_id'   => $user->id,
+                ]);
 
                 // 2. Get ticket & price from base_price
                 $ticket = TicketType::findOrFail($data['selected_ticket_id']);

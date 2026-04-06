@@ -918,11 +918,7 @@ use Illuminate\Support\Str;
 
 @section('scripts')
 <script>
-    const EVENT_ID = {
-        {
-            $event - > id
-        }
-    };
+    const EVENT_ID = @json($event->id);
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
