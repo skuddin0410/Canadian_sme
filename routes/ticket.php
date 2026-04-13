@@ -12,6 +12,9 @@
         Route::post('ticket-types/{ticketType}/update-inventory', [App\Http\Controllers\TicketTypeController::class, 'updateInventory'])
             ->name('ticket-types.update-inventory');
 
+        Route::get('ticket-purchases', [App\Http\Controllers\TicketPurchaseController::class, 'index'])
+            ->name('ticket-purchases.index');
+
         // Ticket Pricing Rules
         Route::resource('ticket-pricing', App\Http\Controllers\TicketPricingController::class);
         Route::patch('ticket-pricing/{ticketPricing}/toggle', [App\Http\Controllers\TicketPricingController::class, 'toggle'])
