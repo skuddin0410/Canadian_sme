@@ -127,6 +127,7 @@ class EventController extends Controller
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
         $validated['created_by'] = auth()->id(); // or any default user
         $validated['subscription_id'] = $subscription?->id;
+        $validated['section_order'] = !empty($validated['section_order']) ? json_encode($validated['section_order']) : null;
 
         $event = Event::create($validated);
 
