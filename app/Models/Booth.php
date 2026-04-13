@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Company;
+use App\Models\Event;
 use App\Traits\Auditable;
 use App\Traits\AutoHtmlDecode;
 use Illuminate\Database\Eloquent\Model;
@@ -16,12 +17,18 @@ class Booth extends Model
      use AutoHtmlDecode;
 
      protected $fillable = [
+        'event_id',
         'company_id',
         'title',
         'booth_number',
         'size',
         'location_preferences',
     ];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 
 
      public function companies()
@@ -40,6 +47,11 @@ public function boothUsers()
 {
     return $this->hasMany(BoothUser::class);
 }
+
+    public function floorPlanMarkers()
+    {
+        return $this->hasMany(EventFloorPlanMarker::class);
+    }
 
 
     public function sessions()

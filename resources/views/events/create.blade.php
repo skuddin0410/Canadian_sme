@@ -78,7 +78,7 @@
                   type="date"
                   class="form-control"
                   name="start_date"
-                  id="slug-source"
+                  id="start_date"
                   value="{{ old('start_date', isset($e) ? $e->start_date->format('Y-m-d') : '') }}"
                   placeholder="Start date"/>
               </div>
@@ -97,7 +97,7 @@
                   type="date"
                   class="form-control"
                   name="end_date"
-                  id="slug-source"
+                  id="end_date"
                   value="{{ old('end_date', isset($e) ? $e->end_date->format('Y-m-d') : '') }}"
                   placeholder="End date"/>
               </div>
@@ -149,18 +149,43 @@
 </div>
 
 
+            <div class="mb-3 card">
+                <div class="card-header d-flex justify-content-between align-items-center p-2 px-3">
+                  <h6 class="mb-0 text-muted small">Landing Page Sections Order</h6>
+                  <small class="text-muted">Drag to reorder</small>
+                </div>
+                <div class="card-body p-3">
+                  @php
+                    $allPossibleSections = [
+                        'attendee' => 'Attendees',
+                        'speaker' => 'Speakers',
+                        'exhibitor' => 'Exhibitors',
+                        'sponsor' => 'Sponsors',
+                    ];
+                    // Default order requested by user
+                    $currentOrder = ['attendee', 'speaker', 'exhibitor', 'sponsor'];
+                  @endphp
+                  <ul class="list-group list-group-flush mb-0" id="active-sections">
+                    @foreach($currentOrder as $secKey)
+                      <li class="list-group-item d-flex align-items-center px-0" data-id="{{ $secKey }}">
+                        <i class="bx bx-menu me-3 handle" style="cursor: move; font-size: 1.1rem;"></i>
+                        <span class="fw-medium">{{ $allPossibleSections[$secKey] }}</span>
+                        <input type="hidden" name="section_order[]" value="{{ $secKey }}">
+                      </li>
+                    @endforeach
+                  </ul>
+                </div>
+            </div>
+
             <div class="mb-3">
               <label class="form-label" for="description">Description<span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge" id="quill-editor" style="height: 300px;">
                 <textarea
-                  type="text"
                   name="description"
-                  id="description1"
-                  class="form-control"
+                  id="description"
+                  class="form-control description-cls"
                   placeholder="Event Description"
                   rows="8" cols="50"
                 >{{ old('description', $e->description ?? '') }}</textarea>
-              </div>
               @if ($errors->has('description'))
                 <span class="text-danger text-left">{{ $errors->first('description') }}</span>
               @endif
@@ -254,11 +279,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="about">About</label>
-              <input type="hidden" name="meta_description" id="about" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about') }}</textarea>
               @if ($errors->has('about'))
                 <span class="text-danger text-left">{{ $errors->first('about') }}</span>
               @endif
@@ -266,11 +287,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="privacy_policy">Privacy Policy</label>
-              <input type="hidden" name="meta_description" id="privacy_policy" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy') }}</textarea>
               @if ($errors->has('privacy_policy'))
                 <span class="text-danger text-left">{{ $errors->first('privacy_policy') }}</span>
               @endif
@@ -278,11 +295,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="terms_condition">Terms & Condition</label>
-              <input type="hidden" name="meta_description" id="terms_condition" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition') }}</textarea>
               @if ($errors->has('terms_condition'))
                 <span class="text-danger text-left">{{ $errors->first('terms_condition') }}</span>
               @endif
@@ -290,11 +303,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="help_support">Help & Support</label>
-              <input type="hidden" name="meta_description" id="help_support" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support') }}</textarea>
               @if ($errors->has('help_support'))
                 <span class="text-danger text-left">{{ $errors->first('help_support') }}</span>
               @endif
@@ -319,18 +328,13 @@
 
             <div class="mb-3">
               <label class="form-label" for="meta_description">Meta description</label>
-              <input type="hidden" name="meta_description" id="meta_description" value="{{ old('meta_description', $e->meta_description ?? '') }}">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea
-                  type="text"
-                  name="meta_description"
-                  id="meta_description"
-                  class="form-control"
-                  placeholder="Meta description"
-                  rows="8" cols="50"
-                >{{ old('meta_description', $e->meta_description ?? '') }}</textarea>
-
-              </div>
+              <textarea
+                name="meta_description"
+                id="meta_description"
+                class="form-control description-cls"
+                placeholder="Meta description"
+                rows="8" cols="50"
+              >{{ old('meta_description', $e->meta_description ?? '') }}</textarea>
               @if ($errors->has('meta_description'))
                 <span class="text-danger text-left">{{ $errors->first('meta_description') }}</span>
               @endif
@@ -369,6 +373,7 @@
 @endsection
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
 <script>
   $("#slug-source").keyup(function() {
       var Text = $(this).val();
@@ -390,5 +395,17 @@ function slugify(str) {
            .replace(/-+/g, '-'); // remove consecutive hyphens
   return str.replace(/^-+|-+$/g, '');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const activeList = document.getElementById('active-sections');
+    if (activeList) {
+        new Sortable(activeList, {
+            animation: 150,
+            handle: '.handle',
+            draggable: 'li',
+            ghostClass: 'sortable-ghost'
+        });
+    }
+});
 </script>
 @endsection

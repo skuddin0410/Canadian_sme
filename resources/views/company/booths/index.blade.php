@@ -34,6 +34,17 @@
                   {{ Session::get('error') }}
                   </div>
               @endif
+          <div class="row mb-3 mt-2">
+            <div class="col-md-4">
+              <label class="form-label">Event</label>
+              <select id="event_id" class="form-select">
+                <option value="">All Events</option>
+                @foreach($events as $event)
+                  <option value="{{ $event->id }}">{{ $event->title }}</option>
+                @endforeach
+              </select>
+            </div>
+          </div>
           <div class="col text-center">
                         <div class="spinner-border spinner-border-sm"></div>
                     </div>
@@ -57,7 +68,7 @@
             headers: {
                 'X-CSRF-Token': $('meta[name="_token"]').attr('content')
             },
-            data:{ajax_request:true},
+            data:{ajax_request:true,event_id: $('#event_id').val()},
             dataType: "json",
             success: function (data) {
                $(document).find("#booth-table").html(data.html);
@@ -71,6 +82,7 @@
 
     $(document).ready(function() {
         GetBlogList();
+        $('#event_id').on('change', GetBlogList);
     });
 
     jQuery(function($) {

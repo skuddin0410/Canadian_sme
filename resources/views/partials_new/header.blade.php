@@ -80,7 +80,10 @@
                         </li>
 
                         <li class="nav-item">
-
+                            <a class="heroBtn ms-3" href="/#request-demo">
+                                <img class="d-xl-none" src="{{ asset('frontend/images/home-2.png') }}" alt="">
+                                <span class="d-none d-xl-block">Request Demo</span>
+                            </a>
                         </li>
                     </ul>
                 </div>

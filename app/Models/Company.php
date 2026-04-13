@@ -138,4 +138,9 @@ class Company extends Model
         return $this->hasMany(EventAndEntityLink::class, 'entity_id', 'id')
                     ->where('entity_type', 'companies');
     }
+
+    public function floorPlanMarkers()
+    {
+        return $this->hasMany(EventFloorPlanMarker::class);
+    }
 }

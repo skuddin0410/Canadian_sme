@@ -95,42 +95,38 @@ class EventController extends Controller
             'meta_keywords' => 'nullable|string|max:1000',
             'tags' => 'nullable|string|max:1000',
             'image' => 'required|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
-            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size')
+            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'section_order' => 'nullable|array'
         ]);
         $admin = auth()->user();
+        $subscription = null;
 
-        //  Get active subscription
-        $subscription = Subscription::active()
-            ->where('user_id', $admin->id)
-            ->latest()
-            ->first();
+        if ((int) $admin->id !== 1) {
+            $subscription = Subscription::active()
+                ->where('user_id', $admin->id)
+                ->latest()
+                ->first();
 
-        //  No subscription
-        if (!$subscription) {
-            return back()->withErrors(['error' => 'No active subscription or subscription expired'])->withInput();
-        }
+            if (!$subscription) {
+                return back()->withErrors(['error' => 'No active subscription or subscription expired'])->withInput();
+            }
 
-        //  Extra safety expiry check (optional but good)
-        if ($subscription->expired_at && $subscription->expired_at < now()) {
-            return back()->withErrors(['error' => 'Subscription expired'])->withInput();
-        }
+            if ($subscription->expired_at && $subscription->expired_at < now()) {
+                return back()->withErrors(['error' => 'Subscription expired'])->withInput();
+            }
 
-        //  Check event limit
-        $eventCount = Event::where('created_by', $admin->id)->count();
+            $eventCount = Event::where('created_by', $admin->id)->count();
 
-        if ($eventCount >= $subscription->event_count) {
-            return back()->withErrors([
-                'error' => "Event limit reached! Allowed: {$subscription->event_count}"
-            ])->withInput();
+            if ($eventCount >= $subscription->event_count) {
+                return back()->withErrors([
+                    'error' => "Event limit reached! Allowed: {$subscription->event_count}"
+                ])->withInput();
+            }
         }
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
         $validated['created_by'] = auth()->id(); // or any default user
-        $validated['subscription_id'] = $subscription->id;
-
-        if (!$subscription) {
-            return back()->withErrors(['error' => 'No active subscription']);
-        }
+        $validated['subscription_id'] = $subscription?->id;
 
         $event = Event::create($validated);
 
@@ -295,7 +291,8 @@ class EventController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255', // each tag must be a string (optional but safer)
             'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
-            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size')
+            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
+            'section_order' => 'nullable|array'
         ]);
 
         $validated['tags'] = $request->has('tags') && !empty($request->tags) ? implode(',', $request->tags) : '';
@@ -313,6 +310,7 @@ class EventController extends Controller
         $event->privacy_policy = $validated['privacy_policy'] ?? null;
         $event->terms_condition = $validated['terms_condition'] ?? null;
         $event->help_support = $validated['help_support'] ?? null;
+        $event->section_order = !empty($validated['section_order']) ? json_encode($validated['section_order']) : null;
         $event->save();
         if ($request->file("image")) {
             $this->imageUpload($request->file("image"), 'events', $event->id, 'events', 'photo', $idForUpdate = $event->id);

@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\TicketType;
 use App\Models\TicketPurchase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use App\Models\UserTicket;
+use App\Models\Event;
+use App\Models\EventAndEntityLink;
 
 
 
@@ -117,7 +121,12 @@ class FormBuilderController extends Controller
     }
     public function submitForm(Request $request, $id)
     {
+        $eventId = session('event_id');
+        if (!$eventId) {
+            return back()->with('error', 'Invalid access. Please start from event page.');
+        }
         $form = Form::findOrFail($id);
+
 
         $data = $request->all();
 
@@ -139,7 +148,9 @@ class FormBuilderController extends Controller
             'selected_ticket_id' => [
                 'nullable',
                 'required_if:registration_type,paid',
-                'exists:ticket_types,id'
+                Rule::exists('ticket_types', 'id')->where(function ($q) use ($eventId) {
+                    $q->where('event_id', $eventId);
+                }),
             ],
         ];
 
@@ -147,6 +158,12 @@ class FormBuilderController extends Controller
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
+        }
+
+
+        if ($data['registration_type'] === 'paid') {
+            $ticket = TicketType::findOrFail($data['selected_ticket_id']);
+            $eventId = $ticket->event_id;
         }
 
         // Save form submission data
@@ -173,6 +190,11 @@ class FormBuilderController extends Controller
                 ]);
 
                 $user->assignRole('Attendee');
+                EventAndEntityLink::create([
+                    'event_id'    => $eventId,
+                    'entity_type' => 'users',
+                    'entity_id'   => $user->id,
+                ]);
 
                 DB::commit();
 
@@ -181,8 +203,11 @@ class FormBuilderController extends Controller
                 if (qrCode($user->id)) {
                     sendNotification("Welcome Email", $user);
                 }
+                return redirect()
+                    ->route('event.user.login', ['event' => $eventId])
+                    ->with('success', 'Form submitted successfully and attendee created!');
 
-                return back()->with('success', 'Form submitted successfully!');
+                // return back()->with('success', 'Form submitted successfully!');
             } catch (\Exception $e) {
                 DB::rollBack();
                 return back()->with('error', $e->getMessage());
@@ -207,6 +232,11 @@ class FormBuilderController extends Controller
                 ]);
 
                 $user->assignRole('Attendee');
+                EventAndEntityLink::create([
+                    'event_id'    => $eventId,
+                    'entity_type' => 'users',
+                    'entity_id'   => $user->id,
+                ]);
 
                 // 2. Get ticket & price from base_price
                 $ticket = TicketType::findOrFail($data['selected_ticket_id']);
@@ -216,7 +246,7 @@ class FormBuilderController extends Controller
                 $ticketPurchase = TicketPurchase::create([
                     'user_id'        => $user->id,
                     'ticket_type_id' => $ticket->id,
-                    'event_id'       => $ticket->event_id,
+                    'event_id'       => $eventId,
                     'amount'         => $amount,
                     'status'         => 'pending_payment',
                 ]);
@@ -453,13 +483,23 @@ class FormBuilderController extends Controller
 
     public function showFrontendForm()
     {
+        if (!session()->has('event_id')) {
+            return redirect()->back()->with('error', 'Please access registration from event page.');
+        }
+
+        $eventId = session('event_id');
+
         $form = Form::where('is_active', true)->firstOrFail();
-        return view('formbuilder.showform', compact('form'));
+
+        $tickets = TicketType::where('event_id', $eventId)->get();
+        return view('formbuilder.showform', compact('form', 'tickets'));
     }
 
-    public function available()
+    public function available(Event $event)
     {
-        $tickets = TicketType::where('is_active', 1)->get();
+        $tickets = TicketType::where('event_id', $event->id)
+            ->where('is_active', 1)
+            ->get();
 
         return response()->json($tickets);
     }

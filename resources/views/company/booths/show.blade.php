@@ -9,6 +9,7 @@
     <a href="{{ route('booths.index') }}" class="btn btn-outline-primary me-2">Back</a>
     </div>
     <div class="card-body">
+      <p><strong>Event:</strong> {{ $booth->event->title ?? 'N/A' }}</p>
       <p><strong>Title:</strong> {{ $booth->title }}</p>
       <p><strong>Booth Number:</strong> {{ $booth->booth_number }}</p>
       <p><strong>Size:</strong> {{ $booth->size }}</p>

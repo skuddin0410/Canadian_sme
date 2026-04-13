@@ -289,7 +289,7 @@
 
 
     @if(isSuperAdmin())
-    <li class="menu-item {{ request()->is('admin/tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->is('admin/tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-purchases*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class=" menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="tickets">Tickets Managment</div>
@@ -303,6 +303,11 @@
             <li class="menu-item {{ request()->is('admin/ticket-types*') ? 'active open' : '' }}">
                 <a href="{{ route('admin.ticket-types.index') }}" class="menu-link">
                     <div data-i18n="ticket-types"> Ticket</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->is('admin/ticket-purchases*') ? 'active open' : '' }}">
+                <a href="{{ route('admin.ticket-purchases.index') }}" class="menu-link">
+                    <div data-i18n="ticket-purchases"> Ticket Purchases</div>
                 </a>
             </li>
 
@@ -320,6 +325,11 @@
             <li class="menu-item {{ request()->is('admin/analytics/session') ? 'active' : '' }}">
                 <a href="{{ route('admin.analytics.session') }}" class="menu-link">
                     <div data-i18n="Session">Session</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->is('admin/analytics/ticket-purchases') ? 'active' : '' }}">
+                <a href="{{ route('admin.analytics.ticket-purchases') }}" class="menu-link">
+                    <div data-i18n="Ticket Purchases">Ticket Purchases</div>
                 </a>
             </li>
         </ul>

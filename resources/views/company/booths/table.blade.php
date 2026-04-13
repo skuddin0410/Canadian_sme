@@ -36,6 +36,7 @@
 <table id="post-manager" class="stripe row-border order-column dataTable no-footer table table-striped table-bordered dt-responsive display nowrap">
 <thead>
         <tr>
+          <th>Event</th>
           <th>Title</th>
           <th>Booth Number</th>
           <th>Size</th>
@@ -48,6 +49,7 @@
 <tbody>	
    @foreach($booths as $booth)
           <tr>
+            <td>{{ $booth->event->title ?? '-' }}</td>
             <td>{{ $booth->title ?? '-' }}</td>
             <td>{{ $booth->booth_number }}</td>
             <td>{{ $booth->size }}</td>

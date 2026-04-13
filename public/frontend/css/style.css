@@ -22,6 +22,8 @@ p {
   padding: 0;
 }
 
+.blueColor{color: var(--theme);}
+
 body {
   font-family: "DM Sans", sans-serif;
   font-weight: 400;

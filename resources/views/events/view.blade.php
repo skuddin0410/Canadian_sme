@@ -19,6 +19,8 @@ Admin | Event Details
 
                 <div class="card-body">
                     <div class="d-flex pt-3 justify-content-end">
+                        <a href="{{ route('events.floor-plan.edit', $event) }}"
+                            class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Floor Plan</a>
                         <a href="{{ route("events.edit",["event"=> $event->id ]) }}"
                             class="btn btn-outline-primary btn-pill btn-streach font-book me-2 mt-6 fs-14 ">Edit</a>
                         <a href="{{ route('events.index') }}"

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booth;
 use App\Models\Company;
+use App\Models\Event;
 
 use Illuminate\Support\Facades\Validator;
 use DB;
@@ -27,11 +28,16 @@ class BoothController extends Controller
         $offset = $perPage * ($pageNo - 1);
 
       if($request->ajax() && $request->ajax_request == true){
-        $booths = Booth::orderBy('id','DESC');
+        $booths = Booth::with('event')->orderBy('id','DESC');
+
+        if ($request->filled('event_id')) {
+            $booths->where('event_id', $request->event_id);
+        }
 
         if($request->search){
             $booths = $booths->where(function($query) use($request){
-                    $query->where('name', 'LIKE', '%'. $request->search .'%');
+                    $query->where('title', 'LIKE', '%'. $request->search .'%')
+                        ->orWhere('booth_number', 'LIKE', '%'. $request->search .'%');
                 });
         }
 
@@ -53,7 +59,8 @@ class BoothController extends Controller
          return response($data);                                              
         }   
                    
-        return view('company.booths.index');
+        $events = Event::orderBy('title')->get(['id', 'title']);
+        return view('company.booths.index', compact('events'));
     }
 
     /**
@@ -62,7 +69,8 @@ class BoothController extends Controller
     public function create()
     {
         $companies = Company::all();
-        return view('company.booths.create', compact('companies'));
+        $events = Event::orderBy('title')->get(['id', 'title']);
+        return view('company.booths.create', compact('companies', 'events'));
     }
 
     /**
@@ -72,6 +80,7 @@ class BoothController extends Controller
     {
         //
          $request->validate([
+            'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
             'booth_number' => 'required|string|max:50',
             'size' => 'required|string|max:50',
@@ -101,7 +110,8 @@ class BoothController extends Controller
         //
         $booth = Booth::findOrFail($id);
         $companies = Company::all();
-        return view('company.booths.edit', compact('booth', 'companies'));
+        $events = Event::orderBy('title')->get(['id', 'title']);
+        return view('company.booths.edit', compact('booth', 'companies', 'events'));
     }
 
     /**
@@ -113,6 +123,7 @@ class BoothController extends Controller
         $booth = Booth::findOrFail($id);
 
         $request->validate([
+            'event_id' => 'required|exists:events,id',
             'title' => 'required|string|max:255',
             'booth_number' => 'required|string|max:50',
             'size' => 'required|string|max:50',

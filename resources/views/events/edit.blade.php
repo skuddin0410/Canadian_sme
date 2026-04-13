@@ -14,6 +14,11 @@
     opacity: 1;
     pointer-events: auto;
   }
+  .sortable-ghost {
+    opacity: 0.4;
+    background-color: #f4f6f9;
+    border: 2px dashed #696cff;
+  }
 </style>
 
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
@@ -309,8 +314,8 @@
               <label class="form-label" for="description">Description <span class="text-danger">*</span></label>
               <textarea
               name="description"
-              id="description1"
-              class="form-control"
+              id="description"
+              class="form-control description-cls"
               rows="8"
               style="min-height: 250px;">{{ old('description', $e->description ?? '') }}</textarea>
                 @error('description')
@@ -320,11 +325,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="about">About</label>
-              <input type="hidden" name="meta_description" id="about" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about', $e->about ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about', $e->about ?? '') }}</textarea>
               @if ($errors->has('about'))
                 <span class="text-danger text-left">{{ $errors->first('about') }}</span>
               @endif
@@ -332,11 +333,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="privacy_policy">Privacy Policy</label>
-              <input type="hidden" name="meta_description" id="privacy_policy" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy', $e->privacy_policy ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy', $e->privacy_policy ?? '') }}</textarea>
               @if ($errors->has('privacy_policy'))
                 <span class="text-danger text-left">{{ $errors->first('privacy_policy') }}</span>
               @endif
@@ -344,11 +341,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="terms_condition">Terms & Condition</label>
-              <input type="hidden" name="meta_description" id="terms_condition" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition', $e->terms_condition ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition', $e->terms_condition ?? '') }}</textarea>
               @if ($errors->has('terms_condition'))
                 <span class="text-danger text-left">{{ $errors->first('terms_condition') }}</span>
               @endif
@@ -356,11 +349,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="help_support">Help & Support</label>
-              <input type="hidden" name="meta_description" id="help_support" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support', $e->help_support ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support', $e->help_support ?? '') }}</textarea>
               @if ($errors->has('help_support'))
                 <span class="text-danger text-left">{{ $errors->first('help_support') }}</span>
               @endif
@@ -373,7 +362,52 @@
 
 
       <div class="col-12 col-lg-4">
-        <div class="card position-sticky" style="top: 1rem;">
+            {{-- Landing Page Sections Order --}}
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Landing Page Sections</h6>
+                <small class="text-muted">Drag to reorder</small>
+              </div>
+              <div class="card-body">
+                @php
+                  $allPossibleSections = [
+                      'attendee' => 'Attendees',
+                      'speaker' => 'Speakers',
+                      'exhibitor' => 'Exhibitors',
+                      'sponsor' => 'Sponsors',
+                  ];
+                  
+                  $currentOrder = json_decode($event->section_order, true);
+                  
+                  // Fallback to default if empty or not an array
+                  if (empty($currentOrder) || !is_array($currentOrder)) {
+                      $currentOrder = ['attendee', 'speaker', 'exhibitor', 'sponsor'];
+                  }
+                  
+                  // Ensure all 4 are always present in the current order even if it was saved with fewer
+                  $extra = array_diff(array_keys($allPossibleSections), $currentOrder);
+                  $currentOrder = array_merge($currentOrder, $extra);
+                @endphp
+
+                <div id="sections-container">
+                  <ul class="list-group mb-3" id="active-sections">
+                    @foreach($currentOrder as $secKey)
+                      @if(isset($allPossibleSections[$secKey]))
+                        <li class="list-group-item d-flex align-items-center" data-id="{{ $secKey }}">
+                          <i class="bx bx-menu me-3 handle" style="cursor: move; font-size: 1.2rem;"></i>
+                          <span class="fw-medium">{{ $allPossibleSections[$secKey] }}</span>
+                          <input type="hidden" name="section_order[]" value="{{ $secKey }}">
+                        </li>
+                      @endif
+                    @endforeach
+                  </ul>
+                </div>
+                
+                <p class="small text-muted mb-0"><i class="bx bx-info-circle me-1"></i> Drag to change the display order on the landing page.</p>
+              </div>
+            </div>
+
+            <div class="card position-sticky" style="top: 1rem;">
           <div class="card-header">
             <h6 class="mb-0">Event Settings</h6>
           </div>
@@ -506,7 +540,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 <script>
   // --- Slug auto-generate from Title ---
   const titleEl = document.getElementById('title');
@@ -528,32 +561,6 @@
     titleEl.addEventListener('blur', syncSlug);
     slugEl.addEventListener('input', () => slugEl.dataset.touched = '1');
   }
-
-  // --- Quill setup for Description ---
-  document.addEventListener('DOMContentLoaded', function() {
-    const descInput = document.getElementById('description');
-    const quillContainer = document.getElementById('quill-editor');
-    if (quillContainer && descInput) {
-      const editor = new Quill('#quill-editor', {
-        theme: 'snow',
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            ['link', 'blockquote', 'code-block', 'clean']
-          ]
-        }
-      });
-      // Set initial HTML
-      editor.root.innerHTML = descInput.value || '';
-      // Keep textarea in sync
-      editor.on('text-change', function() {
-        const html = editor.root.innerHTML;
-        descInput.value = (html === '<p><br></p>') ? '' : html;
-      });
-    }
-  });
 
   // --- Lightweight tags chips preview ---
   const tagsInput = document.getElementById('tags');
@@ -849,5 +856,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const activeList = document.getElementById('active-sections');
+    if (activeList) {
+        new Sortable(activeList, {
+            animation: 150,
+            handle: '.handle',
+            draggable: 'li',
+            ghostClass: 'sortable-ghost'
+        });
+    }
+});
 </script>
 @endsection
