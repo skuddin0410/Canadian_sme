@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('forms', function (Blueprint $table) {
-            $table->foreignId('event_id')
-              ->after('id')
-              ->constrained()
-              ->cascadeOnDelete();
+        Schema::table('events', function (Blueprint $table) {
+            $table->json('section_order')->nullable()->after('visibility');
         });
     }
 
@@ -24,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('forms', function (Blueprint $table) {
-            //
+        Schema::table('events', function (Blueprint $table) {
+            $table->dropColumn('section_order');
         });
     }
 };

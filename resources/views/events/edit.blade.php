@@ -14,6 +14,11 @@
     opacity: 1;
     pointer-events: auto;
   }
+  .sortable-ghost {
+    opacity: 0.4;
+    background-color: #f4f6f9;
+    border: 2px dashed #696cff;
+  }
 </style>
 
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
@@ -357,7 +362,52 @@
 
 
       <div class="col-12 col-lg-4">
-        <div class="card position-sticky" style="top: 1rem;">
+            {{-- Landing Page Sections Order --}}
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Landing Page Sections</h6>
+                <small class="text-muted">Drag to reorder</small>
+              </div>
+              <div class="card-body">
+                @php
+                  $allPossibleSections = [
+                      'attendee' => 'Attendees',
+                      'speaker' => 'Speakers',
+                      'exhibitor' => 'Exhibitors',
+                      'sponsor' => 'Sponsors',
+                  ];
+                  
+                  $currentOrder = json_decode($event->section_order, true);
+                  
+                  // Fallback to default if empty or not an array
+                  if (empty($currentOrder) || !is_array($currentOrder)) {
+                      $currentOrder = ['attendee', 'speaker', 'exhibitor', 'sponsor'];
+                  }
+                  
+                  // Ensure all 4 are always present in the current order even if it was saved with fewer
+                  $extra = array_diff(array_keys($allPossibleSections), $currentOrder);
+                  $currentOrder = array_merge($currentOrder, $extra);
+                @endphp
+
+                <div id="sections-container">
+                  <ul class="list-group mb-3" id="active-sections">
+                    @foreach($currentOrder as $secKey)
+                      @if(isset($allPossibleSections[$secKey]))
+                        <li class="list-group-item d-flex align-items-center" data-id="{{ $secKey }}">
+                          <i class="bx bx-menu me-3 handle" style="cursor: move; font-size: 1.2rem;"></i>
+                          <span class="fw-medium">{{ $allPossibleSections[$secKey] }}</span>
+                          <input type="hidden" name="section_order[]" value="{{ $secKey }}">
+                        </li>
+                      @endif
+                    @endforeach
+                  </ul>
+                </div>
+                
+                <p class="small text-muted mb-0"><i class="bx bx-info-circle me-1"></i> Drag to change the display order on the landing page.</p>
+              </div>
+            </div>
+
+            <div class="card position-sticky" style="top: 1rem;">
           <div class="card-header">
             <h6 class="mb-0">Event Settings</h6>
           </div>
@@ -806,5 +856,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const activeList = document.getElementById('active-sections');
+    if (activeList) {
+        new Sortable(activeList, {
+            animation: 150,
+            handle: '.handle',
+            draggable: 'li',
+            ghostClass: 'sortable-ghost'
+        });
+    }
+});
 </script>
 @endsection

@@ -38,7 +38,8 @@ class Event extends Model
         'privacy_policy',
         'about',
         'help_support',
-        'subscription_id'
+        'subscription_id',
+        'section_order'
     ];
 
     protected $casts = [
@@ -46,6 +47,7 @@ class Event extends Model
         'is_featured' => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        // 'section_order' => 'array', // handled manually via json_decode/json_encode due to AutoHtmlDecode trait
     ];
 
     public function creator()
@@ -98,6 +100,15 @@ class Event extends Model
     {
         return $this->hasMany(EventAndEntityLink::class, 'event_id');
     }
+    public function booths()
+    {
+        return $this->hasMany(Booth::class);
+    }
+    public function floorPlanMarkers()
+    {
+        return $this->hasMany(EventFloorPlanMarker::class)->orderBy('sort_order')->orderBy('id');
+    }
+
     public function contacts()
     {
         return $this->hasMany(ContactUs::class);

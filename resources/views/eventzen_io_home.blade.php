@@ -551,7 +551,7 @@
     <!-- apart end -->
 
     <!-- ======== DEMO BOOKING ======== -->
-    <section class="event-booking section">
+    <section class="event-booking section" id="request-demo">
         <div class="container">
             <div class="row align-items-center event-booking-row">
                 <div class="col-lg-6">

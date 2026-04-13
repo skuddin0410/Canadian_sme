@@ -33,9 +33,11 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\NavbarDynamicController;
 use App\Http\Controllers\PollController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\EventFloorPlanController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\SpeakerAnalyticsController;
 use App\Http\Controllers\EmailTrackingController;
+use App\Http\Controllers\TicketPurchaseController;
 use App\Http\Controllers\SubscriptionController;
 
 Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
@@ -106,6 +108,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
   Route::post('/delete/photo', [App\Http\Controllers\EventController::class, 'removePhoto'])->name('events.removePhoto');
   Route::resource('events', App\Http\Controllers\EventController::class);
+  Route::get('/events/{event}/floor-plan', [EventFloorPlanController::class, 'edit'])->name('events.floor-plan.edit');
+  Route::post('/events/{event}/floor-plan', [EventFloorPlanController::class, 'update'])->name('events.floor-plan.update');
+  Route::get('/events/{event}/floor-plan/view', [EventFloorPlanController::class, 'show'])->name('events.floor-plan.show');
   Route::post('/events/clone/{id}', [App\Http\Controllers\EventController::class, 'clone'])->name('events.clone');
 
   Route::get('/event-tracks', [EventTrackController::class, 'index'])->name('event-tracks.index');
@@ -243,6 +248,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::prefix('analytics')->name('admin.analytics.')->group(function () {
     Route::get('/session', [AnalyticsController::class, 'session'])->name('session');
     Route::get('/speaker', [SpeakerAnalyticsController::class, 'speaker'])->name('speaker');
+    Route::get('/ticket-purchases', [TicketPurchaseController::class, 'analytics'])->name('ticket-purchases');
     Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
   });
   Route::get('subscriptions/index', [SubscriptionController::class, 'index'])->name('subscription.index');

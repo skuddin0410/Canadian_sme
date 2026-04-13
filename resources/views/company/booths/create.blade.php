@@ -35,6 +35,20 @@
             <div class="row">
             <div class="col-6">
              <div class="mb-3">
+              <label class="form-label" for="event_id">Event<span class="text-danger">*</span></label>
+              <select name="event_id" class="form-select">
+                <option value="">Select Event</option>
+                @foreach($events as $event)
+                  <option value="{{ $event->id }}" {{ old('event_id') == $event->id ? 'selected' : '' }}>{{ $event->title }}</option>
+                @endforeach
+              </select>
+              @if ($errors->has('event_id'))
+                <span class="text-danger text-left">{{ $errors->first('event_id') }}</span>
+              @endif
+            </div>
+          </div>
+            <div class="col-6">
+             <div class="mb-3">
               <label class="form-label" for="title">Booth Title<span class="text-danger">*</span></label>
               <div class="input-group input-group-merge">
                 <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>

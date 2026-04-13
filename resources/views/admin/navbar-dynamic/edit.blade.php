@@ -171,6 +171,11 @@ function escPreview(str) {
         .replace(/"/g, '&quot;');
 }
 
+function previewDataAttr(name, value) {
+    if (value === undefined || value === null || value === '') return '';
+    return ` data-dn-${name}="${escPreview(String(value))}"`;
+}
+
 function normalizeWidthValue(value, fallback = '100') {
     if (value === 'auto') return 'auto';
     let normalized = parseFloat(value);
@@ -1121,80 +1126,73 @@ function buildPreviewHTML(sections) {
 
         if (sec.type === 'hero') {
             sectionsHTML += `
-            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
+            <div class="pb-section" data-section-id="${sec.id}">
                 <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> HERO</div>
-                <section style="background:${d.bg || '#f8f9fa'};padding:70px 20px;text-align:${sectionAlign};min-height:${sectionHeight};display:flex;flex-direction:column;justify-content:center;align-items:${sectionJustify};">
-                    <h1 style="font-size:2.2rem;font-weight:800;color:${d.textColor || '#1a1a2e'};margin:0 0 12px;line-height:1.2;">${escPreview(d.title || 'Hero Title')}</h1>
-                    ${d.subtitle ? `<p style="font-size:1.05rem;color:${d.subtitleColor || '#6b7280'};max-width:560px;margin:0 0 24px;line-height:1.7;text-align:${sectionAlign};">${escPreview(d.subtitle)}</p>` : ''}
-                    ${d.btnText ? `<a href="${escPreview(d.btnLink || 'javascript:void(0)')}" style="display:inline-block;padding:12px 28px;border-radius:10px;font-size:.95rem;font-weight:600;text-decoration:none;background:${d.btnColor || '#4361ee'};color:${d.btnTextColor || '#fff'};">${escPreview(d.btnText)}</a>` : ''}
+                <section class="pb-hero dn-section"${previewDataAttr('bg', d.bg || '#f8f9fa')}>
+                    <div class="container dn-section-frame dn-flex dn-flex-col dn-hero-frame"
+                        ${previewDataAttr('width', sectionWidth)}
+                        ${previewDataAttr('min-height', sectionHeight)}
+                        ${previewDataAttr('align-items', sectionJustify)}
+                        ${previewDataAttr('text-align', sectionAlign)}>
+                        <h1${previewDataAttr('color', d.textColor || '#1a1a2e')}>${escPreview(d.title || 'Hero Title')}</h1>
+                        ${d.subtitle ? `<p${previewDataAttr('color', d.subtitleColor || '#6b7280')}>${escPreview(d.subtitle)}</p>` : ''}
+                        ${d.btnText ? `<a href="${escPreview(d.btnLink || 'javascript:void(0)')}" class="pb-hero-btn"${previewDataAttr('bg', d.btnColor || '#4361ee')}${previewDataAttr('color', d.btnTextColor || '#ffffff')}>${escPreview(d.btnText)}</a>` : ''}
+                    </div>
                 </section>
             </div>`;
         }
 
         if (sec.type === 'text') {
             sectionsHTML += `
-            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
+            <div class="pb-section" data-section-id="${sec.id}">
                 <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> TEXT</div>
-                <section style="background:${d.bg || '#ffffff'};padding:50px 20px;min-height:${sectionHeight};display:flex;justify-content:${sectionJustify};align-items:flex-start;">
-                    <div style="max-width:800px;width:100%;font-size:1rem;line-height:1.8;color:${d.textColor || '#374151'};text-align:${sectionAlign};">
+                <section class="pb-text dn-section"${previewDataAttr('bg', d.bg || '#ffffff')}>
+                    <div class="container dn-section-frame dn-flex"
+                        ${previewDataAttr('width', sectionWidth)}
+                        ${previewDataAttr('min-height', sectionHeight)}
+                        ${previewDataAttr('justify', sectionJustify)}>
+                    <div class="pb-text-inner"
+                        ${previewDataAttr('text-align', sectionAlign)}
+                        ${previewDataAttr('color', d.textColor || '#374151')}>
                         ${d.content || '<p style="color:#aaa;font-style:italic;">Text section</p>'}
+                    </div>
                     </div>
                 </section>
             </div>`;
         }
 
-       if (sec.type === 'image') {
+        if (sec.type === 'image') {
     let fullWidthImage = parseFloat(d.sectionWidth || '100') >= 100;
     sectionsHTML += `
-    <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
+    <div class="pb-section" data-section-id="${sec.id}">
         <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> IMAGE</div>
-        <section style="
-            background:${d.bg || '#ffffff'};
-            padding:48px 20px;
-            min-height:${sectionHeight};
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-        ">
+        <section class="pb-image dn-section"${previewDataAttr('bg', d.bg || '#ffffff')}>
+            <div class="container dn-section-frame dn-flex dn-flex-col"
+                ${previewDataAttr('width', sectionWidth)}
+                ${previewDataAttr('min-height', sectionHeight)}
+                ${previewDataAttr('justify', 'center')}>
             ${d.image ? `
-                <div style="
-                    width:100%;
-                    display:flex;
-                    justify-content:${sectionJustify};
-                    align-items:center;
-                ">
+                <div class="pb-image-media"${previewDataAttr('justify', sectionJustify)}>
                     <img
+                        class="pb-image-img"
                         src="${d.image}"
-                        style="
-                            display:block;
-                            width:${fullWidthImage ? '100%' : 'auto'};
-                            max-width:${fullWidthImage ? '100%' : '70%'};
-                            max-height:${sectionHeight === 'auto' ? '520px' : sectionHeight};
-                            border-radius:18px;
-                            box-shadow:0 6px 28px rgba(0,0,0,.10);
-                            object-fit:${fullWidthImage ? 'cover' : 'contain'};
-                        "
+                        ${previewDataAttr('width', fullWidthImage ? '100%' : 'auto')}
+                        ${previewDataAttr('max-height', sectionHeight === 'auto' ? '520px' : sectionHeight)}
+                        ${previewDataAttr('object-fit', fullWidthImage ? 'cover' : 'contain')}
                     >
                 </div>
             ` : ``}
 
             ${d.caption ? `
-                <div style="
-                    width:100%;
-                    display:flex;
-                    justify-content:${sectionJustify};
-                ">
-                    <p style="
-                        margin:12px 0 0;
-                        font-size:.875rem;
-                        color:${d.captionColor || '#6b7280'};
-                        max-width:${fullWidthImage ? '100%' : '70%'};
-                        text-align:${sectionAlign};
-                    ">
+                <div class="pb-image-caption-wrap"${previewDataAttr('justify', sectionJustify)}>
+                    <p class="pb-image-caption"
+                        ${previewDataAttr('text-align', sectionAlign)}
+                        ${previewDataAttr('color', d.captionColor || '#6b7280')}>
                         ${escPreview(d.caption)}
                     </p>
                 </div>
             ` : ''}
+            </div>
         </section>
     </div>`;
 }
@@ -1216,50 +1214,49 @@ function buildPreviewHTML(sections) {
                     let itemHeight = card.height || 'auto';
                     let itemAlign = card.alignment || 'left';
                     let itemJustify = itemAlign === 'center' ? 'center' : itemAlign === 'right' ? 'flex-end' : 'flex-start';
+                    let rawCardBg = String(card.cardBg || '#ffffff').trim().toLowerCase();
+                    let cardBg = ['#ffffff', '#fff', 'white', 'transparent', ''].includes(rawCardBg) ? 'transparent' : (card.cardBg || 'transparent');
 
                     return `
-                    <div class="pb-card" data-card-id="${card.id}" data-section-id="${sec.id}" style="width:${itemWidth};flex:0 0 ${itemWidth};border-radius:18px;overflow:hidden;">
+                    <div class="pb-card" data-card-id="${card.id}" data-section-id="${sec.id}"
+                        ${previewDataAttr('width', itemWidth)}
+                        ${previewDataAttr('flex-basis', itemWidth)}
+                        ${previewDataAttr('min-height', itemHeight)}
+                        ${previewDataAttr('bg', cardBg)}>
                         <div class="pb-card-handle"><span class="pb-grip">⠿⠿</span> ${isImage ? 'IMAGE' : 'CARD'}</div>
-                        <div class="pb-card-body" style="background:${card.cardBg || '#fff'};min-height:${itemHeight};text-align:${itemAlign};">
-                            ${card.image ? `
-                                <div class="pb-card-img" style="
-                                    ${itemHeight !== 'auto' ? `height:${itemHeight};` : 'min-height:180px;'}
-                                    display:flex;
-                                    align-items:center;
-                                    justify-content:${itemJustify};
-                                    padding:${isFullWidthImage ? '0' : '12px'};
-                                    background:${card.cardBg || '#fff'};
-                                ">
-                                    <img src="${card.image}" alt="" style="
-                                        width:${isFullWidthImage ? '100%' : 'auto'};
-                                        max-width:100%;
-                                        max-height:100%;
-                                        object-fit:${isFullWidthImage ? 'cover' : 'contain'};
-                                        display:block;
-                                        border-radius:18px;
-                                    ">
-                                </div>
-                            ` : ''}
-                            ${isImage
-                                ? `${card.caption ? `<div class="pb-card-content" style="text-align:${itemAlign};align-items:${itemJustify};"><p style="color:${card.captionColor || '#6b7280'};">${escPreview(card.caption)}</p></div>` : ''}`
-                                : `<div class="pb-card-content" style="text-align:${itemAlign};align-items:${itemJustify};">
-                                    ${card.title ? `<h3 style="color:${card.titleColor || '#1a1a2e'};">${escPreview(card.title)}</h3>` : ''}
-                                    ${card.description ? `<div style="color:${card.descColor || '#6b7280'};">${card.description}</div>` : ''}
-
-                                    ${card.btnText ? `<a href="${escPreview(card.btnLink || 'javascript:void(0)')}" class="pb-card-btn" style="background:${card.btnColor || '#4361ee'};color:${card.btnTextColor || '#fff'};">${escPreview(card.btnText)}</a>` : ''}
-                                   </div>`
-                            }
-                        </div>
+                        ${card.image ? `
+                            <div class="pb-card-img-wrap"
+                                ${previewDataAttr('height', itemHeight !== 'auto' ? itemHeight : '')}
+                                ${previewDataAttr('min-height', itemHeight === 'auto' ? '180px' : '')}
+                                ${previewDataAttr('bg', cardBg)}>
+                                <img src="${card.image}" alt="${escPreview(card.title || 'Card image')}">
+                            </div>
+                        ` : ''}
+                        ${isImage
+                            ? `${card.caption ? `<div class="pb-card-caption"${previewDataAttr('text-align', itemAlign)}${previewDataAttr('color', card.captionColor || '#6b7280')}${previewDataAttr('bg', cardBg)}>${escPreview(card.caption)}</div>` : ''}`
+                            : `<div class="pb-card-body"
+                                ${previewDataAttr('align-items', itemJustify)}
+                                ${previewDataAttr('text-align', itemAlign)}
+                                ${previewDataAttr('bg', cardBg)}>
+                                    ${card.title ? `<h3 class="pb-card-title"${previewDataAttr('color', card.titleColor || '#1a1a2e')}>${escPreview(card.title)}</h3>` : ''}
+                                    ${card.description ? `<div class="pb-card-description"${previewDataAttr('color', card.descColor || '#6b7280')}>${card.description}</div>` : ''}
+                                    ${card.btnText ? `<a href="${escPreview(card.btnLink || 'javascript:void(0)')}" class="pb-card-btn"${previewDataAttr('align-self', itemJustify)}${previewDataAttr('bg', card.btnColor || '#4361ee')}${previewDataAttr('color', card.btnTextColor || '#ffffff')}>${escPreview(card.btnText)}</a>` : ''}
+                                </div>`
+                        }
                     </div>`;
                 }).join('');
 
             sectionsHTML += `
-            <div class="pb-section" data-section-id="${sec.id}" style="width:${sectionWidth};margin:0 auto;">
+            <div class="pb-section" data-section-id="${sec.id}">
                 <div class="pb-section-handle pb-drag-bar"><span class="pb-grip">⠿⠿</span> SECTION</div>
-                <section style="background:${d.bg || '#f8f9fa'};padding:60px 20px;min-height:${sectionHeight};text-align:${sectionAlign};">
-                    ${d.sectionTitle ? `<h2 style="text-align:${sectionAlign};font-size:1.8rem;font-weight:800;color:${d.sectionTitleColor || '#1a1a2e'};margin:0 0 40px;">${escPreview(d.sectionTitle)}</h2>` : ''}
-                    <div class="pb-cards-grid" data-section-id="${sec.id}">
+                <section class="pb-cards-section-new dn-section"${previewDataAttr('bg', d.bg || '#f8f9fa')}>
+                    <div class="container dn-section-frame"
+                        ${previewDataAttr('width', sectionWidth)}
+                        ${previewDataAttr('min-height', sectionHeight)}>
+                    ${d.sectionTitle ? `<h2 class="pb-section-title"${previewDataAttr('text-align', sectionAlign)}${previewDataAttr('color', d.sectionTitleColor || '#1a1a2e')}>${escPreview(d.sectionTitle)}</h2>` : ''}
+                    <div class="pb-cards-grid pb-cards-grid-live" data-section-id="${sec.id}"${previewDataAttr('justify', sectionJustify)}>
                         ${cardsHTML}
+                    </div>
                     </div>
                 </section>
             </div>`;
@@ -1276,6 +1273,7 @@ function buildPreviewHTML(sections) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/frontend/css/style.css">
+<link rel="stylesheet" href="/frontend/css/dynamic-nav.css">
 <link rel="stylesheet" href="/frontend/css/style_new.css">
 <link rel="stylesheet" href="/frontend/css/developer.css">
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"><\/script>
@@ -1283,40 +1281,21 @@ function buildPreviewHTML(sections) {
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#fff;overflow-x:hidden;padding-bottom:40px}
 img{max-width:100%}
+.pb-preview-main{min-height:300px}
+#pb-wrapper{overflow:visible}
 .pb-section{position:relative;border:2px solid transparent;outline:2px solid transparent;outline-offset:4px;transition:border-color .15s,outline-color .15s,box-shadow .15s;margin-bottom:20px;border-radius:22px}
 .pb-section:hover{border-color:rgba(67,97,238,.22);outline-color:rgba(67,97,238,.55);box-shadow:0 0 0 6px rgba(67,97,238,.12)}
 .pb-drag-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 16px;background:#4361ee;color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;cursor:grab;user-select:none;opacity:0;transition:opacity .15s;position:relative;z-index:30}
 .pb-section:hover .pb-drag-bar{opacity:1}
 .pb-grip{font-size:15px;letter-spacing:-3px}
-.pb-cards-grid{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
 .pb-cards-empty{width:100%;padding:32px;border:2px dashed #e2e8f0;border-radius:12px;text-align:center;color:#94a3b8;font-size:14px}
 .pb-card{display:flex;flex-direction:column;position:relative;border-radius:18px;border:2px solid transparent;transition:border-color .15s,box-shadow .15s;min-width:0}
 .pb-card:hover{border-color:transparent !important;box-shadow:none !important}
 .pb-section .pb-card{border-color:transparent !important;box-shadow:none !important}
 .pb-card-handle{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;background:#4361ee;color:#fff;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:16px 16px 0 0;cursor:grab;user-select:none;opacity:0;transition:opacity .15s ease;flex-shrink:0;position:relative;z-index:20;touch-action:none}
 .pb-card:hover .pb-card-handle{opacity:1}
-.pb-card-body{border-radius:0 0 16px 16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);display:flex;flex-direction:column;flex:1}
-.pb-card-img{width:100%;overflow:hidden;flex-shrink:0}
-.pb-card-img img{display:block}
-.pb-card-content{padding:18px;display:flex;flex-direction:column;flex:1}
-.pb-card-content h3{font-size:1rem;font-weight:700;margin:0 0 8px;line-height:1.3}
-.pb-card-content p{font-size:.875rem;line-height:1.65;flex:1;margin:0 0 14px}
-.pb-card-content ul,
-.pb-card-body ul,
-.pb-section ul{margin:0;padding:0}
-.pb-card-content li,
-.pb-card-body li,
-.pb-section li{position:relative;padding-left:32px;margin-bottom:12px;list-style:none}
-.pb-card-content li::before,
-.pb-card-body li::before,
-.pb-section li::before{content:"\\f00c";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:5px;left:0;width:20px;height:20px;border-radius:50%;background:#004fb8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1}
-.pb-card-content a,
-.pb-card-body a,
-.pb-section a{display:inline-flex;align-items:center;justify-content:center;padding:10px 22px;border-radius:10px;background:#004fb8;color:#fff !important;font-size:inherit;font-weight:inherit;line-height:inherit;text-decoration:none !important;transition:background .2s,transform .15s}
-.pb-card-content a:hover,
-.pb-card-body a:hover,
-.pb-section a:hover{background:#005fdb;color:#fff !important;transform:translateY(-1px)}
-.pb-card-btn{display:inline-block;padding:8px 18px;border-radius:10px;font-size:.8rem;font-weight:600;text-decoration:none}
+.pb-card-body{border-radius:0 0 16px 16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07)}
+.pb-card-caption{border-radius:0 0 16px 16px;box-shadow:0 2px 14px rgba(0,0,0,.07)}
 .pb-ghost-section{opacity:.2;outline:3px dashed #4361ee;background:#eef0ff !important}
 .pb-chosen-section{outline:2px solid #4361ee;box-shadow:0 8px 32px rgba(67,97,238,.2)}
 .pb-ghost-card{opacity:.25;background:#eef0ff !important;border:2px dashed #4361ee !important;border-radius:18px}
@@ -1327,10 +1306,11 @@ img{max-width:100%}
 <body>
 ${previewHeaderHtml}
 <main class="pb-preview-main">
-<div id="pb-wrapper">${sectionsHTML}</div>
+<div id="pb-wrapper" class="dynamic-page-wrapper">${sectionsHTML}</div>
 </main>
 ${previewFooterHtml}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"><\/script>
+<script src="/frontend/js/dynamic-nav.js"><\/script>
 <script src="/frontend/js/script_new.js"><\/script>
 <script>
 (function(){
