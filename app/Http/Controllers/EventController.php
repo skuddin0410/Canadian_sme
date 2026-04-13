@@ -99,39 +99,34 @@ class EventController extends Controller
             'section_order' => 'nullable|array'
         ]);
         $admin = auth()->user();
+        $subscription = null;
 
-        //  Get active subscription
-        $subscription = Subscription::active()
-            ->where('user_id', $admin->id)
-            ->latest()
-            ->first();
+        if ((int) $admin->id !== 1) {
+            $subscription = Subscription::active()
+                ->where('user_id', $admin->id)
+                ->latest()
+                ->first();
 
-        //  No subscription
-        if (!$subscription) {
-            return back()->withErrors(['error' => 'No active subscription or subscription expired'])->withInput();
-        }
+            if (!$subscription) {
+                return back()->withErrors(['error' => 'No active subscription or subscription expired'])->withInput();
+            }
 
-        //  Extra safety expiry check (optional but good)
-        if ($subscription->expired_at && $subscription->expired_at < now()) {
-            return back()->withErrors(['error' => 'Subscription expired'])->withInput();
-        }
+            if ($subscription->expired_at && $subscription->expired_at < now()) {
+                return back()->withErrors(['error' => 'Subscription expired'])->withInput();
+            }
 
-        //  Check event limit
-        $eventCount = Event::where('created_by', $admin->id)->count();
+            $eventCount = Event::where('created_by', $admin->id)->count();
 
-        if ($eventCount >= $subscription->event_count) {
-            return back()->withErrors([
-                'error' => "Event limit reached! Allowed: {$subscription->event_count}"
-            ])->withInput();
+            if ($eventCount >= $subscription->event_count) {
+                return back()->withErrors([
+                    'error' => "Event limit reached! Allowed: {$subscription->event_count}"
+                ])->withInput();
+            }
         }
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
         $validated['created_by'] = auth()->id(); // or any default user
-        $validated['subscription_id'] = $subscription->id;
-
-        if (!$subscription) {
-            return back()->withErrors(['error' => 'No active subscription']);
-        }
+        $validated['subscription_id'] = $subscription?->id;
 
         $event = Event::create($validated);
 
