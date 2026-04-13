@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\EventFloorPlanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\PollController;
@@ -17,7 +18,8 @@ Route::prefix('password')->group(function () {
 });
 
 Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
-    Route::get('/events/{event}/gallery', [EventController::class, 'eventGallery']);
+Route::get('/events/{event}/gallery', [EventController::class, 'eventGallery']);
+Route::get('/events/{event}/floor-plan', [EventFloorPlanController::class, 'show']);
 
 Route::middleware(['auth:api', 'jwtauth'])->group(function () {
     // Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
