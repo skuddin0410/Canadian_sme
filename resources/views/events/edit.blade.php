@@ -309,8 +309,8 @@
               <label class="form-label" for="description">Description <span class="text-danger">*</span></label>
               <textarea
               name="description"
-              id="description1"
-              class="form-control"
+              id="description"
+              class="form-control description-cls"
               rows="8"
               style="min-height: 250px;">{{ old('description', $e->description ?? '') }}</textarea>
                 @error('description')
@@ -320,11 +320,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="about">About</label>
-              <input type="hidden" name="meta_description" id="about" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about', $e->about ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="about" name="about" rows="12" placeholder="Paste or write about us here...">{{ old('about', $e->about ?? '') }}</textarea>
               @if ($errors->has('about'))
                 <span class="text-danger text-left">{{ $errors->first('about') }}</span>
               @endif
@@ -332,11 +328,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="privacy_policy">Privacy Policy</label>
-              <input type="hidden" name="meta_description" id="privacy_policy" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy', $e->privacy_policy ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="privacy_policy" name="privacy_policy" rows="12" placeholder="Paste or write about us here...">{{ old('privacy_policy', $e->privacy_policy ?? '') }}</textarea>
               @if ($errors->has('privacy_policy'))
                 <span class="text-danger text-left">{{ $errors->first('privacy_policy') }}</span>
               @endif
@@ -344,11 +336,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="terms_condition">Terms & Condition</label>
-              <input type="hidden" name="meta_description" id="terms_condition" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition', $e->terms_condition ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="terms_condition" name="terms_condition" rows="12" placeholder="Paste or write about us here...">{{ old('terms_condition', $e->terms_condition ?? '') }}</textarea>
               @if ($errors->has('terms_condition'))
                 <span class="text-danger text-left">{{ $errors->first('terms_condition') }}</span>
               @endif
@@ -356,11 +344,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="help_support">Help & Support</label>
-              <input type="hidden" name="meta_description" id="help_support" value="">
-              <div class="input-group input-group-merge" id="quill-editor1" style="height: 300px;">
-                <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support', $e->help_support ?? '') }}</textarea>
-
-              </div>
+              <textarea class="form-control description-cls" id="help_support" name="help_support" rows="12" placeholder="Paste or write about us here...">{{ old('help_support', $e->help_support ?? '') }}</textarea>
               @if ($errors->has('help_support'))
                 <span class="text-danger text-left">{{ $errors->first('help_support') }}</span>
               @endif
@@ -506,7 +490,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 <script>
   // --- Slug auto-generate from Title ---
   const titleEl = document.getElementById('title');
@@ -528,32 +511,6 @@
     titleEl.addEventListener('blur', syncSlug);
     slugEl.addEventListener('input', () => slugEl.dataset.touched = '1');
   }
-
-  // --- Quill setup for Description ---
-  document.addEventListener('DOMContentLoaded', function() {
-    const descInput = document.getElementById('description');
-    const quillContainer = document.getElementById('quill-editor');
-    if (quillContainer && descInput) {
-      const editor = new Quill('#quill-editor', {
-        theme: 'snow',
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            ['link', 'blockquote', 'code-block', 'clean']
-          ]
-        }
-      });
-      // Set initial HTML
-      editor.root.innerHTML = descInput.value || '';
-      // Keep textarea in sync
-      editor.on('text-change', function() {
-        const html = editor.root.innerHTML;
-        descInput.value = (html === '<p><br></p>') ? '' : html;
-      });
-    }
-  });
 
   // --- Lightweight tags chips preview ---
   const tagsInput = document.getElementById('tags');
