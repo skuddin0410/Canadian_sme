@@ -211,27 +211,25 @@ class AttendeeUserController extends Controller
         }
         $admin = auth()->user();
 
-        //  STEP 2: Get active subscription
-        $subscription = Subscription::active()
-            ->where('user_id', $admin->id)
-            ->latest()
-            ->first();
+        if ((int) $admin->id !== 1) {
+            $subscription = Subscription::active()
+                ->where('user_id', $admin->id)
+                ->latest()
+                ->first();
 
-        //  No active subscription
-        if (!$subscription) {
-            return back()->withErrors([
-                'error' => 'No active subscription found or subscription expired'
-            ])->withInput();
-        }
+            if (!$subscription) {
+                return back()->withErrors([
+                    'error' => 'No active subscription found or subscription expired'
+                ])->withInput();
+            }
 
-        //  STEP 3: Count existing attendees created by admin
-        $currentCount = User::where('created_by', $admin->id)->count();
+            $currentCount = User::where('created_by', $admin->id)->count();
 
-        // STEP 4: Check limit
-        if ($currentCount >= $subscription->attendee_count) {
-            return back()->withErrors([
-                'error' => "Attendee limit reached! Allowed: {$subscription->attendee_count}"
-            ])->withInput();
+            if ($currentCount >= $subscription->attendee_count) {
+                return back()->withErrors([
+                    'error' => "Attendee limit reached! Allowed: {$subscription->attendee_count}"
+                ])->withInput();
+            }
         }
 
         $user = new User();
