@@ -154,7 +154,7 @@
                     </a>
                 </li>
 
-                @if(isSuperAdmin())
+                <!-- @if(isSuperAdmin())
                 <li class="menu-item {{ request()->is('admin/brand*') ? 'active open' : '' }} {{ request()->is('admin/splash*') ? 'active open' : '' }}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <div data-i18n="Booth Management">Branding</div>
@@ -162,16 +162,16 @@
                     <ul class="menu-sub">
                         <a href="{{route('brand')}}" class="menu-link {{ request()->is('admin/brand*') ? 'active open' : '' }}">
                             <div data-i18n="Booth Management">App Branding</div>
-                        </a>
+                        </a> -->
                         {{-- <a href="{{route('booths.index')}}" class="menu-link">
                         <div data-i18n="Booth Management">App Menu</div>
                         </a>--}}
-                        <a href="{{route('splash')}}" class="menu-link {{ request()->is('admin/splash*') ? 'active open' : '' }}">
+                        <!-- <a href="{{route('splash')}}" class="menu-link {{ request()->is('admin/splash*') ? 'active open' : '' }}">
                             <div data-i18n="Booth Management">Splash Screen</div>
                         </a>
                     </ul>
                 </li>
-                @endif
+                @endif  -->
             </ul>
         </li>
 
@@ -195,16 +195,18 @@
                         <div data-i18n="Attendee">Attendees </div>
                     </a>
                 </li>
+                @if(isSuperAdmin())
                 <li class="menu-item {{ request()->is('admin/admin-users*') ? 'active' : '' }}">
                     <a href="{{ route('admin-users.index') }}" class="menu-link">
                         <div data-i18n="Attendee">Admins </div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/newbadges*') ? 'active' : '' }}">
+                @endif
+                {{-- <li class="menu-item {{ request()->is('admin/newbadges*') ? 'active' : '' }}">
                     <a href="{{ route('newbadges.index') }}" class="menu-link">
                         <div data-i18n="Badges">Badges </div>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </li>
 
@@ -247,23 +249,23 @@
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('admin/categories*') ? 'active open' : '' }}">
+        {{-- <li class="menu-item {{ request()->is('admin/categories*') ? 'active open' : '' }}">
             <a href="{{ route('categories.index') }}" class="menu-link">
                 <div data-i18n="categories">Categories & Tags</div>
             </a>
-        </li>
+        </li> --}}
 
-        <li class="menu-item {{ request()->is('admin/webview*') ? 'active open' : '' }}">
+        {{-- <li class="menu-item {{ request()->is('admin/webview*') ? 'active open' : '' }}">
             <a href="{{ route('webview') }}" class="menu-link">
                 <div data-i18n="Coupons">Webview</div>
             </a>
-        </li>
+        </li> --}}
 
-        <li class="menu-item {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
+        {{-- <li class="menu-item {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
             <a href="{{ route('landing-page-settings') }}" class="menu-link">
                 <div data-i18n="Coupons">Landing Setting</div>
             </a>
-        </li>
+        </li> --}}
 
         <li class="menu-item {{ request()->is('admin/event-guides*') ? 'active open' : '' }}">
             <a href="{{ route('event-guides.index') }}" class="menu-link">

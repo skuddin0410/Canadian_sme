@@ -240,16 +240,32 @@
                   </div>
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-12">
                 <div class="mb-3">
-                  <label class="form-label">Event Name</label>
-                  <div class="input-group input-group-merge">
-                    <span class="input-group-text"><i class="bx bxl-book"></i></span>
-                    <input type="text" name="event_name" class="form-control"
-                           value="{{ old('event_name', $user->event_name ?? 'CanadianSME Small Business Summit 2025') }}">
-                  </div>
+                  <label class="form-label">Events <span class="text-danger">*</span></label>
+                  <select name="event_id[]" class="form-control select2" multiple data-placeholder="Select Events" required>
+                    @foreach($events as $event)
+                      <option value="{{ $event->id }}" {{ in_array($event->id, old('event_id', $selectedEvents ?? [])) ? 'selected' : '' }}>{{ $event->title }}</option>
+                    @endforeach
+                  </select>
+                  @error('event_id') <div class="text-danger">{{ $message }}</div> @enderror
                 </div>
               </div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+  $('.select2').select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    placeholder: $(this).data('placeholder'),
+    closeOnSelect: false
+  });
+});
+</script>
 
                   {{-- Description --}}
               <div class="col-12">

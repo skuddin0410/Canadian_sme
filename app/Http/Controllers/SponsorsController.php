@@ -50,9 +50,11 @@ public function index(Request $request)
         });
     }
 
-    /* EVENT FILTER (THIS WAS MISSING) */
     if ($request->filled('event_id')) {
         $eventId = $request->event_id;
+        if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+            $eventId = 0;
+        }
 
         $query->whereExists(function ($q) use ($eventId) {
             $q->select(DB::raw(1))
@@ -60,6 +62,15 @@ public function index(Request $request)
               ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
               ->where('event_and_entity_link.entity_type', 'companies')
               ->where('event_and_entity_link.event_id', $eventId);
+        });
+    } elseif (!isSuperAdmin()) {
+        $eventIds = getEventIds();
+        $query->whereExists(function ($q) use ($eventIds) {
+            $q->select(DB::raw(1))
+              ->from('event_and_entity_link')
+              ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+              ->where('event_and_entity_link.entity_type', 'companies')
+              ->whereIn('event_and_entity_link.event_id', $eventIds);
         });
     }
 
@@ -86,7 +97,9 @@ public function index(Request $request)
         ]);
     } 
 
-    $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+    $events = isSuperAdmin() 
+        ? DB::table('events')->select('id', 'title')->get()
+        : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
 
     return view("users.sponsors.index", [
         "companies" => $companies,
@@ -102,7 +115,10 @@ public function index(Request $request)
      */
     public function create()
     {
-         return view('users.sponsors.create');
+         $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+         return view('users.sponsors.create', compact('events'));
     }
 
     /**
@@ -122,8 +138,8 @@ public function index(Request $request)
             'facebook'      => 'nullable|url',
             'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'banner'     => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
-
-
+            'event_id' => 'required|array',
+            'event_id.*' => 'exists:events,id'
         ]);
         if ($validator->fails()) {
             return redirect(route('sponsors.create'))->withInput()
@@ -132,21 +148,31 @@ public function index(Request $request)
 
        DB::beginTransaction();
        try {
-        $company = Company::create([
-            'name'        => $request->company_name,
-            'slug'=> createUniqueSlug('companies', $request->company_name),
-            'email'       => $request->company_email,
-            'is_sponsor' => true,
-            'phone'       => $request->company_phone,
-            'description' => $request->company_description,
-            'website'     => $request->website,
-            'linkedin'    => $request->linkedin,
-            'twitter'     => $request->twitter,
-            'facebook'    => $request->facebook,
-            'instagram'    => $request->instagram,
-            'type'    => $request->type,
+            $company = Company::create([
+                'name'        => $request->company_name,
+                'slug'=> createUniqueSlug('companies', $request->company_name),
+                'email'       => $request->company_email,
+                'is_sponsor' => true,
+                'phone'       => $request->company_phone,
+                'description' => $request->company_description,
+                'website'     => $request->website,
+                'linkedin'    => $request->linkedin,
+                'twitter'     => $request->twitter,
+                'facebook'    => $request->facebook,
+                'instagram'    => $request->instagram,
+                'type'    => $request->type,
 
-        ]);
+            ]);
+
+            if ($request->event_id) {
+                foreach ($request->event_id as $eventId) {
+                    \App\Models\EventAndEntityLink::create([
+                        'event_id' => $eventId,
+                        'entity_type' => 'companies',
+                        'entity_id' => $company->id,
+                    ]);
+                }
+            }
         if ($request->file("logo")) {
             $this->imageUpload(
                 $request->file("logo"),
@@ -207,7 +233,17 @@ public function index(Request $request)
         $company = Company::findOrFail($id); 
         $company->load('logo' , 'banner','user');
         $user= $company?->user;
-        return view('users.sponsors.edit', compact('user','company'));
+        
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+        
+        $selectedEvents = \App\Models\EventAndEntityLink::where('entity_type', 'companies')
+            ->where('entity_id', $company->id)
+            ->pluck('event_id')
+            ->toArray();
+
+        return view('users.sponsors.edit', compact('user','company', 'events', 'selectedEvents'));
         
     }
 
@@ -224,7 +260,9 @@ public function index(Request $request)
         'facebook'            => 'nullable|url',
         'logo'                => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
         'banner'              => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
-        'sponsor_id'=>'required'
+        'sponsor_id'=>'required',
+        'event_id' => 'required|array',
+        'event_id.*' => 'exists:events,id'
     ]);
 
     if ($validator->fails()) {
@@ -237,20 +275,34 @@ public function index(Request $request)
         $company = Company::where('id',$request->sponsor_id)->first();
     
         if ($company) {
-        $company->update([
-            'name'        => $request->company_name,
-            'slug' => createUniqueSlug('companies',$request->company_name,'slug',$company->id),
-            'email'       => $request->company_email,
-            'phone'       => $request->company_phone,
-            'description' => $request->company_description,
-            'website'     => $request->website,
-            'linkedin'    => $request->linkedin,
-            'twitter'     => $request->twitter,
-            'facebook'    => $request->facebook,
-            'instagram'    => $request->instagram,
-            'type'    => $request->type
-        ]);
+            $company->update([
+                'name'        => $request->company_name,
+                'slug' => createUniqueSlug('companies',$request->company_name,'slug',$company->id),
+                'email'       => $request->company_email,
+                'phone'       => $request->company_phone,
+                'description' => $request->company_description,
+                'website'     => $request->website,
+                'linkedin'    => $request->linkedin,
+                'twitter'     => $request->twitter,
+                'facebook'    => $request->facebook,
+                'instagram'    => $request->instagram,
+                'type'    => $request->type
+            ]);
 
+            // Sync events
+            \App\Models\EventAndEntityLink::where('entity_type', 'companies')
+                ->where('entity_id', $company->id)
+                ->delete();
+
+            if (!empty($request->event_id)) {
+                foreach ($request->event_id as $eventId) {
+                    \App\Models\EventAndEntityLink::create([
+                        'event_id' => $eventId,
+                        'entity_type' => 'companies',
+                        'entity_id' => $company->id,
+                    ]);
+                }
+            }
         }
       
         if ($request->file("logo")) {

@@ -114,6 +114,74 @@
   </div>
 </div>
 
+    {{-- Membership Status Section for Event Admins --}}
+    @if(!isSuperAdmin() && isset($subscription))
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+          <div class="card-header bg-white py-3">
+            <h5 class="mb-0 text-dark font-weight-bold">
+               <i class="bi bi-shield-check text-primary me-2"></i>Membership Status
+            </h5>
+          </div>
+          <div class="card-body bg-light">
+            <div class="row align-items-center">
+              <div class="col-md-3 border-end py-2">
+                <p class="text-muted small text-uppercase mb-1 fw-semibold">Current Plan</p>
+                <h4 class="mb-1 text-primary fw-bold">{{ $subscription->pricing->name ?? 'Individual Plan' }}</h4>
+                <span class="badge {{ ($subscription->status ?? '') == 'active' ? 'bg-label-success' : 'bg-label-danger' }} rounded-pill">
+                  <i class="bi bi-dot me-1"></i>{{ ucfirst($subscription->status ?? 'Inactive') }}
+                </span>
+              </div>
+              
+              <div class="col-md-3 border-end py-2 px-md-4">
+                <p class="text-muted small text-uppercase mb-1 fw-semibold">Attendee Capacity</p>
+                <div class="d-flex align-items-end mb-2">
+                  <h4 class="mb-0 fw-bold">{{ $attendeeCount }}</h4>
+                  <span class="text-muted ms-1">/ {{ $subscription->attendee_count ?? 0 }}</span>
+                </div>
+                <div class="progress" style="height: 8px; border-radius: 4px; background-color: #e0e0e0;">
+                  @php
+                    $attendeePercent = ($subscription->attendee_count ?? 0) > 0 ? ($attendeeCount / $subscription->attendee_count) * 100 : 0;
+                  @endphp
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ min(100, $attendeePercent) }}%" aria-valuenow="{{ $attendeePercent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <p class="small text-muted mt-2 mb-0">{{ round($attendeePercent, 1) }}% space utilized</p>
+              </div>
+
+              <div class="col-md-3 border-end py-2 px-md-4">
+                <p class="text-muted small text-uppercase mb-1 fw-semibold">Event Slots</p>
+                <div class="d-flex align-items-end mb-2">
+                  <h4 class="mb-0 fw-bold">{{ $totalEventCount }}</h4>
+                  <span class="text-muted ms-1">/ {{ $subscription->event_count ?? 0 }}</span>
+                </div>
+                <div class="progress" style="height: 8px; border-radius: 4px; background-color: #e0e0e0;">
+                  @php
+                    $eventPercent = ($subscription->event_count ?? 0) > 0 ? ($totalEventCount / $subscription->event_count) * 100 : 0;
+                  @endphp
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ min(100, $eventPercent) }}%" aria-valuenow="{{ $eventPercent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <p class="small text-muted mt-2 mb-0">{{ round($eventPercent, 1) }}% slots active</p>
+              </div>
+
+              <div class="col-md-3 py-2 px-md-4 text-md-end">
+                <p class="text-muted small text-uppercase mb-1 fw-semibold">Subscription Renewal</p>
+                <h4 class="mb-1 text-dark fw-bold">
+                  {{ $subscription->expired_at ? $subscription->expired_at->format('M d, Y') : 'N/A' }}
+                </h4>
+                @if($subscription->expired_at)
+                <p class="small {{ $subscription->expired_at->isPast() ? 'text-danger' : 'text-muted' }} mb-0">
+                  <i class="bi bi-clock me-1"></i>{{ $subscription->expired_at->diffForHumans() }}
+                </p>
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @endif
+
 
     <div class="row mt-4">
       <div class="col-12">

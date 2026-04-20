@@ -35,33 +35,87 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
-    {  
-        if ( Auth::user()->hasRole('Admin')) {
-            
-            $evntCount = Session::count();
-            $attendeeCount = User::with("roles")
-                ->whereHas("roles", function ($q) {
-                    $q->where("name", "Attendee");
-                })->count();
+    {
+        $user = Auth::user();
+        if ($user->hasRole('Admin')) {
+            $isSuperAdmin = isSuperAdmin();
+            $eventIds = [];
 
-            $speakerCount = Speaker::count();  
+            if (!$isSuperAdmin) {
+                $eventIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
+                    ->where('entity_id', $user->id)
+                    ->pluck('event_id')
+                    ->toArray();
+            }
 
-            $sponsorCount = Company::where('is_sponsor',1)->count();         
-            
-            $exhibitorCount = Company::where('is_sponsor',0)->count();
-           
+            // Sessions / Events Count
+            $querySessions = Session::query();
+            if (!$isSuperAdmin) {
+                $querySessions->whereIn('event_id', $eventIds);
+            }
+            $evntCount = $querySessions->count();
 
-            if(Auth::user()->hasRole('Admin') ){
-                $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get(); 
-                $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();   
-            }else{
-                $logs = AuditLog::with('user')->where('audit_logs.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
-                $loginlogs = UserLogin::with('user')->where('user_logins.user_id',auth()->id())->orderBy('created_at', 'desc')->limit(5)->get(); 
-            } 
+            // Attendees Count
+            $queryAttendees = User::whereHas("roles", function ($q) {
+                $q->where("name", "Attendee");
+            });
+            if (!$isSuperAdmin) {
+                $queryAttendees->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) {
+                    $q->whereIn('event_id', $eventIds);
+                });
+            }
+            $attendeeCount = $queryAttendees->count();
 
-            return view('home',compact('evntCount','attendeeCount','speakerCount','sponsorCount','exhibitorCount','logs','loginlogs'));
+            // Speakers Count
+            $querySpeakers = Speaker::query();
+            if (!$isSuperAdmin) {
+                $querySpeakers->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) {
+                    $q->whereIn('event_id', $eventIds);
+                });
+            }
+            $speakerCount = $querySpeakers->count();
+
+            // Sponsors Count
+            $querySponsors = Company::where('is_sponsor', 1);
+            if (!$isSuperAdmin) {
+                $querySponsors->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) {
+                    $q->whereIn('event_id', $eventIds);
+                });
+            }
+            $sponsorCount = $querySponsors->count();
+
+            // Exhibitors Count
+            $queryExhibitors = Company::where('is_sponsor', 0);
+            if (!$isSuperAdmin) {
+                $queryExhibitors->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) {
+                    $q->whereIn('event_id', $eventIds);
+                });
+            }
+            $exhibitorCount = $queryExhibitors->count();
+
+            // Logs
+            if ($isSuperAdmin) {
+                $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
+                $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
+            } else {
+                $logs = AuditLog::with('user')->where('user_id', $user->id)->orderBy('created_at', 'desc')->limit(5)->get();
+                $loginlogs = UserLogin::with('user')->where('user_id', $user->id)->orderBy('created_at', 'desc')->limit(5)->get();
+            }
+
+            // Events Count (based on Event model)
+            $queryEvents = \App\Models\Event::query();
+            if (!$isSuperAdmin) {
+                $queryEvents->whereIn('id', $eventIds);
+            }
+            $totalEventCount = $queryEvents->count();
+
+            // Subscription
+            $subscription = \App\Models\Subscription::with('pricing')->where('user_id', $user->id)->first();
+
+            return view('home', compact('evntCount', 'attendeeCount', 'speakerCount', 'sponsorCount', 'exhibitorCount', 'logs', 'loginlogs', 'subscription', 'totalEventCount'));
         }
 
+        return redirect()->route('user.home');
     }
 
     public function accountInfo(Request $request)

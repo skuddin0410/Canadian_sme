@@ -54,9 +54,11 @@ public function index(Request $request)
         });
     }
 
-    /* EVENT FILTER (THIS WAS MISSING) */
     if ($request->filled('event_id')) {
         $eventId = $request->event_id;
+        if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+            $eventId = 0;
+        }
 
         $query->whereExists(function ($q) use ($eventId) {
             $q->select(DB::raw(1))
@@ -64,6 +66,15 @@ public function index(Request $request)
               ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
               ->where('event_and_entity_link.entity_type', 'companies')
               ->where('event_and_entity_link.event_id', $eventId);
+        });
+    } elseif (!isSuperAdmin()) {
+        $eventIds = getEventIds();
+        $query->whereExists(function ($q) use ($eventIds) {
+            $q->select(DB::raw(1))
+              ->from('event_and_entity_link')
+              ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+              ->where('event_and_entity_link.entity_type', 'companies')
+              ->whereIn('event_and_entity_link.event_id', $eventIds);
         });
     }
    
@@ -84,7 +95,9 @@ public function index(Request $request)
         ]);
     }
 
-    $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+    $events = isSuperAdmin() 
+        ? DB::table('events')->select('id', 'title')->get()
+        : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
 
     
     return view("users.exhibitor_users.index", [
@@ -103,8 +116,10 @@ public function index(Request $request)
      */
     public function create()
     {
-
-         return view('users.exhibitor_users.create');
+         $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+         return view('users.exhibitor_users.create', compact('events'));
     }
 
     /**
@@ -127,6 +142,8 @@ public function index(Request $request)
             'facebook'      => 'nullable|url',
             'content_icon'    => 'nullable|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'quick_link_icon' => 'nullable|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'event_id' => 'required|array',
+            'event_id.*' => 'exists:events,id'
 
 
         ]);
@@ -150,9 +167,19 @@ public function index(Request $request)
                 'facebook'    => $request->facebook,
                 'instagram'    => $request->instagram,
                 'booth'=> $request->booth,
-                'event_name'=> $request->event_name
+                'is_sponsor' => 0
                 
             ]);
+
+            if ($request->event_id) {
+                foreach ($request->event_id as $eventId) {
+                    \App\Models\EventAndEntityLink::create([
+                        'event_id' => $eventId,
+                        'entity_type' => 'companies',
+                        'entity_id' => $company->id,
+                    ]);
+                }
+            }
 
         if ($request->file("content_icon")) {
             $this->imageUpload(
@@ -210,10 +237,19 @@ public function show($exhibitor_user, Request $request){
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($exhibitor_user){    
-       $user = Company::with(['contentIconFile','quickLinkIconFile'])->where('id', $exhibitor_user)->firstOrFail();
+    public function edit($id)
+    {
+        $company = Company::findOrFail($id);
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+        
+        $selectedEvents = \App\Models\EventAndEntityLink::where('entity_type', 'companies')
+            ->where('entity_id', $company->id)
+            ->pluck('event_id')
+            ->toArray();
 
-        return view('users.exhibitor_users.edit', ['user' => $user]);
+        return view('users.exhibitor_users.edit', compact('company', 'events', 'selectedEvents'));
     }
 
     public function update(Request $request, $exhibitor_user){
@@ -234,6 +270,8 @@ public function show($exhibitor_user, Request $request){
             'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'company_id'       => 'required|string',
+            'event_id' => 'required|array',
+            'event_id.*' => 'exists:events,id'
         ]);
 
         if ($validator->fails()) {
@@ -251,12 +289,26 @@ public function show($exhibitor_user, Request $request){
                     'linkedin'    => $request->linkedin,
                     'twitter'     => $request->twitter,
                     'facebook'    => $request->facebook,
-                    'instagram'   => $request->instagram,
+                    'instagram'    => $request->instagram,
                     'booth'       => $request->booth,
                     'industry'    => $request->industry,
-                    'event_name'=> $request->event_name
-
+                    'is_sponsor' => 0
                 ]); 
+
+                // Sync events
+                \App\Models\EventAndEntityLink::where('entity_type', 'companies')
+                    ->where('entity_id', $company->id)
+                    ->delete();
+
+                if (!empty($request->event_id)) {
+                    foreach ($request->event_id as $eventId) {
+                        \App\Models\EventAndEntityLink::create([
+                            'event_id' => $eventId,
+                            'entity_type' => 'companies',
+                            'entity_id' => $company->id,
+                        ]);
+                    }
+                }
             }
          
             if ($request->hasFile('content_icon')) {

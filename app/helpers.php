@@ -625,6 +625,31 @@ if (! function_exists('isBase64String')) {
     }
 }
 
+if (!function_exists('getEventIds')) {
+    function getEventIds()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return [];
+        }
+
+        if (isSuperAdmin()) {
+            return \App\Models\Event::pluck('id')->toArray();
+        }
+
+        $linkedIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
+            ->where('entity_id', $user->id)
+            ->pluck('event_id')
+            ->toArray();
+
+        $createdIds = \App\Models\Event::where('created_by', $user->id)
+            ->pluck('id')
+            ->toArray();
+
+        return array_unique(array_merge($linkedIds, $createdIds));
+    }
+}
+
 if(! function_exists('isSuperAdmin')){
     function isSuperAdmin(){
         // $superAdminRole = config('app.super_admin_role', 'Super Admin');

@@ -27,7 +27,7 @@ class EventController extends Controller
         if ($request->ajax() && $request->ajax_request == true) {
             $events = Event::with(['category', 'photo', 'mapImage'])->orderBy('id', 'DESC');
 
-            $events = isSuperAdmin() ? $events : $events->where('created_by', auth()->id());
+            $events = isSuperAdmin() ? $events : $events->whereIn('id', getEventIds());
 
             if ($request->search) {
                 $events = $events->where(function ($query) use ($request) {

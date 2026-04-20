@@ -151,13 +151,25 @@ Admin | Speaker Add
                         @error('company') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
 
-                        <div class="col-md-6">
+                      <div class="col-md-6">
                         <label class="form-label">Designation</label>
                         <div class="input-group input-group-merge mb-3">
                           <span class="input-group-text"><i class="bx bx-briefcase"></i></span>
                           <input type="text" class="form-control" name="designation" id="designation" value="{{ $user->designation ?? old('designation') }}" placeholder="Designation">
                         </div>
                         @error('designation') <div class="text-danger">{{ $message }}</div> @enderror
+                      </div>
+
+                      <div class="col-md-12">
+                        <label class="form-label">Events <span class="text-danger">*</span></label>
+                        <div class="mb-3">
+                          <select name="event_id[]" class="form-control select2" multiple data-placeholder="Select Events">
+                            @foreach($events as $event)
+                              <option value="{{ $event->id }}" {{ in_array($event->id, old('event_id', [])) ? 'selected' : '' }}>{{ $event->title }}</option>
+                            @endforeach
+                          </select>
+                        </div>
+                        @error('event_id') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
 
 
