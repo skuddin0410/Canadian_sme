@@ -11,126 +11,114 @@ Admin | Add Sponsors
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Sponsors @if(!empty($user)) Update @else Create @endif</h5>
+          <h5 class="mb-0">Sponsors Create</h5>
         </div>
         
         <div class="card-body">
-          <form
-            action="{{ route('sponsors.store') }}" method="POST" enctype="multipart/form-data">
-            {{ csrf_field() }}
+          <form action="{{ route('sponsors.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
          
+            <div class="row">
+              {{-- Logo --}}
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Logo (<span class="text-danger">600px (width) x 600px (height)</span>)</label>
 
+                  @php
+                    $logoFile = !empty($company?->logoFile) && !empty($company->logoFile->file_path);
+                    $logoSrc = $logoFile 
+                        ? (Str::startsWith($company->logoFile->file_path, ['http://','https://'])
+                            ? $company->logoFile->file_path
+                            : Storage::url($company->logoFile->file_path))
+                        : '';
+                  @endphp
 
-  <div class="row">
-  <div class="row">
-  <div class="col-md-6">
-    <div class="mb-3">
-      <label class="form-label">Logo (<span class="text-danger">600px (width) x 600px (height)</span>)</label>
+                  <div id="logo-dropzone"
+                       class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+                       style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-      @php
-        $logoFile = !empty($company?->logoFile) && !empty($company->logoFile->file_path);
-        $logoSrc = $logoFile 
-            ? (Str::startsWith($company->logoFile->file_path, ['http://','https://'])
-                ? $company->logoFile->file_path
-                : Storage::url($company->logoFile->file_path))
-            : '';
-      @endphp
+                    <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $logoFile ? 'd-none' : '' }}">
+                      <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+                      <div>
+                        <strong>Drag & drop</strong> an image here, or
+                        <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+                      </div>
+                      <small class="text-muted d-block">Max 2048 KB</small>
+                    </div>
 
-      <div id="logo-dropzone"
-     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+                    <img id="dz-image-content"
+                         src="{{ $logoSrc ?? '' }}"
+                         alt="Preview"
+                         class="{{ $logoFile ? '' : 'd-none' }} rounded"
+                         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-  {{-- Placeholder --}}
-  <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $logoFile ? 'd-none' : '' }}">
-    <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-    <div>
-      <strong>Drag & drop</strong> an image here, or
-      <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-    </div>
-    <small class="text-muted d-block">Max 2048 KB</small>
-  </div>
+                    <button type="button"
+                            id="dz-remove-content"
+                            class="btn btn-sm btn-danger position-absolute {{ $logoFile ? '' : 'd-none' }}"
+                            style="top: .5rem; right: .5rem;">
+                      <i class="bx bx-x"></i> Remove
+                    </button>
 
-  {{-- Inline preview --}}
-  <img id="dz-image-content"
-       src="{{ $logoSrc ?? '' }}"
-       alt="Preview"
-       class="{{ $logoFile ? '' : 'd-none' }} rounded"
-       style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+                    <input type="file" id="dz-input-content" name="logo" accept="image/*" class="d-none">
+                  </div>
 
-  {{-- Remove button --}}
-  <button type="button"
-          id="dz-remove-content"
-          class="btn btn-sm btn-danger position-absolute {{ $logoFile ? '' : 'd-none' }}"
-          style="top: .5rem; right: .5rem;">
-    <i class="bx bx-x"></i> Remove
-  </button>
+                  @error('logo')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                  @enderror
+                </div>
+              </div>
 
-  {{-- Hidden input --}}
-  <input type="file" id="dz-input-content" name="logo" accept="image/*" class="d-none">
-</div>
+              {{-- Banner --}}
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Banner (<span class="text-danger">1920px (width) x 1081px (height)</span>)</label>
 
-      @error('logo')
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-      @enderror
-    </div>
-  </div>
+                  @php
+                    $bannerFile = !empty($company?->bannerFile) && !empty($company->bannerFile->file_path);
+                    $bannerSrc = $bannerFile
+                        ? (Str::startsWith($company->bannerFile->file_path, ['http://','https://'])
+                            ? $company->bannerFile->file_path
+                            : Storage::url($company->bannerFile->file_path))
+                        : '';
+                  @endphp
 
-  {{-- Icon --}}
-  <div class="col-md-6">
-    <div class="mb-3">
-      <label class="form-label">Banner (<span class="text-danger">1920px (width) x 1081px (height)</span>)</label>
+                  <div id="banner-icon-dropzone"
+                       class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+                       style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-      @php
-        $bannerFile = !empty($company?->bannerFile) && !empty($company->bannerFile->file_path);
-        $bannerSrc = $bannerFile
-            ? (Str::startsWith($company->bannerFile->file_path, ['http://','https://'])
-                ? $company->bannerFile->file_path
-                : Storage::url($company->bannerFile->file_path))
-            : '';
-      @endphp
+                    <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $bannerFile ? 'd-none' : '' }}">
+                      <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+                      <div>
+                        <strong>Drag & drop</strong> an image here, or
+                        <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+                      </div>
+                      <small class="text-muted d-block">Max 2048 KB</small>
+                    </div>
 
-     <div id="banner-icon-dropzone"
-     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+                    <img id="dz-image-quick"
+                         src="{{ $bannerSrc ?? '' }}"
+                         alt="Preview"
+                         class="{{ $bannerFile ? '' : 'd-none' }} rounded"
+                         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-  {{-- Placeholder --}}
-  <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $bannerFile ? 'd-none' : '' }}">
-    <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-    <div>
-      <strong>Drag & drop</strong> an image here, or
-      <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-    </div>
-    <small class="text-muted d-block">Max 2048 KB</small>
-  </div>
+                    <button type="button"
+                            id="dz-remove-quick"
+                            class="btn btn-sm btn-danger position-absolute {{ $bannerFile ? '' : 'd-none' }}"
+                            style="top: .5rem; right: .5rem;">
+                      <i class="bx bx-x"></i> Remove
+                    </button>
 
-  {{-- Inline preview --}}
-  <img id="dz-image-quick"
-       src="{{ $bannerSrc ?? '' }}"
-       alt="Preview"
-       class="{{ $bannerFile ? '' : 'd-none' }} rounded"
-       style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+                    <input type="file" id="dz-input-quick" name="banner" accept="image/*" class="d-none">
+                  </div>
 
-  {{-- Remove button --}}
-  <button type="button"
-          id="dz-remove-quick"
-          class="btn btn-sm btn-danger position-absolute {{ $bannerFile ? '' : 'd-none' }}"
-          style="top: .5rem; right: .5rem;">
-    <i class="bx bx-x"></i> Remove
-  </button>
+                  @error('banner')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                  @enderror
+                </div>
+              </div>
 
-  {{-- Hidden input --}}
-  <input type="file" id="dz-input-quick" name="banner" accept="image/*" class="d-none">
-</div>
-
-      @error('banner')
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-      @enderror
-    </div>
-  </div>
-
-
-
-             <div class="col-6">
+              {{-- Company Name --}}
+              <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Company Name <span class="text-danger">*</span></label>
                   <div class="input-group input-group-merge">
@@ -165,7 +153,7 @@ Admin | Add Sponsors
                 </div>
               </div>
 
-               {{-- Website --}}
+              {{-- Website --}}
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Website</label>
@@ -213,7 +201,8 @@ Admin | Add Sponsors
                 </div>
               </div>
              
-             <div class="col-6">
+              {{-- Instagram --}}
+              <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Instagram</label>
                   <div class="input-group input-group-merge">
@@ -223,17 +212,21 @@ Admin | Add Sponsors
                   </div>
                 </div>
               </div>
+
+              {{-- Category --}}
               <div class="col-12"> 
-              <label for="type"  class="form-label">Select Category<span class="text-danger">*</span></label>             
-              <select id="type" name="type" class="form-select mb-3">
-                  <option value="">Select  Category</option>
-                 @foreach(getCategory('sponsor') as  $label)
-                  <option value="{{ $label->slug }}" {{ old('type') == $label->slug ? 'selected' : '' }}>
-                      {{ $label->slug }}
-                  </option>
-                @endforeach
-              </select>
+                <label for="type"  class="form-label">Select Category<span class="text-danger">*</span></label>             
+                <select id="type" name="type" class="form-select mb-3">
+                    <option value="">Select Category</option>
+                   @foreach(getCategory('sponsor') as $label)
+                    <option value="{{ $label->slug }}" {{ old('type') == $label->slug ? 'selected' : '' }}>
+                        {{ $label->slug }}
+                    </option>
+                  @endforeach
+                </select>
               </div>
+
+              {{-- Events --}}
               <div class="col-12">
                 <div class="mb-3">
                   <label class="form-label">Events <span class="text-danger">*</span></label>
@@ -246,22 +239,8 @@ Admin | Add Sponsors
                 </div>
               </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
-$(document).ready(function() {
-  $('.select2').select2({
-    theme: 'bootstrap-5',
-    width: '100%',
-    placeholder: $(this).data('placeholder'),
-    closeOnSelect: false
-  });
-});
-</script>
-
               <input type="hidden" name="is_sponsor" value="true"/>
+
               {{-- Company Description --}}
               <div class="col-12">
                 <div class="mb-3">
@@ -270,169 +249,112 @@ $(document).ready(function() {
                             placeholder="Brief description about the Sponsor">{{ old('company_description') }}</textarea>
                 </div>
               </div>
-            </div>
 
-            <div class="col-12">
-              <div class="mb-3">
-                <div class="d-flex pt-3 justify-content-end">
-                  <a href="{{route('sponsors.index')}}"
-                    class="btn btn-outline-primary btn-pill btn-streach font-book ml-3 mt-6 fs-14 me-2">Cancel</a>
-                  <button type="submit" class="btn btn-primary btn-streach font-book mt-6 fs-14 add_user"><i
-                      class="bx bx-save"></i>Save</button>
+              {{-- Submit --}}
+              <div class="col-12">
+                <div class="d-flex pt-3 justify-content-end gap-2">
+                  <a href="{{route('sponsors.index')}}" class="btn btn-outline-primary px-4">Cancel</a>
+                  <button type="submit" class="btn btn-primary px-4"><i class="bx bx-save"></i> Save</button>
                 </div>
               </div>
-            </div>
+
+            </div> {{-- end row --}}
+          </form>
         </div>
       </div>
-      </form>
     </div>
-
   </div>
 </div>
-</div>
-</div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+@endsection
 
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-  $("#last-name-target").keyup(function() {
-    var Text = $('#slug-source').val();
-    var Last = $('#last-name-target').val();
-    console.log(Text + " " + Last);
-    if (Last != undefined && Text != undefined) {
-      Text = Text + " " + Last;
-      Text = slugify(Text);
-      $("#slug-target").val(Text);
+$(document).ready(function() {
+  $('.select2').each(function() {
+    $(this).select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: $(this).data('placeholder'),
+      closeOnSelect: false
+    });
+  });
+
+  // Slug logic
+  $("#last-name-target, #slug-source").keyup(function() {
+    let text = $('#slug-source').val();
+    let last = $('#last-name-target').val();
+    if (last !== undefined && text !== undefined) {
+      $("#slug-target").val(slugify(text + " " + last));
     }
   });
-  $("#slug-source").keyup(function() {
-    var Text = $('#slug-source').val();
-    var Last = $('#last-name-target').val();
-    console.log(Text + " " + Last);
-    if (Last != undefined && Text != undefined) {
-      Text = Text + " " + Last;
-      Text = slugify(Text);
-      $("#slug-target").val(Text);
-    }
-  });
+
   function slugify(str) {
-    str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
-    str = str.toLowerCase(); // convert string to lowercase
-    str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
-      .replace(/\s+/g, '-') // replace spaces with hyphens
-      .replace(/-+/g, '-'); // remove consecutive hyphens
-    return str.replace(/^-+|-+$/g, '');
+    return str.toLowerCase().replace(/^\s+|\s+$/g, '').replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
   }
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const dropzone    = document.getElementById("logo-dropzone");
-    const input       = document.getElementById("dz-input-content");
-    const placeholder = document.getElementById("dz-placeholder-content");
-    const preview     = document.getElementById("dz-image-content");
-    const removeBtn   = document.getElementById("dz-remove-content");
-    const browseBtn   = document.getElementById("dz-browse-content");
 
-    // Browse button click → trigger file input
-    browseBtn.addEventListener("click", () => input.click());
+  // Logo Dropzone
+  const logoInput = document.getElementById("dz-input-content");
+  const logoPreview = document.getElementById("dz-image-content");
+  const logoRemove = document.getElementById("dz-remove-content");
+  const logoPlaceholder = document.getElementById("dz-placeholder-content");
 
-    // Handle file selection
-    input.addEventListener("change", function () {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                preview.src = e.target.result;
-                preview.classList.remove("d-none");
-                removeBtn.classList.remove("d-none");
-                placeholder.classList.add("d-none");
-            };
-            reader.readAsDataURL(this.files[0]);
-        }
+  if(logoInput) {
+    document.getElementById("dz-browse-content").addEventListener("click", () => logoInput.click());
+    logoInput.addEventListener("change", function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          logoPreview.src = e.target.result;
+          logoPreview.classList.remove("d-none");
+          logoRemove.classList.remove("d-none");
+          logoPlaceholder.classList.add("d-none");
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
     });
 
-    // Drag & Drop handling
-    dropzone.addEventListener("dragover", e => {
-        e.preventDefault();
-        dropzone.style.borderColor = "var(--bs-primary)";
+    logoRemove.addEventListener("click", () => {
+      logoInput.value = "";
+      logoPreview.src = "";
+      logoPreview.classList.add("d-none");
+      logoRemove.classList.add("d-none");
+      logoPlaceholder.classList.remove("d-none");
+    });
+  }
+
+  // Banner Dropzone
+  const bannerInput = document.getElementById("dz-input-quick");
+  const bannerPreview = document.getElementById("dz-image-quick");
+  const bannerRemove = document.getElementById("dz-remove-quick");
+  const bannerPlaceholder = document.getElementById("dz-placeholder-quick");
+
+  if(bannerInput) {
+    document.getElementById("dz-browse-quick").addEventListener("click", () => bannerInput.click());
+    bannerInput.addEventListener("change", function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          bannerPreview.src = e.target.result;
+          bannerPreview.classList.remove("d-none");
+          bannerRemove.classList.remove("d-none");
+          bannerPlaceholder.classList.add("d-none");
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
     });
 
-    dropzone.addEventListener("dragleave", e => {
-        dropzone.style.borderColor = "var(--bs-border-color)";
+    bannerRemove.addEventListener("click", () => {
+      bannerInput.value = "";
+      bannerPreview.src = "";
+      bannerPreview.classList.add("d-none");
+      bannerRemove.classList.add("d-none");
+      bannerPlaceholder.classList.remove("d-none");
     });
-
-    dropzone.addEventListener("drop", e => {
-        e.preventDefault();
-        dropzone.style.borderColor = "var(--bs-border-color)";
-        if (e.dataTransfer.files.length) {
-            input.files = e.dataTransfer.files;
-            input.dispatchEvent(new Event("change"));
-        }
-    });
-
-    // Remove button
-    removeBtn.addEventListener("click", () => {
-        input.value = "";
-        preview.src = "";
-        preview.classList.add("d-none");
-        removeBtn.classList.add("d-none");
-        placeholder.classList.remove("d-none");
-    });
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const dropzone    = document.getElementById("banner-icon-dropzone");
-    const input       = document.getElementById("dz-input-quick");
-    const placeholder = document.getElementById("dz-placeholder-quick");
-    const preview     = document.getElementById("dz-image-quick");
-    const removeBtn   = document.getElementById("dz-remove-quick");
-    const browseBtn   = document.getElementById("dz-browse-quick");
-
-    // Browse button → open file dialog
-    browseBtn.addEventListener("click", () => input.click());
-
-    // Handle file input change
-    input.addEventListener("change", function () {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                preview.src = e.target.result;
-                preview.classList.remove("d-none");
-                removeBtn.classList.remove("d-none");
-                placeholder.classList.add("d-none");
-            };
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
-
-    // Drag over effect
-    dropzone.addEventListener("dragover", e => {
-        e.preventDefault();
-        dropzone.style.borderColor = "var(--bs-primary)";
-    });
-
-    dropzone.addEventListener("dragleave", () => {
-        dropzone.style.borderColor = "var(--bs-border-color)";
-    });
-
-    // Handle file drop
-    dropzone.addEventListener("drop", e => {
-        e.preventDefault();
-        dropzone.style.borderColor = "var(--bs-border-color)";
-        if (e.dataTransfer.files.length) {
-            input.files = e.dataTransfer.files;
-            input.dispatchEvent(new Event("change"));
-        }
-    });
-
-    // Remove image
-    removeBtn.addEventListener("click", () => {
-        input.value = "";
-        preview.src = "";
-        preview.classList.add("d-none");
-        removeBtn.classList.add("d-none");
-        placeholder.classList.remove("d-none");
-    });
+  }
 });
 </script>
 @endsection

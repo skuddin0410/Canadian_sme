@@ -20,123 +20,105 @@
         <div class="card-body">
           <form action="{{ route('exhibitor-users.store') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
             @csrf
-            {{-- Row for Content Icon & Quick Link Icon --}}
+            
             <div class="row">
-              <div class="row">
-  {{-- Content Icon --}}
-  <div class="col-md-6">
-    <div class="mb-3">
-      <label class="form-label">Logo (<span class="text-danger">600px (width) x 600px (height)</span>)</label>
+              {{-- Logo --}}
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Logo (<span class="text-danger">600px (width) x 600px (height)</span>)</label>
 
-      @php
-        $contentIconFile = !empty($company?->contentIconFile) && !empty($company->contentIconFile->file_path);
-        $contentIconSrc = $contentIconFile 
-            ? (Str::startsWith($company->contentIconFile->file_path, ['http://','https://'])
-                ? $company->contentIconFile->file_path
-                : Storage::url($company->contentIconFile->file_path))
-            : '';
-      @endphp
+                  @php
+                    $contentIconFile = !empty($company?->contentIconFile) && !empty($company->contentIconFile->file_path);
+                    $contentIconSrc = $contentIconFile 
+                        ? (Str::startsWith($company->contentIconFile->file_path, ['http://','https://'])
+                            ? $company->contentIconFile->file_path
+                            : Storage::url($company->contentIconFile->file_path))
+                        : '';
+                  @endphp
 
-      <div id="content-icon-dropzone"
-     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+                  <div id="content-icon-dropzone"
+                       class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+                       style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-    {{-- Placeholder --}}
-    <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $contentIconFile ? 'd-none' : '' }}">
-      <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-      <div>
-        <strong>Drag & drop</strong> an image here, or
-        <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-      </div>
-      <small class="text-muted d-block">Max 2048 KB</small>
-    </div>
+                    <div id="dz-placeholder-content" class="d-flex flex-column align-items-center gap-2 {{ $contentIconFile ? 'd-none' : '' }}">
+                      <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+                      <div>
+                        <strong>Drag & drop</strong> an image here, or
+                        <button type="button" id="dz-browse-content" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+                      </div>
+                      <small class="text-muted d-block">Max 2048 KB</small>
+                    </div>
 
-    {{-- Inline preview --}}
-    <img id="dz-image-content"
-         src="{{ $contentIconSrc }}"
-         alt="Preview"
-         class="{{ $contentIconFile ? '' : 'd-none' }} rounded"
-         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+                    <img id="dz-image-content"
+                         src="{{ $contentIconSrc }}"
+                         alt="Preview"
+                         class="{{ $contentIconFile ? '' : 'd-none' }} rounded"
+                         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-    {{-- Remove button --}}
-    <button type="button"
-            id="dz-remove-content"
-            class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
-            style="top: .5rem; right: .5rem;">
-      <i class="bx bx-x"></i> Remove
-    </button>
+                    <button type="button"
+                            id="dz-remove-content"
+                            class="btn btn-sm btn-danger position-absolute {{ $contentIconFile ? '' : 'd-none' }}"
+                            style="top: .5rem; right: .5rem;">
+                      <i class="bx bx-x"></i> Remove
+                    </button>
 
-    {{-- Hidden input --}}
-    <input type="file" id="dz-input-content" name="content_icon" accept="image/*" class="d-none">
-</div>
+                    <input type="file" id="dz-input-content" name="content_icon" accept="image/*" class="d-none">
+                  </div>
 
-      @error('content_icon')
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-      @enderror
-    </div>
-  </div>
+                  @error('content_icon')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                  @enderror
+                </div>
+              </div>
 
-  {{-- Quick Link Icon --}}
-  <div class="col-md-6">
-    <div class="mb-3">
-      <label class="form-label">Banner (<span class="text-danger">1920px (width) x 1081px (height)</span>)</label>
+              {{-- Banner --}}
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Banner (<span class="text-danger">1920px (width) x 1081px (height)</span>)</label>
 
-      @php
-        $quickLinkFile = !empty($company?->quickLinkIconFile) && !empty($company->quickLinkIconFile->file_path);
-        $quickLinkSrc = $quickLinkFile 
-            ? (Str::startsWith($company->quickLinkIconFile->file_path, ['http://','https://'])
-                ? $company->quickLinkIconFile->file_path
-                : Storage::url($company->quickLinkIconFile->file_path))
-            : '';
-      @endphp
+                  @php
+                    $quickLinkFile = !empty($company?->quickLinkIconFile) && !empty($company->quickLinkIconFile->file_path);
+                    $quickLinkSrc = $quickLinkFile 
+                        ? (Str::startsWith($company->quickLinkIconFile->file_path, ['http://','https://'])
+                            ? $company->quickLinkIconFile->file_path
+                            : Storage::url($company->quickLinkIconFile->file_path))
+                        : '';
+                  @endphp
 
-     <div id="quick-link-icon-dropzone"
-     class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
-     style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
+                  <div id="quick-link-icon-dropzone"
+                       class="position-relative rounded-3 p-4 text-center d-flex align-items-center justify-content-center overflow-hidden"
+                       style="border: 2px dashed var(--bs-border-color); cursor: pointer; background: var(--bs-body-bg); min-height: 180px;">
 
-    {{-- Placeholder --}}
-    <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $quickLinkFile ? 'd-none' : '' }}">
-        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
-        <div>
-            <strong>Drag & drop</strong> an image here, or
-            <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
-        </div>
-        <small class="text-muted d-block">Max 2048 KB</small>
-    </div>
+                    <div id="dz-placeholder-quick" class="d-flex flex-column align-items-center gap-2 {{ $quickLinkFile ? 'd-none' : '' }}">
+                        <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
+                        <div>
+                            <strong>Drag & drop</strong> an image here, or
+                            <button type="button" id="dz-browse-quick" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
+                        </div>
+                        <small class="text-muted d-block">Max 2048 KB</small>
+                    </div>
 
-    {{-- Inline preview --}}
-    <img id="dz-image-quick"
-         src="{{ $quickLinkSrc }}"
-         alt="Preview"
-         class="{{ $quickLinkFile ? '' : 'd-none' }} rounded"
-         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+                    <img id="dz-image-quick"
+                         src="{{ $quickLinkSrc }}"
+                         alt="Preview"
+                         class="{{ $quickLinkFile ? '' : 'd-none' }} rounded"
+                         style="max-height: 180px; max-width: 100%; object-fit: contain;" />
 
-    {{-- Remove button --}}
-    <button type="button"
-            id="dz-remove-quick"
-            class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
-            style="top: .5rem; right: .5rem;">
-        <i class="bx bx-x"></i> Remove
-    </button>
+                    <button type="button"
+                            id="dz-remove-quick"
+                            class="btn btn-sm btn-danger position-absolute {{ $quickLinkFile ? '' : 'd-none' }}"
+                            style="top: .5rem; right: .5rem;">
+                        <i class="bx bx-x"></i> Remove
+                    </button>
 
-    {{-- Hidden input --}}
-    <input type="file" id="dz-input-quick" name="quick_link_icon" accept="image/*" class="d-none">
-</div>
+                    <input type="file" id="dz-input-quick" name="quick_link_icon" accept="image/*" class="d-none">
+                  </div>
 
-      @error('quick_link_icon')
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-      @enderror
-    </div>
-  </div>
-</div>
-
-  
-            </div>
-
-      
-
-            <div class="row">
-              
+                  @error('quick_link_icon')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                  @enderror
+                </div>
+              </div>
 
               {{-- Company Name --}}
               <div class="col-6">
@@ -174,8 +156,7 @@
                 </div>
               </div>
 
-            
-               {{-- Website --}}
+              {{-- Website --}}
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Website</label>
@@ -223,6 +204,7 @@
                 </div>
               </div>
 
+              {{-- Instagram --}}
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Instagram</label>
@@ -234,6 +216,7 @@
                 </div>
               </div>
 
+              {{-- Booth --}}
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Booth</label>
@@ -244,7 +227,9 @@
                   </div>
                 </div>
               </div>
-               <div class="col-6">
+
+              {{-- Industry --}}
+              <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label">Industry</label>
                   <div class="input-group input-group-merge">
@@ -254,6 +239,8 @@
                   </div>
                 </div>
               </div>
+
+              {{-- Events --}}
               <div class="col-12">
                 <div class="mb-3">
                   <label class="form-label">Events <span class="text-danger">*</span></label>
@@ -266,21 +253,7 @@
                 </div>
               </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
-$(document).ready(function() {
-  $('.select2').select2({
-    theme: 'bootstrap-5',
-    width: '100%',
-    placeholder: $(this).data('placeholder'),
-    closeOnSelect: false
-  });
-});
-</script>
-              
+              {{-- Description --}}
               <div class="col-12">
                 <div class="mb-3">
                   <label class="form-label">Company Description</label>
@@ -291,38 +264,54 @@ $(document).ready(function() {
 
               {{-- Submit --}}
               <div class="col-12">
-                <div class="d-flex pt-3 justify-content-end">
-                  <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary me-2">Cancel</a>
-                  <button type="submit" class="btn btn-primary">Save</button>
+                <div class="d-flex pt-3 justify-content-end gap-2">
+                  <a href="{{ route('exhibitor-users.index') }}" class="btn btn-outline-primary px-4">Cancel</a>
+                  <button type="submit" class="btn btn-primary px-4">Save</button>
                 </div>
               </div>
 
-            </div> {{-- row end --}}
+            </div> {{-- end row --}}
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const dropzone = document.getElementById('content-icon-dropzone');
-    const input = document.getElementById('dz-input-content');
-    const preview = document.getElementById('dz-image-content');
-    const placeholder = document.getElementById('dz-placeholder-content');
-    const removeBtn = document.getElementById('dz-remove-content');
 
-    // Trigger file input when dropzone is clicked
-    dropzone.addEventListener('click', function() {
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+  $('.select2').each(function() {
+    $(this).select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: $(this).data('placeholder'),
+      closeOnSelect: false
+    });
+  });
+
+  // Dropzone scripts
+  const dropzone = document.getElementById('content-icon-dropzone');
+  const input = document.getElementById('dz-input-content');
+  const preview = document.getElementById('dz-image-content');
+  const placeholder = document.getElementById('dz-placeholder-content');
+  const removeBtn = document.getElementById('dz-remove-content');
+
+  if(dropzone) {
+    document.getElementById('dz-browse-content').addEventListener('click', (e) => {
+      e.stopPropagation();
       input.click();
     });
-
-    // Handle file input change (when user selects a file)
     input.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = (event) => {
           preview.src = event.target.result;
           preview.classList.remove('d-none');
           placeholder.classList.add('d-none');
@@ -331,119 +320,56 @@ $(document).ready(function() {
         reader.readAsDataURL(file);
       }
     });
+  }
+  
+  // Quick Link logic
+  const dropzoneQuick = document.getElementById('quick-link-icon-dropzone');
+  const inputQuick = document.getElementById('dz-input-quick');
+  const previewQuick = document.getElementById('dz-image-quick');
+  const placeholderQuick = document.getElementById('dz-placeholder-quick');
+  const removeBtnQuick = document.getElementById('dz-remove-quick');
 
-    // Handle drag over and drop events
-    dropzone.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      dropzone.classList.add('dragover');
+  if(dropzoneQuick) {
+    document.getElementById('dz-browse-quick').addEventListener('click', (e) => {
+      e.stopPropagation();
+      inputQuick.click();
     });
-
-    dropzone.addEventListener('dragleave', function() {
-      dropzone.classList.remove('dragover');
-    });
-
-    dropzone.addEventListener('drop', function(e) {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          preview.src = event.target.result;
-          preview.classList.remove('d-none');
-          placeholder.classList.add('d-none');
-          removeBtn.classList.remove('d-none');
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Remove the selected image
-    removeBtn.addEventListener('click', function() {
-      preview.src = '';
-      preview.classList.add('d-none');
-      placeholder.classList.remove('d-none');
-      removeBtn.classList.add('d-none');
-      input.value = ''; // Clear the file input
-    });
-  });
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const dropzoneQuick = document.getElementById('quick-link-icon-dropzone');
-    const inputQuick = document.getElementById('dz-input-quick');
-    const previewQuick = document.getElementById('dz-image-quick');
-    const placeholderQuick = document.getElementById('dz-placeholder-quick');
-    const removeBtnQuick = document.getElementById('dz-remove-quick');
-    let fileRemoved = false; // Flag to track if the file has been removed
-
-    // Trigger file input when dropzone is clicked
-    dropzoneQuick.addEventListener('click', function() {
-      if (!fileRemoved) { // Only trigger file input if the file wasn't removed
-        inputQuick.click();
-      }
-    });
-
-    // Handle file input change (when user selects a file)
     inputQuick.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = (event) => {
           previewQuick.src = event.target.result;
           previewQuick.classList.remove('d-none');
           placeholderQuick.classList.add('d-none');
           removeBtnQuick.classList.remove('d-none');
-          fileRemoved = false; // Reset the file removed flag
         };
         reader.readAsDataURL(file);
       }
     });
+  }
 
-    // Handle drag over and drop events
-    dropzoneQuick.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      dropzoneQuick.classList.add('dragover');
+  // Remove buttons
+  if(removeBtn) {
+    removeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      preview.src = '';
+      preview.classList.add('d-none');
+      placeholder.classList.remove('d-none');
+      removeBtn.classList.add('d-none');
+      input.value = '';
     });
-
-    dropzoneQuick.addEventListener('dragleave', function() {
-      dropzoneQuick.classList.remove('dragover');
-    });
-
-    dropzoneQuick.addEventListener('drop', function(e) {
-      e.preventDefault();
-      dropzoneQuick.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          previewQuick.src = event.target.result;
-          previewQuick.classList.remove('d-none');
-          placeholderQuick.classList.add('d-none');
-          removeBtnQuick.classList.remove('d-none');
-          fileRemoved = false; // Reset the file removed flag
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Remove the selected image
-    removeBtnQuick.addEventListener('click', function() {
+  }
+  if(removeBtnQuick) {
+    removeBtnQuick.addEventListener('click', function(e) {
+      e.stopPropagation();
       previewQuick.src = '';
       previewQuick.classList.add('d-none');
       placeholderQuick.classList.remove('d-none');
       removeBtnQuick.classList.add('d-none');
-      inputQuick.value = ''; // Clear the file input
-      fileRemoved = true; // Set flag to indicate file is removed
+      inputQuick.value = '';
     });
-  });
+  }
+});
 </script>
 @endsection
-
-
-
-
-
-
-

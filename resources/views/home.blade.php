@@ -115,7 +115,7 @@
 </div>
 
     {{-- Membership Status Section for Event Admins --}}
-    @if(!isSuperAdmin() && isset($subscription))
+    @if(!isSuperAdmin())
     <div class="row mt-4">
       <div class="col-12">
         <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
@@ -124,6 +124,7 @@
                <i class="bi bi-shield-check text-primary me-2"></i>Membership Status
             </h5>
           </div>
+          @if(isset($subscription))
           <div class="card-body bg-light">
             <div class="row align-items-center">
               <div class="col-md-3 border-end py-2">
@@ -177,6 +178,17 @@
               </div>
             </div>
           </div>
+          @else
+          <div class="card-body bg-light">
+            <div class="d-flex flex-column align-items-center justify-content-center py-4">
+              <div class="rounded-circle bg-warning bg-opacity-10 p-3 mb-3">
+                <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
+              </div>
+              <h5 class="text-dark fw-bold mb-1">No Active Subscription Found</h5>
+              <p class="text-muted text-center mb-3">You are currently not on any plan. Please contact the administrator to assign a subscription plan to your account.</p>
+            </div>
+          </div>
+          @endif
         </div>
       </div>
     </div>

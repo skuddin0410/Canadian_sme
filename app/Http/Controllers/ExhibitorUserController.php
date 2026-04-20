@@ -119,7 +119,8 @@ public function index(Request $request)
          $events = isSuperAdmin() 
             ? DB::table('events')->select('id', 'title')->get()
             : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
-         return view('users.exhibitor_users.create', compact('events'));
+         $company = new Company();
+         return view('users.exhibitor_users.create', compact('events', 'company'));
     }
 
     /**
@@ -239,17 +240,18 @@ public function show($exhibitor_user, Request $request){
      */
     public function edit($id)
     {
-        $company = Company::findOrFail($id);
+        $user = Company::with(['contentIconFile','quickLinkIconFile'])->findOrFail($id);
+        $company = $user; // For view compatibility where $company is used
         $events = isSuperAdmin() 
             ? DB::table('events')->select('id', 'title')->get()
             : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
         
         $selectedEvents = \App\Models\EventAndEntityLink::where('entity_type', 'companies')
-            ->where('entity_id', $company->id)
+            ->where('entity_id', $user->id)
             ->pluck('event_id')
             ->toArray();
 
-        return view('users.exhibitor_users.edit', compact('company', 'events', 'selectedEvents'));
+        return view('users.exhibitor_users.edit', compact('user', 'company', 'events', 'selectedEvents'));
     }
 
     public function update(Request $request, $exhibitor_user){
