@@ -625,6 +625,46 @@ if (! function_exists('isBase64String')) {
     }
 }
 
+if (!function_exists('getEventIds')) {
+    function getEventIds()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return [];
+        }
+
+        if (isSuperAdmin()) {
+            return \App\Models\Event::pluck('id')->toArray();
+        }
+
+        // $linkedIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
+        //     ->where('entity_id', $user->id)
+        //     ->pluck('event_id')
+        //     ->toArray();
+
+        // $createdIds = \App\Models\Event::where('created_by', $user->id)
+        //     ->pluck('id')
+        //     ->toArray();
+
+        $events = isSuperAdmin() ? DB::table('events')->select('id', 'title')->get() : DB::table('events')->select('id', 'title')->where('created_by', auth()->user()->id)->get();
+
+        return $events->pluck('id')
+            ->toArray();
+    }
+}
+
+if (!function_exists('getMappedAttendeeCountByCreator')) {
+    function getMappedAttendeeCountByCreator(int $userId): int
+    {
+        return DB::table('event_and_entity_link')
+            ->join('events', 'events.id', '=', 'event_and_entity_link.event_id')
+            ->where('event_and_entity_link.entity_type', 'users')
+            ->where('events.created_by', $userId)
+            ->distinct('event_and_entity_link.entity_id')
+            ->count('event_and_entity_link.entity_id');
+    }
+}
+
 if(! function_exists('isSuperAdmin')){
     function isSuperAdmin(){
         // $superAdminRole = config('app.super_admin_role', 'Super Admin');

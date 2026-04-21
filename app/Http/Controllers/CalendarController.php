@@ -27,7 +27,7 @@ class CalendarController extends Controller
         // All events for dropdown
         $events = isSuperAdmin()
             ? Event::orderBy('created_at', 'DESC')->get()
-            : Event::where('created_by', auth()->id())->orderBy('created_at', 'DESC')->get();
+            : Event::whereIn('id', getEventIds())->orderBy('created_at', 'DESC')->get();
 
         // Selected event
         if (!empty($slug)) {

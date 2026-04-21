@@ -2,12 +2,14 @@
 
 namespace App\Imports;
 
+use App\Models\EventAndEntityLink;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterImport;
+use Maatwebsite\Excel\Row;
 use App\Jobs\UpdateUserQrCodeJob;
 
 // class UsersImport implements ToModel, WithStartRow, WithEvents
@@ -116,95 +118,108 @@ use App\Jobs\UpdateUserQrCodeJob;
 // }
 
 
-class UsersImport implements ToModel, WithStartRow, WithEvents
+class UsersImport implements OnEachRow, WithStartRow, WithEvents
 {
-    protected array $users = [];
-    protected array $emailMap = [];   // O(1) lookup
+    protected ?int $eventId;
+    protected ?int $createdBy;
+    protected array $emailMap = [];
     protected array $duplicates = [];
     protected array $added = [];
+    protected array $mapped = [];
 
-    public function __construct()
+    public function __construct(?int $eventId = null, ?int $createdBy = null)
     {
-        // store as lowercase => true
-        $existing = User::pluck('email')
-            ->map(fn ($e) => strtolower(trim($e)))
-            ->filter()
-            ->unique()
-            ->values()
-            ->toArray();
-
-        $this->emailMap = array_fill_keys($existing, true);
+        $this->eventId = $eventId;
+        $this->createdBy = $createdBy;
     }
 
     public function startRow(): int
     {
-        return 2; // skip header
+        return 2;
     }
 
-    public function model(array $row)
+    public function onRow(Row $row): void
     {
+        $row = $row->toArray();
+
         if (empty($row[0]) || empty($row[1]) || empty($row[2])) {
-            return null;
+            return;
         }
 
         $emailRaw = trim($row[2]);
         $emailKey = strtolower($emailRaw);
 
-        // fast duplicate check (includes already seen in this import)
         if (isset($this->emailMap[$emailKey])) {
+            $user = User::whereRaw('LOWER(email) = ?', [$emailKey])->first();
+
+            if ($user) {
+                $this->mapUserToEvent($user->id);
+            }
+
             $this->duplicates[] = $emailRaw;
-            return null;
+            return;
         }
 
-        // mark as processed
         $this->emailMap[$emailKey] = true;
-        $this->added[] = $emailRaw;
 
-        $this->users[] = [
-            'name' => trim($row[0]),
-            'lastname' => trim($row[1]),
-            'email' => $emailRaw,
-            'status' => $row[3] ?? '',
-            'gdpr_consent' => (isset($row[4]) && strtolower(trim($row[4])) === 'confirmed') ? 1 : 0,
-            'bio' => $row[5] ?? '',
-            'company' => $row[6] ?? '',
-            'designation' => $row[7] ?? '',
-            'mobile' => $row[8] ?? '',
-            'dob' => $row[9] ?? '',
-            'facebook_url' => $row[10] ?? '',
-            'twitter_url' => $row[11] ?? '',
-            'linkedin_url' => $row[12] ?? '',
-            'instagram_url' => $row[13] ?? '',
-            'slug' => createUniqueSlug('users', trim($row[0]) . '_' . trim($row[1])),
-            'primary_group' => 'Attendee',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
+        $user = User::whereRaw('LOWER(email) = ?', [$emailKey])->first();
 
-        // your file limit is 100, so this will run once anyway
-        if (count($this->users) >= 500) {
-            User::insert($this->users);
-            $this->users = [];
+        if (!$user) {
+            $user = User::create([
+                'name' => trim($row[0]),
+                'lastname' => trim($row[1]),
+                'email' => $emailRaw,
+                'status' => $row[3] ?? '',
+                'gdpr_consent' => (isset($row[4]) && strtolower(trim((string) $row[4])) === 'confirmed') ? 1 : 0,
+                'bio' => $row[5] ?? '',
+                'company' => $row[6] ?? '',
+                'designation' => $row[7] ?? '',
+                'mobile' => $row[8] ?? '',
+                'dob' => $row[9] ?? null,
+                'facebook_url' => $row[10] ?? '',
+                'twitter_url' => $row[11] ?? '',
+                'linkedin_url' => $row[12] ?? '',
+                'instagram_url' => $row[13] ?? '',
+                'slug' => createUniqueSlug('users', trim($row[0]) . '_' . trim($row[1])),
+                'primary_group' => 'Attendee',
+                'created_by' => $this->createdBy,
+                'is_approve' => true,
+            ]);
+
+            if (method_exists($user, 'assignRole') && !$user->hasRole('Attendee')) {
+                $user->assignRole('Attendee');
+            }
+
+            $this->added[] = $emailRaw;
+        } else {
+            $this->duplicates[] = $emailRaw;
         }
 
-        return null;
+        $this->mapUserToEvent($user->id);
+    }
+
+    protected function mapUserToEvent(int $userId): void
+    {
+        if (!$this->eventId) {
+            return;
+        }
+
+        EventAndEntityLink::firstOrCreate([
+            'event_id' => $this->eventId,
+            'entity_type' => 'users',
+            'entity_id' => $userId,
+        ]);
+
+        $this->mapped[$userId] = true;
     }
 
     public function registerEvents(): array
     {
         return [
             AfterImport::class => function () {
-                // insert remaining
-                if (!empty($this->users)) {
-                    User::insert($this->users);
-                    $this->users = [];
-                }
-
-                // your job
                 dispatch(new UpdateUserQrCodeJob());
-
-                // optional logs
                 Log::info('Imported users count: ' . count($this->added));
+                Log::info('Mapped users count: ' . count($this->mapped));
                 Log::info('Duplicate/skipped count: ' . count($this->duplicates));
             },
         ];

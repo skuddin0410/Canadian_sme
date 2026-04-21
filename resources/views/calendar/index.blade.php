@@ -56,10 +56,14 @@
                 <div class="card-header bg-gradient-primary  py-3">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h1 class="h3 mb-0 mt-2">{{ $event->title }} - Calendar</h1>
-                            <p class="mb-0">
-                                {{ $event->start_date->format('M j') }} - {{ $event->end_date->format('M j, Y') }}
-                            </p>
+                            @isset($event)
+                                <h1 class="h3 mb-0 mt-2">{{ $event->title }} - Calendar</h1>
+                                <p class="mb-0">
+                                    {{ $event->start_date->format('M j') }} - {{ $event->end_date->format('M j, Y') }}
+                                </p>
+                            @else
+                                <h1 class="h3 mb-0 mt-2">Calendar</h1>
+                            @endisset
                         </div>
                         <div class="col-auto">
                             <select class="form-select" id="eventSelect" name="event_id" required>
@@ -67,7 +71,7 @@
                                     <option 
                                         value="{{ $ev->id }}"
                                         data-slug="{{ $ev->slug }}"
-                                        {{ $event->id === $ev->id ? 'selected' : '' }}
+                                        {{ (isset($event) && $event->id === $ev->id) ? 'selected' : '' }}
                                     >
                                         {{ $ev->title }}
                                     </option>
@@ -141,7 +145,7 @@
             <form id="sessionForm" enctype="multipart/form-data" method="POST">
                 @csrf
                 <input type="hidden" id="sessionId" name="session_id">
-                <!-- <input type="hidden" name="event_id" value="{{ $event->id }}"> -->
+                <!-- <input type="hidden" name="event_id" value="{{ $event->id ?? '' }}"> -->
                 
                 <div class="modal-body">
                     <div id="alertContainer"></div>
@@ -371,13 +375,13 @@
 <script>
     // Laravel data injection
     window.calendarConfig = {
-        eventId: {{ $event->id }},
-        eventName: '{{ $event->title }}',
-        eventStart: "{{ $event->start_date->format('Y-m-d') }}",
-        eventEnd:  "{{ $event->end_date->copy()->addDay()->format('Y-m-d') }}",
+        eventId: {{ $event->id ?? 0 }},
+        eventName: '{{ $event->title ?? '' }}',
+        eventStart: "{{ isset($event) ? $event->start_date->format('Y-m-d') : '' }}",
+        eventEnd:  "{{ isset($event) ? $event->end_date->copy()->addDay()->format('Y-m-d') : '' }}",
         timezone: '{{ config("app.timezone")}}',
         {{-- tracks: @json($event->tracks), --}}
-        venues: @json($event->venues),
+        venues: @json(isset($event) ? $event->venues : []),
         apiUrls: {
             sessions: '{{ route('calendar.sessions') }}',
             createSession: '{{ route('calendar.sessions.store') }}',

@@ -326,7 +326,7 @@ Admin | Edit Attendee Data
                     <div class="mb-3">
                       <label class="form-label">Events</label>
                       <div class="input-group input-group-merge">
-                      <select class="form-select select2" name="event_id"
+                      <select class="form-select select2" name="event_id[]"
                               data-placeholder="Select event" data-allow-clear="true" multiple>
                               <option value="">Please select</option>
                         @foreach($events as $event)

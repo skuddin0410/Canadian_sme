@@ -13,6 +13,7 @@ use App\Models\Drive;
 use App\Models\Subscription;
 
 use App\Models\Company;
+use App\Models\EventAndEntityLink;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
@@ -79,11 +80,7 @@ class AttendeeUserController extends Controller
                         })
                         ->whereHas('eventAndEntityLinks', function ($q) {
                             $q->where('entity_type', 'users')
-                                ->whereIn('event_id', function ($query) {
-                                    $query->select('id')
-                                        ->from('events')
-                                        ->where('created_by', auth()->id());
-                                });
+                                ->whereIn('event_id', getEventIds());
                         })
                         ->orderBy('id', 'DESC');
                 }
@@ -103,8 +100,12 @@ class AttendeeUserController extends Controller
                 }
 
                 if ($request->filled('event_id')) {
-                    $users->whereHas('eventAndEntityLinks', function ($q) use ($request) {
-                        $q->where('event_id', $request->event_id)
+                    $eventId = $request->event_id;
+                    if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                        $eventId = 0;
+                    }
+                    $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
+                        $q->where('event_id', $eventId)
                             ->where('entity_type', 'users');
                     });
                 }
@@ -152,7 +153,9 @@ class AttendeeUserController extends Controller
             return response($data);
         }
 
-        $events = DB::table('events')->select('id', 'title')->where('created_by', auth()->id())->get();
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
 
         return view('users.attendee_users.index', ["kyc" => "", "events" => $events]);
     }
@@ -170,7 +173,9 @@ class AttendeeUserController extends Controller
 
         $groups = config('roles.groups');
 
-        $events = DB::table('events')->select('id', 'title')->where('created_by', auth()->id())->get();
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
 
         return view('users.attendee_users.create', compact('groups', 'exhibitors', 'sponsors', 'speakers', 'events'));
     }
@@ -203,6 +208,8 @@ class AttendeeUserController extends Controller
             'secondary_group'   => ['nullable', 'array'],
             'secondary_group.*' => ['string'],
             'primary_group' => 'required|string',
+            'event_id' => 'required|array',
+            'event_id.*' => 'exists:events,id',
         ]);
 
         if ($validator->fails()) {
@@ -223,7 +230,7 @@ class AttendeeUserController extends Controller
                 ])->withInput();
             }
 
-            $currentCount = User::where('created_by', $admin->id)->count();
+            $currentCount = getMappedAttendeeCountByCreator((int) $admin->id);
 
             if ($currentCount >= $subscription->attendee_count) {
                 return back()->withErrors([
@@ -265,6 +272,16 @@ class AttendeeUserController extends Controller
 
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
             $user->givePermissionTo('Edit Company');
+        }
+
+        if (!empty($request->event_id)) {
+            foreach ($request->event_id as $eventId) {
+                EventAndEntityLink::firstOrCreate([
+                    'event_id' => $eventId,
+                    'entity_type' => 'users',
+                    'entity_id' => $user->id,
+                ]);
+            }
         }
 
         $primaryGroupArray = [];
@@ -382,7 +399,9 @@ class AttendeeUserController extends Controller
 
         $groups = config('roles.groups');
 
-        $events = DB::table('events')->select('id', 'title')->where('created_by', auth()->id())->get();
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
 
         $perticipantEvents = $user->eventAndEntityLinks()
             ->where('entity_type', 'users')
@@ -419,6 +438,8 @@ class AttendeeUserController extends Controller
             'secondary_group'   => ['nullable', 'array'],
             'secondary_group.*' => ['string'],
             'primary_group' => 'required|string',
+            'event_id' => 'required|array',
+            'event_id.*' => 'exists:events,id',
         ]);
 
         if ($validator->fails()) {
@@ -456,6 +477,20 @@ class AttendeeUserController extends Controller
             $user->givePermissionTo('Edit Company');
         } else {
             $user->revokePermissionTo('Edit Company');
+        }
+
+        EventAndEntityLink::where('entity_type', 'users')
+            ->where('entity_id', $user->id)
+            ->delete();
+
+        if (!empty($request->event_id)) {
+            foreach ($request->event_id as $eventId) {
+                EventAndEntityLink::create([
+                    'event_id' => $eventId,
+                    'entity_type' => 'users',
+                    'entity_id' => $user->id,
+                ]);
+            }
         }
 
 

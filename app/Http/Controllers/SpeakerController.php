@@ -51,16 +51,37 @@ class SpeakerController extends Controller
                 });
             }
 
-            /* EVENT FILTER (THIS WAS MISSING) */
+            if (!isSuperAdmin()) {
+                $eventIds = getEventIds();
+                $users->whereExists(function ($q) use ($eventIds) {
+                    $q->select(DB::raw(1))
+                    ->from('event_and_entity_link')
+                    ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
+                    ->where('event_and_entity_link.entity_type', 'speakers')
+                    ->whereIn('event_and_entity_link.event_id', $eventIds);
+                });
+            }
+
             if ($request->filled('event_id')) {
                 $eventId = $request->event_id;
-
+                if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                    $eventId = 0;
+                }
                 $users->whereExists(function ($q) use ($eventId) {
                     $q->select(DB::raw(1))
                     ->from('event_and_entity_link')
                     ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
                     ->where('event_and_entity_link.entity_type', 'speakers')
                     ->where('event_and_entity_link.event_id', $eventId);
+                });
+            } elseif (!isSuperAdmin()) {
+                $eventIds = getEventIds();
+                $users->whereExists(function ($q) use ($eventIds) {
+                    $q->select(DB::raw(1))
+                    ->from('event_and_entity_link')
+                    ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
+                    ->where('event_and_entity_link.entity_type', 'speakers')
+                    ->whereIn('event_and_entity_link.event_id', $eventIds);
                 });
             }
 
@@ -91,7 +112,9 @@ class SpeakerController extends Controller
             return response($data);
               }
 
-        $events = DB::table('events')->select('id','title')->where('created_by',auth()->id())->get();
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
 
         return view('users.speaker.index', ["kyc" => "", "events" => $events]);
     }
@@ -101,7 +124,10 @@ class SpeakerController extends Controller
      */
     public function create()
     {
-        return view('users.speaker.create');
+        $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+        return view('users.speaker.create', compact('events'));
     }
 
     /**
@@ -120,9 +146,11 @@ class SpeakerController extends Controller
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
-            'mobile' => 'nullable|string',
-            'bio' => 'required|string',
-              
+             'mobile' => 'nullable|string',
+             'bio' => 'required|string',
+             'event_id' => 'required|array',
+             'event_id.*' => 'exists:events,id'
+               
         ]);
 
         if ($validator->fails()) {
@@ -149,6 +177,16 @@ class SpeakerController extends Controller
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
         $user->save();
+
+        if ($request->event_id) {
+            foreach ($request->event_id as $eventId) {
+                \App\Models\EventAndEntityLink::create([
+                    'event_id' => $eventId,
+                    'entity_type' => 'speakers',
+                    'entity_id' => $user->id,
+                ]);
+            }
+        }
 
 
         if ($request->hasFile('image')) {
@@ -183,14 +221,19 @@ class SpeakerController extends Controller
 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit($id)
     {    
-    $user = Speaker::findOrFail($id);
-    $groups = config('roles.groups');
-    return view('users.speaker.edit', compact('user','groups'));
+       $user = Speaker::with(['photo','coverphoto','privateDocs'])->where('id', $id)->firstOrFail();
+       $events = isSuperAdmin() 
+            ? DB::table('events')->select('id', 'title')->get()
+            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+       
+       $selectedEvents = \App\Models\EventAndEntityLink::where('entity_type', 'speakers')
+            ->where('entity_id', $user->id)
+            ->pluck('event_id')
+            ->toArray();
+
+        return view('users.speaker.edit', compact('user', 'events', 'selectedEvents'));
     }
 
     /**
@@ -211,6 +254,8 @@ class SpeakerController extends Controller
             'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'nullable|string',
             'bio' => 'required|string',
+            'event_id' => 'required|array',
+            'event_id.*' => 'exists:events,id'
      
         ]);
 
@@ -234,25 +279,37 @@ class SpeakerController extends Controller
         $user->bio = $request->bio;
         $user->save();
 
-
         if ($request->hasFile('image')) {
-          $this->imageUpload($request->file("image"),"speakers",$user->id,'speakers','photo',$user->id);
+            $this->imageUpload($request->file("image"), "speakers", $user->id, 'speakers', 'photo', $user->id);
         }
 
-         if ($request->hasFile('cover_image')) {
-          $this->imageUpload($request->file("cover_image"),"speakers",$user->id,'speakers','cover_photo',$user->id);
+        if ($request->hasFile('cover_image')) {
+            $this->imageUpload($request->file("cover_image"), "speakers", $user->id, 'speakers', 'cover_photo', $user->id);
         }
 
         if (!empty($request->private_docs)) {
-
-          foreach($request->private_docs as $img){
-             $this->imageUpload($img,"speakers",$user->id,'speakers','private_docs'); 
-          }  
-          
+            foreach ($request->private_docs as $img) {
+                $this->imageUpload($img, "speakers", $user->id, 'speakers', 'private_docs');
+            }
         }
 
-     return redirect(route('speaker.index'))
-        ->withSuccess('Speaker data has been saved successfully');
+        // Sync events
+        \App\Models\EventAndEntityLink::where('entity_type', 'speakers')
+            ->where('entity_id', $user->id)
+            ->delete();
+
+        if (!empty($request->event_id)) {
+            foreach ($request->event_id as $eventId) {
+                \App\Models\EventAndEntityLink::create([
+                    'event_id' => $eventId,
+                    'entity_type' => 'speakers',
+                    'entity_id' => $user->id,
+                ]);
+            }
+        }
+
+      return redirect(route('speaker.index'))
+         ->withSuccess('Speaker data has been updated successfully');
     }
 
     /**
@@ -276,11 +333,11 @@ class SpeakerController extends Controller
     if ($currentUser->hasRole(['Admin', 'Admin'])) {
         $allowedRoles = ['Admin', 'Representative', 'Attendee', 'Speaker'];
 
-        if ($user->hasAnyRole($allowedRoles)) {
-            $user->is_block = true;
-            $user->save();
-            return back()->withSuccess('User has been blocked successfully.');
-        } else {
+            if ($user->hasAnyRole($allowedRoles)) {
+                $user->is_block = true;
+                $user->save();
+                return back()->withSuccess('User has been blocked successfully.');
+            } else {
             return back()->withErrors('You are not allowed to block this type of user.');
         }
 

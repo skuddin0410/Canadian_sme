@@ -348,7 +348,7 @@
         </a>
         <div class="show-header-text">
             <h2>Subscription Details</h2>
-            <p>Viewing full record for subscription #{{ $subscription->id }}</p>
+            <p>Viewing full record for subscription #{{ $subscription->user->name }}</p>
         </div>
     </div>
 
@@ -363,13 +363,13 @@
             <div class="hero-info">
                 <div class="hero-name">{{ $subscription->user->name ?? 'N/A' }} {{ $subscription->user->lastname ?? 'N/A' }}</div>
                 <div class="hero-meta">
-                    <span class="hero-tag">
+                    <!-- <span class="hero-tag">
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                             <rect x="1" y="1.5" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
                             <path d="M3 1v1.5M7 1v1.5M1 4h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
                         </svg>
                         ID:{{ $subscription->id }}
-                    </span>
+                    </span> -->
                     <span class="status-hero-badge {{ $subscription->status == 'active' ? 'active' : 'inactive' }}">
                         <span class="status-dot"></span>
                         {{ ucfirst($subscription->status) }}

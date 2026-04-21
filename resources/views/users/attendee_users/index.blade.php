@@ -391,9 +391,27 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mt-3">
-                            <label for="userImportFile">Import Users (Max 100 rows allowed, Allowed file CSV, XLSX) </label>
+                            <label for="importEventId">Select Event <span class="text-danger">*</span></label>
+                            <select id="importEventId" class="form-select select2" name="event_id" required
+                                data-placeholder="Select event" data-allow-clear="true">
+                                <option value="">Please select</option>
+                                @foreach($events as $event)
+                                    <option value="{{ $event->id }}" {{ old('event_id') == $event->id ? 'selected' : '' }}>
+                                        {{ $event->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('event_id')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mt-3">
+                            <label for="userImportFile">Import Users (Max 100 rows allowed at a time, Allowed file CSV, XLSX) </label>
                             <input type="file" id="userImportFile" class="form-control" name="file"
                                 accept=".csv,.xlsx,.xls" required>
+                            @error('file')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
                             <!-- <small class="form-text text-muted">After the import, an email will be sent to each user.</small> -->
                         </div>
                         <div id="rowCount"></div>
@@ -575,6 +593,10 @@
             window.closeImportModal = function() {
                 $('#openImportModal').modal('hide');
             }
+
+            @if($errors->has('file') || $errors->has('event_id'))
+                $('#openImportModal').modal('show');
+            @endif
 
 
             window.submitBulkActionBoth = function() {
@@ -941,7 +963,7 @@
                     const numRows = filteredData.length;
 
                     // Show the row count
-                    document.getElementById('rowCount').innerText = `Number of rows in CSV: ${numRows}`;
+                    // document.getElementById('rowCount').innerText = `Number of rows in CSV: ${numRows}`;
 
                     // Enable the submit button if there are rows to process
                     if (numRows > 0) {

@@ -297,11 +297,21 @@ class UserController extends Controller
 
     //     return back()->with('success', "Imported successfully. Rows detected: {$dataRows}");
     // }
+    
     public function importUser(Request $request)
     {
         $request->validate([
             'file' => 'required|file|mimes:csv,xls,xlsx',
+            'event_id' => 'required|exists:events,id',
         ]);
+
+        $eventId = (int) $request->event_id;
+
+        if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+            return back()->withErrors([
+                'event_id' => 'You are not allowed to import attendees into this event.',
+            ])->withInput();
+        }
 
         $file = $request->file('file');
 
@@ -343,17 +353,17 @@ class UserController extends Controller
         }
 
         //  STEP 3: Check attendee limit
-        $currentCount = User::where('created_by', $user->id)->count();
+        $currentCount = getMappedAttendeeCountByCreator((int) $user->id);
         $allowed = $subscription->attendee_count;
 
         if (($currentCount + $dataRows) > $allowed) {
             return back()->withErrors([
-                'file' => "Limit exceeded! Allowed: {$allowed}, Existing: {$currentCount}, Trying: {$dataRows}"
+                'file' => "Limit exceeded according to you subscription! Allowed Attendee: {$allowed}, Existing Attendee: {$currentCount}, Trying Attendee: {$dataRows}"
             ]);
         }
 
         //  STEP 4: Import
-        Excel::import(new UsersImport, $file);
+        Excel::import(new UsersImport($eventId, (int) $user->id), $file);
 
         return back()->with('success', "Imported successfully. Rows: {$dataRows}");
     }

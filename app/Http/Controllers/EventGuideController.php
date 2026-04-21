@@ -225,8 +225,9 @@ public function showGallery()
     if (isSuperAdmin()) {
         $galleryItems = GalleryItem::with(['user', 'event'])->latest()->get();
     } else {
-        // Others see only approved items OR their own pending items
+        $eventIds = getEventIds();
         $galleryItems = GalleryItem::with(['user', 'event'])
+            ->whereIn('event_id', $eventIds)
             ->where(function($query) {
                 $query->where('is_approved', true)
                       ->orWhere('added_by', Auth::id());
@@ -235,7 +236,9 @@ public function showGallery()
             ->get();
     }
 
-    $events = Event::orderBy('title')->get();
+    $events = isSuperAdmin()
+        ? Event::orderBy('title')->get()
+        : Event::whereIn('id', getEventIds())->orderBy('title')->get();
 
     return view('event_guide.gallery', compact('galleryItems', 'events'));
 }

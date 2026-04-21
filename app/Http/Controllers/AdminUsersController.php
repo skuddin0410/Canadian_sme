@@ -16,6 +16,16 @@ use App\Models\Pricing;
 
 class AdminUsersController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!isSuperAdmin()) {
+                abort(403, 'Unauthorized access.');
+            }
+            return $next($request);
+        });
+    }
+
     /**
      * Display a listing of the resource.
      */

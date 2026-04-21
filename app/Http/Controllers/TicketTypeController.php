@@ -17,7 +17,13 @@ class TicketTypeController extends Controller
         $query = TicketType::with(['event', 'category']);
         
         if ($request->filled('event_id')) {
-            $query->where('event_id', $request->event_id);
+            $eventId = $request->event_id;
+            if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+            $query->where('event_id', $eventId);
+        } elseif (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
         }
         
         if ($request->filled('category_id')) {
@@ -25,7 +31,9 @@ class TicketTypeController extends Controller
         }
         
         $ticketTypes = $query->orderBy('sort_order')->orderBy('name')->paginate(15);
-        $events = Event::whereIn('status',['draft', 'published'])->get();
+        $events = isSuperAdmin() 
+            ? Event::whereIn('status', ['draft', 'published'])->get()
+            : Event::whereIn('status', ['draft', 'published'])->whereIn('id', getEventIds())->get();
         $categories = TicketCategory::active()->ordered()->get();
         
         return view('tickets.types.index', compact('ticketTypes', 'events', 'categories'));
@@ -33,7 +41,9 @@ class TicketTypeController extends Controller
 
     public function create()
     {
-        $events = Event::with('sessions')->get();
+        $events = isSuperAdmin()
+            ? Event::with('sessions')->get()
+            : Event::with('sessions')->whereIn('id', getEventIds())->get();
 
 
     //    $events = Event::whereIn('status',['draft', 'published'])
@@ -114,7 +124,9 @@ class TicketTypeController extends Controller
 
     public function edit(TicketType $ticketType)
     {
-        $events = Event::whereIn('status',['draft', 'published'])->get();
+        $events = isSuperAdmin()
+            ? Event::whereIn('status', ['draft', 'published'])->get()
+            : Event::whereIn('status', ['draft', 'published'])->whereIn('id', getEventIds())->get();
         $categories = TicketCategory::active()->ordered()->get();
         
         return view('tickets.types.edit', compact('ticketType', 'events', 'categories'));
