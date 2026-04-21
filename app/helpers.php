@@ -653,6 +653,18 @@ if (!function_exists('getEventIds')) {
     }
 }
 
+if (!function_exists('getMappedAttendeeCountByCreator')) {
+    function getMappedAttendeeCountByCreator(int $userId): int
+    {
+        return DB::table('event_and_entity_link')
+            ->join('events', 'events.id', '=', 'event_and_entity_link.event_id')
+            ->where('event_and_entity_link.entity_type', 'users')
+            ->where('events.created_by', $userId)
+            ->distinct('event_and_entity_link.entity_id')
+            ->count('event_and_entity_link.entity_id');
+    }
+}
+
 if(! function_exists('isSuperAdmin')){
     function isSuperAdmin(){
         // $superAdminRole = config('app.super_admin_role', 'Super Admin');
