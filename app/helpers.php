@@ -637,16 +637,19 @@ if (!function_exists('getEventIds')) {
             return \App\Models\Event::pluck('id')->toArray();
         }
 
-        $linkedIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
-            ->where('entity_id', $user->id)
-            ->pluck('event_id')
-            ->toArray();
+        // $linkedIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
+        //     ->where('entity_id', $user->id)
+        //     ->pluck('event_id')
+        //     ->toArray();
 
-        $createdIds = \App\Models\Event::where('created_by', $user->id)
-            ->pluck('id')
-            ->toArray();
+        // $createdIds = \App\Models\Event::where('created_by', $user->id)
+        //     ->pluck('id')
+        //     ->toArray();
 
-        return array_unique(array_merge($linkedIds, $createdIds));
+        $events = isSuperAdmin() ? DB::table('events')->select('id', 'title')->get() : DB::table('events')->select('id', 'title')->where('created_by', auth()->user()->id)->get();
+
+        return $events->pluck('id')
+            ->toArray();
     }
 }
 
