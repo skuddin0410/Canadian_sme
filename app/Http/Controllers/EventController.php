@@ -65,7 +65,14 @@ class EventController extends Controller
 
     public function create()
     {
-        return view('events.create');
+        $subscription = null;
+        if (!isSuperAdmin()) {
+            $subscription = Subscription::active()
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->first();
+        }
+        return view('events.create', compact('subscription'));
     }
 
     public function store(Request $request)
@@ -115,7 +122,23 @@ class EventController extends Controller
                 return back()->withErrors(['error' => 'Subscription expired'])->withInput();
             }
 
-            $eventCount = Event::where('created_by', $admin->id)->count();
+            // New Logic: Check if event dates are within subscription validity dates
+            $subStart = $subscription->created_at->startOfDay();
+            $subEnd = $subscription->expired_at ? $subscription->expired_at->endOfDay() : null;
+            
+            $evtStart = \Carbon\Carbon::parse($request->start_date);
+            $evtEnd = \Carbon\Carbon::parse($request->end_date);
+
+            if ($evtStart->lt($subStart)) {
+                return back()->withErrors(['error' => 'Event start date cannot be before the subscription start date ('.$subStart->format('d M Y').')'])->withInput();
+            }
+
+            if ($subEnd && $evtEnd->gt($subEnd)) {
+                return back()->withErrors(['error' => 'Event end date cannot be after the subscription expiry date ('.$subEnd->format('d M Y').')'])->withInput();
+            }
+
+
+            $eventCount = Event::where('subscription_id', $subscription->id)->count();
 
             if ($eventCount >= $subscription->event_count) {
                 return back()->withErrors([
@@ -178,6 +201,10 @@ class EventController extends Controller
         // Get the event that you want to clone
         $event = Event::findOrFail($eventId);
 
+        if (!canManageEvent($event)) {
+             return response()->json(['success' => false, 'message' => 'You cannot clone an event linked to an expired or inactive subscription.'], 403);
+        }
+
         // Clone the event
         $clonedEvent = $event->replicate();
 
@@ -203,6 +230,17 @@ class EventController extends Controller
 
         // Set other fields as necessary (e.g., created_by)
         $clonedEvent->created_by = auth()->id();
+
+        // Assign current active subscription to the cloned event
+        if (!isSuperAdmin()) {
+            $currentSub = Subscription::active()
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->first();
+            if ($currentSub) {
+                $clonedEvent->subscription_id = $currentSub->id;
+            }
+        }
 
         // Save the cloned event
         $clonedEvent->save();
@@ -264,12 +302,27 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
+        if (!canManageEvent($event)) {
+            return redirect()->route('events.index')->with('error', 'You cannot edit an event linked to an expired or inactive subscription.');
+        }
+
         $availableTags = Category::where('type', 'event')->pluck('name');
-        return view('events.edit', compact('event', 'availableTags'));
+        $subscription = null;
+        if (!isSuperAdmin()) {
+            $subscription = Subscription::active()
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->first();
+        }
+        return view('events.edit', compact('event', 'availableTags', 'subscription'));
     }
 
     public function update(Request $request, Event $event)
     {
+        if (!canManageEvent($event)) {
+             return redirect()->route('events.index')->with('error', 'You cannot update an event linked to an expired or inactive subscription.');
+        }
+
         // dd($request->all());
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -295,6 +348,34 @@ class EventController extends Controller
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
             'section_order' => 'nullable|array'
         ]);
+
+        // New Logic for update: check subscription bounds if not superadmin
+        if (!isSuperAdmin()) {
+            $admin = auth()->user();
+            $subscription = Subscription::active()
+                ->where('user_id', $admin->id)
+                ->latest()
+                ->first();
+
+            if (!$subscription) {
+                return back()->withErrors(['error' => 'No active subscription found to modify events.'])->withInput();
+            }
+
+            $subStart = $subscription->created_at->startOfDay();
+            $subEnd = $subscription->expired_at ? $subscription->expired_at->endOfDay() : null;
+            
+            $evtStart = \Carbon\Carbon::parse($request->start_date);
+            $evtEnd = \Carbon\Carbon::parse($request->end_date);
+
+            if ($evtStart->lt($subStart)) {
+                return back()->withErrors(['error' => 'Event start date cannot be before the subscription start date ('.$subStart->format('d M Y').')'])->withInput();
+            }
+
+            if ($subEnd && $evtEnd->gt($subEnd)) {
+                return back()->withErrors(['error' => 'Event end date cannot be after the subscription expiry date ('.$subEnd->format('d M Y').')'])->withInput();
+            }
+        }
+
 
         $validated['tags'] = $request->has('tags') && !empty($request->tags) ? implode(',', $request->tags) : '';
         $event->title        = $validated['title'];
@@ -326,6 +407,10 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
+        if (!canManageEvent($event)) {
+             return redirect()->route('events.index')->with('error', 'You cannot delete an event linked to an expired or inactive subscription.');
+        }
+
         // Delete related records in event_and_entity_link first
         EventAndEntityLink::where('event_id', $event->id)->delete();
         $event->delete();

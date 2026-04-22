@@ -664,3 +664,29 @@ if(! function_exists('isSuperAdmin')){
         }
     }
 }
+
+if (!function_exists('canManageEvent')) {
+    function canManageEvent($event)
+    {
+        if (isSuperAdmin()) {
+            return true;
+        }
+
+        if (empty($event->subscription_id)) {
+            return false;
+        }
+
+        $subscription = \App\Models\Subscription::find($event->subscription_id);
+
+        if (!$subscription) {
+            return false;
+        }
+
+        // Must be active and its expired_at must be in the future
+        if ($subscription->status === 'active' && $subscription->expired_at && $subscription->expired_at > now()) {
+            return true;
+        }
+
+        return false;
+    }
+}

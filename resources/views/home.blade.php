@@ -124,7 +124,7 @@
                <i class="bi bi-shield-check text-primary me-2"></i>Membership Status
             </h5>
           </div>
-          @if(isset($subscription))
+          @if(isset($subscription) && ($subscription->status == 'active') && (!$subscription->expired_at || !$subscription->expired_at->isPast()))
           <div class="card-body bg-light">
             <div class="row align-items-center">
               <div class="col-md-3 border-end py-2">
@@ -166,15 +166,23 @@
               </div>
 
               <div class="col-md-3 py-2 px-md-4 text-md-end">
-                <p class="text-muted small text-uppercase mb-1 fw-semibold">Subscription Renewal</p>
-                <h4 class="mb-1 text-dark fw-bold">
-                  {{ $subscription->expired_at ? $subscription->expired_at->format('M d, Y') : 'N/A' }}
-                </h4>
-                @if($subscription->expired_at)
-                <p class="small {{ $subscription->expired_at->isPast() ? 'text-danger' : 'text-muted' }} mb-0">
-                  <i class="bi bi-clock me-1"></i>{{ $subscription->expired_at->diffForHumans() }}
-                </p>
-                @endif
+                <div class="mb-3">
+                  <p class="text-muted small text-uppercase mb-1 fw-semibold">Start Date</p>
+                  <h6 class="mb-0 text-dark fw-bold">
+                    {{ $subscription->created_at ? $subscription->created_at->format('M d, Y') : 'N/A' }}
+                  </h6>
+                </div>
+                <div>
+                  <p class="text-muted small text-uppercase mb-1 fw-semibold">End Date</p>
+                  <h6 class="mb-0 text-dark fw-bold">
+                    {{ $subscription->expired_at ? $subscription->expired_at->format('M d, Y') : 'N/A' }}
+                  </h6>
+                  @if($subscription->expired_at)
+                  <p class="small {{ $subscription->expired_at->isPast() ? 'text-danger' : 'text-muted' }} mb-0">
+                    <i class="bi bi-clock me-1"></i>{{ $subscription->expired_at->diffForHumans() }}
+                  </p>
+                  @endif
+                </div>
               </div>
             </div>
           </div>

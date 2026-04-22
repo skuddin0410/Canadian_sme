@@ -39,14 +39,7 @@ class HomeController extends Controller
         $user = Auth::user();
         if ($user->hasRole('Admin')) {
             $isSuperAdmin = isSuperAdmin();
-            $eventIds = [];
-
-            if (!$isSuperAdmin) {
-                $eventIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
-                    ->where('entity_id', $user->id)
-                    ->pluck('event_id')
-                    ->toArray();
-            }
+            $eventIds = getEventIds();
 
             // Sessions / Events Count
             $querySessions = Session::query();
@@ -109,8 +102,79 @@ class HomeController extends Controller
             }
             $totalEventCount = $queryEvents->count();
 
-            // Subscription
-            $subscription = \App\Models\Subscription::with('pricing')->where('user_id', $user->id)->first();
+            // Subscription: Get the latest active one, or fallback to the absolute latest record
+            $subscription = \App\Models\Subscription::with('pricing')
+                ->where('user_id', $user->id)
+                ->active()
+                ->latest()
+                ->first();
+
+            if (!$subscription) {
+                $subscription = \App\Models\Subscription::with('pricing')
+                    ->where('user_id', $user->id)
+                    ->latest()
+                    ->first();
+            }
+
+            // --- Isolated Counts for Event Admins (Subscription Scoped) ---
+            if (!$isSuperAdmin && $subscription) {
+                // Get only events linked to THIS specific subscription
+                $subEventIds = \App\Models\Event::where('subscription_id', $subscription->id)->pluck('id')->toArray();
+                $totalEventCount = count($subEventIds);
+
+                // Count unique attendees registered for events in THIS subscription
+                $attendeeCount = User::whereHas("roles", function ($q) {
+                    $q->where("name", "Attendee");
+                })->whereHas('eventAndEntityLinks', function ($q) use ($subEventIds) {
+                    $q->whereIn('event_id', $subEventIds);
+                })->count();
+
+                // For the top row statistics, we use subEventIds for consistency
+                $evntCount = Session::whereIn('event_id', $subEventIds)->count();
+                $speakerCount = Speaker::whereHas('eventAndEntityLinks', function ($q) use ($subEventIds) {
+                    $q->whereIn('event_id', $subEventIds);
+                })->count();
+                $sponsorCount = Company::where('is_sponsor', 1)->whereHas('eventAndEntityLinks', function ($q) use ($subEventIds) {
+                    $q->whereIn('event_id', $subEventIds);
+                })->count();
+                $exhibitorCount = Company::where('is_sponsor', 0)->whereHas('eventAndEntityLinks', function ($q) use ($subEventIds) {
+                    $q->whereIn('event_id', $subEventIds);
+                })->count();
+
+            } else {
+                // Global Counts for Super Admin
+                $querySessions = Session::query();
+                if (!$isSuperAdmin) { $querySessions->whereIn('event_id', $eventIds); }
+                $evntCount = $querySessions->count();
+
+                $queryAttendees = User::whereHas("roles", function ($q) { $q->where("name", "Attendee"); });
+                if (!$isSuperAdmin) {
+                    $queryAttendees->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) { $q->whereIn('event_id', $eventIds); });
+                }
+                $attendeeCount = $queryAttendees->count();
+
+                $querySpeakers = Speaker::query();
+                if (!$isSuperAdmin) {
+                    $querySpeakers->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) { $q->whereIn('event_id', $eventIds); });
+                }
+                $speakerCount = $querySpeakers->count();
+
+                $querySponsors = Company::where('is_sponsor', 1);
+                if (!$isSuperAdmin) {
+                    $querySponsors->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) { $q->whereIn('event_id', $eventIds); });
+                }
+                $sponsorCount = $querySponsors->count();
+
+                $queryExhibitors = Company::where('is_sponsor', 0);
+                if (!$isSuperAdmin) {
+                    $queryExhibitors->whereHas('eventAndEntityLinks', function ($q) use ($eventIds) { $q->whereIn('event_id', $eventIds); });
+                }
+                $exhibitorCount = $queryExhibitors->count();
+
+                $queryEvents = \App\Models\Event::query();
+                if (!$isSuperAdmin) { $queryEvents->whereIn('id', $eventIds); }
+                $totalEventCount = $queryEvents->count();
+            }
 
             return view('home', compact('evntCount', 'attendeeCount', 'speakerCount', 'sponsorCount', 'exhibitorCount', 'logs', 'loginlogs', 'subscription', 'totalEventCount'));
         }

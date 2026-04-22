@@ -335,13 +335,133 @@
         border-color: var(--ink);
         text-decoration: none;
     }
+
+    /* ── Logs / Timeline ── */
+    .logs-section {
+        margin-top: 2.5rem;
+        animation: cardIn .4s ease both .15s;
+    }
+
+    .logs-title {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 1.25rem;
+        color: var(--ink);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .logs-title svg { color: var(--accent); }
+
+    .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--border);
+    }
+
+    .log-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .log-item::before {
+        content: '';
+        position: absolute;
+        left: -1.5rem;
+        top: .25rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        border: 2px solid var(--accent);
+        transform: translateX(-4px);
+        z-index: 2;
+    }
+
+    .log-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.03);
+    }
+
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    .log-user {
+        font-weight: 700;
+        font-size: .85rem;
+        color: var(--ink);
+        font-family: 'Syne', sans-serif;
+    }
+
+    .log-date {
+        font-size: .75rem;
+        color: var(--muted-light);
+    }
+
+    .log-changes {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: .75rem;
+    }
+
+    .change-pill {
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: var(--radius-xs);
+        padding: .5rem .75rem;
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+    }
+
+    .change-label {
+        font-size: .65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--muted-light);
+        letter-spacing: .05em;
+    }
+
+    .change-diff {
+        font-size: .82rem;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+
+    .old-val { color: var(--muted); text-decoration: line-through; opacity: .7; }
+    .new-val { color: var(--success); font-weight: 600; }
+    .diff-arrow { color: var(--muted-light); font-size: .7rem; }
+
 </style>
 
 <div class="show-wrapper">
 
     {{-- Page header --}}
     <div class="show-header">
-        <a href="{{ route('subscription.index') }}" class="back-btn" title="Back">
+        <a href="{{ isSuperAdmin() ? route('subscription.index') : route('subscription.history') }}" class="back-btn" title="Back">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -370,10 +490,17 @@
                         </svg>
                         ID:{{ $subscription->id }}
                     </span> -->
-                    <span class="status-hero-badge {{ $subscription->status == 'active' ? 'active' : 'inactive' }}">
-                        <span class="status-dot"></span>
-                        {{ ucfirst($subscription->status) }}
-                    </span>
+                    @if($subscription->status == 'active' && $subscription->expired_at && $subscription->expired_at->isPast())
+                        <span class="status-hero-badge inactive">
+                            <span class="status-dot"></span>
+                            Expired
+                        </span>
+                    @else
+                        <span class="status-hero-badge {{ $subscription->status == 'active' ? 'active' : 'inactive' }}">
+                            <span class="status-dot"></span>
+                            {{ ucfirst($subscription->status) }}
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -408,11 +535,18 @@
                     Status
                 </div>
                 <div class="detail-value">
-                    <span class="status-hero-badge {{ $subscription->status == 'active' ? 'active' : 'inactive' }}"
-                        style="background:{{ $subscription->status == 'active' ? 'var(--success-bg)' : 'var(--danger-bg)' }}; color:{{ $subscription->status == 'active' ? 'var(--success)' : 'var(--danger)' }}">
-                        <span class="status-dot"></span>
-                        {{ ucfirst($subscription->status) }}
-                    </span>
+                    @if($subscription->status == 'active' && $subscription->expired_at && $subscription->expired_at->isPast())
+                        <span class="status-hero-badge inactive" style="background: var(--danger-bg); color: var(--danger);">
+                            <span class="status-dot"></span>
+                            Expired
+                        </span>
+                    @else
+                        <span class="status-hero-badge {{ $subscription->status == 'active' ? 'active' : 'inactive' }}"
+                            style="background:{{ $subscription->status == 'active' ? 'var(--success-bg)' : 'var(--danger-bg)' }}; color:{{ $subscription->status == 'active' ? 'var(--success)' : 'var(--danger)' }}">
+                            <span class="status-dot"></span>
+                            {{ ucfirst($subscription->status) }}
+                        </span>
+                    @endif
                 </div>
             </div>
 
@@ -467,7 +601,7 @@
 
         {{-- Footer --}}
         <div class="show-footer">
-            <a href="{{ route('subscription.index') }}" class="btn-back">
+            <a href="{{ isSuperAdmin() ? route('subscription.index') : route('subscription.history') }}" class="btn-back">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M9 11L5 7L9 3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -476,6 +610,72 @@
         </div>
 
     </div>
+
+    {{-- History section --}}
+    @if(isset($logs) && $logs->count() > 0)
+    <div class="logs-section">
+        <h3 class="logs-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Change History
+        </h3>
+
+        <div class="timeline">
+            @foreach($logs as $log)
+            <div class="log-item">
+                <div class="log-card">
+                    <div class="log-header">
+                        <div class="log-user">
+                            Admin Changed Settings
+                        </div>
+                        <div class="log-date">
+                            {{ $log->created_at->format('d M Y, h:i A') }}
+                        </div>
+                    </div>
+                    
+                    <div class="log-changes">
+                        @php
+                            $old = is_array($log->old_values) ? $log->old_values : json_decode($log->old_values, true);
+                            $new = is_array($log->new_values) ? $log->new_values : json_decode($log->new_values, true);
+                            
+                            $fields = [
+                                'price_id' => 'Pricing Plan',
+                                'attendee_count' => 'Attendees',
+                                'event_count' => 'Event Count',
+                                'status' => 'Status'
+                            ];
+                        @endphp
+
+                        @foreach($fields as $field => $label)
+                            @if(isset($new[$field]) && $new[$field] != $old[$field])
+                            <div class="change-pill">
+                                <span class="change-label">{{ $label }}</span>
+                                <div class="change-diff">
+                                    @if($field == 'price_id')
+                                        @php
+                                            $oldPrice = \App\Models\Pricing::find($old[$field])?->name ?? 'N/A';
+                                            $newPrice = \App\Models\Pricing::find($new[$field])?->name ?? 'N/A';
+                                        @endphp
+                                        <span class="old-val">{{ $oldPrice }}</span>
+                                        <i class="fa fa-arrow-right diff-arrow"></i>
+                                        <span class="new-val">{{ $newPrice }}</span>
+                                    @else
+                                        <span class="old-val">{{ ucfirst($old[$field]) }}</span>
+                                        <i class="fa fa-arrow-right diff-arrow"></i>
+                                        <span class="new-val">{{ ucfirst($new[$field]) }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
 </div>
 
 @endsection

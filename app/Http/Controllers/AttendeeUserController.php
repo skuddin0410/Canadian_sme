@@ -77,9 +77,12 @@ class AttendeeUserController extends Controller
                         ->whereDoesntHave('roles', function ($q) {
                             $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
                         })
-                        ->whereHas('eventAndEntityLinks', function ($q) {
-                            $q->where('entity_type', 'users')
-                                ->whereIn('event_id', getEventIds());
+                        ->where(function($q) {
+                            $q->whereHas('eventAndEntityLinks', function ($sub) {
+                                $sub->where('entity_type', 'users')
+                                    ->whereIn('event_id', getEventIds());
+                            })
+                            ->orWhere('created_by', auth()->id());
                         })
                         ->orderBy('id', 'DESC');
                 }
@@ -103,7 +106,7 @@ class AttendeeUserController extends Controller
                     if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
                         $eventId = 0;
                     }
-                    $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
+                    $users = $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
                         $q->where('event_id', $eventId)
                             ->where('entity_type', 'users');
                     });
@@ -172,9 +175,21 @@ class AttendeeUserController extends Controller
 
         $groups = config('roles.groups');
 
-        $events = isSuperAdmin() 
-            ? DB::table('events')->select('id', 'title')->get()
-            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+        $events = collect();
+        if (isSuperAdmin()) {
+            $events = DB::table('events')->select('id', 'title')->get();
+        } else {
+            $subscription = Subscription::active()
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->first();
+
+            if ($subscription) {
+                $events = DB::table('events')->select('id', 'title')
+                    ->where('subscription_id', $subscription->id)
+                    ->get();
+            }
+        }
 
         return view('users.attendee_users.create', compact('groups', 'exhibitors', 'sponsors', 'speakers', 'events'));
     }
@@ -207,6 +222,7 @@ class AttendeeUserController extends Controller
             'secondary_group'   => ['nullable', 'array'],
             'secondary_group.*' => ['string'],
             'primary_group' => 'required|string',
+            'event_id' => 'required|array|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -227,7 +243,11 @@ class AttendeeUserController extends Controller
                 ])->withInput();
             }
 
-            $currentCount = User::where('created_by', $admin->id)->count();
+            $subEventIds = \App\Models\Event::where('subscription_id', $subscription->id)->pluck('id')->toArray();
+            $currentCount = \App\Models\EventAndEntityLink::where('entity_type', 'users')
+                ->whereIn('event_id', $subEventIds)
+                ->distinct('entity_id')
+                ->count('entity_id');
 
             if ($currentCount >= $subscription->attendee_count) {
                 return back()->withErrors([
@@ -257,6 +277,7 @@ class AttendeeUserController extends Controller
         $user->mobile = $request->mobile;
         $user->bio = $request->bio ?? null;
         $user->is_approve = true;
+        $user->created_by = auth()->id();
         $user->access_speaker_ids = $request->access_speaker_ids ?? '';
         $user->access_exhibitor_ids = $request->access_exhibitor_ids ??  '';
         $user->access_sponsor_ids = $request->access_sponsor_ids ?? '';
@@ -264,8 +285,10 @@ class AttendeeUserController extends Controller
         $user->save();
 
         $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
-        $user->cometchat_id = $cometChatID['uid'];
-        $user->save();
+        if ($cometChatID && isset($cometChatID['uid'])) {
+            $user->cometchat_id = $cometChatID['uid'];
+            $user->save();
+        }
 
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
             $user->givePermissionTo('Edit Company');
@@ -307,6 +330,17 @@ class AttendeeUserController extends Controller
         if ($user) {
             sendNotification("Welcome Email", $user);
             qrCode($user->id);
+
+            // Sync Event Links
+            if ($request->has('event_id')) {
+                foreach ($request->event_id as $eventId) {
+                    \App\Models\EventAndEntityLink::updateOrCreate([
+                        'event_id' => $eventId,
+                        'entity_id' => $user->id,
+                        'entity_type' => 'users'
+                    ]);
+                }
+            }
         }
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
@@ -386,9 +420,39 @@ class AttendeeUserController extends Controller
 
         $groups = config('roles.groups');
 
-        $events = isSuperAdmin() 
-            ? DB::table('events')->select('id', 'title')->get()
-            : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
+        $events = collect();
+        $oldEvents = collect();
+        $currentSubEventIds = [];
+
+        if (isSuperAdmin()) {
+            $events = DB::table('events')->select('id', 'title')->get();
+        } else {
+            $subscription = Subscription::active()
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->first();
+
+            if ($subscription) {
+                $events = DB::table('events')->select('id', 'title')
+                    ->where('subscription_id', $subscription->id)
+                    ->get();
+                $currentSubEventIds = $events->pluck('id')->toArray();
+            }
+
+            // Fetch old events this attendee is linked to (from previous subscriptions)
+            $participantEventIds = $user->eventAndEntityLinks()
+                ->where('entity_type', 'users')
+                ->where('entity_id', $user->id)
+                ->pluck('event_id')
+                ->toArray();
+
+            $oldEventIds = array_diff($participantEventIds, $currentSubEventIds);
+            if (!empty($oldEventIds)) {
+                $oldEvents = DB::table('events')->select('id', 'title')
+                    ->whereIn('id', $oldEventIds)
+                    ->get();
+            }
+        }
 
         $perticipantEvents = $user->eventAndEntityLinks()
             ->where('entity_type', 'users')
@@ -397,7 +461,7 @@ class AttendeeUserController extends Controller
             ->toArray();
         // dd($perticipantEvents);
 
-        return view('users.attendee_users.edit', compact('user', 'groups', 'exhibitors', 'sponsors', 'speakers', 'events', 'perticipantEvents'));
+        return view('users.attendee_users.edit', compact('user', 'groups', 'exhibitors', 'sponsors', 'speakers', 'events', 'perticipantEvents', 'oldEvents'));
     }
 
     /**
@@ -425,6 +489,7 @@ class AttendeeUserController extends Controller
             'secondary_group'   => ['nullable', 'array'],
             'secondary_group.*' => ['string'],
             'primary_group' => 'required|string',
+            'event_id' => 'required|array|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -494,6 +559,57 @@ class AttendeeUserController extends Controller
             foreach ($request->private_docs as $img) {
                 $this->imageUpload($img, "users", $user->id, 'users', 'private_docs');
             }
+        }
+
+        // Sync Event Links — only for the current subscription's events
+        if (isSuperAdmin()) {
+            // Super admin: full sync as before
+            \App\Models\EventAndEntityLink::where('entity_id', $user->id)
+                ->where('entity_type', 'users')
+                ->delete();
+
+            if ($request->has('event_id')) {
+                foreach ($request->event_id as $eventId) {
+                    \App\Models\EventAndEntityLink::create([
+                        'event_id' => $eventId,
+                        'entity_id' => $user->id,
+                        'entity_type' => 'users'
+                    ]);
+                }
+            }
+        } else {
+            // Event Admin: only touch current subscription's event links
+            $subscription = Subscription::active()
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->first();
+
+            $currentSubEventIds = [];
+            if ($subscription) {
+                $currentSubEventIds = \App\Models\Event::where('subscription_id', $subscription->id)
+                    ->pluck('id')
+                    ->toArray();
+            }
+
+            // Delete only current subscription event links for this user
+            if (!empty($currentSubEventIds)) {
+                \App\Models\EventAndEntityLink::where('entity_id', $user->id)
+                    ->where('entity_type', 'users')
+                    ->whereIn('event_id', $currentSubEventIds)
+                    ->delete();
+            }
+
+            // Re-create links for current subscription events the admin selected
+            if ($request->has('event_id')) {
+                foreach ($request->event_id as $eventId) {
+                    \App\Models\EventAndEntityLink::create([
+                        'event_id' => $eventId,
+                        'entity_id' => $user->id,
+                        'entity_type' => 'users'
+                    ]);
+                }
+            }
+            // Old subscription event links (old_event_id[]) are untouched — they were never deleted
         }
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
