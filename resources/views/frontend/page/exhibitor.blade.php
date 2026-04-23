@@ -16,10 +16,9 @@
                     Exhibitors Showcasing Innovation Across All Industries
                 </h2>
                 <div class="d-none d-xl-block">
-                    <a class="heroBtn btn-long" href="{{url('/')}}">
+                    <a class="heroBtn btn-long" href="{{ route('user.front.events', $event->slug) }}">
                          Back
                     </a>
-                    {{-- <button class="heroBtn btn-long">View More</button> --}}
                 </div>
             </div>
 
@@ -70,7 +69,7 @@
                 @endif
             </div>
             <div class="d-flex justify-content-center mt-4 d-xl-none">
-                 <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
+                 <a class="heroBtn btn-long" href="{{route('exhibitor-index', ['slug' => $event->slug])}}">
                          View More
                     </a>
             </div>

@@ -33,16 +33,20 @@ Route::get(
 Route::get('/payment/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
-Route::get('/schedule', [LandingController::class, 'scheduleIndex'])->name('schedule-index');
+Route::get('/gallery/{slug}', [LandingController::class, 'galleryIndex'])->name('gallery-index');
+Route::get('/schedule/{slug}', [LandingController::class, 'scheduleIndex'])->name('schedule-index');
+Route::get('/session/{slug}', [LandingController::class, 'session'])->name('session');
+
+Route::get('/exhibitors/{slug}', [LandingController::class, 'exhibitorIndex'])->name('exhibitor-index');
+Route::get('/exhibitor/{slug}', [LandingController::class, 'exhibitor'])->name('exhibitor');
+
+Route::get('/attendees/{slug}', [LandingController::class, 'attendeeIndex'])->name('profile-index');
 Route::get('/profile/{slug}', [LandingController::class, 'profile'])->name('profile');
 
-Route::get('/exhibitors', [LandingController::class, 'exhibitorIndex'])->name('exhibitor-index');
-Route::get('/session/{slug}', [LandingController::class, 'session'])->name('session');
-Route::get('/exhibitor/{slug}', [LandingController::class, 'exhibitor'])->name('exhibitor');
-Route::get('/profile', [LandingController::class, 'profile'])->name('profile');
-Route::get('/profile', [LandingController::class, 'attendeeIndex'])->name('profile-index');
-Route::get('/sponsor', [LandingController::class, 'sponsorIndex'])->name('sponsor-index');
+Route::get('/sponsor/{slug}/all', [LandingController::class, 'sponsorIndex'])->name('sponsor-index');
 Route::get('/sponsor/{slug}', [LandingController::class, 'sponsor'])->name('sponsor');
+
+Route::get('/speakers/{slug}', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 Route::get('/speaker/{slug}', [LandingController::class, 'speaker'])->name('speaker');
 
 Route::get('/venue/{slug}', [LandingController::class, 'venue'])->name('venue');
@@ -82,7 +86,6 @@ Route::get('/pricing', function () {
     return view('new_pricing_page', compact('pricings', 'cms', 'features'));
 })->name('pricing');
 
-Route::get('/speakers', [LandingController::class, 'speakerIndex'])->name('speaker-index');
 
 Route::get('/promotional-page', function () {
     return view('frontend.landing'); 

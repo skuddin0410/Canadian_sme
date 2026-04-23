@@ -8,9 +8,9 @@
                 <h2 class="h2-black">
                     Exhibitors Showcasing Innovation Across All Industries
                 </h2>
-                @if(count($exhibitors) > 10)
+                @if(isset($exhibitors) && count($exhibitors) > 0)
                 <div class="d-none d-xl-block">
-                    <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
+                    <a class="heroBtn btn-long" href="{{route('exhibitor-index', ['slug' => $event->slug])}}">
                          View More
                     </a>
                     {{-- <button class="heroBtn btn-long">View More</button> --}}
@@ -75,11 +75,10 @@
                 @endif
             </div>
             <div class="d-flex justify-content-center mt-4 d-xl-none">
-                 <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
+                 <a class="heroBtn btn-long" href="{{route('exhibitor-index', ['slug' => $event->slug])}}">
                          View More
                     </a>
             </div>
         </div>
     </section>
-    <!-- exhibitor end -->
  

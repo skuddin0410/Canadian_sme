@@ -53,9 +53,9 @@
                         </div>
                     </div>
                 </div>
-                @if(count($sponsors) > 10)
+                @if(isset($sponsors) && count($sponsors) > 0)
                 <div class="d-flex justify-content-center mt-3 mt-lg-4">
-                    <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index')}}">View More </a>
+                    <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index', ['slug' => $event->slug])}}">View More </a>
                 </div>
                 @endif
 </div>

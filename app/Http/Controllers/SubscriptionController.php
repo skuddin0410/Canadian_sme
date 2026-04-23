@@ -16,7 +16,7 @@ class SubscriptionController extends Controller
 {
     public function index()
     {
-        $subscriptions = Subscription::paginate(10);
+        $subscriptions = Subscription::orderBy('id', 'DESC')->paginate(10);
         return view('subscription.index', compact('subscriptions'));
     }
 

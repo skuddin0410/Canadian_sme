@@ -12,9 +12,9 @@
                         </span>
                     </div>
                     
-                    @if(count($speakers) > 10)
+                    @if(isset($speakers) && count($speakers) > 0)
                     <div class="d-flex justify-content-left">
-                      <a href="{{ route('speaker-index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold btn-long">
+                      <a href="{{ route('speaker-index', ['slug' => $event->slug]) }}" class="btn btn-outline-light px-4 py-2 fw-semibold btn-long">
                         View More
                       </a>
                     </div>

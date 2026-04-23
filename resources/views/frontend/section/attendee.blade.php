@@ -6,9 +6,9 @@
                 <h2 class="h2-black">
                     Meeting Attendee List with Designations Included
                 </h2>
-                @if(request()->is('/'))
+                @if(isset($attendees) && count($attendees) > 0)
                 <div class="d-none d-xl-block">
-                    <a class="heroBtn btn-long" href="{{ route('profile-index') }}">
+                    <a class="heroBtn btn-long" href="{{ route('profile-index', ['slug' => $event->slug]) }}">
                         View More
                     </a>
                 </div>
@@ -72,11 +72,13 @@
                 </div>
             @endif
         </div>
+        @if(isset($attendees) && count($attendees) > 0)
         <div class="d-flex justify-content-center mt-4 d-xl-none">
-            <a class="heroBtn btn-long" href="{{ route('profile-index') }}">
+            <a class="heroBtn btn-long" href="{{ route('profile-index', ['slug' => $event->slug]) }}">
                 View More
             </a>
         </div>
+        @endif
         </div>
     </section>
     <!-- attendee end -->

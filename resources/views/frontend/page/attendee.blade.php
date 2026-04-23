@@ -13,18 +13,9 @@
                 <h2 class="h2-black">
                     Meeting Attendee List with Designations Included
                 </h2>
-                @if(request()->is('/'))
-                <div class="d-none d-xl-block">
-                    <a class="heroBtn btn-long" href="{{ route('profile-index') }}">
-                        View More
-                    </a>
-                </div>
-                @endif
-                @if(request()->is('profile*'))
                 <div class="d-flex justify-content-end mb-2">
-                  <a href="javascript:history.back()" class="heroBtn ms-md-5">Back</a>
+                  <a href="{{ route('user.front.events', $event->slug) }}" class="heroBtn ms-md-5">Back</a>
                 </div>
-                @endif
             </div>
 
             <div class="attendee-box mt-4 mt-lg-5 d-flex flex-column">

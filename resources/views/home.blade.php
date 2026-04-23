@@ -178,8 +178,8 @@
                     {{ $subscription->expired_at ? $subscription->expired_at->format('M d, Y') : 'N/A' }}
                   </h6>
                   @if($subscription->expired_at)
-                  <p class="small {{ $subscription->expired_at->isPast() ? 'text-danger' : 'text-muted' }} mb-0">
-                    <i class="bi bi-clock me-1"></i>{{ $subscription->expired_at->diffForHumans() }}
+                  <p class="small text-muted mb-0">
+                    <i class="bi bi-clock me-1"></i>{{ getPreciseRemainingTime($subscription->expired_at) }}
                   </p>
                   @endif
                 </div>

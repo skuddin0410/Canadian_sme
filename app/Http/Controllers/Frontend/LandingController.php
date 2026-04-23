@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Crypt;
 use DB;
 use Illuminate\Support\Str;
 use App\Models\DemoRequests;
+use App\Models\GalleryItem;
 
 class LandingController extends Controller
 {
@@ -238,6 +239,13 @@ class LandingController extends Controller
             ->take(6)
             ->get();
 
+        // ---- Gallery for this event ----
+        $galleryItems = GalleryItem::where('event_id', $event->id)
+            ->where('is_approved', 1)
+            ->orderBy('id', 'DESC')
+            ->take(12)
+            ->get();
+
         // ---- Speakers for this event only ----
         $speakerIds = $linkedIds('speakers');
         // dd($speakerIds);
@@ -298,7 +306,7 @@ class LandingController extends Controller
 
         return view(
             'frontend.landing.index',
-            compact('event', 'session', 'speakers', 'exhibitors', 'sponsors', 'attendees', 'schedules', 'location', 'mapUrl', 'shareUrl')
+            compact('event', 'session', 'speakers', 'exhibitors', 'sponsors', 'attendees', 'schedules', 'location', 'mapUrl', 'shareUrl', 'galleryItems')
         );
     }
 
@@ -419,58 +427,94 @@ class LandingController extends Controller
         return $schedules;
     }
 
-    public function exhibitorIndex()
+    public function exhibitorIndex($slug)
     {
-        $event = Event::with(['photo'])->first();
-        $exhibitors = Company::with('contentIconFile')->where('is_sponsor', 0)->paginate(10);
+        $event = Event::where('slug', $slug)->firstOrFail();
 
+        $query = Company::with('contentIconFile')->where('is_sponsor', 0);
+
+        $ids = DB::table('event_and_entity_link')
+            ->where('event_id', $event->id)
+            ->where(function ($q) {
+                $q->whereRaw('LOWER(entity_type) = ?', ['companies'])
+                    ->orWhereRaw('LOWER(entity_type) LIKE ?', ['%\\Company']);
+            })
+            ->pluck('entity_id');
+        $query->whereIn('id', $ids);
+
+        $exhibitors = $query->paginate(10);
         return view('frontend.page.exhibitor', compact('event', 'exhibitors'));
     }
-    public function sponsorIndex()
+
+    public function sponsorIndex($slug)
     {
-        $event = Event::with('photo')->first();
+        $event = Event::where('slug', $slug)->firstOrFail();
 
-        $sponsors = Company::with('logo')
-            ->where('is_sponsor', 1)
-            ->orderby('id', 'DESC')->paginate(10);
+        $query = Company::with(['logo', 'category'])->where('is_sponsor', 1);
 
+        $ids = DB::table('event_and_entity_link')
+            ->where('event_id', $event->id)
+            ->where(function ($q) {
+                $q->whereRaw('LOWER(entity_type) = ?', ['companies'])
+                    ->orWhereRaw('LOWER(entity_type) LIKE ?', ['%\\Company']);
+            })
+            ->pluck('entity_id');
+        $query->whereIn('id', $ids);
+
+        $sponsors = $query->orderby('id', 'DESC')->paginate(10);
         return view('frontend.page.sponsor', compact('event', 'sponsors'));
     }
 
-    public function attendeeIndex()
+    public function attendeeIndex($slug)
     {
-        $attendees = User::with('photo')->with("roles")
+        $event = Event::where('slug', $slug)->firstOrFail();
+
+        $query = User::with('photo')->with("roles")
             ->whereHas("roles", function ($q) {
                 $q->whereIn("name", ["Attendee"]);
             })->whereNotNull('name')
-            ->whereNotNull('slug')
-            ->orderBy('id', 'DESC')->paginate(10);
+            ->whereNotNull('slug');
 
+        $ids = DB::table('event_and_entity_link')
+            ->where('event_id', $event->id)
+            ->where(function ($q) {
+                $q->whereRaw('LOWER(entity_type) = ?', ['users'])
+                    ->orWhereRaw('LOWER(entity_type) LIKE ?', ['%\\User']);
+            })
+            ->pluck('entity_id');
+        $query->whereIn('id', $ids);
 
-        return view('frontend.page.attendee', compact('attendees'));
+        $attendees = $query->orderBy('id', 'DESC')->paginate(10);
+        return view('frontend.page.attendee', compact('event', 'attendees'));
     }
-    public function scheduleIndex()
+    public function scheduleIndex($slug)
     {
-        $event = Event::with(['photo'])->first();
+        $event = Event::where('slug', $slug)->firstOrFail();
 
-        // 🔹 Get ALL sessions
-        $allSessions = Session::with(['photo', 'speakers', 'exhibitors', 'sponsors', 'attendees'])
-            ->orderBy('start_time', 'ASC')
-            ->get();
+        // 🔹 Get ALL sessions (filtered by event)
+        $allSessionsQuery = Session::with(['photo', 'speakers', 'exhibitors', 'sponsors', 'attendees']);
+        $allSessionsQuery->where('event_id', $event->id);
+        $allSessions = $allSessionsQuery->orderBy('start_time', 'ASC')->get();
 
         // 🔹 Get filtered sessions (today / next available date)
-        $schedules = $this->schedules();
+        $schedules = $this->schedules($slug);
 
         return view('frontend.page.schedule', compact('event', 'schedules', 'allSessions'));
     }
 
-    public function schedules()
+    public function schedules($slug)
     {
+        $event = Event::where('slug', $slug)->first();
+
         $now = now();
         $startOfYear = $now->copy()->startOfYear();
         $endOfYear   = $now->copy()->endOfYear();
 
         $baseQuery = Session::with(['speakers']);
+
+        if ($event) {
+            $baseQuery->where('event_id', $event->id);
+        }
 
         // Try to fetch sessions within the current year (ongoing or upcoming)
         $schedules = (clone $baseQuery)
@@ -672,10 +716,35 @@ class LandingController extends Controller
         return view('frontend.venue_app', compact('location', 'mapUrl'));
     }
 
-    public function speakerIndex()
+    public function speakerIndex($slug)
     {
-        $speakers = Speaker::orderBy('created_at', 'DESC')->paginate(10);
-        return view('frontend.page.speaker', compact('speakers'));
+        $event = Event::where('slug', $slug)->firstOrFail();
+
+        $query = Speaker::orderBy('created_at', 'DESC');
+
+        $ids = DB::table('event_and_entity_link')
+            ->where('event_id', $event->id)
+            ->where(function ($q) {
+                $q->whereRaw('LOWER(entity_type) = ?', ['speakers'])
+                    ->orWhereRaw('LOWER(entity_type) LIKE ?', ['%\\Speaker']);
+            })
+            ->pluck('entity_id');
+        $query->whereIn('id', $ids);
+
+        $speakers = $query->paginate(10);
+        return view('frontend.page.speaker', compact('event', 'speakers'));
+    }
+
+    public function galleryIndex($slug)
+    {
+        $event = Event::where('slug', $slug)->firstOrFail();
+
+        $galleryItems = GalleryItem::where('event_id', $event->id)
+            ->where('is_approved', 1)
+            ->orderBy('id', 'DESC')
+            ->paginate(12);
+
+        return view('frontend.page.gallery', compact('event', 'galleryItems'));
     }
 
     public function search(Request $request)

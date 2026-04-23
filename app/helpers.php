@@ -702,3 +702,35 @@ if (!function_exists('canManageEvent')) {
         return false;
     }
 }
+if (!function_exists('getPreciseRemainingTime')) {
+    function getPreciseRemainingTime($date)
+    {
+        if (!$date) return 'N/A';
+        $target = \Carbon\Carbon::parse($date);
+        $now = \Carbon\Carbon::now();
+        $isPast = $target->isPast();
+        
+        // Use absolute difference for calculations
+        $diff = $now->diff($target);
+        
+        // Use absolute values to avoid negative numbers for past dates
+        $totalDays = abs((int)$now->diffInDays($target));
+        $hours = $diff->h;
+        $minutes = $diff->i;
+        $seconds = $diff->s;
+
+        $result = "";
+
+        if ($totalDays > 0) {
+            $result = "{$totalDays} days {$hours} hours";
+        } elseif ($hours > 0) {
+            $result = "{$hours} hours {$minutes} minutes";
+        } elseif ($minutes > 0) {
+            $result = "{$minutes} minutes {$seconds} seconds";
+        } else {
+            $result = "{$seconds} seconds";
+        }
+
+        return $result . ($isPast ? " ago" : " left");
+    }
+}

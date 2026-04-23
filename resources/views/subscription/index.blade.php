@@ -493,7 +493,9 @@
                             <span class="expiry-text">
                                 {{ $subscription->expired_at->format('d M Y') }}
                                 <br>
-                                <small>{{ $subscription->expired_at->format('h:i A') }}</small>
+                                <small class="text-muted">
+                                    {{ getPreciseRemainingTime($subscription->expired_at) }}
+                                </small>
                             </span>
                             @else
                             <span class="expiry-none">No Expiry</span>
