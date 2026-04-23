@@ -549,30 +549,53 @@ class LandingController extends Controller
         return $schedules;
     }
 
-    public function profile($slug)
+    public function profile(Request $request, $slug)
     {
 
         $attendee = User::with(['photo'])
             ->where('slug', $slug)
             ->firstOrFail();
 
+        $eventSlug = $request->get('event');
+        $event = null;
 
-        $sessions = Session::where('start_time', '>=', now())
+        if ($eventSlug) {
+            $event = Event::with('photo')->where('slug', $eventSlug)->first();
+        }
+
+        if (!$event) {
+            // Try to find the event linked to this user
+            $eventLink = DB::table('event_and_entity_link')
+                ->where('entity_type', 'users')
+                ->where('entity_id', $attendee->id)
+                ->first();
+
+            if ($eventLink) {
+                $event = Event::with('photo')->find($eventLink->event_id);
+            }
+        }
+
+        if (!$event) {
+            $event = Event::with('photo')->first();
+        }
+
+        $sessionsQuery = Session::query();
+        if ($event) {
+            $sessionsQuery->where('event_id', $event->id);
+        }
+
+        $sessions = $sessionsQuery->where('start_time', '>=', now())
             ->inRandomOrder()
             ->take(2)
             ->get();
 
-        $event = Event::with('photo')->first();
-
 
         return view('frontend.profile', compact('attendee', 'sessions', 'event'));
     }
-    public function speaker($slug)
+    public function speaker(Request $request, $slug)
     {
-        $speaker = Speaker::with(['photo', 'coverphoto'])
-            ->where('slug', $slug)
-            ->firstOrFail();
-
+        $speaker = Speaker::with(['photo', 'eventAndEntityLinks'])->where('slug', $slug)->firstOrFail();
+        
         $sessions = DB::table('event_sessions as es')
             ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
             ->where('ss.speaker_id', $speaker->id)
@@ -581,7 +604,18 @@ class LandingController extends Controller
             ->select('es.*')
             ->get();
 
-        $event = Event::with('photo')->first();
+        // Get the specific event context
+        $eventSlug = $request->get('event');
+        $event = null;
+
+        if ($eventSlug) {
+            $event = Event::with('photo')->where('slug', $eventSlug)->first();
+        }
+
+        if (!$event) {
+            $eventLink = $speaker->eventAndEntityLinks->first();
+            $event = $eventLink ? Event::with('photo')->find($eventLink->event_id) : Event::with('photo')->first();
+        }
 
         return view('frontend.speaker', compact('speaker', 'sessions', 'event'));
     }
@@ -589,10 +623,10 @@ class LandingController extends Controller
 
     public function exhibitor(Request $request, $slug)
     {
-
-        $company = Company::with('Docs')->where('slug', $slug)
+        $company = Company::with(['Docs', 'eventAndEntityLinks'])->where('slug', $slug)
             ->where('is_sponsor', 0)
             ->firstOrFail();
+
         $sessions = DB::table('event_sessions as es')
             ->join('session_exhibitors as ss', 'es.id', '=', 'ss.session_id')
             ->where('ss.company_id', $company->id)
@@ -601,18 +635,29 @@ class LandingController extends Controller
             ->select('es.*')
             ->get();
 
-        $event = Event::with('photo')->first();
+        // Get the specific event context
+        $eventSlug = $request->get('event');
+        $event = null;
+
+        if ($eventSlug) {
+            $event = Event::with('photo')->where('slug', $eventSlug)->first();
+        }
+
+        if (!$event) {
+            $eventLink = $company->eventAndEntityLinks->first();
+            $event = $eventLink ? Event::with('photo')->find($eventLink->event_id) : Event::with('photo')->first();
+        }
 
         return view('frontend.company', compact('company', 'sessions', 'event'));
     }
 
     public function sponsor(Request $request, $slug)
     {
-
-        $company = Company::with(['logo', 'banner', 'Docs'])
+        $company = Company::with(['logo', 'banner', 'Docs', 'eventAndEntityLinks'])
             ->where('slug', $slug)
             ->where('is_sponsor', 1)
             ->firstOrFail();
+
         $sessions = DB::table('event_sessions as es')
             ->join('session_sponsors as ss', 'es.id', '=', 'ss.session_id')
             ->where('ss.company_id', $company->id)
@@ -621,7 +666,18 @@ class LandingController extends Controller
             ->select('es.*')
             ->get();
 
-        $event = Event::with('photo')->first();
+        // Get the specific event context
+        $eventSlug = $request->get('event');
+        $event = null;
+
+        if ($eventSlug) {
+            $event = Event::with('photo')->where('slug', $eventSlug)->first();
+        }
+
+        if (!$event) {
+            $eventLink = $company->eventAndEntityLinks->first();
+            $event = $eventLink ? Event::with('photo')->find($eventLink->event_id) : Event::with('photo')->first();
+        }
 
         return view('frontend.sponsor', compact('company', 'sessions', 'event'));
     }
@@ -632,7 +688,19 @@ class LandingController extends Controller
     {
         $session = Session::with(['speakers', 'exhibitors', 'sponsors'])->where('slug', $slug)->firstOrFail();
         $speaker = $session->speakers->first();
-        $event = Event::with('photo')->first();
+
+        // Get the specific event context
+        $eventSlug = $request->get('event');
+        $event = null;
+
+        if ($eventSlug) {
+            $event = Event::with('photo')->where('slug', $eventSlug)->first();
+        }
+
+        if (!$event) {
+            $event = Event::with('photo')->where('id', $session->event_id)->first() ?? Event::with('photo')->first();
+        }
+
         return view('frontend.session', compact('session', 'event', 'speaker'));
     }
 
@@ -657,7 +725,9 @@ class LandingController extends Controller
             ->take(2)
             ->get();
 
-        $event = Event::with('photo')->first();
+        if (!$event) {
+            $event = Event::with('photo')->first();
+        }
         return view('frontend.venue', compact('location', 'mapUrl', 'sessions', 'event'));
     }
 

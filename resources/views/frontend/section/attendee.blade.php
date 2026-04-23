@@ -57,7 +57,7 @@
                             <div>
                                 @if (!empty($attendee->slug))
                                 <a class="view-more position-relative d-flex align-items-center gap-2"
-                                     href="{{ route('profile', ['slug' => $attendee->slug]) }}">
+                                     href="{{ route('profile', ['slug' => $attendee->slug, 'event' => $event->slug ?? '']) }}">
                                     View More
                                 </a>
                                 @endif

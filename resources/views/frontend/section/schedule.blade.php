@@ -45,7 +45,7 @@
                             </div>
                             <div>
                                 <a class="view-more position-relative d-flex align-items-center gap-2" 
-                                   href="{{ route('session',$schedule->slug) }}">
+                                   href="{{ route('session', ['slug' => $schedule->slug, 'event' => $event->slug ?? '']) }}">
                                     View More
                                 </a>
                             </div>

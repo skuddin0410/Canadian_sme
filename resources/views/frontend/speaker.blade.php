@@ -29,7 +29,7 @@
                      class="border" 
                      style="height: 200px; object-fit: cover; cursor: pointer;">
                      @else
-                       <img src="{{asset('frontend/images/speaker-1.png')}}"  class="border border-2" 
+                       <img src="{{asset('frontend/images/No-Image-Placeholder.png')}}"  class="border border-2" 
                      style="height: 200px; object-fit: cover; cursor: pointer;">
                     @endif
               </label>
@@ -49,7 +49,7 @@
           <div class="row g-3">
             <div class="col-sm-12">
               <p class="mb-1 text-muted"><i class="fas fa-envelope me-2 text-primary"></i>Bio</p>
-              <p class="fw-semibold">{{ $speaker->bio ?? 'N/A' }}</p>
+              <p class="fw-semibold">{!! $speaker->bio ?? 'N/A' !!}</p>
             </div>
             <div class="col-sm-6">
               <p class="mb-1 text-muted"><i class="fas fa-envelope me-2 text-primary"></i>Email</p>
@@ -183,7 +183,7 @@
                <img src="{{ asset('frontend/images/banner.png') }}" alt="Event" class="img-fluid rounded mt-2">
             @endif
             <p class="fw-bold text-muted mt-2">{{ $event->location ?? '' }}</p>
-            <p class="text-muted mt-2">{{ $event->description ?? '' }}</p>
+            <p class="text-muted mt-2">{!! $event->description ?? '' !!}</p>
           </div>
         </div>
       @endif

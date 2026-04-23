@@ -62,7 +62,7 @@
           <div class="row g-3">
             <div class="col-12 mb-2">
               <p class="mb-1 black-text-18 fw-medium"><i class="fas fa-align-left me-2 text-primary"></i>Bio</p>
-              <p class="text-secondary black-text-18 fw-medium">{{ $company->description ?? 'N/A' }}</p>
+              <p class="text-secondary black-text-18 fw-medium">{!! $company->description ?? 'N/A' !!}</p>
             </div>
 
             <div class="col-lg-6 mb-2">
@@ -221,7 +221,7 @@
                <img src="{{ asset('frontend/images/banner.png') }}" alt="Event" class="img-fluid rounded mt-2">
             @endif
             <p class="fw-bold text-muted mt-2">{{ $event->location ?? '' }}</p>
-            <p class="text-muted mt-2">{{ $event->description ?? '' }}</p>
+            <p class="text-muted mt-2">{!! $event->description ?? '' !!}</p>
           </div>
         </div>
       @endif

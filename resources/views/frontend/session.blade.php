@@ -71,7 +71,7 @@
           <!-- Description -->
           <h5 class="mb-2 small-heading-black fw-bold">About this Session: </h5>
           <p class="text-secondary">
-            {{ $session->description ?? '' }}
+            {!! $session->description ?? '' !!}
           </p>
         </div>
       </div>
@@ -167,7 +167,7 @@
                <img src="{{ asset('frontend/images/banner.png') }}" alt="Event" class="img-fluid rounded mt-2">
             @endif
             <p class="fw-bold text-muted mt-2">{{ $event->location ?? '' }}</p>
-            <p class="text-muted mt-2">{{ $event->description ?? '' }}</p>
+            <p class="text-muted mt-2">{!! $event->description ?? '' !!}</p>
           </div>
         </div>
       @endif

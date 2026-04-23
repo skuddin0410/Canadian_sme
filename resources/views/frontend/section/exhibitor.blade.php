@@ -56,13 +56,13 @@
                     </div> -->
                     <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
-                        <span class="small-heading-black fw-semibold">{{$exhibitor->event_name ?? 'CanadianSME Small Business Summit 2025'}}</span>
+                        <span class="small-heading-black fw-semibold">{{ $event->title }}</span>
                     </div>
                     <!-- ///My code addition/// -->
                    
                     <div>
                         <a class="view-more position-relative d-flex
-                        align-items-center gap-2" href="{{route('exhibitor',$exhibitor->slug)}}">
+                        align-items-center gap-2" href="{{route('exhibitor',['slug' => $exhibitor->slug, 'event' => $event->slug ?? ''])}}">
                             View More
                         </a>
                     </div>

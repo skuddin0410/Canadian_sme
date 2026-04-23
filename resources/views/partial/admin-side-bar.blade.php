@@ -220,7 +220,7 @@
         </li>
 
 
-        <li class="menu-item   {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }}  {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') ? 'active open' : '' }}  {{ request()->is('admin/gallery*') ? 'active open' : '' }}  {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/exhibitor-users*') ? 'active open' : '' }} {{ request()->is('admin/speaker*') ? 'active open' : '' }} {{ request()->is('admin/sponsors*') ? 'active open' : '' }} {{ request()->is('admin/categories*') ? 'active open' : '' }} {{ request()->is('admin/webview*') ? 'active open' : '' }} {{ request()->is('admin/calendar*') ? 'active open' : '' }} {{ request()->is('admin/booths*') ? 'active open' : '' }} {{ request()->is('admin/event-guides*') || request()->routeIs('event-guides.showGallery') ? 'active open' : '' }} {{ request()->is('admin/gallery*') ? 'active open' : '' }} {{ request()->is('admin/landing-page-settings*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="events">Content</div>
@@ -276,16 +276,15 @@
             </a>
         </li> --}}
 
-        <li class="menu-item {{ request()->is('admin/event-guides*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/event-guides*') && !request()->is('admin/event-guides/gallery*') ? 'active open' : '' }}">
             <a href="{{ route('event-guides.index') }}" class="menu-link">
                 <div data-i18n="Coupons">Event Guide</div>
             </a>
         </li>
 
-        <li class="menu-item {{ request()->is('admin/gallery*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/event-guides/gallery*') ? 'active open' : '' }}">
             <a href="{{route('event-guides.showGallery')}}" class="menu-link">
                 <div data-i18n="Gallery">Gallery</div>
-
             </a>
         </li>
         <!-- <li class="menu-item {{ request()->is('admin/booths*') ? 'active open' : '' }}">
