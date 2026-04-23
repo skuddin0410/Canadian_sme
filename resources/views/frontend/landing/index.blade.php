@@ -30,6 +30,8 @@
     @endif
 @endforeach
 
+@include('frontend.section.gallery') 
+
 @include('frontend.section.schedule') 
 
 @include('frontend.section.maps') 

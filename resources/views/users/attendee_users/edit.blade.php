@@ -324,10 +324,25 @@ Admin | Edit Attendee Data
                     </div>
 
                     <div class="mb-3">
-                      <label class="form-label">Events</label>
+                      <label class="form-label">Events <span class="text-danger">*</span></label>
+
+                      {{-- Old subscription events (locked, read-only) --}}
+                      @if(isset($oldEvents) && $oldEvents->count() > 0)
+                        <div class="mb-2">
+                          <small class="text-muted d-block mb-1"><i class="bx bx-lock-alt"></i> Previous subscription events (read-only)</small>
+                          @foreach($oldEvents as $oldEvent)
+                            <input type="hidden" name="old_event_id[]" value="{{ $oldEvent->id }}">
+                            <span class="badge bg-secondary me-1 mb-1" style="font-size: 0.8rem; padding: 0.4em 0.7em;">
+                              <i class="bx bx-lock-alt" style="font-size: 0.7rem;"></i> {{ $oldEvent->title }}
+                            </span>
+                          @endforeach
+                        </div>
+                      @endif
+
+                      {{-- Current subscription events (editable) --}}
                       <div class="input-group input-group-merge">
                       <select class="form-select select2" name="event_id[]"
-                              data-placeholder="Select event" data-allow-clear="true" multiple>
+                              data-placeholder="Select event" data-allow-clear="true" multiple {{ $events->count() > 0 ? 'required' : '' }}>
                               <option value="">Please select</option>
                         @foreach($events as $event)
                           <option {{ in_array($event->id, $perticipantEvents) ? 'selected' : '' }} value="{{ $event->id }}">

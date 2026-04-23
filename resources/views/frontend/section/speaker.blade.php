@@ -12,9 +12,9 @@
                         </span>
                     </div>
                     
-                    @if(count($speakers) > 10)
+                    @if(isset($speakers) && count($speakers) > 0)
                     <div class="d-flex justify-content-left">
-                      <a href="{{ route('speaker-index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold btn-long">
+                      <a href="{{ route('speaker-index', ['slug' => $event->slug]) }}" class="btn btn-outline-light px-4 py-2 fw-semibold btn-long">
                         View More
                       </a>
                     </div>
@@ -30,12 +30,12 @@
                             @foreach($speakers as $speaker)
                             
                             <div class="swiper-slide">
-                                <a href="{{ route('speaker', $speaker->slug) }}" class="text-decoration-none">
+                                <a href="{{ route('speaker', ['slug' => $speaker->slug, 'event' => $event->slug ?? '']) }}" class="text-decoration-none">
                                 <div class="swiper-img-box">
                                     @if(!empty($speaker->photo))
                                      <img src="{{ $speaker->photo->file_path}}" alt="">
                                     @else
-                                     <img src="{{asset('frontend/images/speaker-1.png')}}" alt="">
+                                     <img src="{{asset('frontend/images/No-Image-Placeholder.png')}}" alt="">
                                     @endif
                                 </div>
                             </a>

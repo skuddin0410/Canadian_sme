@@ -8,9 +8,9 @@
                 <h2 class="h2-black">
                     Exhibitors Showcasing Innovation Across All Industries
                 </h2>
-                @if(count($exhibitors) > 10)
+                @if(isset($exhibitors) && count($exhibitors) > 0)
                 <div class="d-none d-xl-block">
-                    <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
+                    <a class="heroBtn btn-long" href="{{route('exhibitor-index', ['slug' => $event->slug])}}">
                          View More
                     </a>
                     {{-- <button class="heroBtn btn-long">View More</button> --}}
@@ -56,13 +56,13 @@
                     </div> -->
                     <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
-                        <span class="small-heading-black fw-semibold">{{$exhibitor->event_name ?? 'CanadianSME Small Business Summit 2025'}}</span>
+                        <span class="small-heading-black fw-semibold">{{ $event->title }}</span>
                     </div>
                     <!-- ///My code addition/// -->
                    
                     <div>
                         <a class="view-more position-relative d-flex
-                        align-items-center gap-2" href="{{route('exhibitor',$exhibitor->slug)}}">
+                        align-items-center gap-2" href="{{route('exhibitor',['slug' => $exhibitor->slug, 'event' => $event->slug ?? ''])}}">
                             View More
                         </a>
                     </div>
@@ -75,11 +75,10 @@
                 @endif
             </div>
             <div class="d-flex justify-content-center mt-4 d-xl-none">
-                 <a class="heroBtn btn-long" href="{{route('exhibitor-index')}}">
+                 <a class="heroBtn btn-long" href="{{route('exhibitor-index', ['slug' => $event->slug])}}">
                          View More
                     </a>
             </div>
         </div>
     </section>
-    <!-- exhibitor end -->
  

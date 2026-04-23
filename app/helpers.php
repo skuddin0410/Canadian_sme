@@ -676,3 +676,61 @@ if(! function_exists('isSuperAdmin')){
         }
     }
 }
+
+if (!function_exists('canManageEvent')) {
+    function canManageEvent($event)
+    {
+        if (isSuperAdmin()) {
+            return true;
+        }
+
+        if (empty($event->subscription_id)) {
+            return false;
+        }
+
+        $subscription = \App\Models\Subscription::find($event->subscription_id);
+
+        if (!$subscription) {
+            return false;
+        }
+
+        // Must be active and its expired_at must be in the future
+        if ($subscription->status === 'active' && $subscription->expired_at && $subscription->expired_at > now()) {
+            return true;
+        }
+
+        return false;
+    }
+}
+if (!function_exists('getPreciseRemainingTime')) {
+    function getPreciseRemainingTime($date)
+    {
+        if (!$date) return 'N/A';
+        $target = \Carbon\Carbon::parse($date);
+        $now = \Carbon\Carbon::now();
+        $isPast = $target->isPast();
+        
+        // Use absolute difference for calculations
+        $diff = $now->diff($target);
+        
+        // Use absolute values to avoid negative numbers for past dates
+        $totalDays = abs((int)$now->diffInDays($target));
+        $hours = $diff->h;
+        $minutes = $diff->i;
+        $seconds = $diff->s;
+
+        $result = "";
+
+        if ($totalDays > 0) {
+            $result = "{$totalDays} days {$hours} hours";
+        } elseif ($hours > 0) {
+            $result = "{$hours} hours {$minutes} minutes";
+        } elseif ($minutes > 0) {
+            $result = "{$minutes} minutes {$seconds} seconds";
+        } else {
+            $result = "{$seconds} seconds";
+        }
+
+        return $result . ($isPast ? " ago" : " left");
+    }
+}

@@ -8,7 +8,7 @@
         --card-bg: #ffffff;
         --border: #e2e1dc;
         --accent: #696cff;
-        --accent-hover: #1e47cc;
+        --accent-hover: #5254d4;
         --success: #16a34a;
         --success-bg: #dcfce7;
         --danger: #dc2626;
@@ -55,9 +55,9 @@
     }
 
     .back-btn:hover {
-        background: var(--ink);
+        background: var(--accent);
         color: #fff;
-        border-color: var(--ink);
+        border-color: var(--accent);
         transform: translateX(-2px);
         text-decoration: none;
     }
@@ -283,14 +283,14 @@
         border: none;
         cursor: pointer;
         transition: background .18s, transform .15s, box-shadow .18s;
-        box-shadow: 0 2px 8px rgba(133, 103, 202, 0.25);
+        box-shadow: 0 2px 8px rgba(105, 108, 255, .3);
         letter-spacing: .01em;
     }
 
     .btn-submit:hover {
         background: var(--accent-hover);
         transform: translateY(-1px);
-        box-shadow: 0 4px 16px rgba(45, 91, 227, .35);
+        box-shadow: 0 4px 16px rgba(105, 108, 255, .4);
     }
 
     .btn-cancel {
@@ -358,25 +358,7 @@
         </div>
         <div class="create-card-body">
 
-            {{-- Errors --}}
-            @if ($errors->any())
-            <div class="error-alert">
-                <div class="error-alert-title">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M7 4v3.5M7 10h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    Please fix the following errors:
-                </div>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
-
-            <form action="{{ route('subscription.store') }}" method="POST">
+            <form action="{{ route('subscription.store') }}" method="POST" id="subscriptionForm">
                 @csrf
                 <div class="form-grid">
 
@@ -435,9 +417,13 @@
                         </div>
                     </div>
 
-                    {{-- Expiry (months) --}}
+                    {{-- Expiry (Days) --}}
                     <div class="field">
+                        <label for="expired_at">Expiry Duration (Days)<span class="text-danger">*</span></label>
+                        {{-- 
+                        Original label:
                         <label for="expired_at">Expiry Duration<span class="text-danger">*</span></label>
+                        --}}
                         <div class="input-icon-wrap">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                 <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4" />
@@ -445,10 +431,28 @@
                             </svg>
                             <input type="number" name="expired_at" id="expired_at"
                                 class="field-input" min="1"
-                                placeholder="e.g. 1, 3, 6, 12"
+                                placeholder="e.g. 30, 90, 365"
                                 value="{{ old('expired_at') }}">
                         </div>
-                        <span class="field-hint">Leave blank for no expiry. Value is in months.</span>
+                        <span class="field-hint">Specify the duration in days.</span>
+                        {{-- 
+                        Original hint:
+                        <span class="field-hint">Leave blank for no expiry. Value is in months.</span> 
+                        --}}
+
+                        {{-- Date Preview --}}
+                        <div id="date-preview-section" style="display: none; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block uppercase" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;">Start Date</small>
+                                    <span id="preview-start-date" class="text-dark fw-bold" style="font-size: 0.85rem;"></span>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block uppercase" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;">Expiry Date</small>
+                                    <span id="preview-end-date" class="text-primary fw-bold" style="font-size: 0.85rem;"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Status --}}
@@ -482,11 +486,12 @@
 </div>
 @endsection
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <!-- jQuery (required) -->
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -498,6 +503,118 @@
             width: '100%',
             minimumResultsForSearch: 0
         });
+
+        // Date calculation logic
+        const expiredInput = document.getElementById('expired_at');
+        const previewSection = document.getElementById('date-preview-section');
+        const startSpan = document.getElementById('preview-start-date');
+        const endSpan = document.getElementById('preview-end-date');
+
+        function updatePreview() {
+            const days = parseInt(expiredInput.value);
+            if (!isNaN(days) && days > 0) {
+                const startDate = new Date();
+                const endDate = new Date();
+                endDate.setDate(startDate.getDate() + days);
+
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                startSpan.textContent = startDate.toLocaleDateString('en-US', options);
+                endSpan.textContent = endDate.toLocaleDateString('en-US', options);
+                previewSection.style.display = 'block';
+            } else {
+                previewSection.style.display = 'none';
+            }
+        }
+
+        expiredInput.addEventListener('input', updatePreview);
+        
+        // Run on load if old value exists
+        if (expiredInput.value) {
+            updatePreview();
+        }
+
+        // SWAL Validation
+        $('#subscriptionForm').on('submit', function(e) {
+            const form = this;
+            const $form = $(form);
+            const user = $('#user_id').val();
+            const pricing = $('#price_id').val();
+            const attendee = $('#attendee_count').val();
+            const eventCount = $('#event_count').val();
+            const expired = $('#expired_at').val();
+            const status = $('#status').val();
+
+            let errors = [];
+
+            if (!user) errors.push("Admin user is required.");
+            if (!pricing) errors.push("Pricing plan is required.");
+            if (!attendee || attendee < 1) errors.push("Attendee count must be at least 1.");
+            if (!eventCount || eventCount < 1) errors.push("Event count must be at least 1.");
+            if (!expired || expired < 1) errors.push("Expiry duration is required.");
+            if (!status) errors.push("Status is required.");
+
+            if (errors.length > 0) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Form Validation Error',
+                    html: '<ul class="text-start">' + errors.map(err => `<li>${err}</li>`).join('') + '</ul>',
+                    icon: 'error',
+                    confirmButtonColor: '#696cff'
+                });
+                return false;
+            }
+
+            // If local validation is passed, check for existing active subscription
+            e.preventDefault();
+            
+            // If already forced, just submit
+            if ($('#force_create').length > 0) {
+                form.submit();
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('subscription.check-active') }}",
+                type: 'GET',
+                data: { user_id: user },
+                success: function(resp) {
+                    if (resp.exists) {
+                        Swal.fire({
+                            title: 'Active Subscription Found',
+                            html: `User already has an active <b>${resp.plan_name}</b> plan (Expires: ${resp.expired_at}).<br><br>Do you still want to create a new one?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#696cff',
+                            cancelButtonColor: '#8592a3',
+                            confirmButtonText: 'Yes, create it!',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $form.append('<input type="hidden" name="force_create" id="force_create" value="1">');
+                                form.submit();
+                            }
+                        });
+                    } else {
+                        // No active sub, proceed normally
+                        form.submit();
+                    }
+                },
+                error: function() {
+                    // Fallback to normal submission if AJAX fails
+                    form.submit();
+                }
+            });
+        });
+
+        // Handle server-side errors
+        @if($errors->any())
+            Swal.fire({
+                title: 'Submission Error',
+                html: '<ul class="text-start">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
+                icon: 'error',
+                confirmButtonColor: '#696cff'
+            });
+        @endif
     });
 </script>
 @endsection

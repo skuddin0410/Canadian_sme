@@ -1,5 +1,5 @@
 @php 
-    $src = asset('storage/' . $item->file_path); 
+    $src = $item->file_path; 
     $filename = $item->file_name;
 @endphp
 

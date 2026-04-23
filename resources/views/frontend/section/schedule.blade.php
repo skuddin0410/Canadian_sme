@@ -45,7 +45,7 @@
                             </div>
                             <div>
                                 <a class="view-more position-relative d-flex align-items-center gap-2" 
-                                   href="{{ route('session',$schedule->slug) }}">
+                                   href="{{ route('session', ['slug' => $schedule->slug, 'event' => $event->slug ?? '']) }}">
                                     View More
                                 </a>
                             </div>
@@ -57,9 +57,9 @@
             </div>
 
             <!-- View More Button at Bottom -->
-             @if(count($schedules) > 6)
+             @if(isset($schedules) && count($schedules) > 0)
             <div class="d-flex justify-content-center mt-4">
-                <a href="{{route('schedule-index')}}" class="heroBtn btn-long">
+                <a href="{{route('schedule-index', ['slug' => $event->slug])}}" class="heroBtn btn-long">
                     View More
                 </a>
             </div>

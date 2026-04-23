@@ -26,12 +26,12 @@
                             @if(isset($sponsors) && count($sponsors) > 0)
                              @foreach($sponsors as $sponsor)
                             <div class="swiper-slide">
-                                 <a href="{{ route('sponsor', $sponsor->slug) }}" class="text-decoration-none">
+                                 <a href="{{ route('sponsor', ['slug' => $sponsor->slug, 'event' => $event->slug ?? '']) }}" class="text-decoration-none">
                                 <div class="swiper-img-box">
                                      @if($sponsor->logo)
                                       <img src="{{$sponsor->logo->file_path}}" alt="">
                                      @else
-                                       <img src="{{asset('frontend/images/sponsor-1.png')}}" alt="">
+                                       <img src="{{asset('frontend/images/No-Image-Placeholder.png')}}" alt="">
                                      @endif
                                 </div>
                                 </a>
@@ -53,9 +53,9 @@
                         </div>
                     </div>
                 </div>
-                @if(count($sponsors) > 10)
+                @if(isset($sponsors) && count($sponsors) > 0)
                 <div class="d-flex justify-content-center mt-3 mt-lg-4">
-                    <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index')}}">View More </a>
+                    <a class="heroBtn bg-transparent view-more" href="{{route('sponsor-index', ['slug' => $event->slug])}}">View More </a>
                 </div>
                 @endif
 </div>

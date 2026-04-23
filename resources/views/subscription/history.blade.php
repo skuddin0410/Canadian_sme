@@ -389,27 +389,10 @@
     {{-- Header --}}
     <div class="subs-header">
         <div class="subs-header-left">
-            <h2>Subscriptions</h2>
-            <p>Manage all active and past subscription records</p>
+            <h2>Subscription History</h2>
+            <p>View all your past and current subscription records</p>
         </div>
-        <a href="{{ route('subscription.create') }}" class="btn-create">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            New Subscription
-        </a>
     </div>
-    @if(session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: "{{ session('success') }}",
-            timer: 2000,
-            showConfirmButton: false
-        });
-    </script>
-    @endif
 
     {{-- Table Card --}}
     <div class="subs-card">
@@ -418,15 +401,10 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>User</th>
-                        <!-- <th>Event</th> -->
-                        <th>Pricing</th>
-                        <th>Attendees</th>
-                        <th>Event Count</th>
+                        <th>Pricing Plan</th>
                         <th>Status</th>
-                        <th>Expires At</th>
-                        <th>Created</th>
-                        <th>Actions</th>
+                        <th>Expiry Date</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -437,40 +415,16 @@
                             <span class="id-chip">{{ $loop->iteration }}</span>
                         </td>
 
-                        {{-- User --}}
-                        <td>
-                            <div class="cell-user">
-                                <div class="avatar">
-                                    {{ strtoupper(substr($subscription->user->name ?? 'N', 0, 1)) }}
-                                </div>
-                                <span class="cell-label">{{ $subscription->user->name ?? 'N/A' }} {{ $subscription->user->lastname ?? 'N/A' }}</span>
-                            </div>
-                        </td>
-
-                        {{-- Event --}}
-                        <!-- <td>
-                            <span class="cell-label">{{ $subscription->event->title ?? 'N/A' }}</span>
-                        </td> -->
-
                         {{-- Pricing --}}
                         <td>
                             @if($subscription->pricing->name ?? false)
                             <span class="pricing-tag">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1 5.5L3.5 8 9 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
                                 {{ $subscription->pricing->name }}
                             </span>
                             @else
                             <span style="color:#bbb;font-size:.8rem;">—</span>
                             @endif
                         </td>
-
-                        {{-- Attendees --}}
-                        <td><span class="count-pill">{{ $subscription->attendee_count }}</span></td>
-
-                        {{-- Event Count --}}
-                        <td><span class="count-pill">{{ $subscription->event_count }}</span></td>
 
                         {{-- Status --}}
                         <td>
@@ -492,51 +446,31 @@
                             @if($subscription->expired_at)
                             <span class="expiry-text">
                                 {{ $subscription->expired_at->format('d M Y') }}
-                                <br>
-                                <small class="text-muted">
-                                    {{ getPreciseRemainingTime($subscription->expired_at) }}
-                                </small>
                             </span>
                             @else
                             <span class="expiry-none">No Expiry</span>
                             @endif
                         </td>
 
-                        {{-- Created --}}
-                        <td>
-                            <span class="date-text">{{ $subscription->created_at->format('d M Y') }}</span>
-                        </td>
-
                         {{-- Actions --}}
-                        <td>
-                            <div class="action-group">
-                                <a href="{{ route('subscription.show', $subscription->id) }}" class="act-btn view" title="View">
+                        <td class="text-end">
+                            <div class="action-group justify-content-end">
+                                <a href="{{ route('subscription.show', $subscription->id) }}" class="act-btn view" title="View Details">
                                     <i class="fa fa-eye"></i>
                                 </a>
-                                <a href="{{ route('subscription.edit', $subscription->id) }}" class="act-btn edit" title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <form action="{{ route('subscription.destroy', $subscription->id) }}" method="POST" class="d-inline delete-form m-0 p-0">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="button" class="act-btn delete btn-delete" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="10">
+                        <td colspan="5">
                             <div class="empty-state">
                                 <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
                                     <rect x="8" y="10" width="32" height="34" rx="4" stroke="#6b7280" stroke-width="2" />
                                     <path d="M16 10V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" stroke="#6b7280" stroke-width="2" />
                                     <path d="M17 22h14M17 29h10" stroke="#6b7280" stroke-width="2" stroke-linecap="round" />
                                 </svg>
-                                <p>No subscriptions found</p>
+                                <p>No subscription history found</p>
                             </div>
                         </td>
                     </tr>
@@ -545,6 +479,12 @@
             </table>
         </div>
     </div>
+    
+    <div class="mt-4">
+        {{ $subscriptions->links() }}
+    </div>
+
+</div>
 
 </div>
 @endsection

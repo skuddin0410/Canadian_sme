@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryItem extends Model
 {
@@ -14,6 +15,22 @@ class GalleryItem extends Model
         'is_approved',
         'event_id',
     ];
+
+    public function getFilePathAttribute($value)
+    {
+        if (empty($value)) {
+            return asset('images/default.png');
+        }
+
+        // If it's already a full URL, return it
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+
+        // Gallery items are stored on the 'public' disk (local)
+        // as per EventGuideController@uploadGallery
+        return asset('storage/' . $value);
+    }
 
     public function user()
     {

@@ -251,7 +251,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/ticket-purchases', [TicketPurchaseController::class, 'analytics'])->name('ticket-purchases');
     Route::get('/session-data', [AnalyticsController::class, 'sessionData'])->name('session.data');
   });
+  Route::get('subscriptions/history', [SubscriptionController::class, 'history'])->name('subscription.history');
   Route::get('subscriptions/index', [SubscriptionController::class, 'index'])->name('subscription.index');
+  Route::get('subscriptions/check-active', [SubscriptionController::class, 'checkActiveSubscription'])->name('subscription.check-active');
   Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('subscription.create');
   Route::get('subscriptions/{id}', [SubscriptionController::class, 'show'])->name('subscription.show');
 
