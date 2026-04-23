@@ -374,6 +374,11 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+@php
+    $subStartDate = $subscription ? $subscription->created_at->format('Y-m-d') : null;
+    $subEndDate = ($subscription && $subscription->expired_at) ? $subscription->expired_at->format('Y-m-d') : null;
+@endphp
+
 <script>
   $("#slug-source").keyup(function() {
       var Text = $(this).val();
@@ -387,25 +392,74 @@
       $("#slug-target").val(Text);        
   });
 
-function slugify(str) {
-  str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
-  str = str.toLowerCase(); // convert string to lowercase
-  str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
-           .replace(/\s+/g, '-') // replace spaces with hyphens
-           .replace(/-+/g, '-'); // remove consecutive hyphens
-  return str.replace(/^-+|-+$/g, '');
-}
+  function slugify(str) {
+    str = str.replace(/^\s+|\s+$/g, ''); 
+    str = str.toLowerCase(); 
+    str = str.replace(/[^a-z0-9 -]/g, '') 
+             .replace(/\s+/g, '-') 
+             .replace(/-+/g, '-'); 
+    return str.replace(/^-+|-+$/g, '');
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const activeList = document.getElementById('active-sections');
-    if (activeList) {
-        new Sortable(activeList, {
-            animation: 150,
-            handle: '.handle',
-            draggable: 'li',
-            ghostClass: 'sortable-ghost'
-        });
-    }
-});
+  document.addEventListener('DOMContentLoaded', () => {
+      // ── Proactive Date Validation ──
+      const subStart = @json($subStartDate);
+      const subEnd = @json($subEndDate);
+      const startDateInput = document.getElementById('start_date');
+      const endDateInput = document.getElementById('end_date');
+
+      if (subStart || subEnd) {
+          // Set visual constraints on pickers
+          if (subStart) {
+              startDateInput.setAttribute('min', subStart);
+              endDateInput.setAttribute('min', subStart);
+          }
+          if (subEnd) {
+              startDateInput.setAttribute('max', subEnd);
+              endDateInput.setAttribute('max', subEnd);
+          }
+
+          const validateDates = (input, type) => {
+              const selectedDate = input.value;
+              if (!selectedDate) return;
+
+              let isInvalid = false;
+              let message = "";
+
+              if (subStart && selectedDate < subStart) {
+                  isInvalid = true;
+                  message = `Event ${type} date cannot be before your subscription start date (${subStart})`;
+              } else if (subEnd && selectedDate > subEnd) {
+                  isInvalid = true;
+                  message = `Event ${type} date cannot be after your subscription expiry date (${subEnd})`;
+              }
+
+              if (isInvalid) {
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'Invalid Date',
+                      text: message,
+                      confirmButtonColor: '#696cff'
+                  });
+                  input.value = ""; // Clear the invalid date
+              }
+          };
+
+          startDateInput.addEventListener('change', () => validateDates(startDateInput, 'start'));
+          endDateInput.addEventListener('change', () => validateDates(endDateInput, 'end'));
+      }
+
+      // ── Sortable ──
+      const activeList = document.getElementById('active-sections');
+      if (activeList) {
+          new Sortable(activeList, {
+              animation: 150,
+              handle: '.handle',
+              draggable: 'li',
+              ghostClass: 'sortable-ghost'
+          });
+      }
+  });
+
 </script>
 @endsection

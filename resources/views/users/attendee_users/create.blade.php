@@ -307,10 +307,10 @@ Admin | Add Attendee
                       </div>
 
                       <div class="mb-3">
-                        <label class="form-label">Events</label>
+                        <label class="form-label">Events <span class="text-danger">*</span></label>
                         <div class="input-group input-group-merge">
                         <select class="form-select select2" name="event_id[]"
-                                data-placeholder="Select event" data-allow-clear="true" multiple>
+                                data-placeholder="Select event" data-allow-clear="true" multiple required>
                                 <option value="">Please select</option>
                           @foreach($events as $event)
                             <option value="{{ $event->id }}">

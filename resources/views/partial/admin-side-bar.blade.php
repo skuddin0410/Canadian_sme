@@ -23,6 +23,15 @@
             </a>
         </li>
 
+        @if(!isSuperAdmin())
+        <li class="menu-item {{ request()->routeIs('subscription.history') ? 'active' : '' }}">
+            <a href="{{ route('subscription.history') }}" class="menu-link">
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
+                <div data-i18n="subscription_history">Subscription History</div>
+            </a>
+        </li>
+        @endif
+
         @if(isSuperAdmin())
         <li class="menu-item {{ request()->is('admin/home-page*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">

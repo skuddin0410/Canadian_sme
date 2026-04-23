@@ -370,7 +370,7 @@
     .btn-submit:hover {
         background: var(--accent-hover);
         transform: translateY(-1px);
-        box-shadow: 0 4px 18px rgba(105, 108, 255, .4);
+        box-shadow: 0 4px 16px rgba(105, 108, 255, .4);
     }
 
     .btn-cancel {
@@ -438,13 +438,21 @@
 
         {{-- Form --}}
         <div class="edit-card-body">
-            <form action="{{ route('subscription.update', $subscription->id) }}" method="POST">
+            <form action="{{ route('subscription.update', $subscription->id) }}" method="POST" id="subscriptionEditForm">
                 @csrf
                 @method('PUT')
 
                 <div class="form-grid">
+                             {{-- Admin Info (Fixed) --}}
+                    <div class="field">
+                        <label>Admin User</label>
+                        <div class="field-input" style="background: #efefef; cursor: not-allowed; opacity: 0.8;">
+                           {{ $subscription->user->name ?? '' }} {{ $subscription->user->lastname ?? '' }}
+                        </div>
+                    </div>
 
-                    {{-- User --}}
+                    {{-- Original User dropdown (Commented out) --}}
+                    {{--
                     <div class="field">
                         <label for="user_id">User</label>
                         <select name="user_id" id="user_id" class="field-select searchable">
@@ -455,8 +463,9 @@
                             @endforeach
                         </select>
                     </div>
+                    --}}
 
-                    {{-- Pricing --}}
+                    {{-- Pricing (Editable) --}}
                     <div class="field">
                         <label for="price_id">Pricing Plan</label>
                         <select name="price_id" id="price_id" class="field-select searchable">
@@ -470,7 +479,25 @@
 
                     <div class="form-divider"></div>
 
-                    {{-- Attendee Count --}}
+                    {{-- Start Date (Fixed) --}}
+                    <div class="field">
+                        <label>Subscription Start Date</label>
+                        <div class="field-input" style="background: #efefef; cursor: not-allowed; opacity: 0.8;">
+                            {{ $subscription->created_at ? $subscription->created_at->format('M d, Y') : 'N/A' }}
+                        </div>
+                    </div>
+
+                    {{-- End Date (Fixed) --}}
+                    <div class="field">
+                        <label>Subscription End Date</label>
+                        <div class="field-input" style="background: #efefef; cursor: not-allowed; opacity: 0.8;">
+                            {{ $subscription->expired_at ? $subscription->expired_at->format('M d, Y') : 'N/A' }}
+                        </div>
+                    </div>
+
+                    <div class="form-divider"></div>
+
+                    {{-- Attendee Count (Editable) --}}
                     <div class="field">
                         <label for="attendee_count">Attendee Count</label>
                         <div class="input-icon-wrap">
@@ -485,7 +512,7 @@
                         </div>
                     </div>
 
-                    {{-- Event Count --}}
+                    {{-- Event Count (Editable) --}}
                     <div class="field">
                         <label for="event_count">Event Count</label>
                         <div class="input-icon-wrap">
@@ -499,7 +526,8 @@
                         </div>
                     </div>
 
-                    {{-- Extend months --}}
+                    {{-- Original Expired at months (Commented out) --}}
+                    {{--
                     <div class="field">
                         <label for="expired_at"> Expired at (months)</label>
                         <div class="input-icon-wrap">
@@ -509,7 +537,7 @@
                             </svg>
                             <input type="number" name="expired_at" id="expired_at"
                                 class="field-input" min="1"
-                                value="{{ $monthsRemaining }}"
+                                value="{{ $monthsRemaining ?? '' }}"
                                 placeholder="e.g. 1, 3, 6, 12">
                         </div>
                         <span class="field-warn">
@@ -520,14 +548,22 @@
                             Adds months to current expiry. Leave blank to keep unchanged.
                         </span>
                     </div>
+                    --}}
 
-                    {{-- Status --}}
+                    {{-- Status (Editable) --}}
                     <div class="field">
                         <label for="status">Status</label>
-                        <select name="status" id="status" class="field-select">
-                            <option value="active" {{ $subscription->status == 'active'   ? 'selected' : '' }}>Active</option>
+                        <select name="status" id="status" class="field-select" {{ ($subscription->expired_at && $subscription->expired_at->isPast()) ? 'disabled' : '' }}>
+                            <option value="active" {{ $subscription->status == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ $subscription->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
+                        @if($subscription->expired_at && $subscription->expired_at->isPast())
+                            <input type="hidden" name="status" value="inactive">
+                            <p class="field-hint" style="color: var(--danger); font-weight: 600; margin-top: 0.5rem;">
+                                <i class="fa fa-exclamation-triangle me-1"></i>
+                                This subscription has expired and its status is locked to Inactive.
+                            </p>
+                        @endif
                     </div>
 
                 </div>
@@ -553,6 +589,7 @@
 
 @endsection
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
@@ -568,6 +605,42 @@
             allowClear: true,
             width: '100%'
         });
+
+        // SWAL Validation
+        $('#subscriptionEditForm').on('submit', function(e) {
+            const pricing = $('#price_id').val();
+            const attendee = $('#attendee_count').val();
+            const eventCount = $('#event_count').val();
+            const status = $('#status').val();
+
+            let errors = [];
+
+            if (!pricing) errors.push("Pricing plan is required.");
+            if (!attendee || attendee < 1) errors.push("Attendee count must be at least 1.");
+            if (!eventCount || eventCount < 1) errors.push("Event count must be at least 1.");
+            if (!status) errors.push("Status is required.");
+
+            if (errors.length > 0) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Validation Error',
+                    html: '<ul class="text-start">' + errors.map(err => `<li>${err}</li>`).join('') + '</ul>',
+                    icon: 'error',
+                    confirmButtonColor: '#696cff'
+                });
+                return false;
+            }
+        });
+
+        // Handle server-side errors
+        @if($errors->any())
+            Swal.fire({
+                title: 'Submission Error',
+                html: '<ul class="text-start">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
+                icon: 'error',
+                confirmButtonColor: '#696cff'
+            });
+        @endif
     });
 </script>
 @endsection

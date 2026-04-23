@@ -859,8 +859,60 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+@php
+    $subStartDate = $subscription ? $subscription->created_at->format('Y-m-d') : null;
+    $subEndDate = ($subscription && $subscription->expired_at) ? $subscription->expired_at->format('Y-m-d') : null;
+@endphp
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // ── Proactive Date Validation ──
+    const subStart = @json($subStartDate);
+    const subEnd = @json($subEndDate);
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+
+    if (subStart || subEnd) {
+        // Set visual constraints on pickers
+        if (subStart) {
+            startDateInput.setAttribute('min', subStart);
+            endDateInput.setAttribute('min', subStart);
+        }
+        if (subEnd) {
+            startDateInput.setAttribute('max', subEnd);
+            endDateInput.setAttribute('max', subEnd);
+        }
+
+        const validateDates = (input, type) => {
+            const selectedDate = input.value;
+            if (!selectedDate) return;
+
+            let isInvalid = false;
+            let message = "";
+
+            if (subStart && selectedDate < subStart) {
+                isInvalid = true;
+                message = `Event ${type} date cannot be before your subscription start date (${subStart})`;
+            } else if (subEnd && selectedDate > subEnd) {
+                isInvalid = true;
+                message = `Event ${type} date cannot be after your subscription expiry date (${subEnd})`;
+            }
+
+            if (isInvalid) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Date',
+                    text: message,
+                    confirmButtonColor: '#696cff'
+                });
+                input.value = input.defaultValue || ""; // Rollback to original value if possible
+            }
+        };
+
+        startDateInput.addEventListener('change', () => validateDates(startDateInput, 'start'));
+        endDateInput.addEventListener('change', () => validateDates(endDateInput, 'end'));
+    }
+
     const activeList = document.getElementById('active-sections');
     if (activeList) {
         new Sortable(activeList, {
