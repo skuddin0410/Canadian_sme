@@ -47,13 +47,26 @@
             <li class="mb-3 text-secondary black-text-18 fw-medium">
               <i class="fas fa-clock me-2 text-primary"></i>
               <strong class="black-text-18 fw-medium">Time:</strong> 
-              {{ $session->start_time ? $session->start_time->format('h:i A') : 'TBD' }} – 
-              {{ $session->end_time ? $session->end_time->format('h:i A') : 'TBD' }}
+              @if($session->start_time)
+                <time class="local-time" datetime="{{ $session->start_time->toIso8601String() }}">{{ $session->start_time->format('h:i A') }}</time>
+              @else
+                TBD
+              @endif
+               – 
+              @if($session->end_time)
+                <time class="local-time" datetime="{{ $session->end_time->toIso8601String() }}">{{ $session->end_time->format('h:i A') }}</time>
+              @else
+                TBD
+              @endif
             </li>
             <li class="text-secondary black-text-18 fw-medium">
               <i class="fas fa-calendar me-2 text-primary"></i>
               <strong class="black-text-18 fw-medium">Date:</strong> 
-              {{ $session->start_time ? $session->start_time->format('F d, Y') : 'TBD' }}
+              @if($session->start_time)
+                <time class="local-date-full" datetime="{{ $session->start_time->toIso8601String() }}">{{ $session->start_time->format('F d, Y') }}</time>
+              @else
+                TBD
+              @endif
             </li>
 
             <li class="text-secondary black-text-18 fw-medium">

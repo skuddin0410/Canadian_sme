@@ -16,12 +16,20 @@
                             <div class="d-flex align-items-center gap-4 date-col">
                                 <div class="pe-4 pe-xxl-5 border-sm-end">
                                     <span class="blue-text-18 mb-2">
-                                        {{ !empty($schedule->start_time) ? $schedule->start_time?->format('M d, Y') : '-' }}
+                                        @if(!empty($schedule->start_time))
+                                            <time class="local-date" datetime="{{ $schedule->start_time->toIso8601String() }}">{{ $schedule->start_time->format('M d, Y') }}</time>
+                                        @else
+                                            -
+                                        @endif
                                     </span>
                                     <span class="small-heading-black fw-semibold">
-                                        {{ !empty($schedule->start_time) ? $schedule->start_time?->format('h:i A'): '' }}
+                                        @if(!empty($schedule->start_time))
+                                            <time class="local-time" datetime="{{ $schedule->start_time->toIso8601String() }}">{{ $schedule->start_time->format('h:i A') }}</time>
+                                        @endif
                                         - 
-                                        {{ !empty($schedule->start_time) ? $schedule->end_time?->format('h:i A') : '' }}
+                                        @if(!empty($schedule->end_time))
+                                            <time class="local-time" datetime="{{ $schedule->end_time->toIso8601String() }}">{{ $schedule->end_time->format('h:i A') }}</time>
+                                        @endif
                                     </span>
                                 </div>
                             </div>

@@ -75,8 +75,8 @@
                                 <div>
                                     <span class="blue-text-18">Time</span>
                                     <span class="small-heading-black fw-semibold">
-                                        {{ $schedule->start_time?->format('h:i A') }} -
-                                        {{ $schedule->end_time?->format('h:i A') }}
+                                        <time class="local-time" datetime="{{ $schedule->start_time?->toIso8601String() }}">{{ $schedule->start_time?->format('h:i A') }}</time> -
+                                        <time class="local-time" datetime="{{ $schedule->end_time?->toIso8601String() }}">{{ $schedule->end_time?->format('h:i A') }}</time>
                                     </span>
                                 </div>
 
