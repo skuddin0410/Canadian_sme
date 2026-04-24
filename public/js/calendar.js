@@ -760,6 +760,15 @@ class LaravelEventCalendar {
 
             const sessionData = Object.fromEntries(formData.entries());
 
+            // Attach browser timezone offset so server knows the exact moment
+            // e.g. '2026-04-24T16:00' becomes '2026-04-24T16:00:00+05:30'
+            if (sessionData.start_time) {
+                sessionData.start_time = moment(sessionData.start_time).format();
+            }
+            if (sessionData.end_time) {
+                sessionData.end_time = moment(sessionData.end_time).format();
+            }
+
             // Validate required fields
             if (!sessionData.title || !sessionData.start_time || !sessionData.end_time) {
                 this.showAlert('Please fill in all required fields', 'danger');
@@ -830,8 +839,8 @@ class LaravelEventCalendar {
     async updateSessionTime(event, newStart, newEnd) {
         try {
             const sessionData = {
-                start_time: moment(newStart).format('YYYY-MM-DD HH:mm:ss'),
-                end_time: moment(newEnd).format('YYYY-MM-DD HH:mm:ss')
+                start_time: moment(newStart).format(),
+                end_time: moment(newEnd).format()
             };
 
             const url = this.config.apiUrls.updateSession.replace(':id', event.id);

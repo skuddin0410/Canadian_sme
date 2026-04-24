@@ -46,6 +46,39 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <!-- add js file -->
     <script src="{{asset('frontend/js/script.js')}}"></script>
+
+    {{-- Global time localizer: converts server-rendered Toronto times to the visitor's local timezone --}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Convert time elements (h:mm AM/PM)
+        document.querySelectorAll('time.local-time').forEach(function(el) {
+            var iso = el.getAttribute('datetime');
+            if (!iso) return;
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return;
+            el.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        });
+
+        // Convert short date elements (Mon DD, YYYY)
+        document.querySelectorAll('time.local-date').forEach(function(el) {
+            var iso = el.getAttribute('datetime');
+            if (!iso) return;
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return;
+            el.textContent = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+        });
+
+        // Convert full date elements (Month DD, YYYY)
+        document.querySelectorAll('time.local-date-full').forEach(function(el) {
+            var iso = el.getAttribute('datetime');
+            if (!iso) return;
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return;
+            el.textContent = d.toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
+        });
+    });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

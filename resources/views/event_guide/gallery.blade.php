@@ -21,6 +21,15 @@
   .nav-pills-filetype .nav-link { background: #f0f0f5; color: #697a8d; font-weight: 500; border-radius: 8px; padding: 0.6rem 1.2rem; margin-right: 0.5rem; transition: all .2s ease; }
   .nav-pills-filetype .nav-link.active { background: #696cff; color: #fff; box-shadow: 0 4px 12px rgba(105,108,255,.3); }
   .nav-pills-filetype .nav-link:hover:not(.active) { background: #e2e2ea; }
+
+  /* New Preview Styles */
+  .preview-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+  .preview-card { width: 100px; position: relative; border: 1px solid #ddd; border-radius: 8px; padding: 5px; background: #fff; }
+  .preview-card img, .preview-card .file-icon { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: #f8f9fa; }
+  .preview-card .remove-btn { position: absolute; top: -5px; right: -5px; background: #ff3e1d; color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  .preview-card .file-name { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px; text-align: center; }
+  .preview-card .file-size { font-size: 9px; color: #888; text-align: center; }
+  #size-meter { font-size: 0.85rem; padding: 5px 10px; border-radius: 20px; background: #e7e7ff; color: #696cff; display: inline-block; }
 </style>
 
 @php
@@ -91,12 +100,27 @@
                     </button>
                 </div>
             </div>
-            <div class="form-text mt-2">
-              Supported: JPG, PNG, GIF, PDF, Video. Max 10MB each. 
-              @if(!isSuperAdmin())
-                <span class="text-warning fw-bold">Note: Uploads require approval before appearing in the public gallery.</span>
-              @endif
+
+            <div id="preview-container" class="preview-grid d-none"></div>
+
+            <div class="d-flex align-items-center justify-content-between flex-wrap mt-3 pt-2 border-top">
+              <div class="form-text">
+                <i class="bi bi-info-circle me-1"></i> 
+                <strong>Limits:</strong> 
+                <span class="badge bg-label-info ms-1">Images: 10MB</span>
+                <span class="badge bg-label-danger ms-1">PDFs: 10MB</span>
+                <span class="badge bg-label-warning ms-1">Videos: 10MB</span>
+              </div>
+              <div id="size-summary" class="d-none">
+                <span id="size-meter">Total Selection: 0 MB</span>
+              </div>
             </div>
+
+            @if(!isSuperAdmin())
+              <div class="form-text mt-2 text-warning fw-bold text-center">
+                Note: Uploads require approval before appearing in the public gallery.
+              </div>
+            @endif
           </form>
         </div>
       </div>
@@ -316,40 +340,108 @@
     document.getElementById('previewImage')?.setAttribute('src', src);
   });
 
-  // Upload confirmation
+  // Interactive Upload Preview System
+  let selectedFiles = [];
+  const fileInput = document.getElementById('images');
+  const previewContainer = document.getElementById('preview-container');
+  const sizeSummary = document.getElementById('size-summary');
+  const sizeMeter = document.getElementById('size-meter');
+
+  fileInput?.addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    
+    files.forEach(file => {
+      // Basic client-side check
+      if (file.size > 10 * 1024 * 1024) {
+        Swal.fire({ icon: 'error', title: 'File too large', text: `${file.name} exceeds the 10MB limit.` });
+        return;
+      }
+      // Avoid duplicates
+      if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        selectedFiles.push(file);
+      }
+    });
+
+    updateFileDisplay();
+  });
+
+  function updateFileDisplay() {
+    previewContainer.innerHTML = '';
+    let totalSize = 0;
+
+    if (selectedFiles.length > 0) {
+      previewContainer.classList.remove('d-none');
+      sizeSummary.classList.remove('d-none');
+    } else {
+      previewContainer.classList.add('d-none');
+      sizeSummary.classList.add('d-none');
+    }
+
+    selectedFiles.forEach((file, index) => {
+      totalSize += file.size;
+      const card = document.createElement('div');
+      card.className = 'preview-card';
+      
+      let previewHtml = '';
+      if (file.type.startsWith('image/')) {
+        previewHtml = `<img src="${URL.createObjectURL(file)}">`;
+      } else if (file.type === 'application/pdf') {
+        previewHtml = `<div class="file-icon"><i class="bi bi-file-earmark-pdf text-danger"></i></div>`;
+      } else if (file.type.startsWith('video/')) {
+        previewHtml = `<div class="file-icon"><i class="bi bi-play-circle text-primary"></i></div>`;
+      } else {
+        previewHtml = `<div class="file-icon"><i class="bi bi-file-earmark"></i></div>`;
+      }
+
+      card.innerHTML = `
+        <button type="button" class="remove-btn" onclick="removeSelectedFile(${index})">&times;</button>
+        ${previewHtml}
+        <div class="file-name" title="${file.name}">${file.name}</div>
+        <div class="file-size">${(file.size / (1024 * 1024)).toFixed(2)} MB</div>
+      `;
+      previewContainer.appendChild(card);
+    });
+
+    sizeMeter.textContent = `Total Selection: ${(totalSize / (1024 * 1024)).toFixed(2)} MB`;
+    
+    // Crucial: Update the actual input file list so the form submits correctly
+    syncFileInput();
+  }
+
+  window.removeSelectedFile = function(index) {
+    selectedFiles.splice(index, 1);
+    updateFileDisplay();
+  };
+
+  function syncFileInput() {
+    const dataTransfer = new DataTransfer();
+    selectedFiles.forEach(file => dataTransfer.items.add(file));
+    fileInput.files = dataTransfer.files;
+  }
+
+  // Upload confirmation updated to use local selectedFiles
   document.getElementById('uploadForm')?.addEventListener('submit', function(e) {
-    if (this.dataset.confirmed) return; // Allow submission if marked as confirmed
+    if (this.dataset.confirmed) return; 
     
     e.preventDefault();
-    
     const form = this;
     const eventDropdown = document.getElementById('event_id');
-    const eventName = eventDropdown.options[eventDropdown.selectedIndex] ? eventDropdown.options[eventDropdown.selectedIndex].text : '';
-    const fileInput = document.getElementById('images');
-    const fileCount = fileInput.files.length;
+    const eventName = eventDropdown.options[eventDropdown.selectedIndex]?.text || '';
     const isSuperAdmin = {{ isSuperAdmin() ? 'true' : 'false' }};
 
     if (!eventDropdown.value) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Event Required',
-            text: 'Please select an event first!',
-        });
+        Swal.fire({ icon: 'error', title: 'Event Required', text: 'Please select an event first!' });
         return;
     }
 
-    if (fileCount === 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Files Required',
-            text: 'Please select at least one file to upload!',
-        });
+    if (selectedFiles.length === 0) {
+        Swal.fire({ icon: 'error', title: 'Files Required', text: 'Please select at least one file to upload!' });
         return;
     }
 
-    let message = `This will add ${fileCount} file(s) to <strong>${eventName}</strong>.`;
+    let message = `This will upload <strong>${selectedFiles.length} file(s)</strong> (${sizeMeter.textContent}) to <strong>${eventName}</strong>.`;
     if (!isSuperAdmin) {
-        message += '<br><small class="text-info mt-2 d-block">Note: After approval, they will appear in the gallery.</small>';
+        message += '<br><small class="text-info mt-2 d-block">Note: These will require approval before appearing.</small>';
     }
 
     Swal.fire({
@@ -368,10 +460,9 @@
         }
     });
   });
-
-  // Approve All confirmation
+  // Restore Approve All confirmation
   document.getElementById('approveAllForm')?.addEventListener('submit', function(e) {
-    if (this.dataset.confirmed) return; // Allow submission if marked as confirmed
+    if (this.dataset.confirmed) return; 
     
     e.preventDefault();
     const form = this;

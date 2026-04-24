@@ -235,7 +235,11 @@ class CalendarController extends Controller
             }
         }
 
-        $session = Session::create($request->except(['speaker_ids','exhibitor_ids','sponsor_ids']));
+        $data = $request->except(['speaker_ids','exhibitor_ids','sponsor_ids']);
+        $data['start_time'] = Carbon::parse($request->start_time)->setTimezone(config('app.timezone'));
+        $data['end_time'] = Carbon::parse($request->end_time)->setTimezone(config('app.timezone'));
+
+        $session = Session::create($data);
         $session->slug = createUniqueSlug('event_sessions', $session->title,'slug', $session->id);
         $session->save();
        
@@ -347,7 +351,15 @@ class CalendarController extends Controller
             }
         }
         
-        $session->update($request->all());
+        $updateData = $request->all();
+        if ($request->has('start_time')) {
+            $updateData['start_time'] = Carbon::parse($request->start_time)->setTimezone(config('app.timezone'));
+        }
+        if ($request->has('end_time')) {
+            $updateData['end_time'] = Carbon::parse($request->end_time)->setTimezone(config('app.timezone'));
+        }
+
+        $session->update($updateData);
 
         if($request->session_image){
           $this->imageBase64Upload($request->session_image,'event_sessions',$session->id,'event_sessions','photo',$session->id); 

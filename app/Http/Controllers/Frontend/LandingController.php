@@ -179,6 +179,9 @@ class LandingController extends Controller
         if ($user && $user->hasRole('Admin')) {
             $eventQuery->select('*')->selectRaw('1 as is_registered');
         } else {
+            // Only allow published events for non-admins
+            $eventQuery->where('status', 'published');
+            
             $eventQuery->withExists([
                 'entityLinks as is_registered' => function ($q) use ($userId) {
                     $q->where('entity_type', 'users')
@@ -920,6 +923,10 @@ class LandingController extends Controller
             // optional: only active/visible events
             // ->where('status', 1)
             // ->where('visibility', 'public')
+            // only show published events to regular users/attendees
+            ->when(!auth()->user() || !auth()->user()->hasRole('Admin'), function ($query) {
+                $query->where('status', 'published');
+            })
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($qq) use ($q) {
                     $qq->where('title', 'like', "%{$q}%")
