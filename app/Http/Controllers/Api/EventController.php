@@ -109,7 +109,7 @@ class EventController extends Controller
                     'id'          => $item->id,
                     'file_name'   => $item->file_name,
                     'file_type'   => $item->file_type,
-                    'file_url'    => asset('storage/' . $item->file_path),
+                    'file_url'    => $item->file_path,
                     'uploaded_by' => optional($item->user)->name,
                     'uploaded_at' => $item->created_at->toDateTimeString(),
                 ];
@@ -144,7 +144,7 @@ class EventController extends Controller
                 'id'          => $item->id,
                 'file_name'   => $item->file_name,
                 'file_type'   => $item->file_type,
-                'file_url'    => asset('storage/' . $item->file_path),
+                'file_url'    => $item->file_path,
                 'uploaded_by' => optional($item->user)->name,
                 'uploaded_at' => $item->created_at->toDateTimeString(),
             ];
