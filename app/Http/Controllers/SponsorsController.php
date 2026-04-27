@@ -37,6 +37,7 @@ public function index(Request $request)
     
     $query = Company::with('user')
         ->where('is_sponsor', true)
+        ->orderBy('order_by', 'ASC')
         ->orderBy('created_at', 'DESC');
 
    
@@ -138,6 +139,7 @@ public function index(Request $request)
             'facebook'      => 'nullable|url',
             'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'banner'     => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'order_by'   => 'nullable|integer|min:0',
             'event_id' => 'required|array',
             'event_id.*' => 'exists:events,id'
         ]);
@@ -161,6 +163,7 @@ public function index(Request $request)
                 'facebook'    => $request->facebook,
                 'instagram'    => $request->instagram,
                 'type'    => $request->type,
+                'order_by'    => $request->order_by ?? 0,
 
             ]);
 
@@ -260,6 +263,7 @@ public function index(Request $request)
         'facebook'            => 'nullable|url',
         'logo'                => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
         'banner'              => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
+        'order_by'            => 'nullable|integer|min:0',
         'sponsor_id'=>'required',
         'event_id' => 'required|array',
         'event_id.*' => 'exists:events,id'
@@ -286,7 +290,8 @@ public function index(Request $request)
                 'twitter'     => $request->twitter,
                 'facebook'    => $request->facebook,
                 'instagram'    => $request->instagram,
-                'type'    => $request->type
+                'type'    => $request->type,
+                'order_by'    => $request->order_by ?? 0,
             ]);
 
             // Sync events

@@ -19,8 +19,19 @@ class AnalyticsController extends Controller
 
     public function session(Request $request)
     {
-        $events = Event::select('id', 'title')->orderBy('title')->get();
-        $tracks = Session::select('track')->distinct()->whereNotNull('track')->where('track', '!=', '')->pluck('track');
+        $events = isSuperAdmin()
+            ? Event::select('id', 'title')->orderBy('title')->get()
+            : Event::select('id', 'title')->whereIn('id', getEventIds())->orderBy('title')->get();
+            
+        $tracks = Session::select('track')
+            ->distinct()
+            ->whereNotNull('track')
+            ->where('track', '!=', '')
+            ->when(!isSuperAdmin(), function($q) {
+                $q->whereIn('event_id', getEventIds());
+            })
+            ->pluck('track');
+            
         return view('admin.analytics.session', compact('events', 'tracks'));
     }
 
@@ -31,7 +42,17 @@ class AnalyticsController extends Controller
     {
         // 1. Fetch Sessions with Filters
         $sessionQuery = Session::query();
-        if ($request->filled('event_id')) $sessionQuery->where('event_id', $request->event_id);
+        
+        if ($request->filled('event_id')) {
+            $eventId = $request->event_id;
+            if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+            $sessionQuery->where('event_id', $eventId);
+        } elseif (!isSuperAdmin()) {
+            $sessionQuery->whereIn('event_id', getEventIds());
+        }
+
         if ($request->filled('track')) $sessionQuery->where('track', $request->track);
         
         $sessions = $sessionQuery->orderBy('title')->get();

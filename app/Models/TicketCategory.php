@@ -15,12 +15,17 @@ class TicketCategory extends Model
 
 
     protected $fillable = [
-        'name', 'slug', 'description', 'color', 'sort_order', 'is_active'
+        'name', 'slug', 'description', 'color', 'sort_order', 'is_active', 'created_by'
     ];
 
     protected $casts = [
         'is_active' => 'boolean'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     // Relationships
     public function ticketTypes()

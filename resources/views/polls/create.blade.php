@@ -124,7 +124,7 @@
                         {{-- Event --}}
                         <div class="mb-3">
                             <label class="form-label">Event <span class="text-danger">*</span></label>
-                            <select name="event_id" class="form-select" required>
+                            <select name="event_id" id="event_id" class="form-select" required>
                                 <option value="">Select Event</option>
                                 @foreach($events as $event)
                                 <option value="{{ $event->id }}"
@@ -141,10 +141,11 @@
                         --}}
                         <div class="mb-3">
                             <label class="form-label">Session <span class="text-muted">(optional)</span></label>
-                            <select name="event_session_id" class="form-select">
+                            <select name="event_session_id" id="event_session_id" class="form-select">
                                 <option value="">Select Session</option>
                                 @foreach($sessions ?? [] as $session)
                                 <option value="{{ $session->id }}"
+                                    data-event-id="{{ $session->event_id }}"
                                     {{ (isset($poll) && $poll->event_session_id == $session->id) || old('event_session_id') == $session->id ? 'selected' : '' }}>
                                     {{ $session->title }}
                                 </option>
@@ -166,7 +167,7 @@
                         {{-- Dates --}}
                         <div class="row">
                             <div class="col-md-6 mb-3 mb-md-0">
-                                <label class="form-label">Start Date</label>
+                                <label class="form-label">Start Date <small class="text-muted">(Leave blank to start immediately)</small></label>
                                 <input type="datetime-local"
                                     name="start_date"
                                     class="form-control"
@@ -174,7 +175,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">End Date</label>
+                                <label class="form-label">End Date <small class="text-muted">(Leave blank to never expire)</small></label>
                                 <input type="datetime-local"
                                     name="end_date"
                                     class="form-control"
@@ -506,8 +507,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ---------- Initial Load ----------
 
-    refreshNumbers();
+    // ---------- Event-Session Dynamic Filter ----------
+    const eventSelect = document.getElementById('event_id');
+    const sessionSelect = document.getElementById('event_session_id');
+    const allSessionOptions = Array.from(sessionSelect.querySelectorAll('option')).filter(opt => opt.value !== '');
 
+    function filterSessions() {
+        const selectedEventId = eventSelect.value;
+        
+        // Reset session selection if it doesn't match the new event
+        const currentSession = sessionSelect.selectedOptions[0];
+        if (currentSession && currentSession.value !== '' && currentSession.dataset.eventId !== selectedEventId) {
+            sessionSelect.value = '';
+        }
+
+        // Show/hide options
+        allSessionOptions.forEach(opt => {
+            if (!selectedEventId || opt.dataset.eventId === selectedEventId) {
+                opt.style.display = 'block';
+            } else {
+                opt.style.display = 'none';
+            }
+        });
+    }
+
+    if (eventSelect && sessionSelect) {
+        eventSelect.addEventListener('change', filterSessions);
+        // Initial filter on page load (useful for old() values or edit mode)
+        filterSessions();
+    }
+
+    refreshNumbers();
 });
 </script>
 @endsection

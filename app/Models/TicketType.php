@@ -18,7 +18,7 @@ class TicketType extends Model
         'base_price', 'total_quantity', 'available_quantity',
         'min_quantity_per_order', 'max_quantity_per_order',
         'is_active', 'requires_approval', 'access_permissions',
-        'sale_start_date', 'sale_end_date', 'sort_order'
+        'sale_start_date', 'sale_end_date', 'sort_order', 'created_by'
     ];
 
     protected $casts = [
@@ -34,6 +34,11 @@ class TicketType extends Model
     public function event()
     {
         return $this->belongsTo(Event::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function category()

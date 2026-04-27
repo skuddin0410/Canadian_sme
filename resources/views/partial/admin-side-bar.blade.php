@@ -187,7 +187,7 @@
 
         <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active open' : '' }} {{ request()->is('admin/usergroup*') ? 'active open' : '' }} {{ request()->is('admin/newbadges*') ? 'active open' : '' }} {{ request()->is('admin/admin-users*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class=" menu-link menu-toggle">
-                <i class="menu-icon  fa fa-list"></i>
+                <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
                 <div data-i18n="tickets">People</div>
             </a>
             <ul class="menu-sub">
@@ -298,11 +298,10 @@
     </li>
 
 
-    @if(isSuperAdmin())
     <li class="menu-item {{ request()->is('admin/tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-purchases*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class=" menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
-            <div data-i18n="tickets">Tickets Managment</div>
+            <div data-i18n="tickets">Tickets Management</div>
         </a>
         <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }}">
@@ -320,12 +319,9 @@
                     <div data-i18n="ticket-purchases"> Ticket Purchases</div>
                 </a>
             </li>
-
         </ul>
     </li>
-    @endif
 
-    @if(isSuperAdmin())
     <li class="menu-item {{ request()->is('admin/analytics*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
@@ -342,15 +338,11 @@
                     <div data-i18n="Ticket Purchases">Ticket Purchases</div>
                 </a>
             </li>
-        </ul>
-        <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/analytics/speaker') ? 'active' : '' }}">
                 <a href="{{ route('admin.analytics.speaker') }}" class="menu-link">
                     <div data-i18n="Session">Speaker analytics</div>
                 </a>
             </li>
-        </ul>
-        <ul class="menu-sub">
             <li class="menu-item {{ request()->is('admin/analytics/email') ? 'active' : '' }}">
                 <a href="{{ route('admin.analytics.email') }}" class="menu-link">
                     <div data-i18n="Session">Email analytics</div>
@@ -359,6 +351,7 @@
         </ul>
     </li>
 
+    @if(isSuperAdmin())
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
@@ -406,16 +399,20 @@
             <div>Demo Requests</div>
         </a>
     </li>
+    @endif
+
     <li class="menu-item {{ request()->is('admin/event-support') ? 'active open' : '' }}">
         <a href="{{ route('event-support.index') }}" class="menu-link">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="event-support">Event Support</div>
         </a>
     </li>
+
+    
     <li class="menu-item {{ request()->routeIs('polls.index*') || request()->is('admin/poll-responses*') ? 'active open' : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons fa fa-list" style="font-size: 20px;"></i>
+            <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div>Polls</div>
         </a>
 
@@ -437,6 +434,7 @@
         </ul>
     </li>
 
+    @if(isSuperAdmin())
     <li class="menu-item {{ request()->routeIs('subscription.*') || request()->is('admin/pricing*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>

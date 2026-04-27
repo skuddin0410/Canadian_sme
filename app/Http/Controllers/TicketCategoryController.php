@@ -10,7 +10,11 @@ class TicketCategoryController extends Controller
 {
     public function index()
     {
-        $categories = TicketCategory::ordered()->paginate(15);
+        $query = TicketCategory::with('creator')->ordered();
+        if (!isSuperAdmin()) {
+            $query->where('created_by', auth()->id());
+        }
+        $categories = $query->paginate(15);
         return view('tickets.categories.index', compact('categories'));
     }
 
@@ -29,13 +33,22 @@ class TicketCategoryController extends Controller
             'is_active' => 'boolean'
         ]);
 
+        $slug = Str::slug($request->name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (TicketCategory::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+
         $category = TicketCategory::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => $slug,
             'description' => $request->description,
             'color' => $request->color,
             'sort_order' => $request->sort_order ?? 0,
-            'is_active' => $request->boolean('is_active', true)
+            'is_active' => $request->boolean('is_active', true),
+            'created_by' => auth()->id()
         ]);
 
         return redirect()->route('admin.ticket-categories.index')
@@ -50,11 +63,18 @@ class TicketCategoryController extends Controller
 
     public function edit(TicketCategory $ticketCategory)
     {
+        if (!isSuperAdmin() && $ticketCategory->created_by !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('tickets.categories.edit', compact('ticketCategory'));
     }
 
     public function update(Request $request, TicketCategory $ticketCategory)
     {
+        if (!isSuperAdmin() && $ticketCategory->created_by !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -63,9 +83,17 @@ class TicketCategoryController extends Controller
             'is_active' => 'boolean'
         ]);
 
+        $slug = Str::slug($request->name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (TicketCategory::where('slug', $slug)->where('id', '!=', $ticketCategory->id)->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+
         $ticketCategory->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => $slug,
             'description' => $request->description,
             'color' => $request->color,
             'sort_order' => $request->sort_order ?? 0,
@@ -78,6 +106,10 @@ class TicketCategoryController extends Controller
 
     public function destroy(TicketCategory $ticketCategory)
     {
+        if (!isSuperAdmin() && $ticketCategory->created_by !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if ($ticketCategory->ticketTypes()->count() > 0) {
             return redirect()->back()
                            ->with('error', 'Cannot delete category that has associated ticket types.');

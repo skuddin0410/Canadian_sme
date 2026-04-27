@@ -13,7 +13,13 @@ class TicketInventoryController extends Controller
         $query = TicketType::with(['event', 'category']);
         
         if ($request->filled('event_id')) {
-            $query->where('event_id', $request->event_id);
+            $eventId = $request->event_id;
+            if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+            $query->where('event_id', $eventId);
+        } elseif (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
         }
         
         if ($request->filled('status')) {
@@ -33,13 +39,18 @@ class TicketInventoryController extends Controller
         $ticketTypes = $query->orderBy('available_quantity', 'asc')->paginate(15);
         
         // Get inventory summary
-        $totalTickets = TicketType::sum('total_quantity');
-        $availableTickets = TicketType::sum('available_quantity');
+        $summaryQuery = TicketType::query();
+        if (!isSuperAdmin()) {
+            $summaryQuery->whereIn('event_id', getEventIds());
+        }
+
+        $totalTickets = (clone $summaryQuery)->sum('total_quantity');
+        $availableTickets = (clone $summaryQuery)->sum('available_quantity');
         $soldTickets = $totalTickets - $availableTickets;
-        $lowStockCount = TicketType::whereRaw('available_quantity <= (total_quantity * 0.1)')
+        $lowStockCount = (clone $summaryQuery)->whereRaw('available_quantity <= (total_quantity * 0.1)')
                                   ->where('available_quantity', '>', 0)
                                   ->count();
-        $soldOutCount = TicketType::where('available_quantity', 0)->count();
+        $soldOutCount = (clone $summaryQuery)->where('available_quantity', 0)->count();
         
         return view('tickets.inventory.index', compact(
             'ticketTypes', 'totalTickets', 'availableTickets', 
@@ -50,6 +61,12 @@ class TicketInventoryController extends Controller
     public function logs(Request $request)
     {
         $query = TicketInventoryLog::with(['ticketType.event', 'user']);
+
+        if (!isSuperAdmin()) {
+            $query->whereHas('ticketType', function($q) {
+                $q->whereIn('event_id', getEventIds());
+            });
+        }
         
         if ($request->filled('ticket_type_id')) {
             $query->where('ticket_type_id', $request->ticket_type_id);
@@ -60,7 +77,9 @@ class TicketInventoryController extends Controller
         }
         
         $logs = $query->orderBy('created_at', 'desc')->paginate(20);
-        $ticketTypes = TicketType::with('event')->get();
+        $ticketTypes = isSuperAdmin() 
+            ? TicketType::with('event')->get()
+            : TicketType::with('event')->whereIn('event_id', getEventIds())->get();
         
         return view('tickets.inventory.logs', compact('logs', 'ticketTypes'));
     }

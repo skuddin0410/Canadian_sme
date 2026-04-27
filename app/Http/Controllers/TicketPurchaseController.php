@@ -15,7 +15,13 @@ class TicketPurchaseController extends Controller
         $query = TicketPurchase::with(['user', 'ticketType', 'event']);
 
         if ($request->filled('event_id')) {
-            $query->where('event_id', $request->event_id);
+            $eventId = $request->event_id;
+            if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+            $query->where('event_id', $eventId);
+        } elseif (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
         }
 
         if ($request->filled('ticket_type_id')) {
@@ -46,8 +52,12 @@ class TicketPurchaseController extends Controller
 
         $ticketPurchases = $query->latest()->paginate(20)->withQueryString();
 
-        $events = Event::orderBy('title')->get(['id', 'title']);
-        $ticketTypes = TicketType::orderBy('name')->get(['id', 'name']);
+        $events = isSuperAdmin() 
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::orderBy('title')->whereIn('id', getEventIds())->get(['id', 'title']);
+        $ticketTypes = isSuperAdmin()
+            ? TicketType::orderBy('name')->get(['id', 'name'])
+            : TicketType::orderBy('name')->whereIn('event_id', getEventIds())->get(['id', 'name']);
         $statuses = TicketPurchase::query()
             ->select('status')
             ->distinct()
@@ -63,7 +73,13 @@ class TicketPurchaseController extends Controller
             ->with(['event:id,title', 'ticketType:id,name', 'user:id,name,lastname,email']);
 
         if ($request->filled('event_id')) {
-            $baseQuery->where('event_id', $request->event_id);
+            $eventId = $request->event_id;
+            if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+            $baseQuery->where('ticket_purchases.event_id', $eventId);
+        } elseif (!isSuperAdmin()) {
+            $baseQuery->whereIn('ticket_purchases.event_id', getEventIds());
         }
 
         if ($request->filled('status')) {
@@ -138,7 +154,9 @@ class TicketPurchaseController extends Controller
             ];
         })->values();
 
-        $events = Event::orderBy('title')->get(['id', 'title']);
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::orderBy('title')->whereIn('id', getEventIds())->get(['id', 'title']);
         $statuses = TicketPurchase::query()
             ->select('status')
             ->distinct()

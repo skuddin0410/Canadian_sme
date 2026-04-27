@@ -60,6 +60,9 @@
                                     <th>Inventory</th>
                                     <th>Sale Period</th>
                                     <th>Status</th>
+                                    @if(isSuperAdmin())
+                                    <th>Created By</th>
+                                    @endif
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -109,13 +112,18 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge badge-{{ $ticketType->is_active ? 'success' : 'secondary' }}">
+                                            <span class="badge bg-label-{{ $ticketType->is_active ? 'success' : 'secondary' }}">
                                                 {{ $ticketType->is_active ? 'Active' : 'Inactive' }}
                                             </span>
                                             @if($ticketType->available_quantity == 0)
                                                 <span class="badge badge-danger">Sold Out</span>
                                             @endif
                                         </td>
+                                        @if(isSuperAdmin())
+                                        <td>
+                                            {{ $ticketType->creator->name ?? 'System' }}
+                                        </td>
+                                        @endif
                                         <td>
                                             <div class="btn-group btn-group-sm">
                                                 <a href="{{ route('admin.ticket-types.show', $ticketType) }}" class="btn btn-sm btn-icon btn-primary" title="Show">
@@ -132,7 +140,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
+                                        <td colspan="{{ isSuperAdmin() ? 9 : 8 }}" class="text-center text-muted py-4">
                                             No ticket types found.
                                         </td>
                                     </tr>

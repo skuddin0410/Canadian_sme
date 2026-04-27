@@ -98,6 +98,10 @@
                         <div class="card-body">
                             <div class="chart-wrap">
                                 <canvas id="ticketPurchaseStatusChart"></canvas>
+                                <div id="ticketPurchaseStatusChartNoData" class="no-data-placeholder" style="display: none;">
+                                    <i class="bx bx-pie-chart-alt-2 fs-1 mb-2"></i>
+                                    <p class="mb-0">No status data available</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,6 +115,10 @@
                         <div class="card-body">
                             <div class="chart-wrap">
                                 <canvas id="ticketTypeChart"></canvas>
+                                <div id="ticketTypeChartNoData" class="no-data-placeholder" style="display: none;">
+                                    <i class="bx bx-bar-chart-alt-2 fs-1 mb-2"></i>
+                                    <p class="mb-0">No ticket type data available</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -124,6 +132,10 @@
                         <div class="card-body">
                             <div class="chart-wrap">
                                 <canvas id="ticketEventChart"></canvas>
+                                <div id="ticketEventChartNoData" class="no-data-placeholder" style="display: none;">
+                                    <i class="bx bx-calendar-event fs-1 mb-2"></i>
+                                    <p class="mb-0">No event data available</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -300,6 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (statusData.length) {
         new Chart(document.getElementById('ticketPurchaseStatusChart'), {
+            // ... chart config ...
             type: 'doughnut',
             data: {
                 labels: statusData.map(item => item.label),
@@ -318,6 +331,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+    } else {
+        document.getElementById('ticketPurchaseStatusChart').style.display = 'none';
+        document.getElementById('ticketPurchaseStatusChartNoData').style.display = 'flex';
     }
 
     if (ticketTypeData.length) {
@@ -343,6 +359,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+    } else {
+        document.getElementById('ticketTypeChart').style.display = 'none';
+        document.getElementById('ticketTypeChartNoData').style.display = 'flex';
     }
 
     if (eventData.length) {
@@ -368,6 +387,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+    } else {
+        document.getElementById('ticketEventChart').style.display = 'none';
+        document.getElementById('ticketEventChartNoData').style.display = 'flex';
     }
 });
 </script>
@@ -375,6 +397,23 @@ document.addEventListener('DOMContentLoaded', function () {
 .chart-wrap {
     position: relative;
     min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+.no-data-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #a1acb8;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px dashed #d9dee3;
 }
 </style>
 @endsection

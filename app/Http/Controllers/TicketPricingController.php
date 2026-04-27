@@ -13,6 +13,12 @@ class TicketPricingController extends Controller
     {
         $query = TicketPricingRule::with('ticketType.event');
         
+        if (!isSuperAdmin()) {
+            $query->whereHas('ticketType', function($q) {
+                $q->whereIn('event_id', getEventIds());
+            });
+        }
+        
         if ($request->filled('ticket_type_id')) {
             $query->where('ticket_type_id', $request->ticket_type_id);
         }
@@ -22,15 +28,21 @@ class TicketPricingController extends Controller
         }
         
         $pricingRules = $query->orderBy('created_at', 'desc')->paginate(15);
-        $ticketTypes = TicketType::active()->with('event')->get();
+        $ticketTypes = isSuperAdmin()
+            ? TicketType::active()->with('event')->get()
+            : TicketType::active()->with('event')->whereIn('event_id', getEventIds())->get();
         
         return view('tickets.pricing.index', compact('pricingRules', 'ticketTypes'));
     }
 
     public function create()
     {
-        $ticketTypes = TicketType::active()->with('event')->get();
-        $events = Event::where('end_date', '>=', now())->where('visibility','public')->get();
+        $ticketTypes = isSuperAdmin()
+            ? TicketType::active()->with('event')->get()
+            : TicketType::active()->with('event')->whereIn('event_id', getEventIds())->get();
+        $events = isSuperAdmin()
+            ? Event::where('end_date', '>=', now())->where('visibility','public')->get()
+            : Event::where('end_date', '>=', now())->where('visibility','public')->whereIn('id', getEventIds())->get();
         return view('tickets.pricing.create', compact('ticketTypes','events'));
     }
 
@@ -52,6 +64,11 @@ class TicketPricingController extends Controller
             'is_active' => 'boolean'
         ]);
 
+        $ticketType = TicketType::findOrFail($request->ticket_type_id);
+        if (!isSuperAdmin() && !in_array($ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         TicketPricingRule::create($request->all());
 
         return redirect()->route('admin.ticket-pricing.index')
@@ -66,12 +83,22 @@ class TicketPricingController extends Controller
 
     public function edit(TicketPricingRule $ticketPricing)
     {
-        $ticketTypes = TicketType::active()->with('event')->get();
+        if (!isSuperAdmin() && !in_array($ticketPricing->ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $ticketTypes = isSuperAdmin()
+            ? TicketType::active()->with('event')->get()
+            : TicketType::active()->with('event')->whereIn('event_id', getEventIds())->get();
         return view('tickets.pricing.edit', compact('ticketPricing', 'ticketTypes'));
     }
 
     public function update(Request $request, TicketPricingRule $ticketPricing)
     {
+        if (!isSuperAdmin() && !in_array($ticketPricing->ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'name' => 'required|string|max:255',
@@ -88,6 +115,11 @@ class TicketPricingController extends Controller
             'is_active' => 'boolean'
         ]);
 
+        $ticketType = TicketType::findOrFail($request->ticket_type_id);
+        if (!isSuperAdmin() && !in_array($ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $ticketPricing->update($request->all());
 
         return redirect()->route('admin.ticket-pricing.index')
@@ -96,6 +128,10 @@ class TicketPricingController extends Controller
 
     public function destroy(TicketPricingRule $ticketPricing)
     {
+        if (!isSuperAdmin() && !in_array($ticketPricing->ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $ticketPricing->delete();
         
         return redirect()->route('admin.ticket-pricing.index')

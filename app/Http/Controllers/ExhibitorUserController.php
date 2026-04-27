@@ -40,7 +40,10 @@ public function index(Request $request)
     $pageNo = (int) $request->input('page', 1);
 
     
-    $query = Company::with(['contentIconFile','quickLinkIconFile','boothUsers.booth','user'])->where('is_sponsor',0)->orderBy("created_at", "DESC");
+    $query = Company::with(['contentIconFile','quickLinkIconFile','boothUsers.booth','user'])
+        ->where('is_sponsor',0)
+        ->orderBy("order_by", "ASC")
+        ->orderBy("created_at", "DESC");
 
     if ($request->filled("search")) {
         $search = "%" . $request->search . "%";
@@ -143,6 +146,7 @@ public function index(Request $request)
             'facebook'      => 'nullable|url',
             'content_icon'    => 'nullable|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'quick_link_icon' => 'nullable|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'order_by'        => 'nullable|integer|min:0',
             'event_id' => 'required|array',
             'event_id.*' => 'exists:events,id'
 
@@ -168,6 +172,7 @@ public function index(Request $request)
                 'facebook'    => $request->facebook,
                 'instagram'    => $request->instagram,
                 'booth'=> $request->booth,
+                'order_by'    => $request->order_by ?? 0,
                 'is_sponsor' => 0
                 
             ]);
@@ -271,6 +276,7 @@ public function show($exhibitor_user, Request $request){
             'facebook'            => 'nullable|url',
             'content_icon'        => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'quick_link_icon'     => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
+            'order_by'            => 'nullable|integer|min:0',
             'company_id'       => 'required|string',
             'event_id' => 'required|array',
             'event_id.*' => 'exists:events,id'
@@ -294,6 +300,7 @@ public function show($exhibitor_user, Request $request){
                     'instagram'    => $request->instagram,
                     'booth'       => $request->booth,
                     'industry'    => $request->industry,
+                    'order_by'    => $request->order_by ?? 0,
                     'is_sponsor' => 0
                 ]); 
 
@@ -445,7 +452,7 @@ public function deleteDoc($id)
     }
 
 
-   public function destroy($exhibitor_id)
+    public function destroy($exhibitor_id)
     {   
         $company = Company::findOrFail($exhibitor_id); 
         $company->delete();
@@ -453,5 +460,26 @@ public function deleteDoc($id)
         return back()->withErrors('Exhibitor deleted successfully.');
     }
 
+    public function getTeam($id)
+    {
+        $exhibitor = Company::findOrFail($id);
+        $team = User::whereRaw("FIND_IN_SET(?, access_exhibitor_ids)", [$id])
+            ->with('photo')
+            ->get();
 
+        return response()->json([
+            'success' => true,
+            'exhibitor_name' => $exhibitor->name,
+            'team' => $team->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->full_name,
+                    'email' => $user->email,
+                    'mobile' => $user->mobile,
+                    'designation' => $user->designation,
+                    'image' => $user->photo ? $user->photo->file_path : asset('images/default.png')
+                ];
+            })
+        ]);
+    }
 }

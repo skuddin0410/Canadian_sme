@@ -256,6 +256,8 @@ class LandingController extends Controller
         $speakers = Speaker::query()
             ->whereIn('id', $speakerIds)   // ONLY these IDs
             ->with(['photo'])
+            ->orderBy('order_by', 'ASC')
+            ->orderBy('id', 'DESC')
             ->take(10)
             ->get();
 
@@ -266,6 +268,8 @@ class LandingController extends Controller
         $exhibitors = Company::query()
             ->where('is_sponsor', 0)
             ->whereIn('id', $exhibitorIds)   // ONLY these IDs
+            ->orderBy('order_by', 'ASC')
+            ->orderBy('id', 'DESC')
             ->take(6)
             ->get();
 
@@ -276,6 +280,8 @@ class LandingController extends Controller
         $sponsors = Company::with(['category'])
             ->where('is_sponsor', 1)
             ->whereIn('id', $sponsorIds)   // ONLY these IDs
+            ->orderBy('order_by', 'ASC')
+            ->orderBy('id', 'DESC')
             ->take(6)
             ->get();
 
@@ -444,8 +450,7 @@ class LandingController extends Controller
             })
             ->pluck('entity_id');
         $query->whereIn('id', $ids);
-
-        $exhibitors = $query->paginate(10);
+        $exhibitors = $query->orderBy('order_by', 'ASC')->orderBy('id', 'DESC')->paginate(10);
         return view('frontend.page.exhibitor', compact('event', 'exhibitors'));
     }
 
@@ -463,8 +468,7 @@ class LandingController extends Controller
             })
             ->pluck('entity_id');
         $query->whereIn('id', $ids);
-
-        $sponsors = $query->orderby('id', 'DESC')->paginate(10);
+        $sponsors = $query->orderBy('order_by', 'ASC')->orderBy('id', 'DESC')->paginate(10);
         return view('frontend.page.sponsor', compact('event', 'sponsors'));
     }
 
@@ -793,7 +797,7 @@ class LandingController extends Controller
     {
         $event = Event::where('slug', $slug)->firstOrFail();
 
-        $query = Speaker::orderBy('created_at', 'DESC');
+        $query = Speaker::orderBy('order_by', 'ASC')->orderBy('created_at', 'DESC');
 
         $ids = DB::table('event_and_entity_link')
             ->where('event_id', $event->id)

@@ -14,7 +14,7 @@ class TicketTypeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = TicketType::with(['event', 'category']);
+        $query = TicketType::with(['event', 'category', 'creator']);
         
         if ($request->filled('event_id')) {
             $eventId = $request->event_id;
@@ -49,7 +49,9 @@ class TicketTypeController extends Controller
     //    $events = Event::whereIn('status',['draft', 'published'])
     //     ->with('sessions')
     //     ->get(); 
-        $categories = TicketCategory::active()->ordered()->get();
+        $categories = isSuperAdmin() 
+            ? TicketCategory::active()->ordered()->get()
+            : TicketCategory::active()->where('created_by', auth()->id())->ordered()->get();
         
         return view('tickets.types.create', compact('events', 'categories'));
     }
@@ -108,7 +110,8 @@ class TicketTypeController extends Controller
         'sale_end_date' => $request->sale_end_date,
         'requires_approval' => $request->boolean('requires_approval'),
         'is_active' => $request->boolean('is_active', true),
-        'access_permissions' => $request->access_permissions ?? []
+        'access_permissions' => $request->access_permissions ?? [],
+        'created_by' => auth()->id()
     ]);
 
     return redirect()->route('admin.ticket-types.index')
@@ -124,16 +127,26 @@ class TicketTypeController extends Controller
 
     public function edit(TicketType $ticketType)
     {
+        if (!isSuperAdmin() && $ticketType->created_by !== auth()->id() && !in_array($ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $events = isSuperAdmin()
             ? Event::whereIn('status', ['draft', 'published'])->get()
             : Event::whereIn('status', ['draft', 'published'])->whereIn('id', getEventIds())->get();
-        $categories = TicketCategory::active()->ordered()->get();
+        $categories = isSuperAdmin()
+            ? TicketCategory::active()->ordered()->get()
+            : TicketCategory::active()->where('created_by', auth()->id())->ordered()->get();
         
         return view('tickets.types.edit', compact('ticketType', 'events', 'categories'));
     }
 
     public function update(Request $request, TicketType $ticketType)
     {
+        if (!isSuperAdmin() && $ticketType->created_by !== auth()->id() && !in_array($ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'category_id' => 'nullable|exists:ticket_categories,id',
@@ -183,6 +196,10 @@ class TicketTypeController extends Controller
 
     public function destroy(TicketType $ticketType)
     {
+        if (!isSuperAdmin() && $ticketType->created_by !== auth()->id() && !in_array($ticketType->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if ($ticketType->eventTickets()->count() > 0) {
             return redirect()->back()
                            ->with('error', 'Cannot delete ticket type that has associated tickets.');

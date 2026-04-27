@@ -284,6 +284,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('exhibitor-users', ExhibitorUserController::class)->parameters([
     'exhibitor-users' => 'exhibitor_user',
   ]);
+  Route::get('exhibitor-users/{id}/team', [ExhibitorUserController::class, 'getTeam'])->name('exhibitor-users.team');
   Route::get('/sponsors/{user}/qr/download', [SponsorsController::class, 'downloadQr'])->name('sponsors.qr.download');
   Route::resource('representative-users', RepresentativeUserController::class);
   Route::resource('attendee-users', AttendeeUserController::class);

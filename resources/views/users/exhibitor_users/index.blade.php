@@ -75,6 +75,47 @@
 		</div>
     </div>
 </div>
+
+<!-- Team Modal -->
+<div class="modal fade" id="teamModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Exhibitor Team: <span id="modalExhibitorName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Designation</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamTableBody">
+                            <!-- Team members will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="teamLoader" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="noTeamMessage" class="text-center d-none p-3">
+                    <p class="text-muted mb-0">No team members found for this exhibitor.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -104,6 +145,47 @@ function GetUserList() {
 
     $(document).ready(function() {
         GetUserList();
+
+        // Handle View Team Button Click
+        $(document).on('click', '.view-team-btn', function() {
+            const exhibitorId = $(this).data('id');
+            const exhibitorName = $(this).data('name');
+            
+            $('#modalExhibitorName').text(exhibitorName);
+            $('#teamTableBody').empty();
+            $('#teamLoader').removeClass('d-none');
+            $('#noTeamMessage').addClass('d-none');
+            $('#teamModal').modal('show');
+
+            $.ajax({
+                url: `/admin/exhibitor-users/${exhibitorId}/team`,
+                type: 'GET',
+                success: function(response) {
+                    $('#teamLoader').addClass('d-none');
+                    if (response.success && response.team.length > 0) {
+                        response.team.forEach(member => {
+                            $('#teamTableBody').append(`
+                                <tr>
+                                    <td>
+                                        <img src="${member.image}" alt="${member.name}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                                    </td>
+                                    <td class="fw-semibold">${member.name}</td>
+                                    <td>${member.designation || '-'}</td>
+                                    <td>${member.email || '-'}</td>
+                                    <td>${member.mobile || '-'}</td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        $('#noTeamMessage').removeClass('d-none');
+                    }
+                },
+                error: function() {
+                    $('#teamLoader').addClass('d-none');
+                    alert('Failed to fetch team members. Please try again.');
+                }
+            });
+        });
     });
 
     jQuery(function($) {

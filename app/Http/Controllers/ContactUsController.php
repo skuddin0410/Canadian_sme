@@ -23,6 +23,10 @@ class ContactUsController extends Controller
         $query = EventSupport::with('event')
             ->orderBy('id', 'DESC');
 
+        if (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
+        }
+
         if ($request->filled('search')) {
             $query->where('name', 'LIKE', '%' . $request->search . '%');
         }
@@ -78,6 +82,10 @@ class ContactUsController extends Controller
     public function update(Request $request, $id)
     {
         $support = Eventsupport::findOrFail($id);
+
+        if (!isSuperAdmin() && !in_array($support->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $request->validate([
             'status' => 'required|in:pending,inprogress,completed'
