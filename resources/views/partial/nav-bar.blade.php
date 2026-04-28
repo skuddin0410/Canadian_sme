@@ -55,6 +55,8 @@
 									<div class="avatar">
 										@if($notification->related_type == 'failed_login')
 										<span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-error"></i></span>
+										@elseif(str_contains($notification->related_type, 'gallery'))
+										<span class="avatar-initial rounded-circle bg-label-primary"><i class="bx bx-image"></i></span>
 										@else
 										<span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-bell"></i></span>
 										@endif

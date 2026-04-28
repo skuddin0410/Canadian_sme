@@ -14,17 +14,22 @@ class EmailTrackingController extends Controller
 
     public function index()
     {
-        $totalSent = MailLog::count();
+        $baseQuery = MailLog::query();
+        if (!isSuperAdmin()) {
+            $baseQuery->where('send_by', auth()->id());
+        }
 
-        $totalOpened = MailLog::where('opened', true)->count();
+        $totalSent = (clone $baseQuery)->count();
 
-        $totalClicks = MailLog::sum('click_count');
+        $totalOpened = (clone $baseQuery)->where('opened', true)->count();
+
+        $totalClicks = (clone $baseQuery)->sum('click_count');
 
         $openRate = $totalSent > 0 ? round(($totalOpened / $totalSent) * 100, 2) : 0;
 
         $clickRate = $totalSent > 0 ? round(($totalClicks / $totalSent) * 100, 2) : 0;
 
-        $emailLogs = MailLog::with('user')
+        $emailLogs = (clone $baseQuery)->with('user')
             ->latest()
             ->paginate(15);
 

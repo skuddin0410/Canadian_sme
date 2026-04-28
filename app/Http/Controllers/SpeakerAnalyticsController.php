@@ -29,7 +29,12 @@ class SpeakerAnalyticsController extends Controller
 
     // Apply event filter
     if ($eventId) {
+        if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+            $eventId = 0;
+        }
         $query->where('event_sessions.event_id', $eventId);
+    } elseif (!isSuperAdmin()) {
+        $query->whereIn('event_sessions.event_id', getEventIds());
     }
 
     $speakerAnalytics = $query
@@ -37,7 +42,9 @@ class SpeakerAnalyticsController extends Controller
         ->get();
 
     // fetch events for dropdown
-    $events = Event::orderBy('title')->get();
+    $events = isSuperAdmin()
+        ? Event::orderBy('title')->get()
+        : Event::orderBy('title')->whereIn('id', getEventIds())->get();
 
     return view('admin.analytics.speaker', compact('speakerAnalytics','events'));
 }

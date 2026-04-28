@@ -22,12 +22,11 @@ Route::get('/run/command', function () {
 });
 
 
-Route::get('/admin/login', function () {
-    return redirect()->route('login');
-});
+Route::get('/admin/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('admin.login.submit');
 
 Route::get('/admin', function () {
-    return redirect()->route('login');
+    return redirect()->route('admin.login');
 });
 
 Route::get('/generate-user-qrcodes', function () {
@@ -105,7 +104,7 @@ Route::prefix('user')->name('user.')->middleware(['webauth'])->group(function ()
     Route::put('/company-details', [App\Http\Controllers\UserHomeController::class, 'updateCompanyDetails'])->name('company.update');
     Route::post('/company-details/file-delete', [App\Http\Controllers\UserHomeController::class, 'deleteCompanyFile'])->name('company.file.delete');
 
-    Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events');
+    Route::get('/event/{slug}', [LandingController::class, 'eachEvent'])->name('front.events')->middleware('event.access');
 });
 
 Route::get('/login', function () {
@@ -123,6 +122,9 @@ Route::get('/login', function () {
 })->name('login');
 
 
+
+Route::post('/send-otp', [App\Http\Controllers\EventUserAuthController::class, 'sendOtp'])->name('send.otp');
+Route::post('/verify-otp', [App\Http\Controllers\EventUserAuthController::class, 'verifyOtp'])->name('verify.otp');
 
 Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
 

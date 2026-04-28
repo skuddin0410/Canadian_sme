@@ -214,7 +214,7 @@ Admin | Add Sponsors
               </div>
 
               {{-- Category --}}
-              <div class="col-12"> 
+              <div class="col-6"> 
                 <label for="type"  class="form-label">Select Category<span class="text-danger">*</span></label>             
                 <select id="type" name="type" class="form-select mb-3">
                     <option value="">Select Category</option>
@@ -224,6 +224,19 @@ Admin | Add Sponsors
                     </option>
                   @endforeach
                 </select>
+              </div>
+
+              {{-- Order By --}}
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Order <small class="text-muted">(Lower numbers show first)</small></label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="bx bx-sort"></i></span>
+                    <input type="number" name="order_by" class="form-control"
+                           value="{{ old('order_by', 0) }}" min="0">
+                  </div>
+                  @error('order_by') <div class="text-danger small">{{ $message }}</div> @enderror
+                </div>
               </div>
 
               {{-- Events --}}

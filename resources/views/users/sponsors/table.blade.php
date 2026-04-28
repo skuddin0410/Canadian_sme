@@ -35,6 +35,7 @@
       <th>Email</th>
       <th>Phone</th>
       <th>Type</th>
+      <th>Order</th>
       <th width="10%">Actions</th>
     </tr>
   </thead>
@@ -59,6 +60,7 @@
       <td>
         {{$company->type}}
      </td>
+      <td>{{ $company->order_by ?? 0 }}</td>
 
       <td>
         <div class="d-flex gap-2">

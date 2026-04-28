@@ -455,8 +455,64 @@
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            form.dataset.confirmed = "true";
-            form.submit();
+            // Show loading state
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Please wait while we process your files.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message
+                    }).then(() => {
+                        // Clear selected files and refresh page
+                        selectedFiles = [];
+                        updateFileDisplay();
+                        window.location.reload();
+                    });
+                } else {
+                    let errorMsg = 'Validation failed:<br>';
+                    if (data.errors) {
+                        errorMsg += '<ul class="text-start mt-2">';
+                        data.errors.forEach(err => {
+                            errorMsg += `<li>${err}</li>`;
+                        });
+                        errorMsg += '</ul>';
+                    } else {
+                        errorMsg = data.message || 'Something went wrong.';
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Upload Failed',
+                        html: errorMsg
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred.'
+                });
+            });
         }
     });
   });

@@ -44,6 +44,8 @@
 		<th>Email</th>
 		<th>Phone</th>
 		<th>Booth ID</th>
+		<th>Order</th>
+		<th>Team</th>
 		<th width="10%">Actions</th>
 	</tr>
 </thead>
@@ -72,6 +74,20 @@
 	<td>
      {{$user->booth?? ''}}
     </td>
+	<td>{{ $user->order_by ?? 0 }}</td>
+
+	<td>
+		@if($user->team_count > 0)
+			<button type="button" 
+					class="btn btn-sm btn-outline-info view-team-btn" 
+					data-id="{{ $user->id }}" 
+					data-name="{{ $user->name }}">
+				<i class="bx bx-group me-1"></i> View
+			</button>
+		@else
+			<span class="text-muted">-</span>
+		@endif
+	</td>
 
 
 

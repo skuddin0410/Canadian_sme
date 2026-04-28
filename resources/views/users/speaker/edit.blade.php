@@ -171,6 +171,17 @@ Admin | Edit Speaker
                         @error('designation') <div class="text-danger">{{ $message }}</div> @enderror
                       </div>
 
+                      {{-- Order By --}}
+                      <div class="col-md-6">
+                        <label class="form-label">Order <small class="text-muted">(Lower numbers show first)</small></label>
+                        <div class="input-group input-group-merge mb-3">
+                          <span class="input-group-text"><i class="bx bx-sort"></i></span>
+                          <input type="number" name="order_by" class="form-control"
+                                 value="{{ old('order_by', $user->order_by) }}" min="0">
+                        </div>
+                        @error('order_by') <div class="text-danger small">{{ $message }}</div> @enderror
+                      </div>
+
                       <div class="col-md-12">
                         <label class="form-label">Events <span class="text-danger">*</span></label>
                         <div class="mb-3">

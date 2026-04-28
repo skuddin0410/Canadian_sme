@@ -40,6 +40,7 @@
 		<th>Email</th>
 		<th>Mobile</th>
 		<th>Designation</th>
+		<th>Order</th>
 		<th width="28%">Action</th>
 	</tr>
 </thead>
@@ -50,6 +51,7 @@
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
 	   <th>{{$user->designation ?? ''}}</th>
+	   <th>{{$user->order_by ?? 0}}</th>
 		{{-- <th>{{dateFormat($user->created_at) ?? '' }}</th> --}}
 		<th>
     <div class="d-flex gap-1">

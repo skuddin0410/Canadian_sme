@@ -29,8 +29,8 @@ class Speaker extends Model
         'mobile',
         'bio',
         'gdpr_consent',
-        'slug'
-
+        'slug',
+        'order_by'
     ];
 
     public function photo()

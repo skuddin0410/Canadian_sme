@@ -17,20 +17,30 @@ class PollController extends Controller
 {
     public function index()
     {
+        $query = Poll::with(['event', 'eventSession']);
 
-        $totalPolls = Poll::count();
+        if (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
+        }
 
+        $totalPolls = (clone $query)->count();
 
-        $polls = Poll::with(['event', 'eventSession'])
-            ->latest()
+        $polls = $query->latest()
             ->paginate(10);
 
         return view('polls.index', compact('polls', 'totalPolls'));
     }
     public function create()
     {
-        $events = Event::all();
-        $sessions = Session::all();
+        $eventIds = isSuperAdmin() ? null : getEventIds();
+
+        $events = isSuperAdmin()
+            ? Event::all()
+            : Event::whereIn('id', $eventIds)->get();
+
+        $sessions = isSuperAdmin()
+            ? Session::all()
+            : Session::whereIn('event_id', $eventIds)->get();
 
         return view('polls.create', compact('events', 'sessions'));
     }
@@ -40,7 +50,7 @@ class PollController extends Controller
     {
         $validated = $request->validate([
             'event_id' => 'required|exists:events,id',
-            'event_session_id' => 'nullable|exists:sessions,id',
+            'event_session_id' => 'nullable|exists:event_sessions,id',
             'title' => 'required|string|max:255',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -111,18 +121,35 @@ class PollController extends Controller
     public function edit($id)
     {
         $poll = Poll::with('questions')->findOrFail($id);
-        $events = Event::all();
 
-        return view('polls.create', compact('poll', 'events'));
+        if (!isSuperAdmin() && !in_array($poll->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $eventIds = isSuperAdmin() ? null : getEventIds();
+
+        $events = isSuperAdmin()
+            ? Event::all()
+            : Event::whereIn('id', $eventIds)->get();
+
+        $sessions = isSuperAdmin()
+            ? Session::all()
+            : Session::whereIn('event_id', $eventIds)->get();
+
+        return view('polls.create', compact('poll', 'events', 'sessions'));
     }
 
     public function update(Request $request, $id)
     {
         $poll = Poll::findOrFail($id);
 
+        if (!isSuperAdmin() && !in_array($poll->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'event_id' => 'required|exists:events,id',
-            'event_session_id' => 'nullable|exists:sessions,id',
+            'event_session_id' => 'nullable|exists:event_sessions,id',
             'title' => 'required|string|max:255',
 
             'start_date' => 'nullable|date',
@@ -215,6 +242,10 @@ class PollController extends Controller
     public function destroy($id)
     {
         $poll = Poll::findOrFail($id);
+
+        if (!isSuperAdmin() && !in_array($poll->event_id, getEventIds())) {
+            abort(403, 'Unauthorized action.');
+        }
         $poll->delete();
 
         return redirect()->route('polls.index')
@@ -272,16 +303,28 @@ class PollController extends Controller
     // }
     public function allResponses(Request $request)
     {
-        $events = Event::orderBy('title')->get();
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get()
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get();
 
-        $polls = Poll::with([
+        $query = Poll::with([
             'event',
             'questions.options',
             'questions.answers.user'
         ])
-            ->whereHas('questions.answers')
-            ->when($request->event_id, function ($query) use ($request) {
-                $query->where('event_id', $request->event_id);
+            ->whereHas('questions.answers');
+
+        if (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
+        }
+
+        $polls = $query->when($request->event_id, function ($q) use ($request) {
+                // Ensure filtered event is within their managed list
+                if (!isSuperAdmin() && !in_array($request->event_id, getEventIds())) {
+                    $q->where('event_id', 0); // No results
+                } else {
+                    $q->where('event_id', $request->event_id);
+                }
             })
             ->latest()
             ->paginate(10)
@@ -292,6 +335,10 @@ class PollController extends Controller
 
     public function getPollResponses(Poll $poll)
     {
+        if (!isSuperAdmin() && !in_array($poll->event_id, getEventIds())) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
         $poll->load([
             'event',
             'questions.answers.user',
@@ -305,6 +352,11 @@ class PollController extends Controller
     }
     public function getQuestionAnswers(PollQuestion $question)
     {
+        $poll = $question->poll;
+        if (!isSuperAdmin() && !in_array($poll->event_id, getEventIds())) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
         $question->load([
             'answers.user',
             'answers.option'
@@ -317,8 +369,20 @@ class PollController extends Controller
     }
     public function export(Request $request)
     {
+        $eventId = $request->event_id;
+
+        // Security: Ensure they can only export data they are allowed to see
+        if (!isSuperAdmin()) {
+            $managedIds = getEventIds();
+            if ($eventId && !in_array($eventId, $managedIds)) {
+                $eventId = -1; // Force no results
+            } elseif (!$eventId) {
+                $eventId = $managedIds; // Export all managed events if no specific ID provided
+            }
+        }
+
         return Excel::download(
-            new PollsExport($request->event_id),
+            new PollsExport($eventId),
             'poll_responses.xlsx'
         );
     }

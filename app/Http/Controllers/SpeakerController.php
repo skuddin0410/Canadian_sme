@@ -42,7 +42,7 @@ class SpeakerController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-            $users = Speaker::orderBy('created_at', 'DESC');
+            $users = Speaker::orderBy('order_by', 'ASC')->orderBy('created_at', 'DESC');
             if ($request->search) {
                 $users = $users->where(function ($query) use ($request) {
                     $query->where('name', 'LIKE', '%' . $request->search . '%');
@@ -148,6 +148,7 @@ class SpeakerController extends Controller
             'twitter_url' => 'nullable|url',
              'mobile' => 'nullable|string',
              'bio' => 'required|string',
+             'order_by' => 'nullable|integer|min:0',
              'event_id' => 'required|array',
              'event_id.*' => 'exists:events,id'
                
@@ -176,6 +177,7 @@ class SpeakerController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->order_by = $request->order_by ?? 0;
         $user->save();
 
         if ($request->event_id) {
@@ -254,6 +256,7 @@ class SpeakerController extends Controller
             'linkedin_url' => 'nullable|string|max:255',
             'mobile' => 'nullable|string',
             'bio' => 'required|string',
+            'order_by' => 'nullable|integer|min:0',
             'event_id' => 'required|array',
             'event_id.*' => 'exists:events,id'
      
@@ -277,6 +280,7 @@ class SpeakerController extends Controller
         $user->twitter_url = $request->twitter_url;
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
+        $user->order_by = $request->order_by ?? 0;
         $user->save();
 
         if ($request->hasFile('image')) {

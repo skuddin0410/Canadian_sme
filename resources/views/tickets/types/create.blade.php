@@ -186,14 +186,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="sale_start_date" class="form-label">Sale Start Date</label>
+                                            <label for="sale_start_date" class="form-label">Sale Start Date <span class="text-danger">*</span></label>
                                             <input type="datetime-local" class="form-control @error('sale_start_date') is-invalid @enderror" 
                                                    id="sale_start_date" name="sale_start_date" 
-                                                   value="{{ old('sale_start_date') }}">
+                                                   value="{{ old('sale_start_date') }}" required>
                                             @error('sale_start_date')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            <div class="form-text">Leave blank to start selling immediately</div>
                                         </div>
                                     </div>
 

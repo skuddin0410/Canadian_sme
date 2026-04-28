@@ -85,6 +85,10 @@
                     <div class="chart-loading" id="attendanceLoading">
                         <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
                     </div>
+                    <div id="attendanceChartNoData" class="no-data-placeholder" style="display: none;">
+                        <i class="bi bi-bar-chart fs-1 mb-2"></i>
+                        <p class="mb-0">No attendance data found</p>
+                    </div>
                     <canvas id="attendanceChart"></canvas>
                 </div>
             </div>
@@ -100,6 +104,10 @@
                 <div class="chart-card-body">
                     <div class="chart-loading" id="popularityLoading">
                         <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                    </div>
+                    <div id="popularityChartNoData" class="no-data-placeholder" style="display: none;">
+                        <i class="bi bi-heart fs-1 mb-2"></i>
+                        <p class="mb-0">No popularity data found</p>
                     </div>
                     <canvas id="popularityChart"></canvas>
                 </div>
@@ -171,7 +179,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderAttendanceChart(data) {
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
+        const canvas = document.getElementById('attendanceChart');
+        const noData = document.getElementById('attendanceChartNoData');
+        
+        if (data.length === 0) {
+            canvas.style.display = 'none';
+            noData.style.display = 'flex';
+            return;
+        }
+        
+        canvas.style.display = 'block';
+        noData.style.display = 'none';
+        
+        const ctx = canvas.getContext('2d');
         const sorted = data.slice(0, 15);
         attendanceChartInstance = new Chart(ctx, {
             type: 'bar',
@@ -189,7 +209,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderPopularityChart(data) {
-        const ctx = document.getElementById('popularityChart').getContext('2d');
+        const canvas = document.getElementById('popularityChart');
+        const noData = document.getElementById('popularityChartNoData');
+        
+        if (data.length === 0) {
+            canvas.style.display = 'none';
+            noData.style.display = 'flex';
+            return;
+        }
+        
+        canvas.style.display = 'block';
+        noData.style.display = 'none';
+
+        const ctx = canvas.getContext('2d');
         const sorted = data.slice(0, 15);
         popularityChartInstance = new Chart(ctx, {
             type: 'bar',
@@ -214,4 +246,19 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchData();
 });
 </script>
+<style>
+.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.kpi-card { background: white; padding: 1.2rem; border-radius: 8px; border: 1px solid #d9dee3; }
+.kpi-label { font-size: 0.85rem; color: #a1acb8; margin-bottom: 0.2rem; }
+.kpi-value { font-size: 1.5rem; font-weight: 700; color: #566a7f; }
+.kpi-icon { font-size: 1.8rem; opacity: 0.8; }
+.filter-bar { background: white; padding: 1.2rem; border-radius: 8px; border: 1px solid #d9dee3; margin-bottom: 1.5rem; }
+.chart-card { background: white; border-radius: 8px; border: 1px solid #d9dee3; margin-bottom: 1.5rem; }
+.chart-card-header { padding: 1.2rem; border-bottom: 1px solid #d9dee3; }
+.chart-card-header h5 { margin: 0; font-size: 1rem; color: #566a7f; }
+.chart-card-body { padding: 1.2rem; min-height: 350px; position: relative; }
+.chart-loading { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; }
+.no-data-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a1acb8; border: 1px dashed #d9dee3; border-radius: 8px; }
+canvas { width: 100% !important; height: 350px !important; }
+</style>
 @endsection

@@ -22,9 +22,12 @@
                                     <th>Color</th>
                                     <th>Name</th>
                                     <th>Description</th>
-                                    <th>Ticket Types</th>
+                                    <th>No. of Tickets</th>
                                     <th>Sort Order</th>
                                     <th>Status</th>
+                                    @if(isSuperAdmin())
+                                    <th>Created By</th>
+                                    @endif
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -42,14 +45,19 @@
 
                                         {{-- <td>{{ Str::limit($category->description, 50) }}</td> --}}
                                         <td>
-                                            <span class="badge badge-info">{{ $category->ticketTypes->count() }}</span>
+                                            {{ $category->ticketTypes->count() }}
                                         </td>
                                         <td>{{ $category->sort_order }}</td>
                                         <td>
-                                            <span class="badge badge-{{ $category->is_active ? 'success' : 'secondary' }}">
+                                            <span class="badge bg-label-{{ $category->is_active ? 'success' : 'secondary' }}">
                                                 {{ $category->is_active ? 'Active' : 'Inactive' }}
                                             </span>
                                         </td>
+                                        @if(isSuperAdmin())
+                                        <td>
+                                            {{ $category->creator->name ?? 'System' }}
+                                        </td>
+                                        @endif
                                         <td>
                                             <div class="btn-group btn-group-sm">
                                                 <a href="{{ route('admin.ticket-categories.show', $category) }}" class="btn btn-sm btn-icon btn-primary">
@@ -63,7 +71,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center text-muted py-4">
+                                        <td colspan="{{ isSuperAdmin() ? 8 : 7 }}" class="text-center text-muted py-4">
                                             No ticket categories found.
                                         </td>
                                     </tr>

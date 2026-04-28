@@ -72,6 +72,10 @@
         </div>
         <div class="sa-chart-wrap">
             <canvas id="speakerChart"></canvas>
+            <div id="speakerChartNoData" class="no-data-placeholder" style="display: none;">
+                <i class="bx bx-bar-chart-alt-2 fs-1 mb-2"></i>
+                <p class="mb-0">No speaker data available</p>
+            </div>
         </div>
     </div>
 
@@ -114,6 +118,11 @@
     </div>
 
 </div>
+</script>
+<style>
+.sa-chart-wrap { position: relative; min-height: 400px; }
+.no-data-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a1acb8; border: 1px dashed #d9dee3; border-radius: 8px; background: rgba(255, 255, 255, 0.05); }
+</style>
 @endsection
 
 @section('scripts')
@@ -134,6 +143,12 @@
 
         const speakerNames = @json($speakerAnalytics -> pluck('name'));
         const attendeeCounts = @json($speakerAnalytics -> pluck('total_attendees'));
+
+        if (speakerNames.length === 0) {
+            document.getElementById('speakerChart').style.display = 'none';
+            document.getElementById('speakerChartNoData').style.display = 'flex';
+            return;
+        }
 
         const ctx = document.getElementById('speakerChart').getContext('2d');
 
