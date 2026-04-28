@@ -14,23 +14,39 @@ Admin |  Team User Details
 
                     <div class="d-flex justify-content-end">
                         
-                        @if($user->is_block ==1)
-                        <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-warning btn-pill btn-streach font-book fs-14 me-2">
-                                Unblock User
-                            </button>
-                        </form>
-                        @else
+                        {{-- Block/Unblock Button for Super Admin --}}
+                        {{-- Block/Unblock Button for Admin --}}
+                        @if(Auth::user()->hasRole('Admin'))
+                            @if(!$user->is_block)
+                                @if($user->hasAnyRole(['Admin', 'Representative', 'Attendee', 'Speaker']))
+                                    <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14 me-2">
+                                            Block User
+                                        </button>
+                                    </form>
+                                @endif
+                            @elseif(isSuperAdmin())
+                                <form action="{{ route('admin-users.unblock', $user->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-success btn-pill btn-streach font-book fs-14 me-2">
+                                        Unblock User
+                                    </button>
+                                </form>
+                            @endif
+                        @endif
 
-                        <form action="{{ route('users.toggleBlock', $user->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-danger btn-pill btn-streach font-book fs-14 me-2">
-                                Block User
-                            </button>
-                        </form>
+                        {{-- Legacy Unblock Button for Support Staff / Helpdesk --}}
+                        @if(Auth::user()->hasRole('Support Staff Or Helpdesk') && $user->is_block)
+                            <form action="{{ route('helpdesk.users.unblock', $user->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-warning btn-pill btn-streach font-book fs-14 me-2">
+                                    Unblock User
+                                </button>
+                            </form>
                         @endif
                         
                         <form action="{{ route('sponsors.index') }}" method="GET" class="d-inline">

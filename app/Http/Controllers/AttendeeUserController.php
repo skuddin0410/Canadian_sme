@@ -353,6 +353,19 @@ class AttendeeUserController extends Controller
                     ]);
                 }
             }
+
+            // Notification to Super Admin
+            if (!isSuperAdmin()) {
+                $superAdminId = 1; // Super Admin ID
+                \App\Models\GeneralNotification::create([
+                    'user_id' => $superAdminId,
+                    'title' => 'New Attendee Registered',
+                    'body' => 'A new attendee "' . $user->full_name . '" has been registered by ' . auth()->user()->full_name,
+                    'related_type' => 'attendee_registration',
+                    'related_id' => $user->id,
+                    'is_read' => 0
+                ]);
+            }
         }
 
         return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');

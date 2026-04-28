@@ -12,6 +12,9 @@ use DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Pricing;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminAccountCreated;
 
 
 class AdminUsersController extends Controller
@@ -114,8 +117,19 @@ class AdminUsersController extends Controller
         $user->mobile = $request->mobile;
         $user->bio = $request->bio;
         $user->pricing_plan_id = $request->pricing_plan_id;
+        
+        $password = Str::random(10);
+        $user->password = Hash::make($password);
+        
         $user->save();
         $user->assignRole('Admin');
+
+        try {
+            Mail::to($user->email)->send(new AdminAccountCreated($user));
+        } catch (\Exception $e) {
+            // Log error if needed, but continue
+        }
+
         if ($request->hasFile('image')) {
           $this->imageUpload($request->file("image"),"users",$user->id,'users','photo');
         }
@@ -194,5 +208,22 @@ class AdminUsersController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Unblock an admin user.
+     */
+    public function unblock(string $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Ensure the user has the Admin role and is currently blocked
+        if ($user->hasRole('Admin') && $user->is_block) {
+            $user->is_block = false;
+            $user->save();
+            return back()->withSuccess('Admin user has been unblocked successfully.');
+        }
+
+        return back()->withErrors('This user is not a blocked Admin.');
     }
 }
