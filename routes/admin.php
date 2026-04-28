@@ -106,6 +106,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('otps', App\Http\Controllers\OtpController::class);
   Route::resource('settings', App\Http\Controllers\SettingController::class);
   Route::resource('admin-users', App\Http\Controllers\AdminUsersController::class);
+  Route::patch('/admin-users/{admin_user}/unblock', [App\Http\Controllers\AdminUsersController::class, 'unblock'])->name('admin-users.unblock');
 
   Route::post('/delete/photo', [App\Http\Controllers\EventController::class, 'removePhoto'])->name('events.removePhoto');
   Route::resource('events', App\Http\Controllers\EventController::class);

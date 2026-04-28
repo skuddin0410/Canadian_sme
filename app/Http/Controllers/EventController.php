@@ -163,6 +163,19 @@ class EventController extends Controller
             $this->imageUpload($request->file("map_image"), $uploadPath, $event->id, 'events', 'map_image');
         }
 
+        // Notification to Super Admin
+        if (!isSuperAdmin()) {
+            $superAdminId = 1; // Super Admin ID
+            \App\Models\GeneralNotification::create([
+                'user_id' => $superAdminId,
+                'title' => 'New Event Created',
+                'body' => 'A new event "' . $event->title . '" has been created by ' . auth()->user()->full_name,
+                'related_type' => 'event',
+                'related_id' => $event->id,
+                'is_read' => 0
+            ]);
+        }
+
         return redirect()->route('events.index')->with('success', 'Event created.');
     }
 
@@ -288,6 +301,19 @@ class EventController extends Controller
             } else {
                 \Log::error('Failed to clone event_and_entity_link record for event ID: ' . $clonedEvent->id);
             }
+        }
+
+        // Notification to Super Admin for cloned event
+        if (!isSuperAdmin()) {
+            $superAdminId = 1; // Super Admin ID
+            \App\Models\GeneralNotification::create([
+                'user_id' => $superAdminId,
+                'title' => 'Event Cloned',
+                'body' => 'An event has been cloned as "' . $clonedEvent->title . '" by ' . auth()->user()->full_name,
+                'related_type' => 'event',
+                'related_id' => $clonedEvent->id,
+                'is_read' => 0
+            ]);
         }
 
         // return redirect()->route('events.index')->with('success', 'Event cloned successfully!');

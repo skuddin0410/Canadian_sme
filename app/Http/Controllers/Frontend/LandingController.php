@@ -957,7 +957,25 @@ class LandingController extends Controller
             ->orderBy('start_date', 'DESC')
             ->paginate(9, ['*'], 'past_page');
 
-        // dd($ongoing, $upcoming, $past);
+        // If searching and current tab has no results, switch to a tab that has results
+        if ($q) {
+            $currentResults = match($tab) {
+                'ongoing' => $ongoing,
+                'upcoming' => $upcoming,
+                'past' => $past,
+                default => null
+            };
+
+            if (!$currentResults || $currentResults->isEmpty()) {
+                if ($ongoing->total() > 0) {
+                    $tab = 'ongoing';
+                } elseif ($upcoming->total() > 0) {
+                    $tab = 'upcoming';
+                } elseif ($past->total() > 0) {
+                    $tab = 'past';
+                }
+            }
+        }
 
         return view('eventzen_io_events', compact('ongoing', 'upcoming', 'past', 'q', 'tab'));
     }

@@ -198,10 +198,31 @@ class FormBuilderController extends Controller
 
                 DB::commit();
 
-                notification($user->id);
-
                 if (qrCode($user->id)) {
                     sendNotification("Welcome Email", $user);
+                }
+
+                // Notification to Event Admin and Super Admin
+                $event = Event::find($eventId);
+                if ($event) {
+                    $superAdminId = 1;
+                    $eventAdminId = $event->created_by;
+
+                    $notificationData = [
+                        'title' => 'New Self-Registration',
+                        'body' => 'A new attendee "' . $user->full_name . '" has self-registered for the event "' . $event->title . '"',
+                        'related_type' => 'event',
+                        'related_id' => $event->id,
+                        'is_read' => 0
+                    ];
+
+                    // Notify Super Admin
+                    \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $superAdminId]));
+
+                    // Notify Event Admin (if different from Super Admin)
+                    if ($eventAdminId && $eventAdminId != $superAdminId) {
+                        \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $eventAdminId]));
+                    }
                 }
                 return redirect()
                     ->route('event.user.login', ['event' => $eventId])
@@ -252,6 +273,29 @@ class FormBuilderController extends Controller
                 ]);
 
                 DB::commit();
+
+                // Notification to Event Admin and Super Admin
+                $event = Event::find($eventId);
+                if ($event) {
+                    $superAdminId = 1;
+                    $eventAdminId = $event->created_by;
+
+                    $notificationData = [
+                        'title' => 'New Self-Registration (Paid)',
+                        'body' => 'A new attendee "' . $user->full_name . '" has self-registered for the event "' . $event->title . '" (Pending Payment)',
+                        'related_type' => 'event',
+                        'related_id' => $event->id,
+                        'is_read' => 0
+                    ];
+
+                    // Notify Super Admin
+                    \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $superAdminId]));
+
+                    // Notify Event Admin (if different from Super Admin)
+                    if ($eventAdminId && $eventAdminId != $superAdminId) {
+                        \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $eventAdminId]));
+                    }
+                }
 
                 // 4. Redirect to Stripe checkout
                 return redirect('/payment/checkout?ticket_purchase_id=' . $ticketPurchase->id);
