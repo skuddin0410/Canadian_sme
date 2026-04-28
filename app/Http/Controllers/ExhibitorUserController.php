@@ -40,7 +40,11 @@ public function index(Request $request)
     $pageNo = (int) $request->input('page', 1);
 
     
-    $query = Company::with(['contentIconFile','quickLinkIconFile','boothUsers.booth','user'])
+    $query = Company::select('companies.*')
+        ->with(['contentIconFile','quickLinkIconFile','boothUsers.booth','user'])
+        ->addSelect(['team_count' => User::selectRaw('count(*)')
+            ->whereRaw('FIND_IN_SET(companies.id, users.access_exhibitor_ids)')
+        ])
         ->where('is_sponsor',0)
         ->orderBy("order_by", "ASC")
         ->orderBy("created_at", "DESC");

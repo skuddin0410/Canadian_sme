@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'webauth' => \App\Http\Middleware\RedirectIfNotAuthenticated::class,
             'company.exists' => \App\Http\Middleware\EnsureCompanyExists::class,
             'admin' => \App\Http\Middleware\AdminOnly::class,
+            'event.access' => \App\Http\Middleware\CheckEventAccess::class,
         ]);
     })->withMiddleware(function (Middleware $middleware) {
         $middleware

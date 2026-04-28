@@ -258,6 +258,18 @@
     <!-- Swiper JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
+    {{-- Live Chat Support Widget --}}
+    <script>
+      (function() {
+        var script = document.createElement('script');
+        script.src = 'https://live-chat-csme.netlify.app/widget-loader.js';
+        script.async = true;
+        script.dataset.eventId = 'd934e068-fae5-421a-b079-8ca3c85bc0bc';
+        script.dataset.baseUrl = 'https://live-chat-csme.netlify.app';
+        document.head.appendChild(script);
+      })();
+    </script>
+
 </body>
 
 </html>

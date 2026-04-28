@@ -33,3 +33,23 @@
 @endif
 </div>
 
+@if(Session::has('error_swal'))
+    <script>
+        (function() {
+            console.log("Access Denied Swal Triggered");
+            var message = "{{ Session::get('error_swal') }}";
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied',
+                    text: message,
+                    confirmButtonColor: '#004fb8'
+                });
+            } else if (typeof alertify !== 'undefined') {
+                alertify.error(message);
+            } else {
+                alert(message);
+            }
+        })();
+    </script>
+@endif

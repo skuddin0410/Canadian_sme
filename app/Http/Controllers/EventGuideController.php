@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Drive;
 use App\Models\GalleryItem;
 use App\Models\Event;
+use App\Models\User;
+use App\Models\GeneralNotification;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -256,6 +258,15 @@ public function approveGalleryItem(Request $request)
     $item = GalleryItem::findOrFail($request->id);
     $item->update(['is_approved' => true]);
 
+    // Notify the uploader
+    GeneralNotification::create([
+        'user_id' => $item->added_by,
+        'title' => 'Gallery Item Approved',
+        'body' => "Your gallery item \"{$item->file_name}\" has been approved and is now visible.",
+        'related_type' => 'gallery_item_approved',
+        'is_read' => 0
+    ]);
+
     return redirect()->route('event-guides.showGallery')->with('success', 'File approved successfully.');
 }
 
@@ -265,41 +276,99 @@ public function approveAllGalleryItems(Request $request)
         return back()->with('error', 'Unauthorized action.');
     }
 
+    $pendingItems = GalleryItem::where('is_approved', false)->get();
+    $uploaders = $pendingItems->pluck('added_by')->unique();
+
     GalleryItem::where('is_approved', false)->update(['is_approved' => true]);
+
+    foreach ($uploaders as $userId) {
+        GeneralNotification::create([
+            'user_id' => $userId,
+            'title' => 'Gallery Items Approved',
+            'body' => "All your pending gallery items have been approved.",
+            'related_type' => 'gallery_items_approved',
+            'is_read' => 0
+        ]);
+    }
 
     return redirect()->route('event-guides.showGallery')->with('success', 'All pending files approved successfully.');
 }
 
-public function uploadGallery(Request $request)
-{
-    $request->validate([
-        'event_id' => 'required|exists:events,id',
-        'images.*' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,mp4,mov,avi,wmv|max:10240',
-    ]);
+    public function uploadGallery(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'event_id' => 'required|exists:events,id',
+            'images.*' => 'required|file|mimes:jpg,jpeg,png,gif,pdf,mp4,mov,avi,wmv|max:10240',
+        ]);
 
-    foreach ($request->file('images') as $file) {
-        $path = $file->store('event_guides', 'public');
-        $extension = strtolower($file->getClientOriginalExtension());
-        
-        $type = 'document';
-        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-            $type = 'image';
-        } elseif (in_array($extension, ['mp4', 'mov', 'avi', 'wmv'])) {
-            $type = 'video';
+        // Set custom attribute names (filenames) before validation fails
+        $attributes = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $key => $file) {
+                // Safely get the original name if it's an uploaded file object
+                if ($file instanceof \Illuminate\Http\UploadedFile) {
+                    $attributes["images.{$key}"] = $file->getClientOriginalName();
+                }
+            }
+        }
+        $validator->setAttributeNames($attributes);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()->all()
+                ], 422);
+            }
+
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        GalleryItem::create([
-            'file_path' => $path,
-            'file_name' => $file->getClientOriginalName(),
-            'file_type' => $type,
-            'added_by' => Auth::id(),
-            'is_approved' => isSuperAdmin() ? true : false,
-            'event_id' => $request->event_id,
-        ]);
-    }
+        foreach ($request->file('images') as $file) {
+            $path = $file->store('event_guides', 'public');
+            $extension = strtolower($file->getClientOriginalExtension());
+            
+            $type = 'document';
+            if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                $type = 'image';
+            } elseif (in_array($extension, ['mp4', 'mov', 'avi', 'wmv'])) {
+                $type = 'video';
+            }
 
-    return redirect()->route('event-guides.showGallery')->with('success', 'Files uploaded successfully.');
-}
+            GalleryItem::create([
+                'file_path' => $path,
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $type,
+                'added_by' => Auth::id(),
+                'is_approved' => isSuperAdmin() ? true : false,
+                'event_id' => $request->event_id,
+            ]);
+        }
+
+        if (!isSuperAdmin()) {
+            $user = Auth::user();
+            $event = Event::find($request->event_id);
+            $superAdmin = User::find(1);
+            if ($superAdmin) {
+                GeneralNotification::create([
+                    'user_id' => $superAdmin->id,
+                    'title' => 'New Gallery Items Pending Approval',
+                    'body' => "{$user->full_name} has uploaded new gallery items for event \"{$event->title}\" and is waiting for approval.",
+                    'related_type' => 'gallery_approval_request',
+                    'is_read' => 0
+                ]);
+            }
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Files uploaded successfully.'
+            ]);
+        }
+
+        return redirect()->route('event-guides.showGallery')->with('success', 'Files uploaded successfully.');
+    }
 
 public function deleteGalleryImage(Request $request)
 {
@@ -308,6 +377,8 @@ public function deleteGalleryImage(Request $request)
     ]);
 
     $item = GalleryItem::findOrFail($request->id);
+    $uploaderId = $item->added_by;
+    $fileName = $item->file_name;
 
     // Delete file from storage
     if (Storage::disk('public')->exists($item->file_path)) {
@@ -315,6 +386,17 @@ public function deleteGalleryImage(Request $request)
     }
 
     $item->delete();
+
+    // Notify the uploader if it was deleted by someone else (Super Admin)
+    if (Auth::id() !== $uploaderId) {
+        GeneralNotification::create([
+            'user_id' => $uploaderId,
+            'title' => 'Gallery Item Deleted',
+            'body' => "Your gallery item \"{$fileName}\" has been deleted by the administrator.",
+            'related_type' => 'gallery_item_deleted',
+            'is_read' => 0
+        ]);
+    }
 
     return redirect()->route('event-guides.showGallery')->with('success', 'File deleted successfully.');
 }

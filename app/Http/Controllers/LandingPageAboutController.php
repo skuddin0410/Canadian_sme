@@ -67,4 +67,18 @@ class LandingPageAboutController extends Controller
 
         return redirect()->back()->withSuccess('About section updated successfully!');
     }
+
+    public function removeImage(Request $request)
+    {
+        $about = LandingPageAbout::first();
+        if (!$about) {
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+        }
+
+        $type = $request->type;
+        // Use the base Controller's deleteFile method
+        \App\Http\Controllers\Controller::deleteFile($about->id, 'landing_page_abouts', $type);
+
+        return response()->json(['success' => true]);
+    }
 }

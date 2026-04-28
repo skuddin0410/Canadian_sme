@@ -110,6 +110,11 @@ Admin | Landing Page About Section
                                             <div class="mb-2 text-muted small">No image found</div>
                                         @endif
                                         <img id="bgBannerPreview" src="{{ !empty($about->bgBanner) ? $about->bgBanner->file_path : '' }}" class="img-fluid rounded mb-2 {{ empty($about->bgBanner) ? 'd-none' : '' }}" style="max-height: 100px;">
+                                        @if(!empty($about->bgBanner))
+                                            <button type="button" class="btn btn-label-danger btn-sm mb-2" onclick="removeImage('bg_banner', 'bgBannerPreview', this)">
+                                                <i class="bx bx-trash me-1"></i> Remove
+                                            </button>
+                                        @endif
                                         <input type="file" class="form-control form-control-sm" name="bg_banner" onchange="previewImage(this, 'bgBannerPreview')">
                                     </div>
                                 </div>
@@ -122,6 +127,11 @@ Admin | Landing Page About Section
                                             <div class="mb-2 text-muted small">No image found</div>
                                         @endif
                                         <img id="bannerImagePreview" src="{{ !empty($about->bannerImage) ? $about->bannerImage->file_path : '' }}" class="img-fluid rounded mb-2 {{ empty($about->bannerImage) ? 'd-none' : '' }}" style="max-height: 100px;">
+                                        @if(!empty($about->bannerImage))
+                                            <button type="button" class="btn btn-label-danger btn-sm mb-2" onclick="removeImage('banner_image', 'bannerImagePreview', this)">
+                                                <i class="bx bx-trash me-1"></i> Remove
+                                            </button>
+                                        @endif
                                         <input type="file" class="form-control form-control-sm" name="banner_image" onchange="previewImage(this, 'bannerImagePreview')">
                                     </div>
                                 </div>
@@ -134,6 +144,11 @@ Admin | Landing Page About Section
                                             <div class="mb-2 text-muted small">No image found</div>
                                         @endif
                                         <img id="frontImagePreview" src="{{ !empty($about->frontImage) ? $about->frontImage->file_path : '' }}" class="img-fluid rounded mb-2 {{ empty($about->frontImage) ? 'd-none' : '' }}" style="max-height: 100px;">
+                                        @if(!empty($about->frontImage))
+                                            <button type="button" class="btn btn-label-danger btn-sm mb-2" onclick="removeImage('front_image', 'frontImagePreview', this)">
+                                                <i class="bx bx-trash me-1"></i> Remove
+                                            </button>
+                                        @endif
                                         <input type="file" class="form-control form-control-sm" name="front_image" onchange="previewImage(this, 'frontImagePreview')">
                                     </div>
                                 </div>
@@ -146,6 +161,11 @@ Admin | Landing Page About Section
                                             <div class="mb-2 text-muted small">No image found</div>
                                         @endif
                                         <img id="bannerButtonImagePreview" src="{{ !empty($about->bannerButtonImage) ? $about->bannerButtonImage->file_path : '' }}" class="img-fluid rounded mb-2 {{ empty($about->bannerButtonImage) ? 'd-none' : '' }}" style="max-height: 100px;">
+                                        @if(!empty($about->bannerButtonImage))
+                                            <button type="button" class="btn btn-label-danger btn-sm mb-2" onclick="removeImage('banner_button_image', 'bannerButtonImagePreview', this)">
+                                                <i class="bx bx-trash me-1"></i> Remove
+                                            </button>
+                                        @endif
                                         <input type="file" class="form-control form-control-sm" name="banner_button_image" onchange="previewImage(this, 'bannerButtonImagePreview')">
                                     </div>
                                 </div>
@@ -158,6 +178,11 @@ Admin | Landing Page About Section
                                             <div class="mb-2 text-muted small">No image found</div>
                                         @endif
                                         <img id="expImagePreview" src="{{ !empty($about->expImage) ? $about->expImage->file_path : '' }}" class="img-fluid rounded mb-2 {{ empty($about->expImage) ? 'd-none' : '' }}" style="max-height: 100px;">
+                                        @if(!empty($about->expImage))
+                                            <button type="button" class="btn btn-label-danger btn-sm mb-2" onclick="removeImage('exp_image', 'expImagePreview', this)">
+                                                <i class="bx bx-trash me-1"></i> Remove
+                                            </button>
+                                        @endif
                                         <input type="file" class="form-control form-control-sm" name="exp_image" onchange="previewImage(this, 'expImagePreview')">
                                     </div>
                                 </div>
@@ -195,6 +220,45 @@ function previewImage(input, previewId) {
         }
         reader.readAsDataURL(input.files[0]);
     }
+}
+
+function removeImage(type, previewId, button) {
+    if (!confirm('Are you sure you want to remove this image?')) return;
+
+    fetch("{{ route('admin.home-page.about.remove-image') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ type: type })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(previewId).src = '';
+            document.getElementById(previewId).classList.add('d-none');
+            button.classList.add('d-none');
+            
+            // Show "No image found" text
+            const container = button.closest('.d-flex');
+            let noImageText = container.querySelector('.text-muted');
+            if (!noImageText) {
+                noImageText = document.createElement('div');
+                noImageText.className = 'mb-2 text-muted small';
+                noImageText.textContent = 'No image found';
+                container.prepend(noImageText);
+            } else {
+                noImageText.classList.remove('d-none');
+            }
+        } else {
+            alert(data.message || 'Failed to remove image');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while removing the image');
+    });
 }
 </script>
 @endsection

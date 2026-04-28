@@ -84,6 +84,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
   Route::get('/home-page/about', [LandingPageAboutController::class, 'index'])->name('admin.home-page.about');
   Route::post('/home-page/about', [LandingPageAboutController::class, 'update'])->name('admin.home-page.about.update');
+  Route::post('/home-page/about/remove-image', [LandingPageAboutController::class, 'removeImage'])->name('admin.home-page.about.remove-image');
 
   Route::get('/home-page/logos', [LandingPageLogoController::class, 'index'])->name('admin.home-page.logos.index');
   Route::get('/home-page/logos/create', [LandingPageLogoController::class, 'create'])->name('admin.home-page.logos.create');
