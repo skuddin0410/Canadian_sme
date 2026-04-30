@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
+use App\Models\Event;
 use App\Models\Otp;
 use App\Models\User;
 use App\Mail\OtpMail;
@@ -22,6 +23,29 @@ use Illuminate\Support\Facades\Log;
 
 class OtpController extends Controller
 {
+    protected function canAccessEvent(User $user, int $eventId): bool
+    {
+        $event = Event::find($eventId);
+
+        if (! $event) {
+            return false;
+        }
+
+        if ($user->hasRole('Super Admin')) {
+            return true;
+        }
+
+        if ($user->hasRole('Admin')) {
+            return (int) $event->created_by === (int) $user->id;
+        }
+
+        return DB::table('event_and_entity_link')
+            ->where('event_id', $eventId)
+            ->where('entity_type', 'users')
+            ->where('entity_id', $user->id)
+            ->exists();
+    }
+
     public function generate(Request $request) {
 
         try {
@@ -63,18 +87,23 @@ class OtpController extends Controller
             }
 
             if(isset($request->event_id)){
-                // Check mapping: event_and_entity_link
-                $isMapped = DB::table('event_and_entity_link')
-                    ->where('event_id', $eventId)
-                    ->where('entity_type', 'users')   // or 'User' depending on what you store
-                    ->where('entity_id', $user->id)
-                    ->exists();
+                $event = Event::find($eventId);
 
-                if (!$isMapped) {
+                if (! $event) {
                     return response()->json([
                         'success' => false,
-                        // 'message' => 'User is not mapped with this event.',
-                        'message' => 'you are not registered for this event.',
+                        'message' => 'Invalid event.',
+                    ], 400);
+                }
+
+                if (! $this->canAccessEvent($user, $eventId)) {
+                    $message = $user->hasRole('Admin')
+                        ? 'You can login only to events created by you.'
+                        : 'You are not registered for this event.';
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message,
                     ], 403);
                 }
             }
@@ -180,12 +209,7 @@ class OtpController extends Controller
                 }
             }
     
-        $user = User::firstOrCreate(
-            ['email' => $request->email],
-            ['password' => Hash::make($request->otp)]
-        );
-        
-        $user->assignRole('Attendee');
+        $user = User::where('email', $request->email)->first();
         
         try {
 
@@ -200,6 +224,29 @@ class OtpController extends Controller
                 'email'    => $request->email,
                 'password' => $request->otp, 
             ];
+
+            if ($request->filled('event_id')) {
+                $eventId = (int) $request->event_id;
+                $event = Event::find($eventId);
+
+                if (! $event) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid event.',
+                    ], 400);
+                }
+
+                if (! $this->canAccessEvent($user, $eventId)) {
+                    $message = $user->hasRole('Admin')
+                        ? 'You can login only to events created by you.'
+                        : 'You are not registered for this event.';
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message,
+                    ], 403);
+                }
+            }
 
             // Log::info('Attempting to authenticate user', ['email' => $request->email]);
             // Log user 
