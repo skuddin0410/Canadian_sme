@@ -56,7 +56,8 @@ class EventUserAuthController extends Controller
 
         // Role check
         $isAdminRoute = $request->isAdmin == 'true'; // Passed from frontend
-        $hasAdminRole = $user->hasAnyRole(['Admin', 'Super Admin', 'Exhibitor', 'Representative', 'Speaker', 'Support Staff Or Helpdesk', 'Registration Desk']);
+        // $hasAdminRole = $user->hasAnyRole(['Admin', 'Super Admin', 'Exhibitor', 'Representative', 'Speaker', 'Support Staff Or Helpdesk', 'Registration Desk']);
+        $hasAdminRole = $user->hasRole('Admin');
         $isAttendee = $user->hasRole('Attendee');
 
         if ($isAdminRoute && !$hasAdminRole) {
