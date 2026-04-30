@@ -137,9 +137,10 @@ class EventUserAuthController extends Controller
         Auth::login($user, $request->filled('remember'));
         
         $redirectUrl = '/user/home';
-        if ($user->hasAnyRole(['Admin', 'Super Admin', 'Exhibitor', 'Representative', 'Speaker', 'Support Staff Or Helpdesk', 'Registration Desk'])) {
-            $redirectUrl = '/admin/home';
-        } else if ($user->hasRole('Attendee')) {
+        // if ($user->hasAnyRole(['Admin', 'Super Admin', 'Exhibitor', 'Representative', 'Speaker', 'Support Staff Or Helpdesk', 'Registration Desk'])) {
+        //     $redirectUrl = '/admin/home';
+        // } else 
+        if ($user->hasRole('Attendee')) {
             $eventId = Session::get('event_id');
             if ($eventId) {
                 $event = Event::find($eventId);
