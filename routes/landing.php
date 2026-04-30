@@ -51,6 +51,10 @@ Route::middleware(['event.access'])->group(function () {
     Route::get('/speaker/{slug}', [LandingController::class, 'speaker'])->name('speaker');
 
     Route::get('/venue/{slug}', [LandingController::class, 'venue'])->name('venue');
+    Route::get('/about/{slug}', [LandingController::class, 'aboutPage'])->name('event.about');
+    Route::get('/terms/{slug}', [LandingController::class, 'termsPage'])->name('event.terms');
+    Route::get('/privacy/{slug}', [LandingController::class, 'privacyPage'])->name('event.privacy');
+    Route::get('/support-page/{slug}', [LandingController::class, 'supportPage'])->name('event.support');
 });
 Route::get('/venue/app', [LandingController::class, 'getVenuInfoForApp'])->name('venue-app');
 

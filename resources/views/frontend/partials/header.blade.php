@@ -42,21 +42,21 @@
 
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => $event->slug ?? null]) }}">Location</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('venue') ? 'active' : '' }}" href="{{ route('venue', ['slug' => $event->slug ?? null]) }}">Location</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'terms']) }}">Terms</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('event.terms') ? 'active' : '' }}" href="{{ route('event.terms', ['slug' => $event->slug ?? null]) }}">Terms</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'policy']) }}">Policy</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('event.privacy') ? 'active' : '' }}" href="{{ route('event.privacy', ['slug' => $event->slug ?? null]) }}">Policy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('venue*') ? 'active' : '' }}" href="{{ route('venue', ['slug' => 'about']) }}">About</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('event.about') ? 'active' : '' }}" href="{{ route('event.about', ['slug' => $event->slug ?? null]) }}">About</a>
                         </li>
                         <li class="nav-item">
                             @isset($event)
-                            <a class="nav-link p-0 {{ request()->is('support*') ? 'active' : '' }}"
-                                href="{{ route('support', ['slug' => $event->slug]) }}">
+                            <a class="nav-link p-0 {{ request()->routeIs('event.support') ? 'active' : '' }}"
+                                href="{{ route('event.support', ['slug' => $event->slug]) }}">
                                 Support
                             </a>
                             @endisset
