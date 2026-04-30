@@ -31,6 +31,17 @@ class LandingController extends Controller
         return "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($query);
     }
 
+    protected function eventSidebarData(Event $event): array
+    {
+        $sessions = Session::where('start_time', '>=', now())
+            ->where('event_id', $event->id)
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        return [$sessions, $event];
+    }
+
     /**
      * Show the landing page.
      */
@@ -722,7 +733,7 @@ class LandingController extends Controller
 
 
 
-    public function venue($slug = null)
+    protected function eventSectionPage(string $section, ?string $slug = null)
     {
         $locationSetting = \App\Models\Setting::where('key', 'company_address')->first();
         $location = $locationSetting ? $locationSetting->value : null;
@@ -730,15 +741,57 @@ class LandingController extends Controller
         $location = $event->location ?? '';
         $mapUrl = $this->buildMapUrl(($event->map_query ?? null) ?: $location);
 
-        $sessions = Session::where('start_time', '>=', now())
-            ->inRandomOrder()
-            ->take(2)
-            ->get();
-
         if (!$event) {
             $event = Event::with('photo')->first();
         }
-        return view('frontend.venue', compact('location', 'mapUrl', 'sessions', 'event'));
+        [$sessions, $event] = $this->eventSidebarData($event);
+
+        $title = match ($section) {
+            'location' => 'Venue Location',
+            'about' => 'About',
+            'terms' => 'Terms & Condition',
+            'privacy' => 'Privacy Policy',
+            'support' => 'Support',
+            default => abort(404),
+        };
+
+        $content = match ($section) {
+            'location' => $location,
+            'about' => $event->about,
+            'terms' => $event->terms_condition,
+            'privacy' => $event->privacy_policy,
+            'support' => $event->help_support,
+            default => null,
+        };
+
+        $showMap = $section === 'location';
+
+        return view('frontend.venue', compact('location', 'mapUrl', 'sessions', 'event', 'section', 'title', 'content', 'showMap'));
+    }
+
+    public function venue($slug = null)
+    {
+        return $this->eventSectionPage('location', $slug);
+    }
+
+    public function aboutPage($slug = null)
+    {
+        return $this->eventSectionPage('about', $slug);
+    }
+
+    public function termsPage($slug = null)
+    {
+        return $this->eventSectionPage('terms', $slug);
+    }
+
+    public function privacyPage($slug = null)
+    {
+        return $this->eventSectionPage('privacy', $slug);
+    }
+
+    public function supportPage($slug = null)
+    {
+        return $this->eventSectionPage('support', $slug);
     }
 
 
