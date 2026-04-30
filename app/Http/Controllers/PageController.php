@@ -254,7 +254,7 @@ class PageController extends Controller
             }
             if($slug=='terms'){
                 $page = Event::where('id', $event_id)->first();
-                return response(['data'=>$page->terms_conditions ?? '']);
+                return response(['data'=>$page->terms_condition ?? '']);
             }
             if($slug=='about'){
                 $page = Event::where('id', $event_id)->first();
