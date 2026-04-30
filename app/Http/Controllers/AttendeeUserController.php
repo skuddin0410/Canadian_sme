@@ -205,7 +205,7 @@ class AttendeeUserController extends Controller
 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
+            'email' => 'required|string|max:255|email',
             'designation' => 'nullable|string|max:255',
             'tags' => 'nullable|string|max:255',
             'website_url' => 'nullable|url',
@@ -258,11 +258,17 @@ class AttendeeUserController extends Controller
             }
         }
 
-        $user = new User();
-        $user->created_by = auth()->id();
+        $user = User::where('email', $request->email)->first();
+        $isNewUser = ! $user;
+
+        if (! $user) {
+            $user = new User();
+            $user->created_by = auth()->id();
+            $user->slug = createUniqueSlug('users', $request->first_name . '_' . $request->last_name);
+        }
+
         $user->name = $request->first_name;
         $user->lastname = $request->last_name;
-        $user->slug = createUniqueSlug('users', $request->first_name . '_' . $request->last_name);
         $user->email = $request->email;
         $user->company = $request->company;
         $user->primary_group = $request->primary_group;
@@ -286,10 +292,12 @@ class AttendeeUserController extends Controller
         $user->company_id = $request->access_exhibitor_ids ?? '';
         $user->save();
 
-        $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
-        if ($cometChatID && isset($cometChatID['uid'])) {
-            $user->cometchat_id = $cometChatID['uid'];
-            $user->save();
+        if ($isNewUser || empty($user->cometchat_id)) {
+            $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
+            if ($cometChatID && isset($cometChatID['uid'])) {
+                $user->cometchat_id = $cometChatID['uid'];
+                $user->save();
+            }
         }
 
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
@@ -340,7 +348,9 @@ class AttendeeUserController extends Controller
         $user = User::where('id', $user->id)->first();
 
         if ($user) {
-            sendNotification("Welcome Email", $user);
+            if ($isNewUser) {
+                sendNotification("Welcome Email", $user);
+            }
             qrCode($user->id);
 
             // Sync Event Links
@@ -359,8 +369,10 @@ class AttendeeUserController extends Controller
                 $superAdminId = 1; // Super Admin ID
                 \App\Models\GeneralNotification::create([
                     'user_id' => $superAdminId,
-                    'title' => 'New Attendee Registered',
-                    'body' => 'A new attendee "' . $user->full_name . '" has been registered by ' . auth()->user()->full_name,
+                    'title' => $isNewUser ? 'New Attendee Registered' : 'Attendee Updated',
+                    'body' => $isNewUser
+                        ? 'A new attendee "' . $user->full_name . '" has been registered by ' . auth()->user()->full_name
+                        : 'Attendee "' . $user->full_name . '" has been updated by ' . auth()->user()->full_name,
                     'related_type' => 'attendee_registration',
                     'related_id' => $user->id,
                     'is_read' => 0
@@ -368,7 +380,7 @@ class AttendeeUserController extends Controller
             }
         }
 
-        return redirect()->to(route('attendee-users.index', $user->id))->withSuccess('Saved successfully.');
+        return redirect()->to(route('attendee-users.index', $user->id))->withSuccess($isNewUser ? 'Saved successfully.' : 'Existing attendee updated and mapped successfully.');
     }
 
 
