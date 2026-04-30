@@ -8,7 +8,7 @@
 
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">Create/</span>Event</h4>
-  <div class="row">
+<div class="row">
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -147,6 +147,24 @@
     </div>
   </div>
 </div>
+
+           <div class="mb-3">
+            <label class="form-label" for="map_query">Map Search Text</label>
+            <div class="input-group input-group-merge">
+              <span class="input-group-text"><i class="bx bx-current-location"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                name="map_query"
+                id="map_query"
+                value="{{ old('map_query', $e->map_query ?? '') }}"
+                placeholder="Enter map search text"/>
+            </div>
+            <small class="text-muted">Optional. If venue is empty, this text will be used for Google Maps search.</small>
+            @if ($errors->has('map_query'))
+              <span class="text-danger text-left">{{ $errors->first('map_query') }}</span>
+            @endif
+          </div>
 
 
             <div class="mb-3 card">

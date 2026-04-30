@@ -95,9 +95,10 @@
                                 <div id="email-step">
                                     <div class="row mb-4 justify-content-center text-center">
                                         <div class="col-md-10">
-                                            <h5 class="mb-3 text-primary">{{ __('Sign In') }}</h5>
+                                            <!-- <h5 class="mb-3 text-primary">{{ __('Sign In') }}</h5> -->
+                                             <h5 class="mb-3 text-primary">Email address</h5>
                                             <div class="mb-4">
-                                                <input id="email" type="email" class="form-control form-control-lg text-center" name="email" value="{{ old('email') }}" required placeholder="name@example.com" autocomplete="email" autofocus>
+                                                <input id="email" type="email" class="form-control form-control-lg text-center" name="email" value="{{ old('email') }}" required placeholder="Enter your email here" autocomplete="email" autofocus>
                                                 <span class="invalid-feedback d-block mt-2" role="alert" id="email-error"></span>
                                             </div>
                                             <button type="button" id="send-otp-btn" class="btn btn-primary btn-lg px-5">

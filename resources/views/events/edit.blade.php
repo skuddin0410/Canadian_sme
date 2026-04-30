@@ -251,6 +251,24 @@
               @enderror
             </div>
 
+            <div class="mb-3">
+              <label class="form-label" for="map_query">Map Search Text</label>
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="bx bx-current-location"></i></span>
+                <input
+                  type="text"
+                  class="form-control @error('map_query') is-invalid @enderror"
+                  name="map_query"
+                  id="map_query"
+                  value="{{ old('map_query', $event->map_query ?? '') }}"
+                  placeholder="Enter map search text" />
+              </div>
+              <small class="text-muted">Optional. If venue is empty, this text will be used for Google Maps search.</small>
+              @error('map_query')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+              @enderror
+            </div>
+
             {{-- YouTube link --}}
             <div class="mb-3">
               <label class="form-label" for="youtube_link">YouTube Link</label>

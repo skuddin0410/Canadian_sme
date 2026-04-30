@@ -84,6 +84,7 @@ class EventController extends Controller
             'slug' => 'required|string|unique:events,slug',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
+            'map_query' => 'nullable|string|max:500',
             'about' => 'nullable|string',
             'terms_condition' => 'nullable|string',
             'help_support' => 'nullable|string',
@@ -150,6 +151,7 @@ class EventController extends Controller
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
         $validated['created_by'] = auth()->id(); // or any default user
         $validated['subscription_id'] = $subscription?->id;
+        $validated['map_query'] = !empty($validated['map_query']) ? trim($validated['map_query']) : null;
         $validated['section_order'] = !empty($validated['section_order']) ? json_encode($validated['section_order']) : null;
 
         $event = Event::create($validated);
@@ -355,6 +357,7 @@ class EventController extends Controller
             'slug' => 'nullable|string|unique:events,slug,' . $event->id,
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'map_query' => 'nullable|string|max:500',
             'about' => 'nullable|string',
             'privacy_policy' => 'nullable|string',
             'terms_condition' => 'nullable|string',
@@ -408,6 +411,7 @@ class EventController extends Controller
         $event->slug         = $validated['slug'] ?? $event->slug;
         $event->description  = $validated['description'] ?? null;
         $event->location     = $validated['location'] ?? null;
+        $event->map_query    = !empty($validated['map_query']) ? trim($validated['map_query']) : null;
         $event->start_date   = $validated['start_date'];
         $event->end_date     = $validated['end_date'];
         $event->youtube_link = $validated['youtube_link'] ?? null;

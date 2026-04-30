@@ -18,6 +18,7 @@ class EventRequest extends FormRequest
             'slug' => 'required|string|max:255|unique:events,slug,' . $this->event?->id,
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'map_query' => 'nullable|string|max:500',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:draft,published,cancelled',
@@ -33,4 +34,3 @@ class EventRequest extends FormRequest
         ];
     }
 }
-
