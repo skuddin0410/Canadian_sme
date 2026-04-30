@@ -21,6 +21,8 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $type = $request->type; // past | ongoing | upcoming
+        $search = trim((string) $request->query('q', ''));
+        $perPage = (int) $request->query('per_page', 6);
         $today = Carbon::today();
 
         // $query = Event::query();
@@ -43,22 +45,39 @@ class EventController extends Controller
         //         }
         //     ]);
 
-        $query = Event::query();
+        $query = Event::query()
+            ->with(['photo'])
+            ->where('status', 'published')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($searchQuery) use ($search) {
+                    $searchQuery->where('title', 'like', "%{$search}%")
+                        ->orWhere('location', 'like', "%{$search}%")
+                        ->orWhere('tags', 'like', "%{$search}%")
+                        ->orWhere('tracks', 'like', "%{$search}%");
+                });
+            });
 
         if ($type === 'past') {
-            $query->whereDate('end_date', '<', $today);
+            $query->whereDate(\DB::raw('COALESCE(end_date, start_date)'), '<', $today)
+                ->orderBy('start_date', 'DESC');
         }
 
         if ($type === 'ongoing') {
             $query->whereDate('start_date', '<=', $today)
-                ->whereDate('end_date', '>=', $today);
+                ->whereDate(\DB::raw('COALESCE(end_date, start_date)'), '>=', $today)
+                ->orderBy('start_date', 'DESC');
         }
 
         if ($type === 'upcoming') {
-            $query->whereDate('start_date', '>', $today);
+            $query->whereDate('start_date', '>', $today)
+                ->orderBy('start_date', 'ASC');
         }
 
-        return EventResource::collection($query->latest()->paginate(6));
+        if (! in_array($type, ['past', 'ongoing', 'upcoming'], true)) {
+            $query->orderBy('start_date', 'DESC');
+        }
+
+        return EventResource::collection($query->paginate($perPage));
     }
 
     public function store(EventRequest $request)
