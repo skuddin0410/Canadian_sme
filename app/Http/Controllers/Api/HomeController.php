@@ -309,7 +309,7 @@ public function getNotifications(Request $request)
     return response()->json($notifications, 200);
 }
 
-public function getAllSession()
+public function getAllSession(Request $request)
 {
     try {
 
@@ -321,12 +321,24 @@ public function getAllSession()
         }   
         $now = now();
 
-        // Resolve event_id
-        $eventId = $request->event_id ?? 1;
+        $eventId = $request->event_id;
 
         $sessions = Session::with(['speakers', 'booth'])
-            ->where('event_id', $eventId)
-            //->where('end_time', '>', now())
+            ->when($eventId, fn ($query) => $query->where('event_id', $eventId))
+            ->when($request->filled('track'), fn ($query) => $query->where('track', $request->track))
+            ->when($request->filled('location'), fn ($query) => $query->where('location', 'like', '%' . $request->location . '%'))
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $search = trim((string) $request->q);
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('description', 'like', '%' . $search . '%')
+                        ->orWhere('track', 'like', '%' . $search . '%')
+                        ->orWhere('location', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($request->filled('date'), function ($query) use ($request) {
+                $query->whereDate('start_time', $request->date);
+            })
             ->orderBy('start_time', 'ASC')
             ->get()
             ->groupBy(function ($session) {
@@ -346,6 +358,10 @@ public function getAllSession()
                             $status = 'Completed';
                         }
 
+                        if (request()->filled('status') && strcasecmp(request()->status, $status) !== 0) {
+                            return null;
+                        }
+
                         return [
                             "id"          => $session->id,
                             "title"       => $session->title,
@@ -363,14 +379,15 @@ public function getAllSession()
                             "agenda" => isAgenda($session->id),
                             "my_agenda" => agendaNote($session->id)
                         ];
-                    })->values()
+                    })->filter()->values()
                 ];
             })
+            ->filter(fn ($day) => $day['session_list']->isNotEmpty())
             ->values(); // reset keys
 
 
 
-            if (! $sessions) {
+            if ($sessions->isEmpty()) {
                 return response()->json([
                     "success" => false,
                     "message" => "Session not found!",

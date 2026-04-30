@@ -192,6 +192,28 @@ class UsersImport implements OnEachRow, WithStartRow, WithEvents
 
             $this->added[] = $emailRaw;
         } else {
+            $user->name = trim($row[0]);
+            $user->lastname = trim($row[1]);
+            $user->status = $row[3] ?? $user->status;
+            $user->gdpr_consent = (isset($row[4]) && strtolower(trim((string) $row[4])) === 'confirmed') ? 1 : 0;
+            $user->bio = $row[5] ?? $user->bio;
+            $user->company = $row[6] ?? $user->company;
+            $user->designation = $row[7] ?? $user->designation;
+            $user->mobile = $row[8] ?? $user->mobile;
+            $user->dob = $row[9] ?? $user->dob;
+            $user->facebook_url = $row[10] ?? $user->facebook_url;
+            $user->twitter_url = $row[11] ?? $user->twitter_url;
+            $user->linkedin_url = $row[12] ?? $user->linkedin_url;
+            $user->instagram_url = $row[13] ?? $user->instagram_url;
+            $user->primary_group = $user->primary_group ?: 'Attendee';
+            $user->created_by = $user->created_by ?: $this->createdBy;
+            $user->is_approve = true;
+            $user->save();
+
+            if (method_exists($user, 'assignRole') && !$user->hasRole('Attendee')) {
+                $user->assignRole('Attendee');
+            }
+
             $this->duplicates[] = $emailRaw;
         }
 
