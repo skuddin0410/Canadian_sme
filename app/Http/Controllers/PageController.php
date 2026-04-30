@@ -228,7 +228,7 @@ class PageController extends Controller
 
     
     public function appPage(Request $request, $slug){
-       if($slug=='privacy-policy'){
+        if($slug=='privacy-policy'){
             $slug = 'privacy';
         }
         if($slug=='terms-condition'){
@@ -248,11 +248,11 @@ class PageController extends Controller
         }
 
         if($event_id = $request->input('event_id')){
-            if($slug=='privacy-policy'){
+            if($slug=='privacy'){
                 $page = Event::where('id', $event_id)->first();
                 return response(['data'=>$page->privacy_policy ?? '']);
             }
-            if($slug=='terms-condition'){
+            if($slug=='terms'){
                 $page = Event::where('id', $event_id)->first();
                 return response(['data'=>$page->terms_conditions ?? '']);
             }
