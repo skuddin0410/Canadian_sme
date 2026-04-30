@@ -19,6 +19,18 @@ use App\Models\GalleryItem;
 
 class LandingController extends Controller
 {
+    protected function buildMapUrl(?string $query): ?string
+    {
+        $googleApiKey = config('services.google_maps.key');
+        $query = trim((string) $query);
+
+        if ($query === '' || empty($googleApiKey)) {
+            return null;
+        }
+
+        return "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($query);
+    }
+
     /**
      * Show the landing page.
      */
@@ -307,11 +319,7 @@ class LandingController extends Controller
 
         // ---- Map ----
         $location = !empty($event->location) ? $event->location : null;
-
-        $googleApiKey = config('services.google_maps.key');
-        $mapUrl = $location && $googleApiKey
-            ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
-            : null;
+        $mapUrl = $this->buildMapUrl($event->map_query ?: $location);
 
         return view(
             'frontend.landing.index',
@@ -720,12 +728,7 @@ class LandingController extends Controller
         $location = $locationSetting ? $locationSetting->value : null;
         $event = Event::with(['photo'])->where('slug', $slug)->first();
         $location = $event->location ?? '';
-
-        $googleApiKey = config('services.google_maps.key');
-
-        $mapUrl = $location && $googleApiKey
-            ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
-            : null;
+        $mapUrl = $this->buildMapUrl(($event->map_query ?? null) ?: $location);
 
         $sessions = Session::where('start_time', '>=', now())
             ->inRandomOrder()
@@ -784,11 +787,7 @@ class LandingController extends Controller
 
         $event = Event::with(['photo'])->first();
         $location = $event->location ?? '';
-        $googleApiKey = config('services.google_maps.key');
-
-        $mapUrl = $location && $googleApiKey
-            ? "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($location)
-            : null;
+        $mapUrl = $this->buildMapUrl(($event->map_query ?? null) ?: $location);
 
         return view('frontend.venue_app', compact('location', 'mapUrl'));
     }
