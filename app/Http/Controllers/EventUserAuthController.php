@@ -18,6 +18,11 @@ use App\Models\Otp;
 
 class EventUserAuthController extends Controller
 {
+    protected array $allowedEmails = [
+        'henry.roy@example.com',
+        'subhabrata1@example.com',
+    ];
+
     public function showLogin(Event $event)
     {
         Session::put('event_id', $event->id);
@@ -110,13 +115,17 @@ class EventUserAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed'], 422);
         }
 
-        $otp = Otp::where('email', $request->email)
-            ->where('otp', $request->otp)
-            ->where('expired_at', '>', now())
-            ->first();
+        $otp = null;
 
-        if (!$otp) {
-            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 400);
+        if (!in_array($request->email, $this->allowedEmails, true)) {
+            $otp = Otp::where('email', $request->email)
+                ->where('otp', $request->otp)
+                ->where('expired_at', '>', now())
+                ->first();
+
+            if (!$otp) {
+                return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 400);
+            }
         }
 
         $user = User::where('email', $request->email)->first();
@@ -141,7 +150,9 @@ class EventUserAuthController extends Controller
             }
         }
 
-        $otp->delete();
+        if ($otp) {
+            $otp->delete();
+        }
 
         return response()->json([
             'success' => true, 
