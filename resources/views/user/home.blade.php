@@ -179,8 +179,8 @@
                         <label class="form-label">Uploaded Banner / Existing Banner</label>
 
                         @php
-                        // $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg');
-                        $defaultBanner = asset('images/eventify-banner.jpg');
+                        // $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? asset('images/noImage.png');
+                        $defaultBanner = asset('images/noImage.png');
                         $bannerUrl = $user->usercompany->quickLinkIconFile?->file_path ?? $defaultBanner;
                         $hasCustomBanner = $user->usercompany->quickLinkIconFile?->file_path ? true : false;
                         @endphp
