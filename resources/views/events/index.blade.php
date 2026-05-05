@@ -54,8 +54,8 @@
                          <div class="mb-3">
                             <select class="form-control" name="event_timing" id="event_timing">
                                 <option value="">All timing</option>
-                                <option value="present">Present</option>
-                                <option value="future">Future</option>
+                                <option value="present">Ongoing</option>
+                                <option value="future">Upcoming</option>
                                 <option value="past">Past</option>
                             </select>
                         </div>
