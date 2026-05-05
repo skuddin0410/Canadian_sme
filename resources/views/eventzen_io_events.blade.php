@@ -63,7 +63,7 @@
                                 <a href="{{ route('user.front.events', $event->slug) }}"  class="explore-event-page-col">
                                     <figure>
                                         <img
-                                        src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
+                                        src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/noImage.png') }}"
                                         alt="{{ $event->title }}"
                                         >
                                     </figure>
@@ -97,7 +97,7 @@
                                 <a href="{{ route('user.front.events', $event->slug) }}" class="explore-event-page-col">
                                     <figure>
                                         <img
-                                        src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
+                                        src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/noImage.png') }}"
                                         alt="{{ $event->title }}"
                                         >
                                     </figure>
@@ -131,7 +131,7 @@
                                 <a href="{{ route('user.front.events', $event->slug) }}" class="explore-event-page-col">
                                     <figure>
                                         <img
-                                        src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/default.png') }}"
+                                        src="{{ $event->photo?->file_path ? asset($event->photo->file_path) : asset('images/noImage.png') }}"
                                         alt="{{ $event->title }}"
                                         >
                                     </figure>

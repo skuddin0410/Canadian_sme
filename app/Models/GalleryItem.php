@@ -19,7 +19,7 @@ class GalleryItem extends Model
     public function getFilePathAttribute($value)
     {
         if (empty($value)) {
-            return asset('images/default.png');
+            return asset('images/noImage.png');
         }
 
         // If it's already a full URL, return it
