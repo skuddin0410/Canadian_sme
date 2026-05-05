@@ -303,34 +303,173 @@ class PollController extends Controller
     // }
     public function allResponses(Request $request)
     {
+        $managedEventIds = isSuperAdmin() ? null : getEventIds();
+        $selectedQuestion = null;
+
         $events = isSuperAdmin()
             ? Event::orderBy('title')->get()
-            : Event::whereIn('id', getEventIds())->orderBy('title')->get();
+            : Event::whereIn('id', $managedEventIds)->orderBy('title')->get();
 
-        $query = Poll::with([
-            'event',
-            'questions.options',
-            'questions.answers.user'
-        ])
+        $pollOptionsQuery = Poll::with('event')
             ->whereHas('questions.answers');
 
         if (!isSuperAdmin()) {
-            $query->whereIn('event_id', getEventIds());
+            $pollOptionsQuery->whereIn('event_id', $managedEventIds);
         }
 
-        $polls = $query->when($request->event_id, function ($q) use ($request) {
-                // Ensure filtered event is within their managed list
-                if (!isSuperAdmin() && !in_array($request->event_id, getEventIds())) {
-                    $q->where('event_id', 0); // No results
+        if ($request->filled('event_id')) {
+            if (!isSuperAdmin() && !in_array((int) $request->event_id, $managedEventIds, true)) {
+                $pollOptionsQuery->whereRaw('1 = 0');
+            } else {
+                $pollOptionsQuery->where('event_id', $request->event_id);
+            }
+        }
+
+        $pollOptions = $pollOptionsQuery
+            ->orderBy('title')
+            ->get();
+
+        $questionOptionsQuery = PollQuestion::with('poll')
+            ->whereHas('answers')
+            ->whereHas('poll', function ($q) use ($request, $managedEventIds) {
+                if (!isSuperAdmin()) {
+                    $q->whereIn('event_id', $managedEventIds);
+                }
+
+                if ($request->filled('event_id')) {
+                    if (!isSuperAdmin() && !in_array((int) $request->event_id, $managedEventIds, true)) {
+                        $q->whereRaw('1 = 0');
+                    } else {
+                        $q->where('event_id', $request->event_id);
+                    }
+                }
+
+                if ($request->filled('poll_id')) {
+                    $q->where('id', $request->poll_id);
+                }
+            });
+
+        $questionOptions = $questionOptionsQuery
+            ->orderBy('question')
+            ->get();
+
+        if ($request->filled('question_id')) {
+            $selectedQuestion = $questionOptions->firstWhere('id', (int) $request->question_id);
+        }
+
+        $answersQuery = PollAnswer::with([
+            'user',
+            'option',
+            'question.poll.event',
+            'question.options',
+        ])->whereHas('question.poll', function ($q) use ($request, $managedEventIds) {
+            if (!isSuperAdmin()) {
+                $q->whereIn('event_id', $managedEventIds);
+            }
+
+            if ($request->filled('event_id')) {
+                if (!isSuperAdmin() && !in_array((int) $request->event_id, $managedEventIds, true)) {
+                    $q->whereRaw('1 = 0');
                 } else {
                     $q->where('event_id', $request->event_id);
                 }
-            })
+            }
+
+            if ($request->filled('poll_id')) {
+                $q->where('id', $request->poll_id);
+            }
+        });
+
+        $answersQuery->when($request->filled('question_id'), function ($q) use ($request) {
+            $q->where('poll_answers.poll_question_id', $request->question_id);
+        });
+
+        $answersQuery->when($request->filled('user_query'), function ($q) use ($request) {
+            $search = trim($request->user_query);
+
+            $q->where(function ($query) use ($search) {
+                $query->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('lastname', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                });
+
+                if (strcasecmp($search, 'guest') === 0) {
+                    $query->orWhereNull('user_id');
+                }
+            });
+        });
+
+        $answersQuery->when($request->filled('submitted_from'), function ($q) use ($request) {
+            $q->whereDate('created_at', '>=', $request->submitted_from);
+        });
+
+        $answersQuery->when($request->filled('submitted_to'), function ($q) use ($request) {
+            $q->whereDate('created_at', '<=', $request->submitted_to);
+        });
+
+        $answerFilterOptions = [];
+        $answerFilterMode = null;
+
+        if ($selectedQuestion && $selectedQuestion->type === 'text') {
+            $answerFilterMode = 'text';
+        } elseif ($selectedQuestion && $selectedQuestion->type === 'yes_no') {
+            $answerFilterMode = 'select';
+            $answerFilterOptions = [
+                ['value' => '1', 'label' => 'Yes'],
+                ['value' => '0', 'label' => 'No'],
+            ];
+        } elseif ($selectedQuestion && $selectedQuestion->type === 'rating') {
+            $answerFilterMode = 'select';
+            $ratingValues = (clone $answersQuery)
+                ->whereNotNull('rating_answer')
+                ->select('rating_answer')
+                ->distinct()
+                ->orderBy('rating_answer')
+                ->pluck('rating_answer');
+
+            $answerFilterOptions = $ratingValues
+                ->map(fn ($value) => ['value' => (string) $value, 'label' => (string) $value])
+                ->values()
+                ->all();
+        } elseif ($selectedQuestion && $selectedQuestion->type === 'option') {
+            $answerFilterMode = 'select';
+            $optionValues = (clone $answersQuery)
+                ->whereNotNull('poll_answers.option_id')
+                ->join('poll_question_options', 'poll_answers.option_id', '=', 'poll_question_options.id')
+                ->select('poll_answers.option_id', 'poll_question_options.option_text')
+                ->distinct()
+                ->orderBy('poll_question_options.option_text')
+                ->get();
+
+            $answerFilterOptions = $optionValues
+                ->map(fn ($option) => ['value' => (string) $option->option_id, 'label' => $option->option_text])
+                ->values()
+                ->all();
+        }
+
+        $answersQuery->when($selectedQuestion && $selectedQuestion->type === 'text' && $request->filled('answer_text'), function ($q) use ($request) {
+            $q->where('poll_answers.text_answer', 'like', '%' . trim($request->answer_text) . '%');
+        });
+
+        $answersQuery->when($selectedQuestion && $selectedQuestion->type === 'yes_no' && $request->filled('answer_value'), function ($q) use ($request) {
+            $q->where('poll_answers.yes_no_answer', (int) $request->answer_value);
+        });
+
+        $answersQuery->when($selectedQuestion && $selectedQuestion->type === 'rating' && $request->filled('answer_value'), function ($q) use ($request) {
+            $q->where('poll_answers.rating_answer', (int) $request->answer_value);
+        });
+
+        $answersQuery->when($selectedQuestion && $selectedQuestion->type === 'option' && $request->filled('answer_value'), function ($q) use ($request) {
+            $q->where('poll_answers.option_id', (int) $request->answer_value);
+        });
+
+        $answers = $answersQuery
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('polls.response-index', compact('polls', 'events'));
+        return view('polls.response-index', compact('answers', 'events', 'pollOptions', 'questionOptions', 'answerFilterOptions', 'answerFilterMode'));
     }
 
     public function getPollResponses(Poll $poll)
@@ -369,20 +508,19 @@ class PollController extends Controller
     }
     public function export(Request $request)
     {
-        $eventId = $request->event_id;
-
-        // Security: Ensure they can only export data they are allowed to see
-        if (!isSuperAdmin()) {
-            $managedIds = getEventIds();
-            if ($eventId && !in_array($eventId, $managedIds)) {
-                $eventId = -1; // Force no results
-            } elseif (!$eventId) {
-                $eventId = $managedIds; // Export all managed events if no specific ID provided
-            }
-        }
+        $filters = $request->only([
+            'event_id',
+            'poll_id',
+            'question_id',
+            'answer_text',
+            'answer_value',
+            'user_query',
+            'submitted_from',
+            'submitted_to',
+        ]);
 
         return Excel::download(
-            new PollsExport($eventId),
+            new PollsExport($filters),
             'poll_responses.xlsx'
         );
     }

@@ -916,6 +916,43 @@
                         @endforeach
                     </select>
 
+                    <select name="poll_id" class="ap-select">
+                        <option value="">All Polls</option>
+                        @foreach($pollOptions as $pollOption)
+                        <option value="{{ $pollOption->id }}" {{ request('poll_id') == $pollOption->id ? 'selected' : '' }}>
+                            {{ $pollOption->title }}
+                        </option>
+                        @endforeach
+                    </select>
+
+                    <select name="question_id" class="ap-select">
+                        <option value="">All Questions</option>
+                        @foreach($questionOptions as $questionOption)
+                        <option value="{{ $questionOption->id }}" {{ request('question_id') == $questionOption->id ? 'selected' : '' }}>
+                            {{ $questionOption->question }}
+                        </option>
+                        @endforeach
+                    </select>
+
+                    @if($answerFilterMode === 'text')
+                    <input type="text" name="answer_text" class="ap-select" placeholder="Type answer text" value="{{ request('answer_text') }}">
+                    @elseif($answerFilterMode === 'select')
+                    <select name="answer_value" class="ap-select">
+                        <option value="">All Answers</option>
+                        @foreach($answerFilterOptions as $answerOption)
+                        <option value="{{ $answerOption['value'] }}" {{ request('answer_value') == $answerOption['value'] ? 'selected' : '' }}>
+                            {{ $answerOption['label'] }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @endif
+
+                    <input type="text" name="user_query" class="ap-select" placeholder="User name, email, or Guest" value="{{ request('user_query') }}">
+
+                    <input type="date" name="submitted_from" class="ap-select" value="{{ request('submitted_from') }}" title="Submitted from">
+
+                    <input type="date" name="submitted_to" class="ap-select" value="{{ request('submitted_to') }}" title="Submitted to">
+
                     <button type="submit" class="ap-toolbar-btn primary">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
@@ -923,7 +960,7 @@
                         Filter
                     </button>
 
-                    @if(request('event_id'))
+                    @if(request()->hasAny(['event_id', 'poll_id', 'question_id', 'answer_text', 'answer_value', 'user_query', 'submitted_from', 'submitted_to']))
                     <a href="{{ route('polls.responses.index') }}" class="ap-toolbar-btn secondary">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <path d="M18 6L6 18M6 6l12 12" />
@@ -948,7 +985,7 @@
                         <rect x="3" y="3" width="18" height="18" rx="2" />
                         <path d="M3 9h18" />
                     </svg>
-                    <strong>{{ $polls->count() }}</strong> polls listed
+                    <strong>{{ $answers->total() }}</strong> responses found
                 </span>
             </div>
         </div>
@@ -970,11 +1007,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($polls as $poll)
-                        @foreach($poll->questions as $question)
-                        @foreach($question->answers as $answer)
+                        @forelse($answers as $answer)
                         @php
-                        $name = $answer->user->name ?? 'Guest';
+                        $poll = $answer->question?->poll;
+                        $question = $answer->question;
+                        $name = trim(($answer->user->name ?? '') . ' ' . ($answer->user->lastname ?? ''));
+                        $name = $name !== '' ? $name : ($answer->user->email ?? 'Guest');
                         $isGuest = !$answer->user;
                         $initials = $isGuest
                         ? '?'
@@ -987,7 +1025,7 @@
                         'text' => $answer->text_answer,
                         'yes_no' => ($answer->yes_no_answer ? 'Yes' : 'No'),
                         'rating' => $answer->rating_answer . ' / ' . $question->rating_scale,
-                        'option' => $question->options->firstWhere('id', $answer->option_id)->option_text ?? 'N/A',
+                        'option' => $answer->option->option_text ?? $question->options->firstWhere('id', $answer->option_id)->option_text ?? 'N/A',
                         default => null,
                         };
                         $badgeClass = match($type) {
@@ -1000,7 +1038,7 @@
                         @endphp
                         <tr>
                             <td style="text-align:center">
-                                <span class="ap-idx">{{ $loop->parent->parent->iteration }}</span>
+                                <span class="ap-idx">{{ $answers->firstItem() + $loop->index }}</span>
                             </td>
 
                             <td>
@@ -1058,8 +1096,6 @@
                                 </button>
                             </td>
                         </tr>
-                        @endforeach
-                        @endforeach
                         @empty
                         <tr>
                             <td colspan="8">
@@ -1078,6 +1114,12 @@
                     </tbody>
                 </table>
             </div>
+
+            @if($answers->hasPages())
+            <div style="padding:16px 18px;">
+                {{ $answers->links() }}
+            </div>
+            @endif
         </div>
 
     </div>
