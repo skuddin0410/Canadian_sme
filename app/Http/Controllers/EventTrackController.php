@@ -21,10 +21,15 @@ class EventTrackController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        // Create and store the event track
-        Track::create([
-            'name' => $request->name,
+        $track = Track::firstOrCreate([
+            'name' => trim($request->name),
         ]);
+
+        if (! $track->wasRecentlyCreated) {
+            return redirect()
+                ->route('calendar.index')
+                ->with('success', 'Event Track already exists.');
+        }
 
         return redirect()->route('calendar.index')->with('success', 'Event Track added successfully!');
     }

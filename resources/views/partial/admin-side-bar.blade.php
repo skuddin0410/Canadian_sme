@@ -258,11 +258,11 @@
             </a>
         </li>
 
-        {{-- <li class="menu-item {{ request()->is('admin/categories*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/categories*') ? 'active open' : '' }}">
             <a href="{{ route('categories.index') }}" class="menu-link">
                 <div data-i18n="categories">Categories & Tags</div>
             </a>
-        </li> --}}
+        </li>
 
         {{-- <li class="menu-item {{ request()->is('admin/webview*') ? 'active open' : '' }}">
             <a href="{{ route('webview') }}" class="menu-link">
