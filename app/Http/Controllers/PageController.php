@@ -261,8 +261,10 @@ class PageController extends Controller
                 return response(['data'=>$page->about ?? '']);
             }
             if($slug=='support'){
-                $page = Page::where('slug', $slug)->first();
-                return response(['data'=>$page->description ?? '']);
+                // $page = Page::where('slug', $slug)->first();
+                // return response(['data'=>$page->description ?? '']);
+                $page = Event::where('id', $event_id)->first();
+                return response(['data'=>$page->help_support ?? '']);
             }
             if($slug=='location'){
                 $page = Event::where('id', $event_id)->first();
