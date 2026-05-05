@@ -79,7 +79,7 @@ class CreateCometChatIdsForBatchUsers extends Command
  
             // Get the user's photo URL using the `photo` relationship
             $user = User::find($userId);
-            $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/default.png');
+            $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/noImage.png');
  
             $data = [
                 'uid' => "SME_CometChat_{$userId}",

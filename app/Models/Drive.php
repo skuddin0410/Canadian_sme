@@ -34,7 +34,7 @@ class Drive extends Model
            }
         }
 
-        return asset('images/default.png');
+        return asset('images/noImage.png');
     }
 
     public function getMobilePathAttribute()
@@ -74,7 +74,7 @@ class Drive extends Model
             }
         }
 
-        return asset('images/default.png');
+        return asset('images/noImage.png');
     }
 
     protected $appends = ['file_path','mobile_path'];

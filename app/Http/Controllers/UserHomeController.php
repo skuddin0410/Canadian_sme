@@ -28,7 +28,7 @@ class UserHomeController extends Controller
     //         'last_name' => $user->lastname ?? '',
     //         'email' => $user->email ?? '',
     //         'phone' => $user->mobile ?? '',
-    //         'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
+    //         'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/noImage.png'),
 
     //         'company_about_page' => config('app.url') . 'app/page/about',
     //         'company_location_page' => config('app.url') . 'app/page/location',
@@ -104,7 +104,7 @@ class UserHomeController extends Controller
                     'id'       => $exhibitor->id,
                     'name'     => $exhibitor->name ?? '',
                     'word_no'  => $exhibitor->booth ?? '',
-                    'avatar'   => $exhibitor->contentIconFile?->mobile_path ?? asset('images/default.png'),
+                    'avatar'   => $exhibitor->contentIconFile?->mobile_path ?? asset('images/noImage.png'),
                     'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg'),
                     'location' => $exhibitor->location ?? ($exhibitor->booth ?? ''),
                     'email'    => $exhibitor->email ?? '',

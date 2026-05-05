@@ -392,7 +392,7 @@ class AttendeeUserController extends Controller
         $region = env('COMETCHAT_REGION');
 
         $user = User::find($userId);
-        $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/default.png');
+        $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/noImage.png');
 
         $data = [
             'uid' => "SME_CometChat_{$userId}",

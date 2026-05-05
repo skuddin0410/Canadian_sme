@@ -45,7 +45,7 @@ class JWTAuthController extends Controller
                 'last_name' => $user->lastname ?? '',
                 'email'     => $user->email ?? '',
                 'phone'    => $user->mobile ?? '',
-                'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
+                'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/noImage.png'),
                 'company_about_page'  => config('app.url').'app/page/about',
                 'company_location_page'    => config('app.url').'app/page/location',
                 'company_privacy_policy_page' => config('app.url').'app/page/privacy',
@@ -113,7 +113,7 @@ class JWTAuthController extends Controller
                 'last_name' => $user->lastname ?? '',
                 'email' => $user->email ?? '',
                 'phone' => $user->mobile ?? '',
-                'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/default.png'),
+                'imageUrl' => !empty($user->photo) ? $user->photo->mobile_path : asset('images/noImage.png'),
                 'my_qr_code' => !empty($user->qr_code) ? asset($user->qr_code) : null,
                 'company_name' => !empty($user->usercompany) ? $user->usercompany->name : $user->company,
                 'company_email' => !empty($user->usercompany) ? $user->usercompany->email : $user->email,
@@ -488,7 +488,7 @@ public function getExhibitor($exhibitorId)
         $response = [
             'name'     => $exhibitor->name ?? '',
             'word_no'  => $exhibitor->booth ?? '',
-            'avatar'   => $exhibitor->contentIconFile?->mobile_path ?? asset('images/default.png'),
+            'avatar'   => $exhibitor->contentIconFile?->mobile_path ?? asset('images/noImage.png'),
             'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg'),
             'location' => $exhibitor->booth ?? '',
             'email'    => $exhibitor->email ?? '',
@@ -568,7 +568,7 @@ public function uploadExhibitorFiles(Request $request, $detailsID)
             return response()->json([
                 'message'   => 'File uploaded successfully.',
                 'file_id'   =>  !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->id : null,
-                'image_url' => !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->file_path : asset('images/default.png'),
+                'image_url' => !empty($exhibitor->Docs) ? $exhibitor->Docs[0]->file_path : asset('images/noImage.png'),
                 "type"=>$request->type
             ]);
 
@@ -591,7 +591,7 @@ public function uploadExhibitorFiles(Request $request, $detailsID)
             return response()->json([
                 'message'   => 'File uploaded successfully.',
                 'file_id'   =>  !empty($user->privateDocs) ? $user->privateDocs[0]->id : null,
-                'image_url' => !empty($user->privateDocs) ? $user->privateDocs[0]->file_path : asset('images/default.png'),
+                'image_url' => !empty($user->privateDocs) ? $user->privateDocs[0]->file_path : asset('images/noImage.png'),
                 "type"=>$request->type
             ]);
 
@@ -732,7 +732,7 @@ public function getSpeaker(Request $request)
                 'name'     => $speaker->full_name,
                 'company_name'  => $speaker->company ?? '',
                 'role'  => $speaker->designation ?? '',
-                'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/default.png'),
+                'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/noImage.png'),
                 'roles' => speakerGroups($speaker)
             ];
         });
@@ -794,7 +794,7 @@ public function getSpeakerById(Request $request){
             'company_details'=> $speaker->bio ?? '',
             'bio'            => $speaker->bio ?? '',
             'role'           => $speaker->designation ?? '',
-            'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/default.png'),
+            'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/noImage.png'),
             'roles'          => speakerGroups($speaker),
             'company_website'=> $speaker->website_url ?? '',
             'contact_details'=> $contactDetails
@@ -864,7 +864,7 @@ public function getAttendee(Request $request)
                     'name'     => $speaker->full_name,
                     'company_name'  => $speaker->company ?? '',
                     'role'  => $speaker->designation ?? '',
-                    'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/default.png'),
+                    'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/noImage.png'),
                     'roles' => groups($speaker)
                 ];
         });
@@ -925,7 +925,7 @@ public function getAttendeeById(Request $request){
             'company_details'=> $speaker->bio ?? '',
             'bio'            => $speaker->bio ?? '',
             'role'           => $speaker->designation ?? '',
-            'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/default.png'),
+            'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/noImage.png'),
             'roles'          => groups($speaker),
             'contact_details'=> $contactDetails,
             'company_website' => $speaker->website_url ?? '',
@@ -1063,7 +1063,7 @@ public function getAllExhibitor(Request $request){
                 return [
                     'id'          => $exhibitor->id,
                     'name'        => $exhibitor->name,
-                    'image_url'   => $exhibitor->contentIconFile ? $exhibitor->contentIconFile->mobile_path : asset('images/default.png'),
+                    'image_url'   => $exhibitor->contentIconFile ? $exhibitor->contentIconFile->mobile_path : asset('images/noImage.png'),
                     'location'    => $exhibitor->booth ?? '',
                 ];
             });
@@ -1122,7 +1122,7 @@ public function getAllExhibitor(Request $request){
                 return [
                     'id'          => $sponsor->id,
                     'name'        => $sponsor->name,
-                    'image_url'   => $sponsor->logo ? $sponsor->logo->mobile_path : asset('images/default.png'),
+                    'image_url'   => $sponsor->logo ? $sponsor->logo->mobile_path : asset('images/noImage.png'),
                     'level'    =>  $sponsor->type ? ucfirst(str_replace('-', ' ', $sponsor->type)) : '',
                     'color_code'    => $sponsor->type ?  typeColor($sponsor->type) : '',
                 ];
@@ -1161,7 +1161,7 @@ public function getAllExhibitor(Request $request){
                 $data = [
                     "id"=> $sponsor->id ?? '',
                     "name" => $sponsor->name ?? '',
-                    "avatar" => $sponsor->logo ? $sponsor->logo->mobile_path : asset('images/default.png'),
+                    "avatar" => $sponsor->logo ? $sponsor->logo->mobile_path : asset('images/noImage.png'),
                     'banner'   => $sponsor->banner?->file_path ?? asset('images/eventify-banner.jpg'),
                     "word_no" => $sponsor->booth ?? '',
                     "location" => $sponsor->booth ?? '',

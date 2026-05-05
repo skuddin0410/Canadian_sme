@@ -481,7 +481,7 @@ public function deleteDoc($id)
                     'email' => $user->email,
                     'mobile' => $user->mobile,
                     'designation' => $user->designation,
-                    'image' => $user->photo ? $user->photo->file_path : asset('images/default.png')
+                    'image' => $user->photo ? $user->photo->file_path : asset('images/noImage.png')
                 ];
             })
         ]);
