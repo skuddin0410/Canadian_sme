@@ -61,6 +61,7 @@ class OtpController extends Controller
 
             $email   = $request->email;
             $eventId = (int) $request->event_id;
+            $event = null;
 
             // Fetch user once (including soft deleted)
             $user = User::withTrashed()->where('email', $email)->first();
@@ -117,6 +118,11 @@ class OtpController extends Controller
                 ], 429);
             }
 
+            $subject = 'Login OTP';
+            if (!empty($event?->title)) {
+                $subject .= ' - ' . $event->title;
+            }
+
             $code = rand(1000, 9999);
             $currentDateTime = Carbon::now();
           
@@ -130,7 +136,7 @@ class OtpController extends Controller
 
                 // Mail::to($request->email)->send(new OtpMail($code)); //Subabrata da code for otp mail
 
-                Mail::raw($code.' is your login OTP. Please ensure this as confidential. ' .env('APP_NAME'). ' will never call you to verify your OTP. Good Luck,', function($m) use ($request){ $m->to($request->email)->subject('Login OTP'); }); //My code for otp mail
+                Mail::raw($code.' is your login OTP. Please ensure this as confidential. ' .env('APP_NAME'). ' will never call you to verify your OTP. Good Luck,', function($m) use ($request, $subject){ $m->to($request->email)->subject($subject); }); //My code for otp mail
 
                 return response()->json([
                     'success' => true,

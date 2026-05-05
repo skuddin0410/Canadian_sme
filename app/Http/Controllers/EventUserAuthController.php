@@ -91,14 +91,24 @@ class EventUserAuthController extends Controller
             }
         }
 
+        $event = null;
+        if ($request->filled('event_id')) {
+            $event = Event::find($request->event_id);
+        }
+
+        $subject = 'Login OTP';
+        if (!empty($event?->title)) {
+            $subject .= ' - ' . $event->title;
+        }
+
         $code = rand(1000, 9999);
         Otp::updateOrCreate(
             ['email' => $email],
             ['otp' => $code, 'expired_at' => now()->addMinutes(10)]
         );
 
-        Mail::raw($code . ' is your login OTP. Please ensure this as confidential. ' . config('app.name') . ' will never call you to verify your OTP.', function ($m) use ($email) {
-            $m->to($email)->subject('Login OTP');
+        Mail::raw($code . ' is your login OTP. Please ensure this as confidential. ' . config('app.name') . ' will never call you to verify your OTP.', function ($m) use ($email, $subject) {
+            $m->to($email)->subject($subject);
         });
 
         return response()->json(['success' => true, 'message' => 'OTP sent successfully to ' . $email]);
