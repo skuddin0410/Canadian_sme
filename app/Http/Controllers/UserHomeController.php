@@ -105,7 +105,7 @@ class UserHomeController extends Controller
                     'name'     => $exhibitor->name ?? '',
                     'word_no'  => $exhibitor->booth ?? '',
                     'avatar'   => $exhibitor->contentIconFile?->mobile_path ?? asset('images/noImage.png'),
-                    'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/eventify-banner.jpg'),
+                    'banner'   => $exhibitor->quickLinkIconFile?->file_path ?? asset('images/noImage.png'),
                     'location' => $exhibitor->location ?? ($exhibitor->booth ?? ''),
                     'email'    => $exhibitor->email ?? '',
                     'phone'    => $exhibitor->phone ?? '',
