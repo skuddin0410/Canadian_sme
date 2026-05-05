@@ -23,6 +23,7 @@ class EventController extends Controller
         $perPage = (int) $request->input('perPage', 20);
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
+        $today = now()->startOfDay();
 
         if ($request->ajax() && $request->ajax_request == true) {
             $events = Event::with(['category', 'photo', 'mapImage'])->orderBy('id', 'DESC');
@@ -39,6 +40,29 @@ class EventController extends Controller
                 $events = $events->where(function ($query) use ($request) {
                     $query->where('category', $request->category);
                 });
+            }
+
+            if ($request->filled('event_timing')) {
+                if ($request->event_timing === 'past') {
+                    $events->whereDate(DB::raw('COALESCE(end_date, start_date)'), '<', $today);
+                }
+
+                if ($request->event_timing === 'present') {
+                    $events->whereDate('start_date', '<=', $today)
+                        ->whereDate(DB::raw('COALESCE(end_date, start_date)'), '>=', $today);
+                }
+
+                if ($request->event_timing === 'future') {
+                    $events->whereDate('start_date', '>', $today);
+                }
+            }
+
+            if ($request->filled('visibility')) {
+                $events->where('visibility', $request->visibility);
+            }
+
+            if ($request->filled('status')) {
+                $events->where('status', $request->status);
             }
 
             $eventsCount = clone $events;

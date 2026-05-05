@@ -48,6 +48,7 @@ class EventController extends Controller
         $query = Event::query()
             ->with(['photo'])
             ->where('status', 'published')
+            ->where('visibility', 'listed')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($searchQuery) use ($search) {
                     $searchQuery->where('title', 'like', "%{$search}%")

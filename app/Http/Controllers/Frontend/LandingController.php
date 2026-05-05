@@ -976,13 +976,10 @@ class LandingController extends Controller
         }
 
         $base = $base->with(['photo'])
-            // optional: only active/visible events
-            // ->where('status', 1)
-            // ->where('visibility', 'public')
-            // only show published events to regular users/attendees
             ->when(!auth()->user() || !auth()->user()->hasRole('Admin'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->where('visibility', 'listed')
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($qq) use ($q) {
                     $qq->where('title', 'like', "%{$q}%")
