@@ -230,11 +230,11 @@
                 </div>
                 <div class="col-6">
                     <div class="mb-3">
-                      <label class="form-label" for="title">Visibility<span class="text-danger">*</span></label>
+                      <label class="form-label" for="title">Listing Privacy<span class="text-danger">*</span></label>
                       <div class="input-group input-group-merge">
                         <span id="title-icon" class="input-group-text"><i class="bx bx-book"></i></span>
                         <select class="form-control" name="visibility">
-                            @foreach(['public', 'private', 'unlisted'] as $visibility)
+                            @foreach(['listed', 'unlisted'] as $visibility)
                                 <option value="{{ $visibility }}" @selected(old('visibility', $e->visibility ?? '') === $visibility)>
                                     {{ ucfirst($visibility) }}
                                 </option>

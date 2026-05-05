@@ -27,9 +27,9 @@
                 <div class="col-12 text-right">
                     <form action="#" method="GET" id="blog-filter">        
                     <div class="row padding-none">
-                        <div class="col-4">  
+                        <div class="col-12 col-md-2">  
                         </div>
-                        <div class="col-3">
+                        <div class="col-12 col-md-2">
                               <input
                               type="text"
                               class="form-control"
@@ -38,7 +38,7 @@
                               id="search"
                               placeholder="Search"/>
                         </div>          
-                        <div class="col-3">  
+                        <div class="col-12 col-md-2">  
                          <div class="mb-3">
                             <select class="form-control" name="category" id="category">
                                 <option value="">Please select category</option>
@@ -50,7 +50,38 @@
                             </select>
                         </div>
                         </div>
-                        <div class="col-2 text-center">
+                        <div class="col-12 col-md-2">
+                         <div class="mb-3">
+                            <select class="form-control" name="event_timing" id="event_timing">
+                                <option value="">All timing</option>
+                                <option value="present">Present</option>
+                                <option value="future">Future</option>
+                                <option value="past">Past</option>
+                            </select>
+                        </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                         <div class="mb-3">
+                            <select class="form-control" name="visibility" id="visibility">
+                                <option value="">Listing Privacy</option>
+                                <option value="listed">Listed</option>
+                                <option value="unlisted">Unlisted</option>
+                            </select>
+                        </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                         <div class="mb-3">
+                            <select class="form-control" name="status" id="status">
+                                <option value="">All status</option>
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row padding-none">
+                        <div class="col-12 text-center">
                            <button type="button" class="btn btn-outline-primary btn-pill reset-filter">Reset</button>
                            <button type="button" class="btn btn-primary filter">Filter</button>
                         </div>  
@@ -170,7 +201,10 @@
     $(document).on("click", ".filter", function(e) {
         var search = $('#search').val();
         var category = $('#category').val();
-        if( search.trim() == '' && category.trim()== ''){
+        var eventTiming = $('#event_timing').val();
+        var visibility = $('#visibility').val();
+        var status = $('#status').val();
+        if( search.trim() == '' && category.trim()== '' && eventTiming.trim() == '' && visibility.trim() == '' && status.trim() == ''){
            return ;
         } 
        $(".spinner-border").fadeIn(300); 
