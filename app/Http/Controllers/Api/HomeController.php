@@ -287,11 +287,13 @@ public function getNotifications(Request $request)
     $isSpeaker = $user->hasRole('Speaker');
     $photo = $user->photo;
     $userPhoto = !empty($user->photo) ? $user->photo->mobile_path : asset('images/noImage.png');
+    $eventId = (int) ($request->event_id ?: 1);
     
     $notifications = GeneralNotification::query()
         ->where(function ($q) use ($user) {        
             $q->Where('user_id', $user->id); 
         })
+        ->where('event_id', $eventId)
         ->latest()
         ->take(20)
         ->get()
@@ -953,7 +955,10 @@ public function readAllNotifications(Request $request){
             ], 401);
         }
 
-       GeneralNotification::where("user_id",$user->id)->update(["is_read"=>1, "read_at"=>Now()]);
+       $eventId = (int) ($request->event_id ?: 1);
+       GeneralNotification::where("user_id",$user->id)
+            ->where('event_id', $eventId)
+            ->update(["is_read"=>1, "read_at"=>Now()]);
        return response()->json(["message" => "Notification all read!"]);
     
     } catch (\Exception $e) {

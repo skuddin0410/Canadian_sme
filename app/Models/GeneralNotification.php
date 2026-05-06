@@ -20,7 +20,7 @@
      use AutoHtmlDecode;
 
 	protected $fillable = [
-	'user_id','title','body',
+	'user_id','event_id','title','body',
 	'related_type','related_id','related_name',
 	'scheduled_at','delivered_at','read_at','meta','is_read',
 	];
