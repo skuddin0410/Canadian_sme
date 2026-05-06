@@ -220,14 +220,14 @@ class User extends Authenticatable implements JWTSubject
     public function connections()
     {
         return $this->belongsToMany(User::class, 'user_connections', 'user_id', 'connection_id')
-            ->withPivot('status')
+            ->withPivot('status', 'event_id')
             ->withTimestamps();
     }
 
     public function connectedWithMe()
     {
         return $this->belongsToMany(User::class, 'user_connections', 'connection_id', 'user_id')
-            ->withPivot('status')
+            ->withPivot('status', 'event_id')
             ->withTimestamps();
     }
 
