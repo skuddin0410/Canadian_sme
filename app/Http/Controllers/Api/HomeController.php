@@ -477,9 +477,11 @@ public function getConnections(Request $request)
             ], 401);
         }
 
-        
+        $eventId = (int) ($request->event_id ?: 1);
         $user = auth()->user();
-        $connectionData = UserConnection::where('user_id', $user->id)->pluck('connection_id');
+        $connectionData = UserConnection::where('user_id', $user->id)
+            ->where('event_id', $eventId)
+            ->pluck('connection_id');
         $connections = [];
         if(!empty($connectionData)){
 
@@ -522,10 +524,14 @@ public function getConnectionsDetails(Request $request)
             ], 401);
         }
 
-        
+        $eventId = (int) ($request->event_id ?: 1);
         $user = auth()->user();
         // merge both sides
-        $connecteduser = UserConnection::with('connection')->where('connection_id', $request->connectionId)->where('user_id', $user->id)->first();
+        $connecteduser = UserConnection::with('connection')
+            ->where('connection_id', $request->connectionId)
+            ->where('user_id', $user->id)
+            ->where('event_id', $eventId)
+            ->first();
 
         if (!$connecteduser) {
             return response()->json([
@@ -538,6 +544,7 @@ public function getConnectionsDetails(Request $request)
         $connecteduser = UserConnection::with('connection', 'connection.photo', 'connection.visitingcard','connection.privateDocs')
         ->where('connection_id', $request->connectionId)
         ->where('user_id', $user->id)
+        ->where('event_id', $eventId)
         ->first();
      
         $connectionDetails = [
@@ -574,7 +581,7 @@ public function getConnectionsDetails(Request $request)
                                     : asset('images/noImage.png'),
             "status"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->status ?? null : null,
             "address"          => $connecteduser && $connecteduser->connection ? $connecteduser->connection->pivot->street ?? null : null,
-            'is_favorite'     => $connecteduser && $connecteduser->connection ? isFavoriteConnection($connecteduser->connection->id) :false,
+            'is_favorite'     => $connecteduser && $connecteduser->connection ? isFavoriteConnection($connecteduser->connection->id, $eventId) :false,
 
             "uploaded_files" => $connecteduser && $connecteduser->connection && $connecteduser->connection->privateDocs 
                             ? $connecteduser->connection->privateDocs->map(fn ($doc) => [
@@ -716,11 +723,20 @@ public function scanDetails(Request $request){
             ], 422);
         }
 
-        $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
+        $eventId = (int) ($request->event_id ?: 1);
+        $data = UserConnection::with('connection')
+            ->where('user_id',$user->id)
+            ->where('connection_id',$request->qrData)
+            ->where('event_id', $eventId)
+            ->first();
        
         if(!$data){
-          userConnection($user->id, $request->qrData);
-          $data = UserConnection::with('connection')->where('user_id',$user->id)->where('connection_id',$request->qrData)->first();
+          userConnection($user->id, $request->qrData, $eventId);
+          $data = UserConnection::with('connection')
+            ->where('user_id',$user->id)
+            ->where('connection_id',$request->qrData)
+            ->where('event_id', $eventId)
+            ->first();
         }
         
         if(empty($data->connection)){
@@ -760,7 +776,11 @@ public function scanDetailsUpdate(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
-        $connetion = UserConnection::where('connection_id',$request->qrData)->where('user_id',$user->id)->first();
+        $eventId = (int) ($request->event_id ?: 1);
+        $connetion = UserConnection::where('connection_id',$request->qrData)
+            ->where('user_id',$user->id)
+            ->where('event_id', $eventId)
+            ->first();
         if(!$connetion){
            return response()->json([
             "message"=> "Fail to add note!",
@@ -787,7 +807,11 @@ public function connectionUpdate(Request $request){
             ], 401);
         }
         
-        $connetion = UserConnection::where('connection_id',$request->connectionId)->where('user_id',$user->id)->first();
+        $eventId = (int) ($request->event_id ?: 1);
+        $connetion = UserConnection::where('connection_id',$request->connectionId)
+            ->where('user_id',$user->id)
+            ->where('event_id', $eventId)
+            ->first();
 
         if(!$connetion){
            return response()->json([
@@ -866,8 +890,12 @@ public function createConnection(Request $request){
             notification($connection->id);
         }
         
-        userConnection($user->id, $connection->id);
-        $connetionUpdate = UserConnection::where('connection_id',$connection->id)->where('user_id',$user->id)->first();
+        $eventId = (int) ($request->event_id ?: 1);
+        userConnection($user->id, $connection->id, $eventId);
+        $connetionUpdate = UserConnection::where('connection_id',$connection->id)
+            ->where('user_id',$user->id)
+            ->where('event_id', $eventId)
+            ->first();
         $connetionUpdate->rating = $request->rating ?? '';
         $connetionUpdate->note =$request->note ?? '';
         $connetionUpdate->save(); 
@@ -943,8 +971,12 @@ public function readAllNotifications(Request $request){
             ], 401);
         }
         
+        $eventId = (int) ($request->event_id ?: 1);
         if($request->qr_code == 'm' ){
-            $connections = UserConnection::with('connection')->where('user_id', $user->id)->get();
+            $connections = UserConnection::with('connection')
+                ->where('user_id', $user->id)
+                ->where('event_id', $eventId)
+                ->get();
             if(empty($connections)){
 
                 return response()->json([
@@ -985,7 +1017,10 @@ public function readAllNotifications(Request $request){
             
         }else{
 
-            $connection = UserConnection::with('connection')->where('connection_id', $request->qr_code)->first();
+            $connection = UserConnection::with('connection')
+                ->where('connection_id', $request->qr_code)
+                ->where('event_id', $eventId)
+                ->first();
 
             if (!$connection) {
               return response()->json(['message' => 'Connection not found'], 404);
@@ -1123,12 +1158,13 @@ public function sendPushNotificationTest(Request $request)
                 'message' => 'Unauthorized'
             ], 401);
         } 
-       
-       if(!isFavoriteConnection($request->connectionId)){
-          addConnection($request->connectionId);
+       $eventId = (int) ($request->event_id ?: 1);
+
+       if(!isFavoriteConnection($request->connectionId, $eventId)){
+          addConnection($request->connectionId, null, $eventId);
           return response()->json(["message"=> "Connection added as favourite"]);
         }else{
-          removeConnection($request->connectionId);
+          removeConnection($request->connectionId, null, $eventId);
           return response()->json(["message"=> "Connection moved from favourite"]);
         }
     }
@@ -1142,9 +1178,11 @@ public function sendPushNotificationTest(Request $request)
             ], 401);
         }
 
-        
+        $eventId = (int) ($request->event_id ?: 1);
         $user = auth()->user();
-        $connectionData = FavoriteConnection::where('user_id', $user->id)->pluck('connection_id');
+        $connectionData = FavoriteConnection::where('user_id', $user->id)
+            ->where('event_id', $eventId)
+            ->pluck('connection_id');
         $connections = [];
         if(!empty($connectionData)){
 

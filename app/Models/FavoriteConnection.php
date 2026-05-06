@@ -14,6 +14,7 @@ class FavoriteConnection extends Model
     protected $fillable = [
         'user_id',
         'connection_id',
+        'event_id',
     ];
 
     /**
