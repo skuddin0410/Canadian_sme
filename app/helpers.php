@@ -416,13 +416,14 @@ if (! function_exists('isFavorite')) {
 }
 
 if (! function_exists('userConnection')) {
-    function userConnection($senderId,$receiverId)
+    function userConnection($senderId,$receiverId,$eventId=1)
     {   
 
         UserConnection::updateOrCreate(
             [
                 'user_id'       => $senderId,
                 'connection_id' => $receiverId,
+                'event_id'      => $eventId,
             ],
             [
                 'status'        => 'accepted',

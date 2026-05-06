@@ -13,7 +13,7 @@ class UserConnection extends Model
     use  Auditable;
     use AutoHtmlDecode;
 
-    protected $fillable = ['user_id', 'connection_id', 'status','rating','note'];
+    protected $fillable = ['user_id', 'connection_id', 'status','rating','note', 'event_id'];
 
     public function user()
     {
@@ -25,18 +25,25 @@ class UserConnection extends Model
         return $this->belongsTo(User::class, 'connection_id');
     }
 
-    public static function alreadyConnected($userId, $connectionId): bool
+    public function event()
     {
-        return self::where(function ($q) use ($userId, $connectionId) {
-                $q->where('user_id', $userId)
-                  ->where('connection_id', $connectionId);
-            })
-            ->orWhere(function ($q) use ($userId, $connectionId) {
-                $q->where('user_id', $connectionId)
-                  ->where('connection_id', $userId);
+        return $this->belongsTo(Event::class, 'event_id');
+    }
+
+    public static function alreadyConnected($userId, $connectionId, $eventId = 1): bool
+    {
+        return self::where('event_id', $eventId)
+            ->where(function ($q) use ($userId, $connectionId) {
+                $q->where(function ($q2) use ($userId, $connectionId) {
+                    $q2->where('user_id', $userId)
+                       ->where('connection_id', $connectionId);
+                })
+                ->orWhere(function ($q2) use ($userId, $connectionId) {
+                    $q2->where('user_id', $connectionId)
+                       ->where('connection_id', $userId);
+                });
             })
             ->exists();
     }
-
 }
 
