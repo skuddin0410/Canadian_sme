@@ -16,9 +16,15 @@ class EmailTemplate extends Model
     use SoftDeletes;
     protected $dates = ['deleted_at']; 
     protected $fillable = [
+        'event_id',
         'template_name',
         'subject',
         'type',
         'message',
     ];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }

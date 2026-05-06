@@ -448,18 +448,26 @@ if (! function_exists('removeFavorite')) {
 
 
 if (!function_exists('fetchEmailTemplates')) {
-    function fetchEmailTemplates()
+    function fetchEmailTemplates($eventId = null)
     {  
-       $emailTemplate = EmailTemplate::where('type','email')->orderBy("created_at","DESC")->get();
+       $emailTemplate = EmailTemplate::where('type','email');
+       if (!empty($eventId)) {
+            $emailTemplate->where('event_id', $eventId);
+       }
+       $emailTemplate = $emailTemplate->orderBy("created_at","DESC")->get();
        return $emailTemplate;
     }
 }
 
 
 if (!function_exists('fetchNotificationTemplates')) {
-    function fetchNotificationTemplates()
+    function fetchNotificationTemplates($eventId = null)
     {  
-       $emailTemplate = EmailTemplate::where('type','notifications')->orderBy("created_at","DESC")->get();
+       $emailTemplate = EmailTemplate::where('type','notifications');
+       if (!empty($eventId)) {
+            $emailTemplate->where('event_id', $eventId);
+       }
+       $emailTemplate = $emailTemplate->orderBy("created_at","DESC")->get();
        return $emailTemplate;
     }
 }

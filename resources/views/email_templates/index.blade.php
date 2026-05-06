@@ -18,11 +18,38 @@
     </button>
 </div>
 
-        
+    <form action="{{ route('email-templates.index') }}" method="GET" class="row g-2 align-items-end mb-3">
+        <div class="col-md-3">
+            <label for="filter_event_id" class="form-label">Event</label>
+            <select name="event_id" id="filter_event_id" class="form-select">
+                <option value="">All Events</option>
+                @foreach($events as $event)
+                    <option value="{{ $event->id }}" {{ (string) request('event_id') === (string) $event->id ? 'selected' : '' }}>
+                        {{ $event->title }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="filter_type" class="form-label">Type</label>
+            <select name="type" id="filter_type" class="form-select">
+                <option value="">All Types</option>
+                <option value="email" {{ request('type') === 'email' ? 'selected' : '' }}>Email</option>
+                <option value="notifications" {{ request('type') === 'notifications' ? 'selected' : '' }}>Notification</option>
+            </select>
+        </div>
+        <div class="col-md-auto">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+        <div class="col-md-auto">
+            <a href="{{ route('email-templates.index') }}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
 
     <table class="table table-bordered">
         <tr>
             <th>ID</th>
+            <th>Event</th>
             <th>Template Name</th>
             <th>Subject</th>
             <th>Type</th>
@@ -39,6 +66,7 @@
             <tr>
                 {{-- <td>{{ $template->id }}</td> --}}
                 <td>{{ $loop->iteration + ($templates->currentPage() - 1) * $templates->perPage() }}</td>
+                <td>{{ $template->event?->title ?? '-' }}</td>
                 <td>{{ $template->template_name }}</td>
                 <td>{{ $template->subject }}</td>
                 <td>{{ $template->type }}</td>

@@ -19,14 +19,16 @@ class SendScheduledBulkNotificationJob implements ShouldQueue
 
     public $userIds;
     public $templateName;
+    public $eventId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(array $userIds, string $templateName)
+    public function __construct(array $userIds, string $templateName, int $eventId)
     {
         $this->userIds = $userIds;
         $this->templateName = $templateName;
+        $this->eventId = $eventId;
     }
 
     /**
@@ -35,6 +37,7 @@ class SendScheduledBulkNotificationJob implements ShouldQueue
     public function handle(): void
     {
         $notificationTemplate = EmailTemplate::where('template_name', $this->templateName)
+            ->where('event_id', $this->eventId)
             ->where('type', 'notifications')
             ->first();
 

@@ -760,6 +760,9 @@ class AttendeeUserController extends Controller
 
     public function bulkAction(Request $request)
     {
+        $request->validate([
+            'event_id' => 'required|exists:events,id',
+        ]);
         // dd($request->all());
 
         $userIds = json_decode($request->user_ids, true);
@@ -772,7 +775,9 @@ class AttendeeUserController extends Controller
             $users = User::whereIn('id', $userIds)->get();
         }
 
-        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)->first();
+        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)
+            ->where('event_id', $request->event_id)
+            ->first();
         $subject = $emailTemplate->subject ?? '';
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -829,33 +834,33 @@ class AttendeeUserController extends Controller
 
                 // Tracking Pixel (hidden properly)
                 $pixel = '<img src="' . $pixelUrl . '" width="1" height="1" 
-    style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
-    alt="" border="0">';
+                style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
+                alt="" border="0">';
 
                 // Email HTML
                 $htmlBody = '
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>' . $subject . '</title>
-</head>
-<body style="font-family:Arial, sans-serif; line-height:1.6; color:#333;">
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>' . $subject . '</title>
+                </head>
+                <body style="font-family:Arial, sans-serif; line-height:1.6; color:#333;">
 
-    <h3>Hi ' . $user->full_name . ',</h3>
+                    <h3>Hi ' . $user->full_name . ',</h3>
 
-    <div>
-        ' . $message . '
-    </div>
+                    <div>
+                        ' . $message . '
+                    </div>
 
-    <!-- Tracking pixel: 1x1, no display:none, loads on email open -->
-    <img src="' . $pixelUrl . '" width="1" height="1" 
-         style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
-         alt="" border="0">
+                    <!-- Tracking pixel: 1x1, no display:none, loads on email open -->
+                    <img src="' . $pixelUrl . '" width="1" height="1" 
+                        style="width:1px;height:1px;border:0;margin:0;padding:0;overflow:hidden;" 
+                        alt="" border="0">
 
-</body>
-</html>
-';
+                </body>
+                </html>
+                ';
 
                 Mail::send([], [], function ($mail) use ($user, $subject, $htmlBody) {
 
@@ -1168,12 +1173,14 @@ class AttendeeUserController extends Controller
     public function sendBoth(Request $request)
     {
         $request->validate([
+            'event_id' => 'required|exists:events,id',
             'email_template' => 'nullable|string',
             'notification_template' => 'nullable|string',
             'schedule_time' => 'nullable|date',
             'timezone'      => 'nullable|string',
         ]);
-
+        // dd($request->all());
+        
         $emailTemplateName = $request->email_template;
         $notificationTemplateName = $request->notification_template;
         $scheduleTime = $request->schedule_time;
@@ -1194,13 +1201,13 @@ class AttendeeUserController extends Controller
             }
 
             if ($emailTemplateName) {
-                SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName)
+                SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName, (int) $request->event_id)
                     ->delay($time)
                     ->onQueue('default');
             }
 
             if ($notificationTemplateName) {
-                SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName)
+                SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName, (int) $request->event_id)
                     ->delay($time)
                     ->onQueue('default');
             }
@@ -1215,11 +1222,13 @@ class AttendeeUserController extends Controller
             return response()->json(['message' => 'No users found to send.'], 404);
         }
 
-        $usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName) {
+        $usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName, $request) {
             foreach ($users as $user) {
                 // Handle email sending
                 if ($emailTemplateName) {
-                    $emailTemplate = EmailTemplate::where('template_name', $emailTemplateName)->first();
+                    $emailTemplate = EmailTemplate::where('template_name', $emailTemplateName)
+                        ->where('event_id', $request->event_id)
+                        ->first();
                     if ($emailTemplate && $emailTemplate->type === 'email') {
                         $subject = str_replace(['{{site_name}}', '{{ site_name }}'], config('app.name'), $emailTemplate->subject ?? '');
                         $message = $emailTemplate->message ?? '';
@@ -1249,7 +1258,9 @@ class AttendeeUserController extends Controller
 
                 // Handle notification sending
                 if ($notificationTemplateName) {
-                    $notificationTemplate = EmailTemplate::where('template_name', $notificationTemplateName)->first();
+                    $notificationTemplate = EmailTemplate::where('template_name', $notificationTemplateName)
+                        ->where('event_id', $request->event_id)
+                        ->first();
                     if ($notificationTemplate && $notificationTemplate->type === 'notifications') {
                         $title = 'Hi, ' . ($user->name ?? $user->email) . ',';
                         $message = str_replace(
@@ -1338,6 +1349,7 @@ class AttendeeUserController extends Controller
     public function scheduleEmail(Request $request)
     {
         $request->validate([
+            'event_id' => 'required|exists:events,id',
             'template_name' => 'required|string',
             'schedule_time' => 'required|date',
             'timezone'      => 'nullable|string',
@@ -1360,7 +1372,7 @@ class AttendeeUserController extends Controller
             ], 422);
         }
 
-        SendScheduledBulkEmailJob::dispatch($userIds, $request->template_name)
+        SendScheduledBulkEmailJob::dispatch($userIds, $request->template_name, (int) $request->event_id)
             ->delay($scheduleTime)
             ->onQueue('default');
 
@@ -1375,6 +1387,7 @@ class AttendeeUserController extends Controller
     public function scheduleNotification(Request $request)
     {
         $request->validate([
+            'event_id' => 'required|exists:events,id',
             'template_name' => 'required|string',
             'schedule_time' => 'required|date',
             'timezone'      => 'nullable|string',
@@ -1396,7 +1409,7 @@ class AttendeeUserController extends Controller
             ], 422);
         }
 
-        SendScheduledBulkNotificationJob::dispatch($userIds, $request->template_name)
+        SendScheduledBulkNotificationJob::dispatch($userIds, $request->template_name, (int) $request->event_id)
             ->delay($scheduleTime)
             ->onQueue('default');
 

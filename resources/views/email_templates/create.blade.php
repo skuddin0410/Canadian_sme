@@ -18,6 +18,16 @@
                         </div>
 
                         <div class="mb-3">
+                            <label>Event</label>
+                            <select name="event_id" class="form-control" required>
+                                <option value="">Please select event</option>
+                                @foreach($events as $event)
+                                    <option value="{{ $event->id }}">{{ $event->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label>Subject</label>
                             <input type="text" name="subject" class="form-control" required>
                         </div>
