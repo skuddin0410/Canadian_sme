@@ -251,7 +251,7 @@ if (!function_exists('qrCode')) {
 }
 
 if (!function_exists('notification')) {
-  function notification($user_id,$type='welcome', $session_id=null, $title='',$body='')
+  function notification($user_id,$type='welcome', $session_id=null, $title='',$body='', $event_id = null)
   {  
     $user = User::find($user_id);
     $session=null;
@@ -295,8 +295,13 @@ if (!function_exists('notification')) {
         'session' => $session
     ];
 
+    $resolvedEventId = $event_id
+        ?? ($session->event_id ?? null)
+        ?? 1;
+
      GeneralNotification::create([
         'user_id'=>$user->id,
+        'event_id' => $resolvedEventId,
         'title'=>$title,
         'related_type'=> $type,
         'body'=>$body,
