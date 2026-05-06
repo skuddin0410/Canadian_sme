@@ -588,17 +588,18 @@ if (!function_exists('sendPush')) {
 
 
 if (! function_exists('addConnection')) {
-    function addConnection($connectionId,$userId=null)
+    function addConnection($connectionId, $userId = null, $eventId = 1)
     {
         FavoriteConnection::firstOrCreate([
             'user_id' => !empty($userId) ? $userId : auth()->id(),
-            'connection_id' => $connectionId
+            'connection_id' => $connectionId,
+            'event_id' => $eventId,
         ]);
     }
 }
 
 if (! function_exists('removeConnection')) {
-    function removeConnection($connectionId, $userId = null): bool
+    function removeConnection($connectionId, $userId = null, $eventId = 1): bool
     {
         $uid = $userId ?? auth()->id();
         if (! $uid) {
@@ -607,15 +608,17 @@ if (! function_exists('removeConnection')) {
         
         return (bool) FavoriteConnection::where('user_id', $uid)
             ->where('connection_id', $connectionId)
+            ->where('event_id', $eventId)
             ->delete();
     }
 }
 
 if (! function_exists('isConnection')) {
-    function isFavoriteConnection($connectionId)
+    function isFavoriteConnection($connectionId, $eventId = 1)
     {
         $exists = FavoriteConnection::where('user_id', auth()->id())
         ->where('connection_id', $connectionId)
+        ->where('event_id', $eventId)
         ->exists();
 
         if ($exists) {
