@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Event;
 use App\Mail\UserWelcome;
 use Illuminate\Http\Request;
 use App\Models\EmailTemplate;
@@ -12,21 +13,40 @@ use Illuminate\Support\Facades\Crypt;
 
 class EmailTemplateController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $templates = EmailTemplate::latest()->paginate(10);
-        return view('email_templates.index', compact('templates'));
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
+
+        $templates = EmailTemplate::with('event')
+            ->when($request->filled('type'), function ($query) use ($request) {
+                $query->where('type', $request->type);
+            })
+            ->when($request->filled('event_id'), function ($query) use ($request) {
+                $query->where('event_id', $request->event_id);
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends($request->query());
+
+        return view('email_templates.index', compact('templates', 'events'));
     }
 
     public function create()
     {
-        return view('email_templates.create');
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
+
+        return view('email_templates.create', compact('events'));
     }
 
   public function store(Request $request)
 {
     $request->validate([
-        'template_name' => 'required|unique:email_templates,template_name',
+        'event_id' => 'required|exists:events,id',
+        'template_name' => 'required|unique:email_templates,template_name,NULL,id,event_id,' . $request->event_id,
         'subject' => 'required',
         'type' => 'required|in:email,notifications',
         'message' => [
@@ -59,27 +79,39 @@ class EmailTemplateController extends Controller
 
     public function edit(EmailTemplate $emailTemplate)
     {
-        return view('email_templates.edit', compact('emailTemplate'));
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
+
+        return view('email_templates.edit', compact('emailTemplate', 'events'));
     }
 
     public function update(Request $request, EmailTemplate $emailTemplate)
     {
         $request->validate([
-            'template_name' => 'required|unique:email_templates,template_name,' . $emailTemplate->id,
+            'event_id' => 'required|exists:events,id',
+            'template_name' => 'required|unique:email_templates,template_name,' . $emailTemplate->id . ',id,event_id,' . $request->event_id,
             'subject' => 'required',
-            'type' => 'nullable|string',
+            'type' => 'required|in:email,notifications',
             'message' => [
                 'required',
                 function ($attribute, $value, $fail) use ($request) {
+                    $textValue = $request->type === 'notifications' ? strip_tags($value) : $value;
                     $max = $request->type === 'notifications' ? 400 : 3000;
-                    if (strlen($value) > $max) {
+                    if (strlen($textValue) > $max) {
                         $fail("The {$attribute} may not be greater than {$max} characters for {$request->type}.");
                     }
                 }
             ]
         ]);
 
-        $emailTemplate->update($request->all());
+        $data = $request->all();
+
+        if ($request->type === 'notifications') {
+            $data['message'] = strip_tags($data['message']);
+        }
+
+        $emailTemplate->update($data);
 
         return redirect()->route('email-templates.index')
                          ->with('success', 'Email Template updated successfully.');

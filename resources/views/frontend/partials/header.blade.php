@@ -37,21 +37,21 @@
                     </button>
                     <ul class="navbar-nav mb-2 mb-md-0 gap-3 gap-lg-5 align-items-center ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('user.front.events', ['slug' => $event->slug ?? null]) }}">Home</a>
+                            <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('user.front.events', ['slug' => $event->slug]) : url('/') }}">Home</a>
                         </li>
 
 
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->routeIs('venue') ? 'active' : '' }}" href="{{ route('venue', ['slug' => $event->slug ?? null]) }}">Location</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('venue') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('venue', ['slug' => $event->slug]) : '#' }}">Location</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->routeIs('event.terms') ? 'active' : '' }}" href="{{ route('event.terms', ['slug' => $event->slug ?? null]) }}">Terms</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('event.terms') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('event.terms', ['slug' => $event->slug]) : '#' }}">Terms</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->routeIs('event.privacy') ? 'active' : '' }}" href="{{ route('event.privacy', ['slug' => $event->slug ?? null]) }}">Policy</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('event.privacy') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('event.privacy', ['slug' => $event->slug]) : '#' }}">Policy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->routeIs('event.about') ? 'active' : '' }}" href="{{ route('event.about', ['slug' => $event->slug ?? null]) }}">About</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('event.about') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('event.about', ['slug' => $event->slug]) : '#' }}">About</a>
                         </li>
                         <li class="nav-item">
                             @isset($event)

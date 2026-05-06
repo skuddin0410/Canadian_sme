@@ -275,6 +275,12 @@ function submitBulkAction(actionType) {
     if (selected.length === 0) {
        selected.push('all');
     }
+
+    const eventId = document.getElementById('event_id').value;
+    if (!eventId) {
+        Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+        return;
+    }
     
     const emailTemplateValue = document.getElementById('emailTemplate').value;
     const notificationTemplateValue = document.getElementById('notificationTemplate').value;
@@ -323,6 +329,7 @@ function submitBulkAction(actionType) {
                     data: {
                         user_ids: JSON.stringify(selected),
                         template_name: template_name,
+                        event_id: eventId,
                         schedule_time: schedule_time,
                         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                         _token: '{{ csrf_token() }}'
@@ -351,6 +358,7 @@ function submitBulkAction(actionType) {
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+            document.getElementById('selectedEventIdForSend').value = eventId;
             let form = document.getElementById('bulkActionForm');
             form.action = "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name+"&type="+type;
             form.submit();

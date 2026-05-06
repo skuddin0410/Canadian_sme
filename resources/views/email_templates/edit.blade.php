@@ -7,7 +7,8 @@
     <h2>Edit Email Template</h2>
 
         @php
-            $emailTemplateList = ["Event Reminder", "Welcome Email", "Event Reminder Notification","Welcome Notification","Event Cancellation Notification"];
+            // $emailTemplateList = ["Event Reminder", "Welcome Email", "Event Reminder Notification","Welcome Notification","Event Cancellation Notification"];
+            $emailTemplateList = [];
             $isRestricted = in_array($emailTemplate->template_name, $emailTemplateList);
             
         @endphp
@@ -26,6 +27,18 @@
                             <input type="text" name="template_name" 
                                    value="{{ $emailTemplate->template_name }}" 
                                    class="form-control" required {{ $isRestricted ? 'readonly' : '' }}>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Event</label>
+                            <select name="event_id" class="form-control" required>
+                                <option value="">Please select event</option>
+                                @foreach($events as $event)
+                                    <option value="{{ $event->id }}" {{ (int) $emailTemplate->event_id === (int) $event->id ? 'selected' : '' }}>
+                                        {{ $event->title }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mb-3">

@@ -86,6 +86,7 @@
                             <form id="bulkActionForm" action="#" method="POST">
                                 @csrf
                                 <input type="hidden" name="user_ids" id="selectedUserIds">
+                                <input type="hidden" name="event_id" id="selectedEventIdForSend">
 
                                 <div class="d-inline-block">
                                     <button type="button" class="btn btn-primary" onclick="openModal('email')">
@@ -139,7 +140,7 @@
                         <option value="">Please Select Template</option>
                         @if (!empty(fetchEmailTemplates()))
                             @foreach (fetchEmailTemplates() as $emailtemplate)
-                                <option value="{{ $emailtemplate->template_name }}">{{ $emailtemplate->template_name }}
+                                <option value="{{ $emailtemplate->template_name }}" data-event-id="{{ $emailtemplate->event_id }}">{{ $emailtemplate->template_name }}
                                 </option>
                             @endforeach
                         @endif
@@ -190,7 +191,7 @@
                         <option value="">Please Select Template</option>
                         @if (!empty(fetchNotificationTemplates()))
                             @foreach (fetchNotificationTemplates() as $emailtemplate)
-                                <option value="{{ $emailtemplate->template_name }}">{{ $emailtemplate->template_name }}
+                                <option value="{{ $emailtemplate->template_name }}" data-event-id="{{ $emailtemplate->event_id }}">{{ $emailtemplate->template_name }}
                                 </option>
                             @endforeach
                         @endif
@@ -234,7 +235,7 @@
                             <option value="">Please select email template</option>
                             @if (!empty(fetchEmailTemplates()))
                                 @foreach (fetchEmailTemplates() as $template)
-                                    <option value="{{ $template->template_name }}">{{ $template->template_name }}</option>
+                                    <option value="{{ $template->template_name }}" data-event-id="{{ $template->event_id }}">{{ $template->template_name }}</option>
                                 @endforeach
                             @endif
                         </select>
@@ -246,7 +247,7 @@
                             <option value="">Please select notification template</option>
                             @if (!empty(fetchNotificationTemplates()))
                                 @foreach (fetchNotificationTemplates() as $template)
-                                    <option value="{{ $template->template_name }}">{{ $template->template_name }}
+                                    <option value="{{ $template->template_name }}" data-event-id="{{ $template->event_id }}">{{ $template->template_name }}
                                     </option>
                                 @endforeach
                             @endif
@@ -569,9 +570,32 @@
                 $('#schedule_time_email, #schedule_time_notif, #schedule_time_both').val('');
             }
 
+            function filterTemplatesByEvent(eventId) {
+                $('#emailTemplate option, #notificationTemplate option, #emailTemplateBoth option, #notificationTemplateBoth option').each(function() {
+                    const optionEventId = $(this).data('event-id');
+
+                    if (!$(this).val()) {
+                        $(this).prop('hidden', false);
+                        return;
+                    }
+
+                    $(this).prop('hidden', String(optionEventId) !== String(eventId));
+                });
+
+                $('#emailTemplate, #notificationTemplate, #emailTemplateBoth, #notificationTemplateBoth').val('');
+            }
+
             window.openModal = function(actionType) {
+                const eventId = $('#event_id').val();
+                if (!eventId) {
+                    Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+                    return;
+                }
+
                 window.selectedActionType = actionType;
                 closeModal();
+                filterTemplatesByEvent(eventId);
+                $('#selectedEventIdForSend').val(eventId);
 
                 if (actionType === 'email') $('#bulkActionModalEmail').modal('show');
                 else if (actionType === 'notification') $('#bulkActionModalNotifications').modal('show');
@@ -608,6 +632,12 @@
                     return;
                 }
 
+                const eventId = $('#event_id').val();
+                if (!eventId) {
+                    Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+                    return;
+                }
+
                 const scheduleTime = $('#schedule_time_both').val();
                 const confirmTitle = scheduleTime ? 'Schedule Both?' : 'Send Both Now?';
                 const confirmText = scheduleTime 
@@ -625,6 +655,7 @@
                     if (result.isConfirmed) {
                         let data = {
                             user_ids: 'all',
+                            event_id: eventId,
                             _token: '{{ csrf_token() }}'
                         };
 

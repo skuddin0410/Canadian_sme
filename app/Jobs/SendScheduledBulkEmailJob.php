@@ -20,16 +20,20 @@ class SendScheduledBulkEmailJob implements ShouldQueue
 
     public $userIds;
     public $templateName;
+    public $eventId;
 
-    public function __construct(array $userIds, string $templateName)
+    public function __construct(array $userIds, string $templateName, int $eventId)
     {
         $this->userIds = $userIds;
         $this->templateName = $templateName;
+        $this->eventId = $eventId;
     }
 
     public function handle()
     {
-        $emailTemplate = EmailTemplate::where('template_name', $this->templateName)->first();
+        $emailTemplate = EmailTemplate::where('template_name', $this->templateName)
+            ->where('event_id', $this->eventId)
+            ->first();
 
         if (!$emailTemplate || $emailTemplate->type !== 'email') {
             Log::error("Scheduled email: Template '{$this->templateName}' not found or not email type.");
