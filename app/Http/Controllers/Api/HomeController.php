@@ -138,8 +138,8 @@ class HomeController extends Controller
         $myStats = [
             "totalAgents" => UserAgenda::where('user_agendas.user_id', auth()->id())
                 ->when($eventId, function ($q) use ($eventId) {
-                    $q->join('sessions', 'user_agendas.session_id', '=', 'sessions.id')
-                        ->where('sessions.event_id', $eventId);
+                    $q->join('event_sessions', 'user_agendas.session_id', '=', 'event_sessions.id')
+                        ->where('event_sessions.event_id', $eventId);
                 })->count(),
             "totalConnections" => UserConnection::where('user_id', auth()->id())
                 ->when($eventId, function ($q) use ($eventId) {
@@ -277,8 +277,8 @@ class HomeController extends Controller
         // ================= My Stats =================
         $myStats = [
             "totalAgents" => UserAgenda::where('user_agendas.user_id', auth()->id())
-                ->join('sessions', 'user_agendas.session_id', '=', 'sessions.id')
-                ->where('sessions.event_id', $eventId)
+                ->join('event_sessions', 'user_agendas.session_id', '=', 'event_sessions.id')
+                ->where('event_sessions.event_id', $eventId)
                 ->count(),
 
             "totalConnections" => UserConnection::where('user_id', auth()->id())
