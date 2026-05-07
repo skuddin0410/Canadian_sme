@@ -10,28 +10,58 @@ use Illuminate\Support\Facades\Response;
 
 class UserConnectionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $connections = User::join('user_connections', 'users.id', '=', 'user_connections.user_id')
+        $query = User::join('user_connections', 'users.id', '=', 'user_connections.user_id')
             ->select('users.*','user_connections.id as connection_id', DB::raw('COUNT(user_connections.id) as total_connections'))
-            ->groupBy('user_connections.user_id', 'users.id')
-            ->paginate(10);
-        return view('user_connections.index', compact('connections'));
+            ->groupBy('user_connections.user_id', 'users.id');
+
+        if (!isSuperAdmin()) {
+            $query->whereIn('user_connections.event_id', getEventIds());
+        }
+
+        if ($request->filled('event_id')) {
+            $query->where('user_connections.event_id', $request->event_id);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('users.name', 'like', "%{$search}%")
+                  ->orWhere('users.lastname', 'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%");
+            });
+        }
+
+        $connections = $query->paginate(10)->withQueryString();
+        
+        $events = isSuperAdmin() 
+            ? \App\Models\Event::orderBy('title')->get(['id', 'title']) 
+            : \App\Models\Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
+
+        return view('user_connections.index', compact('connections', 'events'));
 
     }
 
     public function show(UserConnection $userConnection)
     {   
-        
         $user = User::findOrFail($userConnection->user_id);
-        $connections = UserConnection::with('connection')->where('user_id', $user->id)->get();
+        $query = UserConnection::with('connection')->where('user_id', $user->id);
+        if (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
+        }
+        $connections = $query->get();
         return view('user_connections.show', compact('user', 'connections'));
     }
 
     public function export($user_id)
     {
     $user = User::findOrFail($user_id);
-    $connections = UserConnection::with('connection')->where('user_id', $user->id)->get();
+    $query = UserConnection::with('connection')->where('user_id', $user->id);
+    if (!isSuperAdmin()) {
+        $query->whereIn('event_id', getEventIds());
+    }
+    $connections = $query->get();
 
     $filename = 'connections_' . $user->id . '.csv';
 

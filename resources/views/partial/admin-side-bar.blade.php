@@ -351,7 +351,6 @@
         </ul>
     </li>
 
-    @if(isSuperAdmin())
     <li class="menu-item {{ request()->is('admin/leads*') ? 'active open' : '' }} {{ request()->is('admin/email-templates*') ? 'active open' : '' }} {{ request()->is('admin/audit*') ? 'active open' : '' }}  {{ request()->is('admin/audit*') ? 'active open' : '' }} {{ request()->is('admin/role-permission-matrix*') ? 'active open' : '' }} {{ request()->is('admin/user-connections*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
@@ -384,7 +383,6 @@
 
         </ul>
     </li>
-    @endif
 
     @if(isSuperAdmin())
     <li class="menu-item {{ request()->is('admin/supports') ? 'active open' : '' }}">

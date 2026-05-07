@@ -20,6 +20,9 @@ class EmailTemplateController extends Controller
             : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
 
         $templates = EmailTemplate::with('event')
+            ->when(!isSuperAdmin(), function ($query) {
+                $query->whereIn('event_id', getEventIds());
+            })
             ->when($request->filled('type'), function ($query) use ($request) {
                 $query->where('type', $request->type);
             })
