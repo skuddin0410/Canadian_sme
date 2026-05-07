@@ -17,7 +17,11 @@ class LeadsExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $leads = Lead::all();
+        $query = Lead::query();
+        if (!isSuperAdmin()) {
+            $query->whereIn('matched_event_id', getEventIds());
+        }
+        $leads = $query->get();
 
         return $leads->map(function($lead) {
             if ($this->format === 'crm') {

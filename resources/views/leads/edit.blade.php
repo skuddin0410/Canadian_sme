@@ -110,6 +110,20 @@
                     </div>
                 </div>
 
+                <div class="row g-3 mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Event</label>
+                        <select name="matched_event_id" class="form-select">
+                            <option value="">Select Event</option>
+                            @foreach($events as $event)
+                                <option value="{{ $event->id }}" {{ old('matched_event_id', $lead->matched_event_id) == $event->id ? 'selected' : '' }}>
+                                    {{ $event->title }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
 
                 <hr class="my-4">
 

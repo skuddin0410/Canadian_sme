@@ -17,6 +17,10 @@ public function index(Request $request)
 {
     $query = Lead::with(['user']);
 
+    if (!isSuperAdmin()) {
+        $query->whereIn('matched_event_id', getEventIds());
+    }
+
     // Search by lead's first_name or last_name
     if ($request->filled('search')) {
         $search = $request->search;
@@ -49,7 +53,10 @@ public function index(Request $request)
      */
     public function create()
     {
-          return view('leads.create');
+        $events = isSuperAdmin() 
+            ? Event::orderBy('title')->get() 
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get();
+        return view('leads.create', compact('events'));
         
     }
 
@@ -69,7 +76,14 @@ public function index(Request $request)
             'source'            => 'nullable|in:website,referral,social_media,walk_in,phone,advertisement',
             'desired_amenities' => 'nullable|array',
             'tags'              => 'nullable|array',
+            'matched_event_id'  => 'nullable|exists:events,id',
         ]);
+
+        if (!isSuperAdmin() && $request->filled('matched_event_id')) {
+            if (!in_array($request->matched_event_id, getEventIds())) {
+                return back()->withError('Unauthorized event selected.');
+            }
+        }
 
         Lead::create([
             'first_name'        => $request->first_name,
@@ -81,6 +95,7 @@ public function index(Request $request)
             'source'            => $request->source ?? 'website',
             'desired_amenities' => $request->desired_amenities ? json_encode($request->desired_amenities) : null,
             'tags'              => $request->tags ? json_encode($request->tags) : null,
+            'matched_event_id'  => $request->matched_event_id,
         ]);
 
 
@@ -130,7 +145,11 @@ public function index(Request $request)
     $amenities = ['parking','gym','pool','laundry','pet_friendly','balcony','concierge','storage']; // example list
     $tags = ['hot', 'warm', 'cold', 'follow-up'];
 
-         return view('leads.edit', compact('lead','amenities', 'selectedAmenities'));
+    $events = isSuperAdmin() 
+        ? Event::orderBy('title')->get() 
+        : Event::whereIn('id', getEventIds())->orderBy('title')->get();
+
+         return view('leads.edit', compact('lead','amenities', 'selectedAmenities', 'events'));
     }
 
     /**
@@ -149,7 +168,14 @@ public function index(Request $request)
             'source'            => 'nullable|in:website,referral,social_media,walk_in,phone,advertisement',
             'desired_amenities' => 'nullable|array',
             'tags'              => 'nullable|array',
+            'matched_event_id'  => 'nullable|exists:events,id',
         ]);
+
+        if (!isSuperAdmin() && $request->filled('matched_event_id')) {
+            if (!in_array($request->matched_event_id, getEventIds())) {
+                return back()->withError('Unauthorized event selected.');
+            }
+        }
 
         $lead->update([
             'first_name'        => $request->first_name,
@@ -161,6 +187,7 @@ public function index(Request $request)
             'source'            => $request->source,
             'desired_amenities' => $request->desired_amenities ? json_encode($request->desired_amenities) : null,
             'tags'              => $request->tags ? json_encode($request->tags) : null,
+            'matched_event_id'  => $request->matched_event_id,
         ]);
 
         return redirect()->route('leads.index')->with('success', 'Lead updated successfully!');

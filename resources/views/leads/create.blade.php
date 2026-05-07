@@ -69,7 +69,7 @@
 
                 {{-- Lead Details --}}
                 <h5 class="fw-bold mb-3">Lead Details</h5>
-                <div class="row g-3">
+                <div class="row g-3 mt-2">
                     <div class="col-md-4">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select">
@@ -96,6 +96,20 @@
                             @foreach(['website','referral','social_media','walk_in','phone','advertisement'] as $src)
                                 <option value="{{ $src }}" {{ old('source') == $src ? 'selected' : '' }}>
                                     {{ ucfirst(str_replace('_',' ',$src)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-12">
+                        <label class="form-label">Event</label>
+                        <select name="matched_event_id" class="form-select">
+                            <option value="">Select Event</option>
+                            @foreach($events as $event)
+                                <option value="{{ $event->id }}" {{ old('matched_event_id') == $event->id ? 'selected' : '' }}>
+                                    {{ $event->title }}
                                 </option>
                             @endforeach
                         </select>

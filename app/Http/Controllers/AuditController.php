@@ -10,6 +10,10 @@ class AuditController extends Controller
     public function index(Request $request)
     {   
         $query = AuditLog::query();
+
+        if (!isSuperAdmin()) {
+            $query->where('user_id', auth()->id());
+        }
         
         // Filter by event type
         if ($request->has('event') && $request->event != null) {
