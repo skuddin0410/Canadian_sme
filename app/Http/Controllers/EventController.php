@@ -26,7 +26,7 @@ class EventController extends Controller
         $today = now()->startOfDay();
 
         if ($request->ajax() && $request->ajax_request == true) {
-            $events = Event::with(['category', 'photo', 'mapImage'])->orderBy('id', 'DESC');
+            $events = Event::with(['category', 'photo', 'mapImage', 'creator', 'subscription'])->orderBy('id', 'DESC');
 
             $events = isSuperAdmin() ? $events : $events->whereIn('id', getEventIds());
 

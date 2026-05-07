@@ -705,7 +705,11 @@ if (!function_exists('canManageEvent')) {
             return false;
         }
 
-        $subscription = \App\Models\Subscription::find($event->subscription_id);
+        if ($event->relationLoaded('subscription')) {
+            $subscription = $event->subscription;
+        } else {
+            $subscription = \App\Models\Subscription::find($event->subscription_id);
+        }
 
         if (!$subscription) {
             return false;
