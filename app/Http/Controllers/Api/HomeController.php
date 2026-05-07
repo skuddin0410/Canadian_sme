@@ -92,13 +92,19 @@ class HomeController extends Controller
     
         // ================= Home Connections (from session_sponsors) =================
         $user = auth()->user();
-        $homeConnections = $user->connections->map(function ($connection) {
-            return [
-                "id" => $connection->id,
-                "name" => $connection->full_name ?? $connection->name,
-                "avatarUrl" => $connection->photo && $connection->photo->mobile_path ? $connection->photo->mobile_path : asset('images/noImage.png')
-            ];
-        });
+        $eventId = $featuredEvent->id ?? null;
+        $homeConnections = $user->connections()
+            ->when($eventId, function ($query) use ($eventId) {
+                return $query->wherePivot('event_id', $eventId);
+            })
+            ->get()
+            ->map(function ($connection) {
+                return [
+                    "id" => $connection->id,
+                    "name" => $connection->full_name ?? $connection->name,
+                    "avatarUrl" => $connection->photo && $connection->photo->mobile_path ? $connection->photo->mobile_path : asset('images/noImage.png')
+                ];
+            });
 
 
 
@@ -106,9 +112,13 @@ class HomeController extends Controller
         $user = auth()->user();
         
         $notificationsQuery = GeneralNotification::where('is_read', 0)
-        ->where(function ($q) use ($user) {
-            $q->where('user_id', $user->id);
-        })->latest();
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->when($eventId, function ($q) use ($eventId) {
+                $q->where('event_id', $eventId);
+            })
+            ->latest();
 
         $notificationsList = $notificationsQuery->get()->map(function ($n) {
             return [
@@ -126,8 +136,15 @@ class HomeController extends Controller
 
         //================= My Stats =================
         $myStats = [
-            "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
-            "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
+            "totalAgents" => UserAgenda::where('user_agendas.user_id', auth()->id())
+                ->when($eventId, function ($q) use ($eventId) {
+                    $q->join('sessions', 'user_agendas.session_id', '=', 'sessions.id')
+                        ->where('sessions.event_id', $eventId);
+                })->count(),
+            "totalConnections" => UserConnection::where('user_id', auth()->id())
+                ->when($eventId, function ($q) use ($eventId) {
+                    $q->where('event_id', $eventId);
+                })->count(),
             "totalSessionAttendee" => !empty($upcomingSession->attendees) ? $upcomingSession->attendees->count() : 0,
         ];
 
@@ -223,19 +240,23 @@ class HomeController extends Controller
         // ================= Home Connections =================
         $user = auth()->user();
 
-        $homeConnections = $user->connections->map(function ($connection) {
-            return [
-                "id" => $connection->id,
-                "name" => $connection->full_name ?? $connection->name,
-                "avatarUrl" => $connection->photo && $connection->photo->mobile_path
-                    ? $connection->photo->mobile_path
-                    : asset('images/noImage.png')
-            ];
-        });
+        $homeConnections = $user->connections()
+            ->wherePivot('event_id', $eventId)
+            ->get()
+            ->map(function ($connection) {
+                return [
+                    "id" => $connection->id,
+                    "name" => $connection->full_name ?? $connection->name,
+                    "avatarUrl" => $connection->photo && $connection->photo->mobile_path
+                        ? $connection->photo->mobile_path
+                        : asset('images/noImage.png')
+                ];
+            });
 
         // ================= Notifications =================
         $notificationsQuery = GeneralNotification::where('is_read', 0)
             ->where('user_id', $user->id)
+            ->where('event_id', $eventId)
             ->latest();
 
         $notificationsList = $notificationsQuery->get()->map(function ($n) {
@@ -255,9 +276,14 @@ class HomeController extends Controller
 
         // ================= My Stats =================
         $myStats = [
-            "totalAgents" => UserAgenda::where('user_id', auth()->id())->count(),
+            "totalAgents" => UserAgenda::where('user_agendas.user_id', auth()->id())
+                ->join('sessions', 'user_agendas.session_id', '=', 'sessions.id')
+                ->where('sessions.event_id', $eventId)
+                ->count(),
 
-            "totalConnections" => UserConnection::where('user_id', auth()->id())->count(),
+            "totalConnections" => UserConnection::where('user_id', auth()->id())
+                ->where('event_id', $eventId)
+                ->count(),
 
             "totalSessionAttendee" => $upcomingSession
                 ? $upcomingSession->attendees->count()

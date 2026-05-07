@@ -46,7 +46,8 @@ class AttendeeUserController extends Controller
     public function index(Request $request)
     {
         //
-        $perPage = (int) $request->input('perPage', 150);
+        $isSuperAdmin = isSuperAdmin();
+        $perPage = (int) $request->input('perPage', $isSuperAdmin ? 150 : 50);
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
         $search = $request->input('search', '');
@@ -67,22 +68,26 @@ class AttendeeUserController extends Controller
                     })
                     ->orderBy('id', 'DESC');
             } else {
-                if (isSuperAdmin()) {
+                if ($isSuperAdmin) {
                     $users = User::with('roles')
                         ->whereDoesntHave('roles', function ($q) {
                             $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
                         })
                         ->orderBy('id', 'DESC');
                 } else {
+                    $eventIds = getEventIds();
+                    $attendeeIds = DB::table('event_and_entity_link')
+                        ->where('entity_type', 'users')
+                        ->whereIn('event_id', $eventIds)
+                        ->pluck('entity_id')
+                        ->toArray();
+
                     $users = User::with('roles')
                         ->whereDoesntHave('roles', function ($q) {
                             $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
                         })
-                        ->where(function($q) {
-                            $q->whereHas('eventAndEntityLinks', function ($sub) {
-                                $sub->where('entity_type', 'users')
-                                    ->whereIn('event_id', getEventIds());
-                            })
+                        ->where(function($q) use ($attendeeIds) {
+                            $q->whereIn('users.id', $attendeeIds)
                             ->orWhere('created_by', auth()->id());
                         })
                         ->orderBy('id', 'DESC');
@@ -104,13 +109,23 @@ class AttendeeUserController extends Controller
 
                 if ($request->filled('event_id')) {
                     $eventId = $request->event_id;
-                    if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                    if (!$isSuperAdmin && !in_array($eventId, getEventIds())) {
                         $eventId = 0;
                     }
-                    $users = $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
-                        $q->where('event_id', $eventId)
-                            ->where('entity_type', 'users');
-                    });
+
+                    if (!$isSuperAdmin) {
+                        $filteredAttendeeIds = DB::table('event_and_entity_link')
+                            ->where('event_id', $eventId)
+                            ->where('entity_type', 'users')
+                            ->pluck('entity_id')
+                            ->toArray();
+                        $users = $users->whereIn('users.id', $filteredAttendeeIds);
+                    } else {
+                        $users = $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
+                            $q->where('event_id', $eventId)
+                                ->where('entity_type', 'users');
+                        });
+                    }
                 }
 
                 // Filters (triggered by filter button, add your filter logic here)

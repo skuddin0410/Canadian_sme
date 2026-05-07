@@ -401,12 +401,12 @@
     </li>
     @endif
 
-    <li class="menu-item {{ request()->is('admin/event-support') ? 'active open' : '' }}">
+    <!-- <li class="menu-item {{ request()->is('admin/event-support') ? 'active open' : '' }}">
         <a href="{{ route('event-support.index') }}" class="menu-link">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="event-support">Event Support</div>
         </a>
-    </li>
+    </li> -->
 
     
     <li class="menu-item {{ request()->routeIs('polls.index*') || request()->is('admin/poll-responses*') ? 'active open' : '' }}">

@@ -6,7 +6,7 @@
                 <img class="logo" src="/frontend/images/logo.png" alt="logo">
             </a> -->
 
-            <a class="navbar-brand" href="">
+            <a class="navbar-brand" href="/">
                 <img class="logo" src="/eventzen-logo.svg" alt="logo" width="50%">
             </a>
 
