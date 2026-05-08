@@ -273,8 +273,13 @@ class AttendeeUserController extends Controller
             }
         }
 
-        $user = User::where('email', $request->email)->first();
+        // $user = User::where('email', $request->email)->first();
+        $user = User::withTrashed()->where('email', $request->email)->first();
         $isNewUser = ! $user;
+
+        if ($user && $user->trashed()) {
+            $user->restore();
+        }
 
         if (! $user) {
             $user = new User();
