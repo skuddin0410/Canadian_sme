@@ -53,6 +53,7 @@
                 @php
                     $exts = array_map('trim', explode(',', config('app.image_mime_types')));
                     $acceptList = implode(',', array_map(fn($e) => (stripos($e, 'image/') === 0 ? $e : 'image/'.$e), $exts));
+                    $mapAcceptList = $acceptList . ',application/pdf';
                   @endphp
 
                   <div class="mb-2">
@@ -127,9 +128,9 @@
 
                   <div class="mb-2">
                     <label class="form-label">
-                      Map Image 
+                      Map Image / PDF
                       <span class="text-danger">
-                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
+                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }}, pdf)
                       </span>
                     </label>
 
@@ -142,13 +143,14 @@
                           class="form-control d-none @error('map_image') is-invalid @enderror"
                           name="map_image"
                           id="map_image"
-                          accept="{{ $acceptList ?: 'image/*' }}"
+                          accept="{{ $mapAcceptList ?: 'image/*,application/pdf' }}"
                           data-max-size-kb="{{ (int) config('app.blog_image_size') }}"
                         />
 
 
                             @php
                               $hasMapImage = !empty($event->mapImage) && !empty($event->mapImage->file_path);
+                              $isMapPdf = $hasMapImage && Str::endsWith(strtolower($event->mapImage->file_name), '.pdf');
                               $mapImgSrc = $hasMapImage ? (Str::startsWith($event->mapImage->file_path, ['http://','https://'])
                                           ? $event->mapImage->file_path
                                           : Storage::url($event->mapImage->file_path)) : '';
@@ -162,18 +164,30 @@
                             <div id="map-dz-placeholder" class="d-flex flex-column align-items-center gap-2 {{ $hasMapImage ? 'd-none' : '' }}">
                               <i class="bx bx-cloud-upload" style="font-size: 2rem;"></i>
                               <div>
-                                <strong>Drag & drop</strong> a map image here, or
+                                <strong>Drag & drop</strong> a map file here, or
                                 <button type="button" id="map-dz-browse" class="btn btn-sm btn-outline-primary ms-1">Browse</button>
                               </div>
-                              <small class="text-muted d-block">Max {{ (int) config('app.blog_image_size') }} KB</small>
+                              <small class="text-muted d-block">Max {{ (int) config('app.blog_image_size') }} KB (Image or PDF)</small>
                             </div>
 
                             {{-- Inline preview --}}
                             <img id="map-dz-image"
                                  src="{{ $mapImgSrc }}"
                                  alt="Preview"
-                                 class="{{ $hasMapImage ? '' : 'd-none' }} rounded"
+                                 class="{{ ($hasMapImage && !$isMapPdf) ? '' : 'd-none' }} rounded"
                                  style="max-height: 180px; max-width: 100%; object-fit: contain;" />
+
+                            {{-- PDF Preview --}}
+                            <a id="map-dz-pdf-preview" 
+                               href="{{ $isMapPdf ? $mapImgSrc : 'javascript:void(0)' }}" 
+                               target="_blank"
+                               class="d-flex flex-column align-items-center gap-2 {{ $isMapPdf ? '' : 'd-none' }} text-decoration-none">
+                                <i class="bx bxs-file-pdf" style="font-size: 3rem; color: #ff3e1d;"></i>
+                                <div class="mt-1 text-center">
+                                  <strong id="map-dz-pdf-name" class="text-body">{{ $isMapPdf ? $event->mapImage->file_name : '' }}</strong>
+                                  <br><small class="text-muted">PDF Document (Click to view)</small>
+                                </div>
+                            </a>
 
                             {{-- Remove button --}}
                            
@@ -184,7 +198,7 @@
                               <i class="bx bx-x"></i> Remove
                             </button>
 
-                            <input type="file" id="map-dz-input" name="map_image" accept="image/*" class="d-none">
+                            <input type="file" id="map-dz-input" name="map_image" accept="image/*,application/pdf" class="d-none">
                           </div>
 
 
@@ -825,16 +839,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapDropzone = document.getElementById('map-image-dropzone');
   const mapImg = document.getElementById('map-dz-image');
   const mapPlaceholder = document.getElementById('map-dz-placeholder');
+  const mapPdfPreview = document.getElementById('map-dz-pdf-preview');
+  const mapPdfName = document.getElementById('map-dz-pdf-name');
   const mapRemoveBtn = document.getElementById('map-dz-remove');
   const mapInput = document.getElementById('map-dz-input');
   const mapBrowse = document.getElementById('map-dz-browse');
 
   const showMapPreview = (file) => {
+    // Revoke previous object URL if any
+    if (mapPdfPreview.dataset.objectUrl) {
+      URL.revokeObjectURL(mapPdfPreview.dataset.objectUrl);
+      delete mapPdfPreview.dataset.objectUrl;
+    }
+
+    if (file.type === 'application/pdf') {
+      mapImg.classList.add('d-none');
+      mapImg.src = '';
+      mapPlaceholder.classList.add('d-none');
+      mapPdfPreview.classList.remove('d-none');
+      mapPdfName.textContent = file.name;
+      
+      const fileURL = URL.createObjectURL(file);
+      mapPdfPreview.href = fileURL;
+      mapPdfPreview.dataset.objectUrl = fileURL;
+
+      mapRemoveBtn.classList.remove('d-none');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = e => {
       mapImg.src = e.target.result;
       mapImg.classList.remove('d-none');
       mapPlaceholder.classList.add('d-none');
+      mapPdfPreview.classList.add('d-none');
+      mapPdfPreview.href = 'javascript:void(0)';
       mapRemoveBtn.classList.remove('d-none');
     };
     reader.readAsDataURL(file);
@@ -855,6 +894,12 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     mapImg.src = '';
     mapImg.classList.add('d-none');
+    if (mapPdfPreview.dataset.objectUrl) {
+      URL.revokeObjectURL(mapPdfPreview.dataset.objectUrl);
+      delete mapPdfPreview.dataset.objectUrl;
+    }
+    mapPdfPreview.classList.add('d-none');
+    mapPdfPreview.href = 'javascript:void(0)';
     mapPlaceholder.classList.remove('d-none');
     mapRemoveBtn.classList.add('d-none');
     mapInput.value = ''; // clears chosen file

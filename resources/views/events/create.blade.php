@@ -263,14 +263,27 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="map_image">Map Image<span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }}) </span> </label>
+              <label class="form-label" for="map_image">Map Image / PDF <span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }}, pdf) </span> </label>
               <div class="input-group input-group-merge">
                 <span id="title-icon" class="input-group-text"><i class="bx bx-map-alt"></i></span>
                 <input
                   type="file"
                   class="form-control"
                   name="map_image"
-                  id="map_image"/>
+                  id="map_image"
+                  accept="image/*,application/pdf"/>
+              </div>
+              <div id="map-preview-container" class="mt-2 d-none">
+                <img id="map-preview-img" src="#" alt="Preview" class="img-thumbnail d-none" style="max-height: 150px;">
+                <a id="map-preview-pdf" href="javascript:void(0)" target="_blank" class="d-none text-decoration-none">
+                  <div class="d-flex align-items-center p-2 border rounded bg-light">
+                    <i class="bx bxs-file-pdf me-2" style="font-size: 2rem; color: #ff3e1d;"></i>
+                    <div>
+                      <strong id="map-preview-pdf-name" class="text-body small"></strong>
+                      <br><small class="text-muted">PDF Document (Click to view)</small>
+                    </div>
+                  </div>
+                </a>
               </div>
               @if ($errors->has('map_image'))
                 <span class="text-danger text-left">{{ $errors->first('map_image') }}</span>
@@ -475,6 +488,41 @@
               handle: '.handle',
               draggable: 'li',
               ghostClass: 'sortable-ghost'
+          });
+      }
+
+      // ── Map Image Preview ──
+      const mapInput = document.getElementById('map_image');
+      const previewContainer = document.getElementById('map-preview-container');
+      const previewImg = document.getElementById('map-preview-img');
+      const previewPdf = document.getElementById('map-preview-pdf');
+      const previewPdfName = document.getElementById('map-preview-pdf-name');
+
+      if (mapInput) {
+          mapInput.addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                  previewContainer.classList.remove('d-none');
+                  if (file.type === 'application/pdf') {
+                      previewImg.classList.add('d-none');
+                      previewPdf.classList.remove('d-none');
+                      previewPdfName.textContent = file.name;
+                      const url = URL.createObjectURL(file);
+                      if (previewPdf.dataset.objectUrl) URL.revokeObjectURL(previewPdf.dataset.objectUrl);
+                      previewPdf.href = url;
+                      previewPdf.dataset.objectUrl = url;
+                  } else if (file.type.startsWith('image/')) {
+                      previewPdf.classList.add('d-none');
+                      previewImg.classList.remove('d-none');
+                      const reader = new FileReader();
+                      reader.onload = e => previewImg.src = e.target.result;
+                      reader.readAsDataURL(file);
+                  } else {
+                      previewContainer.classList.add('d-none');
+                  }
+              } else {
+                  previewContainer.classList.add('d-none');
+              }
           });
       }
   });

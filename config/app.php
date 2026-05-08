@@ -106,6 +106,7 @@ return [
     'banner_image_size' => env('BANNER_IMAGE_SIZE','5120'),
     'user_image_size' => env('USER_IMAGE_SIZE','5120'),
     'testimonial_image_size' => env('TESTIMONIAL_IMAGE_SIZE','5120'),
+    'blog_image_size' => env('BLOG_IMAGE_SIZE','5120'),
     'image_mime_types' => env('IMAGE_MIME_TYPES','image/jpeg,image/png,image/gif'),
     'adhaar_image_size' => env('ADHAAR_IMAGE_SIZE','1024'),
     'currency_sign' => env('CURRENCY_SIGN','₹'),

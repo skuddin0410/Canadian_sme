@@ -211,11 +211,11 @@
                     </a>
                 </li>
                 @endif
-                {{-- <li class="menu-item {{ request()->is('admin/newbadges*') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/newbadges*') ? 'active' : '' }}">
                     <a href="{{ route('newbadges.index') }}" class="menu-link">
                         <div data-i18n="Badges">Badges </div>
                     </a>
-                </li> --}}
+                </li>
             </ul>
         </li>
 

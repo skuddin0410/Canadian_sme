@@ -688,44 +688,126 @@
                 });
             }
 
-            // window.submitBulkAction = function() {
-            //     const emailTemplate = $('#emailTemplate').val();
-            //     const notificationTemplate = $('#notificationTemplate').val();
+            window.submitBulkAction = function(actionType) {
+                let selected = [];
+                document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
+                    selected.push(cb.value);
+                });
 
-            //     if (!emailTemplate && !notificationTemplate) {
-            //         alert("Please select at least one template (email or notification).");
-            //         return;
-            //     }
+                if (selected.length === 0) {
+                    selected.push('all');
+                }
 
-            //     // Always send to all users
-            //     let data = {
-            //         user_ids: 'all',
-            //         _token: '{{ csrf_token() }}'
-            //     };
+                const eventId = document.getElementById('event_id').value;
+                if (!eventId) {
+                    Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+                    return;
+                }
 
-            //     if (emailTemplate) data.email_template = emailTemplate;
-            //     if (notificationTemplate) data.notification_template = notificationTemplate;
+                const emailTemplateValue = document.getElementById('emailTemplate').value;
+                const notificationTemplateValue = document.getElementById('notificationTemplate').value;
 
-            //     $.ajax({
-            //         url: "{{ route('attendee-users.bulkAction') }}",
-            //         method: "POST",
-            //         data: data,
-            //         beforeSend: function() {
-            //             $('.btn-primary').prop('disabled', true).text('Sending...');
-            //         },
-            //         success: function(resp) {
-            //             alert(resp.message || 'Emails & Notifications sent successfully!');
-            //             closeModal();
-            //         },
-            //         error: function(xhr) {
-            //             console.error(xhr.responseText);
-            //             alert(xhr.responseJSON?.message || 'Unexpected error occurred.');
-            //         },
-            //         complete: function() {
-            //             $('.btn-primary').prop('disabled', false).text('Send');
-            //         }
-            //     });
-            // }
+                if (!emailTemplateValue && !notificationTemplateValue) {
+                    Swal.fire('Missing Template', 'Please select an email or notification template.', 'warning');
+                    return;
+                }
+
+                let schedule_time = '';
+                let template_name = '';
+                let type = '';
+
+                if (emailTemplateValue) {
+                    template_name = emailTemplateValue;
+                    type = 'email';
+                    schedule_time = document.getElementById('schedule_time_email').value;
+                }
+
+                if (notificationTemplateValue) {
+                    template_name = notificationTemplateValue;
+                    type = 'notification';
+                    schedule_time = document.getElementById('schedule_time_notif').value;
+                }
+
+                // If schedule_time is set, use AJAX to schedule
+                if (schedule_time) {
+                    const scheduleUrl = type === 'email' ?
+                        "{{ route('attendee-users.scheduleEmail') }}" :
+                        "{{ route('attendee-users.scheduleNotification') }}";
+
+                    Swal.fire({
+                        title: 'Schedule ' + (type === 'email' ? 'Email' : 'Notification') + '?',
+                        text: 'This will be scheduled for the selected time.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, schedule it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Scheduling...',
+                                allowOutsideClick: false,
+                                didOpen: () => Swal.showLoading()
+                            });
+
+                            $.ajax({
+                                url: scheduleUrl,
+                                method: 'POST',
+                                data: {
+                                    user_ids: JSON.stringify(selected),
+                                    template_name: template_name,
+                                    event_id: eventId,
+                                    schedule_time: schedule_time,
+                                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function(resp) {
+                                    Swal.fire('Scheduled!', resp.message || 'Mails scheduled successfully.', 'success');
+                                    closeModal();
+                                },
+                                error: function(xhr) {
+                                    Swal.fire('Error', xhr.responseJSON?.message || 'Failed to schedule.', 'error');
+                                }
+                            });
+                        }
+                    });
+                    return;
+                }
+
+                // Normal send now (confirm before AJAX send)
+                Swal.fire({
+                    title: 'Send ' + (type === 'email' ? 'Email' : 'Notification') + ' Now?',
+                    text: 'This will be sent to ' + (selected[0] === 'all' ? 'all users' : selected.length + ' selected user(s)') + ' immediately.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, send it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Sending...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        $.ajax({
+                            url: "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name + "&type=" + type,
+                            method: "POST",
+                            data: {
+                                user_ids: JSON.stringify(selected),
+                                event_id: eventId,
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(resp) {
+                                Swal.fire('Processing!', resp.message || 'Sending mails in the background', 'success');
+                                closeModal();
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Error', xhr.responseJSON?.message || 'Unexpected error occurred.', 'error');
+                            }
+                        });
+                    }
+                });
+            }
 
         });
     </script>

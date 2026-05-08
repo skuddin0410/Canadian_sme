@@ -150,7 +150,8 @@ class UsersImport implements OnEachRow, WithStartRow, WithEvents
         $emailKey = strtolower($emailRaw);
 
         if (isset($this->emailMap[$emailKey])) {
-            $user = User::whereRaw('LOWER(email) = ?', [$emailKey])->first();
+            // $user = User::whereRaw('LOWER(email) = ?', [$emailKey])->first();
+            $user = User::withTrashed()->whereRaw('LOWER(email) = ?', [$emailKey])->first();
 
             if ($user) {
                 $this->mapUserToEvent($user->id);
@@ -162,7 +163,13 @@ class UsersImport implements OnEachRow, WithStartRow, WithEvents
 
         $this->emailMap[$emailKey] = true;
 
-        $user = User::whereRaw('LOWER(email) = ?', [$emailKey])->first();
+        // $user = User::whereRaw('LOWER(email) = ?', [$emailKey])->first();
+
+        $user = User::withTrashed()->whereRaw('LOWER(email) = ?', [$emailKey])->first();
+        
+        if ($user && $user->trashed()) {
+            $user->restore();
+        }
 
         if (!$user) {
             $user = User::create([

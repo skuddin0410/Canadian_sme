@@ -127,7 +127,7 @@ class EventController extends Controller
             'meta_keywords' => 'nullable|string|max:1000',
             'tags' => 'nullable|string|max:1000',
             'image' => 'required|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
-            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.user_image_size'),
             'section_order' => 'nullable|array'
         ]);
         $admin = auth()->user();
@@ -398,7 +398,7 @@ class EventController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255', // each tag must be a string (optional but safer)
             'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
-            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
+            'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.banner_image_size'),
             'section_order' => 'nullable|array'
         ]);
 
