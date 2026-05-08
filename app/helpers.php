@@ -541,8 +541,12 @@ if (!function_exists('fetchBadgeTemplates')) {
 if (!function_exists('fetchNewBadgeTemplates')) {
     function fetchNewBadgeTemplates()
     {  
-       $emailBadgeTemplate = NewBadge::orderBy("created_at","DESC")->get();
-       return $emailBadgeTemplate;
+        if (isSuperAdmin()) {
+            $emailBadgeTemplate = NewBadge::orderBy("created_at","DESC")->get();
+        } else {
+            $emailBadgeTemplate = NewBadge::where('created_by', auth()->id())->orderBy("created_at","DESC")->get();
+        }
+        return $emailBadgeTemplate;
     }
 }
 

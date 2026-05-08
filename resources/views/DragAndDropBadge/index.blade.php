@@ -23,6 +23,9 @@
                         <th>Printer</th>
                         <th>Badge Size</th>
                         <th>Target</th>
+                        @if(isSuperAdmin())
+                            <th>Created By</th>
+                        @endif
                         <th style="width:150px">Actions</th>
                     </tr>
                 </thead>
@@ -34,6 +37,9 @@
                         <td>{{$badge->printer}}</td>
                         <td>{{$badge->width}} inch X {{$badge->height}} inch</td>
                         <td>{{$badge->target}}</td>
+                        @if(isSuperAdmin())
+                            <td>{{$badge->creator->full_name ?? 'N/A'}}</td>
+                        @endif
                         <td>
                            
                            <div class="d-flex align-items-center gap-2">

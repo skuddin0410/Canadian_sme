@@ -11,7 +11,11 @@ class NewBadgeController extends Controller
 {
     public function index()
     {
-        $badges = NewBadge::all();
+        if (isSuperAdmin()) {
+            $badges = NewBadge::with('creator')->get();
+        } else {
+            $badges = NewBadge::where('created_by', auth()->id())->get();
+        }
         return view('DragAndDropBadge.index', compact('badges'));
     }
 
@@ -25,8 +29,9 @@ class NewBadgeController extends Controller
             'height'     => 'required|numeric',
         ]);
        
-         NewBadge::create($validated);
-         return redirect()->route('newbadges.index');
+        $validated['created_by'] = auth()->id();
+        NewBadge::create($validated);
+        return redirect()->route('newbadges.index');
     }
 
     public function show(NewBadge $newbadge)

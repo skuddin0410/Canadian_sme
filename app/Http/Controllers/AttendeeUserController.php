@@ -31,6 +31,7 @@ use App\Mail\UserWelcome;
 use App\Models\EmailTemplate;
 use OneSignal;
 use App\Models\Speaker;
+use App\Models\NewBadge;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -1369,11 +1370,11 @@ class AttendeeUserController extends Controller
     public function generateBadge(Request $request)
     {
         $request->validate([
-            'badge_id' => 'required|exists:badges,id',
+            'badge_id' => 'required|exists:new_badges,id',
             'user_ids' => 'required',
         ]);
 
-        $badge = Badge::findOrFail($request->badge_id);
+        $badge = NewBadge::findOrFail($request->badge_id);
         $userIds = json_decode($request->user_ids, true);
 
         if (empty($userIds)) {
@@ -1381,9 +1382,16 @@ class AttendeeUserController extends Controller
         }
 
         $users = User::whereIn('id', $userIds)->get();
+        $layout = json_decode($badge->layout, true);
 
-        // Generate PDF (or redirect to view)
-        $pdf = PDF::loadView('badges.pdf', compact('badge', 'users'));
+        // Inch -> Point
+        $widthPt  = ($badge->width ?? 4) * 72;
+        $heightPt = ($badge->height ?? 3) * 72;
+
+        // Generate PDF using the new drag-and-drop template
+        $pdf = \PDF::loadView('DragAndDropBadge.pdf', compact('badge', 'layout', 'users'))
+            ->setPaper([0, 0, $widthPt, $heightPt]);
+
         return $pdf->download('attendee_badges.pdf');
     }
 
