@@ -877,15 +877,21 @@ class AttendeeUserController extends Controller
                 </html>
                 ';
 
-                Mail::send([], [], function ($mail) use ($user, $subject, $htmlBody) {
+                // old mail system
+                /*Mail::send([], [], function ($mail) use ($user, $subject, $htmlBody) {
 
                     $mail->to($user->email)
                         ->subject($subject)
                         ->html($htmlBody);
-                });
+                });*/
+
+                // Use Mailable which implements ShouldQueue for background processing
+
+                // new system to queue
+                Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, $mailLog->id));
             }
         } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
-            // dd('notification block');
+            /*
             foreach ($users as $user) {
                 $message = $emailTemplate->message ?? '';
                 $message = str_replace('{{name}}', $user->full_name, $message);
@@ -1115,17 +1121,27 @@ class AttendeeUserController extends Controller
                         ]);
                     }
                 }
-
-
-                // $this->sendOneSignalPushByExternalId(
+                    // $this->sendOneSignalPushByExternalId(
                 //     (string) $user->id,
                 //     $title,
                 //     $notificationMessage
                 // );
             }
+            */
+
+            // Use Job for background processing
+            $userIdsArray = ($request->user_ids == 'all') ? ['all'] : (is_array($userIds) ? $userIds : [$userIds]);
+            dispatch(new \App\Jobs\SendScheduledBulkNotificationJob($userIdsArray, $emailTemplate->template_name, (int)$request->event_id));
         }
 
-        return redirect()->back()->with('success', ucfirst($type) . " sent successfully to selected users.");
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Sending mails in the background"
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Sending mails in the background");
     }
 
     // private function sendOneSignalPushByExternalId(string $externalId, string $title, string $content): void
@@ -1227,7 +1243,7 @@ class AttendeeUserController extends Controller
                     ->onQueue('default');
             }
 
-            return response()->json(['message' => 'Both actions scheduled successfully.']);
+            return response()->json(['message' => 'Mails scheduled successfully.']);
         }
 
         // Immediate send for 'all'
@@ -1237,7 +1253,7 @@ class AttendeeUserController extends Controller
             return response()->json(['message' => 'No users found to send.'], 404);
         }
 
-        $usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName, $request) {
+        /*$usersQuery->chunk(200, function ($users) use ($emailTemplateName, $notificationTemplateName, $request) {
             foreach ($users as $user) {
                 // Handle email sending
                 if ($emailTemplateName) {
@@ -1307,9 +1323,17 @@ class AttendeeUserController extends Controller
                     }
                 }
             }
-        });
+        });*/
 
-        return response()->json(['message' => 'Emails & Notifications sent successfully.']);
+        if ($emailTemplateName) {
+            SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName, (int) $request->event_id);
+        }
+
+        if ($notificationTemplateName) {
+            SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName, (int) $request->event_id);
+        }
+
+        return response()->json(['message' => 'Sending mails in the background']);
     }
 
     protected function sendOneSignalPushManual($playerId, $title, $message)
@@ -1392,7 +1416,7 @@ class AttendeeUserController extends Controller
             ->onQueue('default');
 
         return response()->json([
-            'message' => 'Email scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
+            'message' => 'Mails scheduled successfully.'
         ]);
     }
 
@@ -1429,7 +1453,7 @@ class AttendeeUserController extends Controller
             ->onQueue('default');
 
         return response()->json([
-            'message' => 'Notification scheduled successfully for ' . $scheduleTime->format('Y-m-d H:i:s') . ' UTC'
+            'message' => 'Mails scheduled successfully.'
         ]);
     }
 
