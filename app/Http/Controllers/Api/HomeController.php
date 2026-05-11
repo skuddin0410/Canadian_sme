@@ -798,6 +798,7 @@ public function scanDetails(Request $request){
 
 public function scanDetailsUpdate(Request $request){
     try {
+        Log::info($request->all());
         if (!$user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
                 'success' => false,
