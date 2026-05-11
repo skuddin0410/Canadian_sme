@@ -1392,7 +1392,7 @@ class AttendeeUserController extends Controller
         $pdf = \PDF::loadView('DragAndDropBadge.pdf', compact('badge', 'layout', 'users'))
             ->setPaper([0, 0, $widthPt, $heightPt]);
 
-        return $pdf->download('attendee_badges.pdf');
+        return $pdf->stream('attendee_badges.pdf');
     }
 
     /**

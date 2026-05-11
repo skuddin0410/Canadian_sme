@@ -95,10 +95,7 @@ class NewBadgeController extends Controller
             compact('badge', 'layout', 'users')
         )->setPaper([0, 0, $widthPt, $heightPt]);
 
-        if(!$request->template_name)
-            return $pdf->download('badges.pdf');
-        else
-            return $pdf->stream('badges.pdf');
+        return $pdf->stream('badges.pdf');
     }
 
      public function generateBadgePdfPreview(Request $request)
