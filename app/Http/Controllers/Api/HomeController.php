@@ -834,6 +834,10 @@ public function scanDetailsUpdate(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
+        Log::info("Authenticated user: " . $user->id);
+         $validator = Validator::make($request->all(), [
+            'qrData' => 'required'
+        ]);
         $eventId = (int) ($request->event_id ?? 1);
         $connetion = UserConnection::where('connection_id',$request->qrData)
             ->where('user_id',$user->id)
