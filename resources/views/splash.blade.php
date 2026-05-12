@@ -2,210 +2,215 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin | Banners
+    Admin | Splash Screen
 @endsection
 @section('content')
 
-<form action="{{route('splash')}}" method="POST" enctype="multipart/form-data" class="container py-4">
-  @csrf
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Splash Screen Configuration</h3>
+    <div class="col-md-4">
+        <label for="event_selector" class="form-label fw-bold">Select Event</label>
+        <select id="event_selector" class="form-select" onchange="window.location.href='{{ route('splash') }}?event_id=' + this.value">
+            <option value="">-- Select Event --</option>
+            @foreach($events as $event)
+                <option value="{{ $event->id }}" {{ $eventId == $event->id ? 'selected' : '' }}>{{ $event->title }}</option>
+            @endforeach
+        </select>
+    </div>
+  </div>
 
-  <h3 class="text-left mb-4">Splash Screen </h3>
+  @if($eventId)
+  <form action="{{route('splash')}}" method="POST" enctype="multipart/form-data">
+    @csrf
+    <input type="hidden" name="event_id" value="{{ $eventId }}">
+    
+    <!-- Full-Width Cards Layout for iOS and Android Uploads -->
+    <div class="row g-4">
+      <!-- iOS Section -->
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header fw-semibold bg-light">iOS Splash Screen Uploads</div>
+          <div class="card-body">
+            <div class="row g-4">
+              <!-- iPhone Launch Screen (1125x2436) -->
+              @php
+                $has_ios_iphone_image = !empty($splashScreen->iosIphone) && !empty($splashScreen->iosIphone->file_name);
+                $ios_iphone_image_src = $has_ios_iphone_image ? $splashScreen->iosIphone->file_path : '';
+              @endphp
+              <div class="col-md-6">
+                <div class="dz" id="dz-ios-iphone" style="--dz-height: 220px;" data-valid-width="1125" data-valid-height="2436">
+                  <div class="dz-placeholder text-center {{ $has_ios_iphone_image ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                      <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+                    </div>
+                    <div class="small text-muted mb-2">Drag & drop iPhone splash image (1125x2436)</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
+                  </div>
 
-  <!-- Full-Width Cards Layout for iOS and Android Uploads -->
-  <div class="row g-4">
-    <!-- iOS Section -->
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header fw-semibold">iOS Splash Screen Uploads</div>
-        <div class="card-body">
-          <div class="row g-4">
-            <!-- iPhone Launch Screen (1125x2436) -->
+                  <img src="{{ $ios_iphone_image_src }}" class="{{ $has_ios_iphone_image ? '' : 'd-none' }} rounded" alt="iPhone Preview" id="ios-iphone-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
+
+                  <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_ios_iphone_image ? '' : 'd-none' }}" id="ios-iphone-remove" data-key="ios_iphone_image" data-eventid="{{ $eventId }}">
+                    <i class="fa fa-times"></i> Remove
+                  </button>
+                  <input class="dz-input d-none" type="file" name="ios_iphone_image" accept="image/*">
+                </div>
+                <div class="form-text mt-2">Required size: 1125x2436 px (Portrait)</div>
+              </div>
+
+              <!-- iPad Launch Screen (1536x2048) -->
             @php
-              $ios_iphone_image = getKeyValue('ios_iphone_image'); 
-              $has_ios_iphone_image = !empty($ios_iphone_image->photo) && !empty($ios_iphone_image->photo->file_path);
-              $ios_iphone_image_src = $has_ios_iphone_image ? (Str::startsWith($ios_iphone_image->photo->file_path, ['http://','https://'])
-                          ? $ios_iphone_image->photo->file_path
-                          : Storage::url($ios_iphone_image->photo->file_path)) : '';
+              $has_ios_ipad_image = !empty($splashScreen->iosIpad) && !empty($splashScreen->iosIpad->file_name);
+              $ios_ipad_image_src = $has_ios_ipad_image ? $splashScreen->iosIpad->file_path : '';
             @endphp
-            <div class="col-md-6">
-              <div class="dz" id="dz-ios-iphone" style="--dz-height: 220px;" data-valid-width="1125" data-valid-height="2436">
-                <div class="dz-placeholder text-center {{ $has_ios_iphone_image ? 'd-none' : '' }}">
-                  <div class="mb-2">
-                    <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+              <div class="col-md-6">
+                <div class="dz" id="dz-ios-ipad" style="--dz-height: 220px;" data-valid-width="1536" data-valid-height="2048">
+                  <div class="dz-placeholder text-center {{ $has_ios_ipad_image ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                      <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+                    </div>
+                    <div class="small text-muted mb-2">Drag & drop iPad splash image (1536x2048)</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
                   </div>
-                  <div class="small text-muted mb-2">Drag & drop iPhone splash image (1125x2436)</div>
-                  <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
+                  <img src="{{ $ios_ipad_image_src }}" class="{{ $has_ios_ipad_image ? '' : 'd-none' }} rounded" alt="iPad Preview" id="ios-ipad-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
+                  <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_ios_ipad_image ? '' : 'd-none' }}" id="ios-ipad-remove" data-key="ios_ipad_image" data-eventid="{{ $eventId }}">
+                    <i class="fa fa-times"></i> Remove
+                  </button>
+                  <input class="dz-input d-none" type="file" name="ios_ipad_image" accept="image/*">
                 </div>
-
-                <img src="{{ $ios_iphone_image_src }}" class="{{ $has_ios_iphone_image ? '' : 'd-none' }} rounded" alt="iPhone Preview" id="ios-iphone-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-
-                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_ios_iphone_image ? '' : 'd-none' }}" id="ios-iphone-remove" data-photoid=" {{!empty($ios_iphone_image->photo) ? $ios_iphone_image->photo->id : ''}}">
-                  <i class="fa fa-times"></i> Remove
-                </button>
-                <input class="dz-input d-none" type="file" name="ios_iphone_image" accept="image/*">
+                <div class="form-text mt-2">Required size: 1536x2048 px (Portrait)</div>
               </div>
-              <div class="form-text mt-2">Required size: 1125x2436 px (Portrait)</div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- iPad Launch Screen (1536x2048) -->
-          @php
-            $ios_ipad_image = getKeyValue('ios_ipad_image'); 
-            $has_ios_ipad_image = !empty($ios_ipad_image->photo) && !empty($ios_ipad_image->photo->file_path);
-            $ios_ipad_image_src = $has_ios_ipad_image ? (Str::startsWith($ios_ipad_image->photo->file_path, ['http://','https://']) ? $ios_ipad_image->photo->file_path
-                        : Storage::url($ios_ipad_image->photo->file_path)) : '';
-          @endphp
-            <div class="col-md-6">
-              <div class="dz" id="dz-ios-ipad" style="--dz-height: 220px;" data-valid-width="1536" data-valid-height="2048">
-                <div class="dz-placeholder text-center {{ $has_ios_ipad_image ? 'd-none' : '' }}">
-                  <div class="mb-2">
-                    <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+      <!-- Android Section -->
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header fw-semibold bg-light">Android Splash Screen Uploads</div>
+          <div class="card-body">
+            <div class="row g-4">
+              <!-- HDPI (720x1280) -->
+              @php
+                $has_android_hdpi_image = !empty($splashScreen->androidHdpi) && !empty($splashScreen->androidHdpi->file_name);
+                $android_hdpi_image_src = $has_android_hdpi_image ? $splashScreen->androidHdpi->file_path : '';
+              @endphp
+
+              <div class="col-md-3">
+                <div class="dz" id="dz-android-hdpi" style="--dz-height: 220px;" data-valid-width="720" data-valid-height="1280">
+                  <div class="dz-placeholder text-center {{ $has_android_hdpi_image ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                      <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+                    </div>
+                    <div class="small text-muted mb-2">Drag & drop HDPI splash image (720x1280)</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
                   </div>
-                  <div class="small text-muted mb-2">Drag & drop iPad splash image (1536x2048)</div>
-                  <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
+                  <img src="{{ $android_hdpi_image_src }}" class="{{ $has_android_hdpi_image ? '' : 'd-none' }} rounded" alt="HDPI Preview" id="android-hdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
+                  <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_hdpi_image ? '' : 'd-none' }}" id="android-hdpi-remove" data-key="android_hdpi_image" data-eventid="{{ $eventId }}">
+                    <i class="fa fa-times"></i> Remove
+                  </button>
+                  <input class="dz-input d-none" type="file" name="android_hdpi_image" accept="image/*">
                 </div>
-                <img src="{{ $ios_ipad_image_src }}" class="{{ $has_ios_ipad_image ? '' : 'd-none' }} alt="iPad Preview" id="ios-ipad-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_ios_ipad_image ? '' : 'd-none' }}" id="ios-ipad-remove" data-photoid=" {{!empty($ios_ipad_image->photo) ? $ios_ipad_image->photo->id : ''}}">
-                  <i class="fa fa-times"></i> Remove
-                </button>
-                <input class="dz-input d-none" type="file" name="ios_ipad_image" accept="image/*">
+                <div class="form-text mt-2">Required size: 720x1280 px</div>
               </div>
-              <div class="form-text mt-2">Required size: 1536x2048 px (Portrait)</div>
+
+              <!-- MDPI (480x800) -->
+              @php
+                $has_android_mdpi_image = !empty($splashScreen->androidMdpi) && !empty($splashScreen->androidMdpi->file_name);
+                $android_mdpi_image_src = $has_android_mdpi_image ? $splashScreen->androidMdpi->file_path : '';
+              @endphp
+
+              <div class="col-md-3">
+                <div class="dz" id="dz-android-mdpi" style="--dz-height: 220px;" data-valid-width="480" data-valid-height="800">
+                  <div class="dz-placeholder text-center {{ $has_android_mdpi_image ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                      <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+                    </div>
+                    <div class="small text-muted mb-2">Drag & drop MDPI splash image (480x800)</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
+                  </div>
+                  <img src="{{ $android_mdpi_image_src }}" class="{{ $has_android_mdpi_image ? '' : 'd-none' }} rounded" alt="MDPI Preview" id="android-mdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
+                  <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_mdpi_image ? '' : 'd-none' }}" id="android-mdpi-remove" data-key="android_mdpi_image" data-eventid="{{ $eventId }}">
+                    <i class="fa fa-times"></i> Remove
+                  </button>
+                  <input class="dz-input d-none" type="file" name="android_mdpi_image" accept="image/*">
+                </div>
+                <div class="form-text mt-2">Required size: 480x800 px</div>
+              </div>
+
+              <!-- XHDPI (960x1600) -->
+              @php
+                $has_android_xhdpi_image = !empty($splashScreen->androidXhdpi) && !empty($splashScreen->androidXhdpi->file_name);
+                $android_xhdpi_image_src = $has_android_xhdpi_image ? $splashScreen->androidXhdpi->file_path : '';
+              @endphp
+              <div class="col-md-3">
+                <div class="dz" id="dz-android-xhdpi" style="--dz-height: 220px;" data-valid-width="960" data-valid-height="1600">
+                  <div class="dz-placeholder text-center {{ $has_android_xhdpi_image ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                      <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+                    </div>
+                    <div class="small text-muted mb-2">Drag & drop XHDPI splash image (960x1600)</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
+                  </div>
+                  <img src="{{ $android_xhdpi_image_src }}" class="{{ $has_android_xhdpi_image ? '' : 'd-none' }} rounded" alt="XHDPI Preview" id="android-xhdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
+                  
+                  <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_xhdpi_image ? '' : 'd-none' }}" id="android-xhdpi-remove" data-key="android_xhdpi_image" data-eventid="{{ $eventId }}">
+                    <i class="fa fa-times"></i> Remove
+                  </button>
+                  <input class="dz-input d-none" type="file" name="android_xhdpi_image" accept="image/*">
+                </div>
+                <div class="form-text mt-2">Required size: 960x1600 px</div>
+              </div>
+
+              <!-- XXHDPI (1440x2560) -->
+               @php
+                $has_android_xxhdpi_image = !empty($splashScreen->androidXxhdpi) && !empty($splashScreen->androidXxhdpi->file_name);
+                $android_xxhdpi_image_src = $has_android_xxhdpi_image ? $splashScreen->androidXxhdpi->file_path : '';
+              @endphp
+
+              <div class="col-md-3">
+                <div class="dz" id="dz-android-xxhdpi" style="--dz-height: 220px;" data-valid-width="1440" data-valid-height="2560">
+                  <div class="dz-placeholder text-center {{ $has_android_xxhdpi_image ? 'd-none' : '' }}">
+                    <div class="mb-2">
+                      <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
+                    </div>
+                    <div class="small text-muted mb-2">Drag & drop XXHDPI splash image (1440x2560)</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
+                  </div>
+                  <img src="{{ $android_xxhdpi_image_src }}" class="{{ $has_android_xxhdpi_image ? '' : 'd-none' }} rounded" alt="XXHDPI Preview" id="android-xxhdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
+                  <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_xxhdpi_image ? '' : 'd-none' }}" id="android-xxhdpi-remove" data-key="android_xxhdpi_image" data-eventid="{{ $eventId }}">
+                    <i class="fa fa-times"></i> Remove
+                  </button>
+                  <input class="dz-input d-none" type="file" name="android_xxhdpi_image" accept="image/*">
+                </div>
+                <div class="form-text mt-2">Required size: 1440x2560 px</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Android Section -->
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-header fw-semibold">Android Splash Screen Uploads</div>
-        <div class="card-body">
-          <div class="row g-4">
-            <!-- HDPI (720x1280) -->
-            @php
-              $android_hdpi_image = getKeyValue('android_hdpi_image'); 
-              $has_android_hdpi_image = !empty($android_hdpi_image->photo) && !empty($android_hdpi_image->photo->file_path);
-              $android_hdpi_image_src = $has_android_hdpi_image ? (Str::startsWith($android_hdpi_image->photo->file_path, ['http://','https://']) ? $android_hdpi_image->photo->file_path
-                          : Storage::url($android_hdpi_image->photo->file_path)) : '';
-            @endphp
-
-            <div class="col-md-3">
-              <div class="dz" id="dz-android-hdpi" style="--dz-height: 220px;" data-valid-width="720" data-valid-height="1280">
-                <div class="dz-placeholder text-center {{ $has_android_hdpi_image ? 'd-none' : '' }}">
-                  <div class="mb-2">
-                    <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
-                  </div>
-                  <div class="small text-muted mb-2">Drag & drop HDPI splash image (720x1280)</div>
-                  <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
-                </div>
-                <img src="{{ $android_hdpi_image_src }}" class="{{ $has_android_hdpi_image ? '' : 'd-none' }} rounded" alt="HDPI Preview" id="android-hdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_hdpi_image ? '' : 'd-none' }}" id="android-hdpi-remove" data-photoid=" {{!empty($android_hdpi_image->photo) ? $android_hdpi_image->photo->id : ''}}">
-                  <i class="fa fa-times"></i> Remove
-                </button>
-                <input class="dz-input d-none" type="file" name="android_hdpi_image" accept="image/*">
-              </div>
-              <div class="form-text mt-2">Required size: 720x1280 px</div>
-            </div>
-
-            <!-- MDPI (480x800) -->
-            @php
-              $android_mdpi_image = getKeyValue('android_mdpi_image'); 
-              $has_android_mdpi_image = !empty($android_mdpi_image->photo) && !empty($android_mdpi_image->photo->file_path);
-              $android_mdpi_image_src = $has_android_mdpi_image ? (Str::startsWith($android_mdpi_image->photo->file_path, ['http://','https://']) ? $android_mdpi_image->photo->file_path
-                          : Storage::url($android_mdpi_image->photo->file_path)) : '';
-            @endphp
-
-            <div class="col-md-3">
-              <div class="dz" id="dz-android-mdpi" style="--dz-height: 220px;" data-valid-width="480" data-valid-height="800">
-                <div class="dz-placeholder text-center {{ $has_android_mdpi_image ? 'd-none' : '' }}">
-                  <div class="mb-2">
-                    <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
-                  </div>
-                  <div class="small text-muted mb-2">Drag & drop MDPI splash image (480x800)</div>
-                  <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
-                </div>
-                <img src="{{ $android_mdpi_image_src }}" class="{{ $has_android_mdpi_image ? '' : 'd-none' }} rounded" alt="MDPI Preview" id="android-mdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_mdpi_image ? '' : 'd-none' }}" id="android-mdpi-remove" data-photoid=" {{!empty($android_mdpi_image->photo) ? $android_mdpi_image->photo->id : ''}}">
-                  <i class="fa fa-times"></i> Remove
-                </button>
-                <input class="dz-input d-none" type="file" name="android_mdpi_image" accept="image/*">
-              </div>
-              <div class="form-text mt-2">Required size: 480x800 px</div>
-            </div>
-
-            <!-- XHDPI (960x1600) -->
-            @php
-              $android_xhdpi_image = getKeyValue('android_xhdpi_image'); 
-              $has_android_xhdpi_image = !empty($android_xhdpi_image->photo) && !empty($android_xhdpi_image->photo->file_path);
-              $android_xhdpi_image_src = $has_android_xhdpi_image ? (Str::startsWith($android_xhdpi_image->photo->file_path, ['http://','https://']) ? $android_xhdpi_image->photo->file_path
-                          : Storage::url($android_xhdpi_image->photo->file_path)) : '';
-            @endphp
-            <div class="col-md-3">
-              <div class="dz" id="dz-android-xhdpi" style="--dz-height: 220px;" data-valid-width="960" data-valid-height="1600">
-                <div class="dz-placeholder text-center {{ $has_android_xhdpi_image ? 'd-none' : '' }}">
-                  <div class="mb-2">
-                    <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
-                  </div>
-                  <div class="small text-muted mb-2">Drag & drop XHDPI splash image (960x1600)</div>
-                  <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
-                </div>
-                <img src="{{ $android_xhdpi_image_src }}" class="{{ $has_android_xhdpi_image ? '' : 'd-none' }} rounded" alt="XHDPI Preview" id="android-xhdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                
-                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_xhdpi_image ? '' : 'd-none' }}" id="android-xhdpi-remove" data-photoid=" {{!empty($android_xhdpi_image->photo) ? $android_xhdpi_image->photo->id : ''}}">
-                  <i class="fa fa-times"></i> Remove
-                </button>
-                <input class="dz-input d-none" type="file" name="android_xhdpi_image" accept="image/*">
-              </div>
-              <div class="form-text mt-2">Required size: 960x1600 px</div>
-            </div>
-
-            <!-- XXHDPI (1440x2560) -->
-
-             @php
-              $android_xxhdpi_image = getKeyValue('android_xxhdpi_image'); 
-              $has_android_xxhdpi_image = !empty($android_xxhdpi_image->photo) && !empty($android_xxhdpi_image->photo->file_path);
-              $android_xxhdpi_image_src = $has_android_xxhdpi_image ? (Str::startsWith($android_xxhdpi_image->photo->file_path, ['http://','https://']) ? $android_xxhdpi_image->photo->file_path
-                          : Storage::url($android_xxhdpi_image->photo->file_path)) : '';
-            @endphp
-
-            <div class="col-md-3">
-              <div class="dz" id="dz-android-xxhdpi" style="--dz-height: 220px;" data-valid-width="1440" data-valid-height="2560">
-                <div class="dz-placeholder text-center {{ $has_android_xxhdpi_image ? 'd-none' : '' }}">
-                  <div class="mb-2">
-                    <i class="fa fa-cloud-upload" style="font-size:2rem;"></i>
-                  </div>
-                  <div class="small text-muted mb-2">Drag & drop XXHDPI splash image (1440x2560)</div>
-                  <button type="button" class="btn btn-sm btn-outline-primary dz-browse">Browse</button>
-                </div>
-                <img src="{{ $android_xxhdpi_image_src }}" class="{{ $has_android_xxhdpi_image ? '' : 'd-none' }} rounded" alt="XXHDPI Preview" id="android-xxhdpi-preview" style="max-height:200px; max-width:100%; object-fit: contain;">
-                <button type="button" class="btn btn-sm btn-danger dz-remove {{ $has_android_xxhdpi_image ? '' : 'd-none' }}" id="android-xxhdpi-remove" data-photoid=" {{!empty($android_xxhdpi_image->photo) ? $android_xxhdpi_image->photo->id : ''}}">
-                  <i class="fa fa-times"></i> Remove
-                </button>
-                <input class="dz-input d-none" type="file" name="android_xxhdpi_image" accept="image/*">
-              </div>
-              <div class="form-text mt-2">Required size: 1440x2560 px</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Submit Button -->
+    <div class="text-end mt-4">
+      <input type="hidden" name="mode" value="save">
+      <button type="submit" class="btn btn-primary btn-lg px-5">Save Splash Screen</button>
     </div>
-  </div>
-
-  <!-- Submit Button -->
-  <div class="text-end mt-4">
-    <input type="hidden" name="mode" value="save">
-    <button type="submit" class="btn btn-primary">Save</button>
-  </div>
-</form>
-
-<!-- Bootstrap 5 JS and Popper.js (for modal etc.) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+  </form>
+  @else
+    <div class="alert alert-info text-center py-5">
+        <i class="fa fa-info-circle fa-3x mb-3"></i>
+        <h4>Please select an event to configure its splash screen.</h4>
+    </div>
+  @endif
+</div>
 
 <script>
   // Handle image upload and preview for each dropzone
   const handleImageUpload = (dzId, previewId, removeBtnId, inputName, validDimensions) => {
     const dz = document.getElementById(dzId);
+    if(!dz) return;
     const input = dz.querySelector('.dz-input');
     const preview = document.getElementById(previewId);
     const removeBtn = document.getElementById(removeBtnId);
@@ -228,16 +233,6 @@
       const img = new Image();
       img.onload = () => {
         showPreview(file);
-       /* if (img.width !== validDimensions.width || img.height !== validDimensions.height) {
-          alert(`Invalid image dimensions. Required: ${validDimensions.width}x${validDimensions.height}px`);
-          preview.classList.add('d-none');
-          removeBtn.classList.add('d-none');
-          browseBtn.classList.remove('d-none');
-          dzPlaceholder.classList.remove('d-none');
-          input.value = '';
-        } else {
-          showPreview(file);
-        }*/
       };
       img.src = URL.createObjectURL(file);
     };
@@ -277,22 +272,31 @@
 
     removeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      preview.src = '';
-      preview.classList.add('d-none');
-      removeBtn.classList.add('d-none');
-      browseBtn.classList.remove('d-none');
-      dzPlaceholder.classList.remove('d-none');
-      input.value = '';
-      const photoId = removeBtn.dataset.photoid;
+      if(!confirm('Are you sure you want to remove this image?')) return;
+      
+      const key = removeBtn.dataset.key;
+      const eventId = removeBtn.dataset.eventid;
+      
       $.ajax({
-        url: `/delete/photo`, 
+        url: `{{ route('splash.deletePhoto') }}`, 
         type: 'POST',
         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        data: { photo_id: photoId },
+        data: { key: key, event_id: eventId },
         success: function (res) {
-            console.log('Image removed successfully:', res);
+            if(res.success) {
+                preview.src = '';
+                preview.classList.add('d-none');
+                removeBtn.classList.add('d-none');
+                browseBtn.classList.remove('d-none');
+                dzPlaceholder.classList.remove('d-none');
+                input.value = '';
+                alertify.success(res.message);
+            } else {
+                alertify.error(res.message);
+            }
         },
         error: function (xhr) {
+            alertify.error('Error removing image');
             console.error('Error removing image:', xhr.responseText);
         }
       });
@@ -342,6 +346,5 @@
     background: rgba(0, 123, 255, 0.1);
   }
 </style>
-
 
 @endsection

@@ -114,4 +114,9 @@ class Event extends Model
     {
         return $this->hasMany(ContactUs::class);
     }
+
+    public function splashScreen()
+    {
+        return $this->hasOne(SplashScreen::class);
+    }
 }

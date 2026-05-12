@@ -175,12 +175,18 @@
                         {{-- <a href="{{route('booths.index')}}" class="menu-link">
                         <div data-i18n="Booth Management">App Menu</div>
                         </a>--}}
-                         <a href="{{route('splash')}}" class="menu-link {{ request()->is('admin/splash*') ? 'active open' : '' }}">
+                         <!-- <a href="{{route('splash')}}" class="menu-link {{ request()->is('admin/splash*') ? 'active open' : '' }}">
                             <div data-i18n="Booth Management">Splash Screen</div>
                         </a>
-                    <!--</ul>
+                    </ul>
                 </li>
                 @endif  -->
+
+                <li class="menu-item {{ request()->is('splash*') || request()->is('admin/splash*') ? 'active open' : '' }}">
+                    <a href="{{route('splash')}}" class="menu-link">
+                        <div data-i18n="Splash Screen">Splash Screen</div>
+                    </a>
+                </li>
             </ul>
         </li>
 

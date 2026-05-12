@@ -46,7 +46,15 @@ class EventController extends Controller
         //     ]);
 
         $query = Event::query()
-            ->with(['photo'])
+            ->with([
+                'photo', 
+                'splashScreen.iosIphone', 
+                'splashScreen.iosIpad', 
+                'splashScreen.androidHdpi', 
+                'splashScreen.androidMdpi', 
+                'splashScreen.androidXhdpi', 
+                'splashScreen.androidXxhdpi'
+            ])
             ->where('status', 'published')
             ->where('visibility', 'listed')
             ->when($search, function ($query) use ($search) {

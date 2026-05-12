@@ -311,63 +311,137 @@ class HomeController extends Controller
         return view('brand')->with('message','App Branding media updated successfully');
     }
 
-    public function splash(Request $request){
+    public function splash(Request $request)
+    {
+        $user = auth()->user();
+        $isSuperAdmin = isSuperAdmin();
+        
+        if ($isSuperAdmin) {
+            $events = \App\Models\Event::orderBy('title', 'ASC')->get();
+        } else {
+            // Get active subscription for the current event admin
+            $subscription = \App\Models\Subscription::active()
+                ->where('user_id', $user->id)
+                ->latest()
+                ->first();
 
-        if($request->mode =='save'){
-            $ios_iphone_image = Setting::where('key','ios_iphone_image')->first();
-            $ios_iphone_image->save();
-
-            if(!empty($request->file("ios_iphone_image"))){
-                    $this->deleteFile($ios_iphone_image->id,'settings');    
-                    $this->imageUpload($request->file("ios_iphone_image"),"settings",$ios_iphone_image->id,'settings','photo',$ios_iphone_image->id);
+            if ($subscription) {
+                // Only show events created by THIS admin within THIS active subscription
+                $events = \App\Models\Event::where('subscription_id', $subscription->id)
+                    ->where('created_by', $user->id)
+                    ->orderBy('title', 'ASC')
+                    ->get();
+            } else {
+                $events = collect();
             }
-
-            $ios_ipad_image = Setting::where('key','ios_ipad_image')->first();
-            $ios_ipad_image->save();
-
-            if(!empty($request->file("ios_ipad_image"))){
-                    $this->deleteFile($ios_ipad_image->id,'settings');    
-                    $this->imageUpload($request->file("ios_ipad_image"),"settings",$ios_ipad_image->id,'settings','photo',$ios_ipad_image->id);
-            }
-
-            $android_hdpi_image = Setting::where('key','android_hdpi_image')->first();
-            $android_hdpi_image->save();
-
-            if(!empty($request->file("android_hdpi_image"))){
-                    $this->deleteFile($android_hdpi_image->id,'settings');    
-                    $this->imageUpload($request->file("android_hdpi_image"),"settings",$android_hdpi_image->id,'settings','photo',$android_hdpi_image->id);
-            }
-
-            $android_mdpi_image = Setting::where('key','android_mdpi_image')->first();
-            $android_mdpi_image->save();
-
-            if(!empty($request->file("android_mdpi_image"))){
-                    $this->deleteFile($android_mdpi_image->id,'settings');    
-                    $this->imageUpload($request->file("android_mdpi_image"),"settings",$android_mdpi_image->id,'settings','photo',$android_mdpi_image->id);
-            }
-
-
-            $android_xhdpi_image = Setting::where('key','android_xhdpi_image')->first();
-            $android_xhdpi_image->save();
-
-            if(!empty($request->file("android_xhdpi_image"))){
-                    $this->deleteFile($android_xhdpi_image->id,'settings');    
-                    $this->imageUpload($request->file("android_xhdpi_image"),"settings",$android_xhdpi_image->id,'settings','photo',$android_xhdpi_image->id);
-            }
-
-            $android_xxhdpi_image = Setting::where('key','android_xxhdpi_image')->first();
-            $android_xxhdpi_image->save();
-
-            if(!empty($request->file("android_xxhdpi_image"))){
-                    $this->deleteFile($android_xxhdpi_image->id,'settings');    
-                    $this->imageUpload($request->file("android_xxhdpi_image"),"settings",$android_xxhdpi_image->id,'settings','photo',$android_xxhdpi_image->id);
-            }
-
         }
-        session()->flash('success', 'Saved successfully.');
-        //return redirect()->back()->with('success','App Branding media updated successfully');
-        return view('splash'); 
+        
+        $eventId = $request->event_id ?? $request->input('event_id');
+        
+        // Security check: Ensure the selected event is within the allowed list
+        if ($eventId && !$events->contains('id', $eventId)) {
+            if (!$request->ajax()) {
+                return redirect()->route('splash')->with('error', 'You do not have permission to manage splash screen for this event.');
+            }
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // If no eventId is selected, default to the first one for convenience
+        if (!$eventId && $events->isNotEmpty()) {
+            $eventId = $events->first()->id;
+        }
+
+        $splashScreen = null;
+        if ($eventId) {
+            $splashScreen = \App\Models\SplashScreen::with(['iosIphone', 'iosIpad', 'androidHdpi', 'androidMdpi', 'androidXhdpi', 'androidXxhdpi'])
+                ->where('event_id', $eventId)->first();
+        }
+
+        if ($request->mode == 'save') {
+            $data = [
+                'event_id' => $eventId,
+                'created_by' => $user->id,
+            ];
+
+            $keys = [
+                'ios_iphone_image',
+                'ios_ipad_image',
+                'android_hdpi_image',
+                'android_mdpi_image',
+                'android_xhdpi_image',
+                'android_xxhdpi_image'
+            ];
+
+            if ($splashScreen) {
+                $splashScreen->update($data);
+            } else {
+                $splashScreen = \App\Models\SplashScreen::create($data);
+            }
+
+            foreach ($keys as $key) {
+                if ($request->hasFile($key)) {
+                    // Use the same imageUpload mechanism as the rest of the app
+                    $filename = $this->imageUpload(
+                        $request->file($key), 
+                        'splash_screens', 
+                        $splashScreen->id, 
+                        'splash_screens', 
+                        $key, 
+                        $splashScreen->id // For update if already exists in Drive
+                    );
+                    
+                    if ($filename && $filename !== 'null') {
+                        $splashScreen->update([$key => $filename]);
+                    }
+                }
+            }
+            
+            session()->flash('success', 'Splash screen saved successfully.');
+            return redirect()->route('splash', ['event_id' => $eventId]);
+        }
+
+        return view('splash', compact('events', 'splashScreen', 'eventId'));
     }
+
+    public function removeSplashScreenPhoto(Request $request)
+    {
+        $user = auth()->user();
+        $isSuperAdmin = isSuperAdmin();
+        $eventId = $request->event_id;
+        $key = $request->key;
+
+        // Security check
+        if (!$isSuperAdmin) {
+            $subscription = \App\Models\Subscription::active()
+                ->where('user_id', $user->id)
+                ->latest()
+                ->first();
+
+            $event = \App\Models\Event::where('id', $eventId)
+                ->where('created_by', $user->id)
+                ->when($subscription, fn($q) => $q->where('subscription_id', $subscription->id))
+                ->first();
+
+            if (!$event) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+        }
+
+        $splashScreen = \App\Models\SplashScreen::where('event_id', $eventId)->first();
+        if ($splashScreen) {
+            // Use the standard deleteFile helper to clean up Drive record and physical file
+            $this->deleteFile($splashScreen->id, 'splash_screens', $key);
+            
+            // Update the column in splash_screens table
+            $splashScreen->$key = null;
+            $splashScreen->save();
+            
+            return response()->json(['success' => true, 'message' => 'Image removed successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Splash screen not found.'], 404);
+    }
+
 
     public function registrationSettings(Request $request){
         if($request->mode == 'save'){
