@@ -825,41 +825,129 @@ public function scanDetails(Request $request){
     }
 }
 
-public function scanDetailsUpdate(Request $request){
-    try {
-        Log::info($request->all());
-        if (!$user = JWTAuth::parseToken()->authenticate()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 401);
-        }
-        Log::info("Authenticated user: " . $user->id);
-         $validator = Validator::make($request->all(), [
-            'qrData' => 'required'
-        ]);
-        $eventId = (int) ($request->event_id ?? 1);
-        $connetion = UserConnection::where('connection_id',$request->qrData)
-            ->where('user_id',$user->id)
-            ->where('event_id', $eventId)
-            ->first();
-        if(!$connetion){
-           return response()->json([
-            "message"=> "Fail to add note!",
-           ]);
-        }
-        $connetion->note =$request->note ?? '';
-        $connetion->save(); 
-        return response()->json([
-            "message"=> "Connection note added!",
-        ]);
+// public function scanDetailsUpdate(Request $request){
+//     try {
+//         Log::info($request->all());
+//         if (!$user = JWTAuth::parseToken()->authenticate()) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'Unauthorized'
+//             ], 401);
+//         }
+//         Log::info("Authenticated user: " . $user->id);
+//          $validator = Validator::make($request->all(), [
+//             'qrData' => 'required'
+//         ]);
+//         $eventId = (int) ($request->event_id ?? 1);
+//         $connetion = UserConnection::where('connection_id',$request->qrData)
+//             ->where('user_id',$user->id)
+//             ->where('event_id', $eventId)
+//             ->first();
+//         if(!$connetion){
+//            return response()->json([
+//             "message"=> "Fail to add note!",
+//            ]);
+//         }
+//         $connetion->note =$request->note ?? '';
+//         $connetion->save(); 
+//         return response()->json([
+//             "message"=> "Connection note added!",
+//         ]);
     
 
-    } catch (\Exception $e) {
-        return response()->json(["message" => "Fail to add note!"]);
-    }
-}
+//     } catch (\Exception $e) {
+//         return response()->json(["message" => "Fail to add note!"]);
+//     }
+// }
 
+
+    public function scanDetailsUpdate(Request $request){
+        try {
+            Log::info('scanDetailsUpdate request:', $request->all());
+
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], 401);
+            }
+
+            Log::info('Authenticated user: ' . $user->id);
+
+            $validator = Validator::make($request->all(), [
+                'qrData'   => 'required|integer',
+                'event_id' => 'required|integer',
+                'note'     => 'nullable|string|max:500',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
+
+            $connectionId = (int) $request->qrData;
+            $eventId = (int) $request->event_id;
+
+            $connection = UserConnection::updateOrCreate(
+                [
+                    'user_id'       => $user->id,
+                    'connection_id' => $connectionId,
+                    'event_id'      => $eventId,
+                ],
+                [
+                    'note' => $request->note ?? '',
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => $connection->wasRecentlyCreated
+                    ? 'Connection note created!'
+                    : 'Connection note updated!',
+                'data' => [
+                    'id'            => $connection->id,
+                    'user_id'       => $connection->user_id,
+                    'connection_id' => $connection->connection_id,
+                    'event_id'      => $connection->event_id,
+                    'note'          => $connection->note,
+                ],
+            ], 200);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token expired',
+            ], 401);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token invalid',
+            ], 401);
+
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token missing or invalid',
+            ], 401);
+
+        } catch (\Exception $e) {
+            Log::error('scanDetailsUpdate error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to add note!',
+            ], 500);
+        }
+    }
 public function connectionUpdate(Request $request){
     try {
         if (!$user = JWTAuth::parseToken()->authenticate()) {
