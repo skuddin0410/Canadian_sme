@@ -28,6 +28,14 @@ class EventResource extends JsonResource
                 'description' => $this->meta_description,
                 'keywords' => $this->meta_keywords,
             ],
+            'splash_screen' => $this->splashScreen ? [
+                'ios_iphone' => $this->splashScreen->iosIphone?->file_path,
+                'ios_ipad' => $this->splashScreen->iosIpad?->file_path,
+                'android_hdpi' => $this->splashScreen->androidHdpi?->file_path,
+                'android_mdpi' => $this->splashScreen->androidMdpi?->file_path,
+                'android_xhdpi' => $this->splashScreen->androidXhdpi?->file_path,
+                'android_xxhdpi' => $this->splashScreen->androidXxhdpi?->file_path,
+            ] : null,
             'created_at' => $this->created_at,
             'is_registered' => (bool) $this->is_registered,
         ];

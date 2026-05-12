@@ -138,10 +138,29 @@ class OtpController extends Controller
 
                 Mail::raw($code.' is your login OTP. Please ensure this as confidential. ' .env('APP_NAME'). ' will never call you to verify your OTP. Good Luck,', function($m) use ($request, $subject){ $m->to($request->email)->subject($subject); }); //My code for otp mail
 
+                $splashScreen = null;
+                if ($eventId) {
+                    $splashScreenRecord = \App\Models\SplashScreen::with([
+                        'iosIphone', 'iosIpad', 'androidHdpi', 'androidMdpi', 'androidXhdpi', 'androidXxhdpi'
+                    ])->where('event_id', $eventId)->first();
+
+                    if ($splashScreenRecord) {
+                        $splashScreen = [
+                            'ios_iphone' => $splashScreenRecord->iosIphone?->file_path,
+                            'ios_ipad' => $splashScreenRecord->iosIpad?->file_path,
+                            'android_hdpi' => $splashScreenRecord->androidHdpi?->file_path,
+                            'android_mdpi' => $splashScreenRecord->androidMdpi?->file_path,
+                            'android_xhdpi' => $splashScreenRecord->androidXhdpi?->file_path,
+                            'android_xxhdpi' => $splashScreenRecord->androidXxhdpi?->file_path,
+                        ];
+                    }
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => 'OTP sent successfully to '.$request->email. '.',
                     'data' => $otp,
+                    'splash_screen' => $splashScreen,
                 ]);
 
             } catch (JWTException $e) {

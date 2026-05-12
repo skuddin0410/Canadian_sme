@@ -193,6 +193,20 @@ class HomeController extends Controller
             "imageUrl" => asset('images/noImage.png'),
         ];
 
+        // ================= Splash Screen =================
+        $splashScreenRecord = \App\Models\SplashScreen::with([
+            'iosIphone', 'iosIpad', 'androidHdpi', 'androidMdpi', 'androidXhdpi', 'androidXxhdpi'
+        ])->where('event_id', $eventId)->first();
+
+        $splashScreen = $splashScreenRecord ? [
+            'ios_iphone' => $splashScreenRecord->iosIphone?->file_path,
+            'ios_ipad' => $splashScreenRecord->iosIpad?->file_path,
+            'android_hdpi' => $splashScreenRecord->androidHdpi?->file_path,
+            'android_mdpi' => $splashScreenRecord->androidMdpi?->file_path,
+            'android_xhdpi' => $splashScreenRecord->androidXhdpi?->file_path,
+            'android_xxhdpi' => $splashScreenRecord->androidXxhdpi?->file_path,
+        ] : null;
+
         // ================= Upcoming Session =================
         $upcomingSession = Session::with(['attendees', 'sponsors'])
             ->where('event_id', $eventId)
@@ -310,7 +324,8 @@ class HomeController extends Controller
             "home_sessions" => $homeSessions,
             "home_connections" => $homeConnections,
             "myStats" => $myStats,
-            "notifications" => $notifications
+            "notifications" => $notifications,
+            "splash_screen" => $splashScreen
         ]);
     }
 
