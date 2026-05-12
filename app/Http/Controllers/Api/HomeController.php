@@ -834,7 +834,7 @@ public function scanDetailsUpdate(Request $request){
                 'message' => 'Unauthorized'
             ], 401);
         }
-        $eventId = (int) ($request->event_id ?: 1);
+        $eventId = (int) ($request->event_id ?? 1);
         $connetion = UserConnection::where('connection_id',$request->qrData)
             ->where('user_id',$user->id)
             ->where('event_id', $eventId)
