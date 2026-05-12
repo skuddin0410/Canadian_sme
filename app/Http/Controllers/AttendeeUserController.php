@@ -716,9 +716,9 @@ class AttendeeUserController extends Controller
         }
         return back()->withErrors('You do not have permission to perform this action.');
     }
-    public function exportAttendees()
+    public function exportAttendees(Request $request)
     {
-        return Excel::download(new AttendeesExport, 'attendees.xlsx');
+        return Excel::download(new AttendeesExport($request), 'attendees.xlsx');
     }
     public function allowAccess(string $id)
     {

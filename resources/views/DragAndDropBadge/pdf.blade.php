@@ -38,8 +38,8 @@ html, body {
     position: absolute;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    text-align: left;
     overflow: hidden;
     padding: 0;
     margin: 0;

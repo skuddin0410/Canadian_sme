@@ -238,20 +238,34 @@ class HomeController extends Controller
             });
 
         // ================= Home Connections =================
-        $user = auth()->user();
+        // $user = auth()->user();
 
-        $homeConnections = $user->connections()
-            ->wherePivot('event_id', $eventId)
+        // $homeConnections = $user->connections()
+        //     ->wherePivot('event_id', $eventId)
+        //     ->get()
+        //     ->map(function ($connection) {
+        //         return [
+        //             "id" => $connection->id,
+        //             "name" => $connection->full_name ?? $connection->name,
+        //             "avatarUrl" => $connection->photo && $connection->photo->mobile_path
+        //                 ? $connection->photo->mobile_path
+        //                 : asset('images/noImage.png')
+        //         ];
+        //     });
+
+        $homeConnections = User::join('event_and_entity_link', 'users.id', '=', 'event_and_entity_link.entity_id')
+            ->where('event_and_entity_link.event_id', $eventId)
+            ->where('event_and_entity_link.entity_type', 'users')
+            ->select('users.*')
+            ->with('photo')
+            ->orderBy('event_and_entity_link.id', 'DESC')
+            ->take(7)
             ->get()
-            ->map(function ($connection) {
-                return [
-                    "id" => $connection->id,
-                    "name" => $connection->full_name ?? $connection->name,
-                    "avatarUrl" => $connection->photo && $connection->photo->mobile_path
-                        ? $connection->photo->mobile_path
-                        : asset('images/noImage.png')
-                ];
-            });
+            ->map(fn($attendee) => [
+                "id"        => $attendee->id,
+                "name"      => $attendee->full_name ?? $attendee->name,
+                "avatarUrl" => $attendee->photo ? $attendee->photo->mobile_path : asset('images/noImage.png')
+            ]);
 
         // ================= Notifications =================
         $notificationsQuery = GeneralNotification::where('is_read', 0)

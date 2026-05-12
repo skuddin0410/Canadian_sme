@@ -25,7 +25,7 @@
                             <button type="button" class="btn btn-outline-info btn-pill" onclick="openScheduledNotificationsModal()">
                                 <i class="bx bx-bell me-1"></i>Scheduled Notifications
                             </button>
-                            <a href="{{ route('attendee-users.export') }}" class="btn btn-outline-primary btn-pill">Export
+                            <a href="{{ route('attendee-users.export') }}" class="btn btn-outline-primary btn-pill" id="export-link">Export
                                 Users</a>
                             <a href="#" class="btn btn-outline-primary btn-pill" id="importusers"
                                 onclick="openImportModal()">Import Users</a>
@@ -454,6 +454,11 @@
             localStorage.setItem('attendeeParams', JSON.stringify(params));
             $(".spinner-border").fadeIn(300);
 
+            // Update export link
+            let exportUrl = "{{ route('attendee-users.export') }}";
+            let queryString = $.param(params);
+            $('#export-link').attr('href', exportUrl + (queryString ? '?' + queryString : ''));
+
             $.ajax({
                 url: "{{ route('attendee-users.index') }}",
                 type: 'GET',
@@ -612,6 +617,10 @@
             }
 
             window.openImportModal = function() {
+                const mainEventId = $('#event_id').val();
+                if (mainEventId) {
+                    $('#importEventId').val(mainEventId).trigger('change');
+                }
                 $('#openImportModal').modal('show');
             }
             window.closeImportModal = function() {
@@ -1009,7 +1018,12 @@
 
     // Collect selected user IDs (from checkboxes)
     const selectedUserIds = [];
+    /*
     $('input[name="user_checkbox[]"]:checked').each(function() {
+        selectedUserIds.push($(this).val());
+    });
+    */
+    $('.user-checkbox:checked').each(function() {
         selectedUserIds.push($(this).val());
     });
 
@@ -1048,8 +1062,19 @@
     form.submit();
 };
         window.openBadgeModal = function() {
+            /*
             closeModal(); // closes other modals
             $('#bulkBadgeModal').modal('show'); // opens badge modal
+            */
+
+            // Auto-select latest badge and submit
+            const latestBadgeId = $('#badge_id option:eq(1)').val(); 
+            if (!latestBadgeId) {
+                Swal.fire('No Badge Found', 'Please create a badge template first.', 'warning');
+                return;
+            }
+            $('#badge_id').val(latestBadgeId);
+            window.submitBadgeAction();
         };
     </script>
 
