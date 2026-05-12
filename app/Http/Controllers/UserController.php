@@ -365,6 +365,19 @@ class UserController extends Controller
         //  STEP 4: Import
         Excel::import(new UsersImport($eventId, (int) $user->id), $file);
 
+        // Notify Super Admin
+        if (!isSuperAdmin()) {
+            $event = \App\Models\Event::find($eventId);
+            \App\Models\GeneralNotification::create([
+                'user_id' => 1, // Super Admin ID
+                'title' => 'Attendees Imported',
+                'body' => $dataRows . ' rows from a file imported by ' . auth()->user()->full_name . ' for event "' . ($event->title ?? 'Unknown Event') . '"',
+                'related_type' => 'attendee_import',
+                'related_id' => $eventId,
+                'is_read' => 0
+            ]);
+        }
+
         return back()->with('success', "Imported successfully. Rows: {$dataRows}");
     }
     private function countDataRows(string $path, string $ext): int

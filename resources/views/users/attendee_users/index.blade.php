@@ -1018,7 +1018,12 @@
 
     // Collect selected user IDs (from checkboxes)
     const selectedUserIds = [];
+    /*
     $('input[name="user_checkbox[]"]:checked').each(function() {
+        selectedUserIds.push($(this).val());
+    });
+    */
+    $('.user-checkbox:checked').each(function() {
         selectedUserIds.push($(this).val());
     });
 
@@ -1057,8 +1062,19 @@
     form.submit();
 };
         window.openBadgeModal = function() {
+            /*
             closeModal(); // closes other modals
             $('#bulkBadgeModal').modal('show'); // opens badge modal
+            */
+
+            // Auto-select latest badge and submit
+            const latestBadgeId = $('#badge_id option:eq(1)').val(); 
+            if (!latestBadgeId) {
+                Swal.fire('No Badge Found', 'Please create a badge template first.', 'warning');
+                return;
+            }
+            $('#badge_id').val(latestBadgeId);
+            window.submitBadgeAction();
         };
     </script>
 

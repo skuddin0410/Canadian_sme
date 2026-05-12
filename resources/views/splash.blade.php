@@ -200,7 +200,7 @@
 </form>
 
 <!-- Bootstrap 5 JS and Popper.js (for modal etc.) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 
 <script>
   // Handle image upload and preview for each dropzone

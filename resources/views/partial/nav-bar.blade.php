@@ -57,6 +57,10 @@
 										<span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-error"></i></span>
 										@elseif(str_contains($notification->related_type, 'gallery'))
 										<span class="avatar-initial rounded-circle bg-label-primary"><i class="bx bx-image"></i></span>
+										@elseif($notification->related_type == 'attendee_import')
+										<span class="avatar-initial rounded-circle bg-label-info"><i class="bx bx-import"></i></span>
+										@elseif($notification->related_type == 'attendee_registration')
+										<span class="avatar-initial rounded-circle bg-label-primary"><i class="bx bx-user-plus"></i></span>
 										@else
 										<span class="avatar-initial rounded-circle bg-label-success"><i class="bx bx-bell"></i></span>
 										@endif
