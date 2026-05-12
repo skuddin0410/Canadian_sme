@@ -238,7 +238,7 @@ class HomeController extends Controller
             });
 
         // ================= Home Connections =================
-        // $user = auth()->user();
+        $user = auth()->user();
 
         // $homeConnections = $user->connections()
         //     ->wherePivot('event_id', $eventId)
