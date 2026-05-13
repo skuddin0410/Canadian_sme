@@ -1212,11 +1212,12 @@ public function sendPushNotificationTest(Request $request)
 {
     try {
         $response = Http::withHeaders([
-            'Authorization' => 'Basic os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa',
+            'Authorization' => 'Key os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa',
             'Content-Type' => 'application/json; charset=utf-8',
-        ])->post('https://api.onesignal.com/api/v1/notifications', [
+        ])->post('https://api.onesignal.com/notifications?c=push', [
             'app_id' => '45726252-6dce-4f91-bb5e-58f9d6f75f2d',
-            'include_player_ids' => ['232d65bd-4636-498c-86c1-4df3421b6c60'],
+            'include_subscription_ids' => ['232d65bd-4636-498c-86c1-4df3421b6c60'],
+            'target_channel' => 'push',
             'headings' => ['en' => 'Hi Subhabrata'],
             'contents' => ['en' => 'Test'],
         ]);
@@ -1251,18 +1252,18 @@ public function sendPushNotificationTest(Request $request)
      
         $fields = array(
             'app_id' => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-            'include_player_ids' => array($playerId),
+            'include_subscription_ids' => array($playerId),
+            'target_channel' => 'push',
             'headings' => $headings,
             'contents' => $content
         );
 
         $fields = json_encode($fields);
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq'
-
+            'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq'
         ));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1274,14 +1275,14 @@ public function sendPushNotificationTest(Request $request)
         curl_close($ch);
      
         return $response;
-
     }
 
     public static function sendNotificationTest()
     {
         $content = [
             "app_id" => "45726252-6dce-4f91-bb5e-58f9d6f75f2d",
-            "include_player_ids" => ['c562d159-5963-4611-bda4-19a4c8dd5a0a'],
+            "include_subscription_ids" => ['c562d159-5963-4611-bda4-19a4c8dd5a0a'],
+            "target_channel" => "push",
             "headings" => ["en" => 'Hi'],
             "contents" => ["en" => 'Hello']
         ];
@@ -1289,10 +1290,10 @@ public function sendPushNotificationTest(Request $request)
         $fields = json_encode($content);
      
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa'
+            'Authorization: Key os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa'
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
