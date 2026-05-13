@@ -28,7 +28,7 @@
                   $setting = getLandingPageSettings();
                 @endphp
                 <div class="left-inner">
-                    <a href="javascript:void()">
+                    <a href="https://eventzen.io">
                         <img class="landing-page-logo" src="{{asset('/eventzen-logo.svg')}}" alt="">
                     </a>
                     <h2 class="h2-black mt-4 mb-3">

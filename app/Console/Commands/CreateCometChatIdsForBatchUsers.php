@@ -52,6 +52,12 @@ class CreateCometChatIdsForBatchUsers extends Command
                     $this->info("CometChat ID created for user: {$user->id} ({$user->name})");
                 } else {
                     // Output a failure message if the user creation fails
+                    Log::error('Failed to create CometChat ID for user.', [
+                        'user_id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'mobile' => $user->mobile,
+                    ]);
                     $this->error("Failed to create CometChat ID for user: {$user->id} ({$user->name})");
                 }
  
@@ -76,6 +82,16 @@ class CreateCometChatIdsForBatchUsers extends Command
             $appID = env('COMETCHAT_APP_ID');
             $apiKey = env('COMETCHAT_API_KEY');
             $region = env('COMETCHAT_REGION');
+
+            if (empty($appID) || empty($apiKey) || empty($region)) {
+                Log::error('CometChat credentials are missing.', [
+                    'user_id' => $userId,
+                    'app_id_present' => !empty($appID),
+                    'api_key_present' => !empty($apiKey),
+                    'region_present' => !empty($region),
+                ]);
+                return null;
+            }
  
             // Get the user's photo URL using the `photo` relationship
             $user = User::find($userId);
@@ -115,10 +131,20 @@ class CreateCometChatIdsForBatchUsers extends Command
                     'authToken' => $responseData['data']['authToken']
                 ];
             }
+
+            Log::error('CometChat API user creation failed.', [
+                'user_id' => $userId,
+                'email' => $email,
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
  
             return null;
         } catch (\Exception $e) {
-            Log::error("Error creating CometChat user for user ID {$userId}: " . $e->getMessage());
+            Log::error("Error creating CometChat user for user ID {$userId}: " . $e->getMessage(), [
+                'user_id' => $userId,
+                'email' => $email,
+            ]);
             return null;
         }  
     }
