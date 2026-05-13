@@ -29,7 +29,7 @@
                 @endphp
                 <div class="left-inner">
                     <a href="javascript:void()">
-                        <img class="landing-page-logo" src="{{asset('frontend/images/logo.png')}}" alt="">
+                        <img class="landing-page-logo" src="{{asset('/eventzen-logo.svg')}}" alt="">
                     </a>
                     <h2 class="h2-black mt-4 mb-3">
                        {{$setting->title ?? ''}}
