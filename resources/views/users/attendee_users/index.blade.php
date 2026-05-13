@@ -65,6 +65,15 @@
                                         </select>
                                     </div>
                                     <div class="col-auto">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" value="1"
+                                                id="missing_cometchat_id" name="missing_cometchat_id">
+                                            <label class="form-check-label" for="missing_cometchat_id">
+                                                CometChat ID missing
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
                                         <button type="button" class="btn btn-md btn-primary"
                                             id="search-btn">Search</button>
                                     </div>
@@ -448,6 +457,9 @@
         if (savedParams.event_id) {
             $('#event_id').val(savedParams.event_id).trigger('change');
         }
+        if (savedParams.missing_cometchat_id) {
+            $('#missing_cometchat_id').prop('checked', true);
+        }
         loadUsers(savedParams);
 
         function loadUsers(params = {}) {
@@ -530,10 +542,12 @@
             $('#search-btn, #filter-btn').click(function() {
                 const searchVal = $('#search').val().trim();
                 const eventId   = $('#event_id').val();
+                const missingCometChatId = $('#missing_cometchat_id').is(':checked') ? 1 : 0;
 
                 loadUsers({
                     search: searchVal,
                     event_id: eventId,
+                    missing_cometchat_id: missingCometChatId,
                     page: 1
                 });
             });
@@ -541,6 +555,7 @@
             $('.reset-filter').click(function() {
                 $('#search').val('');
                 $('#event_id').val('').trigger('change');
+                $('#missing_cometchat_id').prop('checked', false);
                 localStorage.removeItem('attendeeParams');
                 loadUsers();
             });

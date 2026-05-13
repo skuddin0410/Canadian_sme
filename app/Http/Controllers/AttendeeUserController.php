@@ -129,6 +129,10 @@ class AttendeeUserController extends Controller
                     }
                 }
 
+                if ($request->boolean('missing_cometchat_id')) {
+                    $users = $users->whereNull('cometchat_id');
+                }
+
                 // Filters (triggered by filter button, add your filter logic here)
                 if ($request->filled('start_at') && $request->filled('end_at')) {
                     $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
