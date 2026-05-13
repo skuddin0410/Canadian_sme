@@ -106,7 +106,7 @@ class SendScheduledBulkNotificationJob implements ShouldQueue
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Key ' . $apiKey,
-                'Content-Type'  => 'application/json',
+                'Content-Type'  => 'application/json', 
             ])->post('https://api.onesignal.com/notifications?c=push', $payload);
 
             if (!$response->successful()) {
