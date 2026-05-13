@@ -64,7 +64,7 @@
                                         @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-auto">
+                                    <!-- <div class="col-auto">
                                         <div class="form-check mt-2">
                                             <input class="form-check-input" type="checkbox" value="1"
                                                 id="missing_cometchat_id" name="missing_cometchat_id">
@@ -72,7 +72,7 @@
                                                 CometChat ID missing
                                             </label>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="col-auto">
                                         <button type="button" class="btn btn-md btn-primary"
                                             id="search-btn">Search</button>
