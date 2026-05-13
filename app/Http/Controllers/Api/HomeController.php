@@ -1308,7 +1308,7 @@ public function sendPushNotificationTest(Request $request)
     }
 
 
-    public function addFavoriteConnection(Request $request){
+    public function addFavoriteConnection(Request $request){ 
 
         if (!$user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([
