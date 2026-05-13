@@ -284,7 +284,9 @@ class HomeController extends Controller
         // ================= Notifications =================
         $notificationsQuery = GeneralNotification::where('is_read', 0)
             ->where('user_id', $user->id)
-            ->where('event_id', $eventId)
+            ->when($eventId, function ($q) use ($eventId) {
+                $q->where('event_id', $eventId);
+            })
             ->latest();
 
         $notificationsList = $notificationsQuery->get()->map(function ($n) {
@@ -348,7 +350,9 @@ public function getNotifications(Request $request)
         ->where(function ($q) use ($user) {        
             $q->Where('user_id', $user->id); 
         })
-        ->where('event_id', $eventId)
+        ->when($eventId, function ($q) use ($eventId) {
+            $q->where('event_id', $eventId);
+        })
         ->latest()
         ->take(20)
         ->get()

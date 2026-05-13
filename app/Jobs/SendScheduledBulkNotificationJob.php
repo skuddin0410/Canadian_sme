@@ -70,6 +70,7 @@ class SendScheduledBulkNotificationJob implements ShouldQueue
                 // 1. Create internal database notification record via GeneralNotification model
                 \App\Models\GeneralNotification::create([
                     'user_id' => $user->id,
+                    'event_id' => $this->eventId,
                     'title'   => $notificationTemplate->title ?? $title,
                     'body'    => $message,
                     'is_read' => 0,
