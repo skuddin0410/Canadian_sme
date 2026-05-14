@@ -209,6 +209,58 @@
                     </div>
                   </div>
 
+                  <div class="mb-3">
+                    <label class="form-label" for="event_logo">
+                      Event Logo Image
+                      <span class="text-danger">
+                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
+                      </span>
+                    </label>
+                    <input
+                      type="file"
+                      class="form-control @error('event_logo') is-invalid @enderror"
+                      name="event_logo"
+                      id="event_logo"
+                      accept="{{ $acceptList ?: 'image/*' }}" />
+                    <div id="event-logo-preview-container" class="mt-2 {{ !empty($event->eventLogo) && !empty($event->eventLogo->file_path) ? '' : 'd-none' }}">
+                      <img
+                        id="event-logo-preview-img"
+                        src="{{ !empty($event->eventLogo) && !empty($event->eventLogo->file_path) ? $event->eventLogo->file_path : '#' }}"
+                        alt="Event Logo"
+                        class="img-thumbnail"
+                        style="max-height: 120px;">
+                    </div>
+                    @error('event_logo')
+                      <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="sponsor_banner">
+                      Sponsor Banner Image
+                      <span class="text-danger">
+                        (Allowed: {{ (int) config('app.blog_image_size') }} KB; Types: {{ config('app.image_mime_types') }})
+                      </span>
+                    </label>
+                    <input
+                      type="file"
+                      class="form-control @error('sponsor_banner') is-invalid @enderror"
+                      name="sponsor_banner"
+                      id="sponsor_banner"
+                      accept="{{ $acceptList ?: 'image/*' }}" />
+                    <div id="sponsor-banner-preview-container" class="mt-2 {{ !empty($event->sponsorBanner) && !empty($event->sponsorBanner->file_path) ? '' : 'd-none' }}">
+                      <img
+                        id="sponsor-banner-preview-img"
+                        src="{{ !empty($event->sponsorBanner) && !empty($event->sponsorBanner->file_path) ? $event->sponsorBanner->file_path : '#' }}"
+                        alt="Sponsor Banner"
+                        class="img-thumbnail"
+                        style="max-height: 120px;">
+                    </div>
+                    @error('sponsor_banner')
+                      <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                  </div>
+
               <div class="col-md-7">
                 <div class="mb-3">
                   <label class="form-label" for="title">Event Name <span class="text-danger">*</span></label>
@@ -301,8 +353,6 @@
               @enderror
             </div>
  
-            <input type="hidden" name="tags" id="tags-hidden" value="{{ old('tags', $e->tags ?? '') }}">
-
               <div class="mb-2">
               <label class="form-label d-flex align-items-center justify-content-between">
                 <span>Tags</span>
@@ -313,9 +363,11 @@
 
               <div id="tags-list" class="d-flex flex-wrap gap-2">
                 @php
-
                   $availableTags = $availableTags ?? ['Music', 'Meetup', 'Conference', 'Workshop', '2025'];
-                  $selectedTags = collect(explode(',', old('tags', $e->tags ?? '')))
+                  $oldTags = old('tags', $e->tags ?? '');
+                  $selectedTags = is_array($oldTags)
+                                    ? collect($oldTags)
+                                    : collect(explode(',', $oldTags))
                                     ->map(fn($t) => trim($t))
                                     ->filter();
                 @endphp
@@ -334,9 +386,6 @@
                   </label>
                 @endforeach
               </div>
-
-              {{-- If you store as comma string instead of array, uncomment below & include sync script further down --}}
-              {{-- <input type="hidden" name="tags" id="tags-hidden" value="{{ old('tags', $e->tags ?? '') }}"> --}}
 
               @error('tags')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -636,19 +685,6 @@
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const hidden = document.getElementById('tags-hidden');
-  const checks = document.querySelectorAll('input[name="tags[]"]');
-  function syncTags() {
-    const values = [...checks].filter(c => c.checked).map(c => c.value);
-    hidden.value = values.join(',');
-  }
-  checks.forEach(c => c.addEventListener('change', syncTags));
-  syncTags();
-});
-</script>
-
-<script>
   // ---- Slugify helper
   function slugifyTags(str) {
     return String(str || '')
@@ -755,13 +791,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tagsList.appendChild(input);
         tagsList.appendChild(label);
-
-        // If you store as comma-string, also sync hidden input:
-        const hidden = document.getElementById('tags-hidden');
-        if (hidden) {
-          const checks = tagsList.querySelectorAll('input[name="tags[]"]');
-          hidden.value = [...checks].filter(c => c.checked).map(c => c.value).join(',');
-        }
 
         // Reset + close modal
         form.reset();
@@ -917,6 +946,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
   });
+
+  const bindSimpleImagePreview = (inputEl, containerEl, imageEl) => {
+    if (!inputEl || !containerEl || !imageEl) {
+      return;
+    }
+
+    inputEl.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+
+      if (!file || !file.type.startsWith('image/')) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        imageEl.src = event.target.result;
+        containerEl.classList.remove('d-none');
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  bindSimpleImagePreview(
+    document.getElementById('event_logo'),
+    document.getElementById('event-logo-preview-container'),
+    document.getElementById('event-logo-preview-img')
+  );
+
+  bindSimpleImagePreview(
+    document.getElementById('sponsor_banner'),
+    document.getElementById('sponsor-banner-preview-container'),
+    document.getElementById('sponsor-banner-preview-img')
+  );
 });
 
 </script>

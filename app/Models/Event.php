@@ -88,6 +88,22 @@ class Event extends Model
             ->whereNotNull('file_name');
     }
 
+    public function eventLogo()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'events')
+            ->where('file_type', 'event_logo')
+            ->whereNotNull('file_name');
+    }
+
+    public function sponsorBanner()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'events')
+            ->where('file_type', 'sponsor_banner')
+            ->whereNotNull('file_name');
+    }
+
     public function sessions()
     {
         return $this->hasMany(Session::class);
