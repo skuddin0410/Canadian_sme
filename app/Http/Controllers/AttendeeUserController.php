@@ -1200,7 +1200,8 @@ class AttendeeUserController extends Controller
             return response()->json([
                 'success' => true,
                 // 'message' => "Sending mails in the background"
-                'message' => "Process are running in the background"
+                // 'message' => "Process are running in the background"
+                'message' => "Successfully sent to " . count($users) . " users."
             ]);
         }
 

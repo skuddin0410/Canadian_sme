@@ -127,6 +127,8 @@ class EventController extends Controller
             'meta_keywords' => 'nullable|string|max:1000',
             'tags' => 'nullable|string|max:1000',
             'image' => 'required|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'event_logo' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'sponsor_banner' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.user_image_size'),
             'section_order' => 'nullable|array'
         ]);
@@ -183,6 +185,14 @@ class EventController extends Controller
         $uploadPath = 'events';
         if ($request->file("image")) {
             $this->imageUpload($request->file("image"), $uploadPath, $event->id, 'events', 'photo');
+        }
+
+        if ($request->file("event_logo")) {
+            $this->imageUpload($request->file("event_logo"), $uploadPath, $event->id, 'events', 'event_logo');
+        }
+
+        if ($request->file("sponsor_banner")) {
+            $this->imageUpload($request->file("sponsor_banner"), $uploadPath, $event->id, 'events', 'sponsor_banner');
         }
 
         if ($request->file("map_image")) {
@@ -304,6 +314,26 @@ class EventController extends Controller
             ]);
         }
 
+        if ($event->eventLogo) {
+            Drive::create([
+                'table_id' => $clonedEvent->id,
+                'table_type' => 'events',
+                'file_type' => 'event_logo',
+                'file_name' => $event->eventLogo->file_name,
+                'is_local_file' => $event->eventLogo->is_local_file,
+            ]);
+        }
+
+        if ($event->sponsorBanner) {
+            Drive::create([
+                'table_id' => $clonedEvent->id,
+                'table_type' => 'events',
+                'file_type' => 'sponsor_banner',
+                'file_name' => $event->sponsorBanner->file_name,
+                'is_local_file' => $event->sponsorBanner->is_local_file,
+            ]);
+        }
+
         // Clone the related records from `event_and_entity_link`
         $eventAndEntityLinks = EventAndEntityLink::where('event_id', $eventId)->get();
         // If no records are found, log a message
@@ -398,6 +428,8 @@ class EventController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255', // each tag must be a string (optional but safer)
             'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
+            'event_logo' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
+            'sponsor_banner' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.banner_image_size'),
             'section_order' => 'nullable|array'
         ]);
@@ -450,6 +482,14 @@ class EventController extends Controller
         $event->save();
         if ($request->file("image")) {
             $this->imageUpload($request->file("image"), 'events', $event->id, 'events', 'photo', $idForUpdate = $event->id);
+        }
+
+        if ($request->file("event_logo")) {
+            $this->imageUpload($request->file("event_logo"), 'events', $event->id, 'events', 'event_logo', $idForUpdate = $event->id);
+        }
+
+        if ($request->file("sponsor_banner")) {
+            $this->imageUpload($request->file("sponsor_banner"), 'events', $event->id, 'events', 'sponsor_banner', $idForUpdate = $event->id);
         }
 
         if ($request->file("map_image")) {
