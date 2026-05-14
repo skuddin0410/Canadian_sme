@@ -31,7 +31,7 @@ class SendScheduledBulkEmailJob implements ShouldQueue
 
     public function handle()
     {
-        $emailTemplate = EmailTemplate::where('template_name', $this->templateName)
+        $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->where('template_name', $this->templateName)
             ->where('event_id', $this->eventId)
             ->first();
 
@@ -46,7 +46,8 @@ class SendScheduledBulkEmailJob implements ShouldQueue
             ? User::query()
             : User::whereIn('id', $this->userIds);
 
-        $usersQuery->chunk(100, function ($users) use ($emailTemplate, $subject) {
+        $event = $emailTemplate->event;
+        $usersQuery->chunk(100, function ($users) use ($emailTemplate, $subject, $event) {
             foreach ($users as $user) {
                 try {
                     $qr_code_url = asset($user->qr_code);
@@ -63,7 +64,7 @@ class SendScheduledBulkEmailJob implements ShouldQueue
                         $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
                     }
 
-                    Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+                    Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, null, $event));
                 } catch (\Exception $e) {
                     Log::error("Scheduled email failed for user {$user->id}: " . $e->getMessage());
                 }
