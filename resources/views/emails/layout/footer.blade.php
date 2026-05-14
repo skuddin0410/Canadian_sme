@@ -4,14 +4,19 @@
 
             <tr>
             <td class="content" style="padding:30px 25px; font-size:15px; line-height:1.6; color:#444;">
+            <div style="text-align:center; margin-bottom:18px;">
+            <a href="{{ $websiteUrl ?? config('app.url') }}" target="_blank" style="color:#002364; font-weight:600; text-decoration:none;">
+            {{ $websiteUrl ?? config('app.url') }}
+            </a>
+            </div>
             <div style="text-align: center; display: flex; justify-content: center; gap: 15px;">
             <!-- Google Play Button -->
-            <a href="https://play.google.com/store/apps/details?id=com.canadianSME.app" target="_blank">
+            <a href="{{ $androidUrl ?? 'https://play.google.com/store/apps/details?id=com.canadianSME.app' }}" target="_blank">
             <img src="{{asset('images/playstore.png')}}" alt="Get it on Google Play" style="width: 150px; height: auto;">
             </a>
 
             <!-- App Store Button -->
-            <a href="https://apps.apple.com/us/app/sme-summit-2025/id6753012008" target="_blank">
+            <a href="{{ $iosUrl ?? 'https://apps.apple.com/us/app/sme-summit-2025/id6753012008' }}" target="_blank">
             <img src="{{asset('images/appstore.png')}}" style="width: 150px; height: auto;">
             </a>
             </div>

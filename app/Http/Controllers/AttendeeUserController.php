@@ -800,9 +800,10 @@ class AttendeeUserController extends Controller
             $users = User::whereIn('id', $userIds)->get();
         }
 
-        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)
+        $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->where('template_name', $request->template_name)
             ->where('event_id', $request->event_id)
             ->first();
+        $event = $emailTemplate?->event;
         $subject = $emailTemplate->subject ?? '';
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -898,7 +899,7 @@ class AttendeeUserController extends Controller
                 // Use Mailable which implements ShouldQueue for background processing
 
                 // new system to queue
-                Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, $mailLog->id));
+                Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, $mailLog->id, $event));
             }
         } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
             /*

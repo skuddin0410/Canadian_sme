@@ -485,7 +485,7 @@ if (!function_exists('sendNotification')) {
     function sendNotification($template_name, $user)
     {  
       
-        $emailTemplate = EmailTemplate::where('template_name', $template_name)->first();
+        $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->where('template_name', $template_name)->first();
         if (!empty($emailTemplate) && $emailTemplate->type == 'email') {
             $subject = $emailTemplate->subject ?? '';
             $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -505,7 +505,7 @@ if (!function_exists('sendNotification')) {
             }
 
             $message = Purifier::clean($message, 'default');
-            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, null, $emailTemplate->event));
  
         } elseif (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
             foreach ($users as $user) {

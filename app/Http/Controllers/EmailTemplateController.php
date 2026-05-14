@@ -135,7 +135,7 @@ class EmailTemplateController extends Controller
             'template' => 'required|exists:email_templates,id',
         ]);
 
-        $emailTemplate = EmailTemplate::findOrFail($request->template);
+        $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->findOrFail($request->template);
         $subject = $emailTemplate->subject ?? '';
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -153,7 +153,7 @@ class EmailTemplateController extends Controller
               $message = str_replace('{{profile_update_link}}', '<br><a href="' . $updateUrl . '">Update Profile</a>', $message);
         }
         $message = Purifier::clean($message, 'default');
-        Mail::to($request->email)->send(new UserWelcome(null, $subject, $message));
+        Mail::to($request->email)->send(new UserWelcome(null, $subject, $message, null, $emailTemplate->event));
         return back()->with('success', 'Email sent successfully!');
     }
 
