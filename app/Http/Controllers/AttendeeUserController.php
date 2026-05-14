@@ -1158,7 +1158,8 @@ class AttendeeUserController extends Controller
 
                 $title = 'Hi, ' . ($user->full_name ?? '') . ',';
 
-                notification($user->id, $type = 'push_notification', null, $title, $message);
+                notification($user->id, $type = 'push_notification', null, $title, $message, (int)$request->event_id);
+
                 if (!empty($user->onesignal_userid)) {
                     $payload = [
                         // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
