@@ -90,7 +90,8 @@
                 </div>
             </div>
             <div class="right">
-                <img class="mobile-img" src="{{asset('frontend/images/mobile-image.svg')}}" alt="">
+                <!-- <img class="mobile-img" src="{{asset('frontend/images/mobile-image.svg')}}" alt=""> -->
+                <img class="mobile-img" src="{{asset('images/promo-event.png')}}" alt="">
             </div>
         </div>
     </section>
