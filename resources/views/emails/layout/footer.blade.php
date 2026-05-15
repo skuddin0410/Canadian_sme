@@ -12,7 +12,7 @@
                   </a>
                 </td>
                 <td class="footer-link-cell" align="center" style="padding:0 6px 10px 6px;">
-                  <a href="{{ $iosUrl ?? 'https://apps.apple.com/us/app/sme-summit-2025/id6753012008' }}" target="_blank" style="display:block;">
+                  <a href="{{ $iosUrl ?? 'https://apps.apple.com/in/app/eventzen/id6753012008' }}" target="_blank" style="display:block;">
                     <img src="{{ asset('images/appstore.png') }}" alt="Download on the App Store" width="150" class="store-badge" style="width:150px; height:auto; display:block; border:0;">
                   </a>
                 </td>
