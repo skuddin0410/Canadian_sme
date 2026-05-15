@@ -17,6 +17,11 @@
     table {
       border-collapse: collapse !important;
     }
+    p {
+      margin: 0;
+      /* padding: 0; */
+    }
+
     /* Mobile Styles */
     @media only screen and (max-width:600px) {
       .container {
