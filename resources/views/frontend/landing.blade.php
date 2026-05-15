@@ -63,7 +63,7 @@
                     <div class="app-grid mt-3">
                         <div class="cell">
                             <div>
-                              <a href="https://apps.apple.com/us/app/sme-summit-2025/id6753012008">  <img class="h-100 w-100" src="{{asset('frontend/images/apple-store.svg')}}" alt=""></a>
+                              <a href="https://apps.apple.com/in/app/eventzen/id6753012008">  <img class="h-100 w-100" src="{{asset('frontend/images/apple-store.svg')}}" alt=""></a>
                             </div>
                         </div>
                         <div class="cell">
