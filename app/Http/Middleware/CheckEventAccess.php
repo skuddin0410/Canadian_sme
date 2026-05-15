@@ -59,9 +59,12 @@ class CheckEventAccess
                 }
 
                 // Redirect back with both a standard error and a swal flag
+                // return redirect()->back()
+                //     ->with('error', 'You do not have permission to access this event.')
+                //     ->with('error_swal', 'You do not have permission to access this event.');
                 return redirect()->back()
-                    ->with('error', 'You do not have permission to access this event.')
-                    ->with('error_swal', 'You do not have permission to access this event.');
+                    ->with('error', 'You do not have permission to access this event, you can logout and try with different credentials.')
+                    ->with('error_swal', 'You do not have permission to access this event, you can logout and try with different credentials.');
             }
         }
 
