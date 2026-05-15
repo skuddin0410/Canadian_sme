@@ -7,12 +7,14 @@
             <table role="presentation" class="footer-links" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;">
               <tr>
                 <td class="footer-link-cell" align="center" style="padding:0 6px 10px 6px;">
-                  <a href="{{ $androidUrl ?? 'https://play.google.com/store/apps/details?id=com.canadianSME.app' }}" target="_blank" style="display:block;">
+                  <!-- <a href="{{ $androidUrl ?? 'https://play.google.com/store/apps/details?id=com.canadianSME.app' }}" target="_blank" style="display:block;"> -->
+                  <a href="{{ 'https://play.google.com/store/apps/details?id=com.canadianSME.app' }}" target="_blank" style="display:block;">
                     <img src="{{ asset('images/playstore.png') }}" alt="Get it on Google Play" width="150" class="store-badge" style="width:150px; height:auto; display:block; border:0;">
                   </a>
                 </td>
                 <td class="footer-link-cell" align="center" style="padding:0 6px 10px 6px;">
-                  <a href="{{ $iosUrl ?? 'https://apps.apple.com/in/app/eventzen/id6753012008' }}" target="_blank" style="display:block;">
+                  <!-- <a href="{{ $iosUrl ?? 'https://apps.apple.com/in/app/eventzen/id6753012008' }}" target="_blank" style="display:block;"> -->
+                  <a href="{{ 'https://apps.apple.com/in/app/eventzen/id6753012008' }}" target="_blank" style="display:block;">
                     <img src="{{ asset('images/appstore.png') }}" alt="Download on the App Store" width="150" class="store-badge" style="width:150px; height:auto; display:block; border:0;">
                   </a>
                 </td>
