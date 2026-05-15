@@ -39,6 +39,26 @@
         font-size: 14px !important;
         padding: 10px 16px !important;
       }
+      .footer-links,
+      .footer-links tbody,
+      .footer-links tr,
+      .footer-link-cell {
+        display: block !important;
+        width: 100% !important;
+      }
+      .footer-link-cell {
+        padding: 0 0 12px 0 !important;
+      }
+      .footer-link-cell:last-child {
+        padding-bottom: 0 !important;
+      }
+      .store-badge,
+      .website-button {
+        margin: 0 auto !important;
+      }
+      .website-button {
+        width: 100% !important;
+      }
     }
   </style>
 </head>
@@ -56,7 +76,7 @@
           
           <!-- Header -->
           <tr>
-            <td bgcolor="#002364" style="padding:20px;">
+            <td bgcolor="#1f58c2ff" style="padding:20px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td width="190" valign="middle">
