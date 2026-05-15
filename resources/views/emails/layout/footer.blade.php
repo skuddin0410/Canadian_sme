@@ -19,8 +19,8 @@
                 <td class="footer-link-cell" align="center" style="padding:0 6px 10px 6px;">
                   <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
                     <tr>
-                      <td align="center" bgcolor="#1f58c2ff" style="border-radius:6px;">
-                        <a href="{{ $websiteUrl ?? config('app.url') }}" target="_blank" class="website-button" style="display:block; min-width:150px; background:#1f58c2ff; color:#ffffff; text-decoration:none; font-size:14px; font-weight:700; line-height:18px; padding:16px 18px; border-radius:6px; text-align:center; box-sizing:border-box; -webkit-text-size-adjust:none;">
+                      <td align="center" style="border-radius:6px;">
+                        <a href="{{ $websiteUrl ?? config('app.url') }}" target="_blank" class="website-button" style="display:block; min-width:150px; background:#0e3e97ff; color:#ffffff; text-decoration:none; font-size:14px; font-weight:700; line-height:18px; padding:16px 18px; border-radius:6px; text-align:center; box-sizing:border-box; -webkit-text-size-adjust:none;">
                           Visit Website
                         </a>
                       </td>
@@ -34,7 +34,7 @@
 
 
           <tr>
-            <td align="center" bgcolor="#1f58c2ff" style="padding:15px; color:#ffffff; font-size:13px;">
+            <td align="center" bgcolor="#0e3e97ff" style="padding:15px; color:#ffffff; font-size:13px;">
               © {{ date('Y') }} | All Rights Reserved
             </td>
           </tr>

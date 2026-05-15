@@ -32,9 +32,9 @@
 </p>
 @endif
 @if(!empty($mailLogId))
-<p style="color:red;font-size:12px;">
+<!-- <p style="color:red;font-size:12px;">
     Pixel URL: {{ url('/email/open/' . $mailLogId) }}
-</p>
+</p> -->
 @endif
 {{-- Email Open Tracking Pixel --}}
 @if(!empty($mailLogId))
