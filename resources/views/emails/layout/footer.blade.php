@@ -34,7 +34,7 @@
 
 
           <tr>
-            <td align="center" bgcolor="#1f58c2ff" style="padding:15px; color:#ffffff; font-size:13px;">
+            <td align="center" bgcolor="#0e3e97ff" style="padding:15px; color:#ffffff; font-size:13px;">
               © {{ date('Y') }} | All Rights Reserved
             </td>
           </tr>
