@@ -338,7 +338,7 @@ Admin | Add Attendee
                               <option value="">Please select</option>
                         @foreach($speakers as $speaker)
                           <option value="{{ $speaker->id }}">
-                            {{ $speaker->full_name }}
+                            {{ $speaker->display_label ?? $speaker->full_name }}
                           </option>
                         @endforeach
                       </select>
@@ -356,7 +356,7 @@ Admin | Add Attendee
                                   <option value="">Please select</option>
                             @foreach($exhibitors as $exhibitor)
                               <option value="{{ $exhibitor->id }}">
-                                {{ $exhibitor->name }}
+                                {{ $exhibitor->display_label ?? $exhibitor->name }}
                               </option>
                             @endforeach
                           </select>
@@ -384,7 +384,7 @@ Admin | Add Attendee
                                <option value="">Please select</option>
                         @foreach($sponsors as $sponsor)
                           <option value="{{ $sponsor->id }}">
-                            {{ $sponsor->name }}
+                            {{ $sponsor->display_label ?? $sponsor->name }}
                           </option>
                         @endforeach
                       </select>
