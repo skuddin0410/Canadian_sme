@@ -474,13 +474,60 @@ class AttendeeUserController extends Controller
     {
 
         $user = User::findOrFail($id);
-        $speakers = Speaker::select('id', 'name', 'lastname')->orderBy('created_at', 'DESC')->get();
-
-        $exhibitors = Company::select('id', 'name')->where('is_sponsor', 0)->orderBy('created_at', 'DESC')->get();
-
-        $sponsors = Company::select('id', 'name')->where('is_sponsor', 1)->orderBy('created_at', 'DESC')->get();
-
         $groups = config('roles.groups');
+        $perticipantEvents = $user->eventAndEntityLinks()
+            ->where('entity_type', 'users')
+            ->where('entity_id', $user->id)
+            ->pluck('event_id')
+            ->toArray();
+
+        $speakers = Speaker::select('speakers.id', 'speakers.name', 'speakers.lastname')
+            ->when(!empty($perticipantEvents), function ($query) use ($perticipantEvents) {
+                $query->whereExists(function ($q) use ($perticipantEvents) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
+                        ->where('event_and_entity_link.entity_type', 'speakers')
+                        ->whereIn('event_and_entity_link.event_id', $perticipantEvents);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('speakers.name')
+            ->orderBy('speakers.lastname')
+            ->get();
+
+        $exhibitors = Company::select('companies.id', 'companies.name')
+            ->where('companies.is_sponsor', 0)
+            ->when(!empty($perticipantEvents), function ($query) use ($perticipantEvents) {
+                $query->whereExists(function ($q) use ($perticipantEvents) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+                        ->where('event_and_entity_link.entity_type', 'companies')
+                        ->whereIn('event_and_entity_link.event_id', $perticipantEvents);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('companies.name')
+            ->get();
+
+        $sponsors = Company::select('companies.id', 'companies.name')
+            ->where('companies.is_sponsor', 1)
+            ->when(!empty($perticipantEvents), function ($query) use ($perticipantEvents) {
+                $query->whereExists(function ($q) use ($perticipantEvents) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+                        ->where('event_and_entity_link.entity_type', 'companies')
+                        ->whereIn('event_and_entity_link.event_id', $perticipantEvents);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('companies.name')
+            ->get();
 
         $events = collect();
         $oldEvents = collect();
@@ -515,13 +562,6 @@ class AttendeeUserController extends Controller
                     ->get();
             }
         }
-
-        $perticipantEvents = $user->eventAndEntityLinks()
-            ->where('entity_type', 'users')
-            ->where('entity_id', $user->id)
-            ->pluck('event_id')
-            ->toArray();
-        // dd($perticipantEvents);
 
         return view('users.attendee_users.edit', compact('user', 'groups', 'exhibitors', 'sponsors', 'speakers', 'events', 'perticipantEvents', 'oldEvents'));
     }
