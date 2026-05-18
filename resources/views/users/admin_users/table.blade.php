@@ -40,7 +40,7 @@
 		<th>Email</th>
 		<th>Mobile</th>
 		<th>Created At</th>
-		<th width="8%">Action</th>
+		<th width="12%">Action</th>
 	</tr>
 </thead>
 <tbody>	
@@ -64,6 +64,15 @@
             </div>
 		    <div class="col-4 p-1">	
 			<a href="{{ route("admin-users.edit",["admin_user"=> $user->id ]) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit"></i></a>
+            </div>
+            <div class="col-4 p-1">
+                <form action="{{ route('admin-users.destroy', ['admin_user' => $user->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this admin user?');">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-sm btn-danger btn-icon" type="submit" title="Delete">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                </form>
             </div>
        </th>
 	</tr>

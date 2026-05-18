@@ -207,7 +207,20 @@ class AdminUsersController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        if ((int) $user->id === (int) auth()->id()) {
+            return redirect()->back()->withErrors('You cannot delete your own admin account.');
+        }
+
+        if (! $user->hasRole('Admin')) {
+            return redirect()->back()->withErrors('Only admin users can be deleted from this listing.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin-users.index')
+            ->withSuccess('Admin user has been deleted successfully');
     }
 
     /**
