@@ -43,11 +43,15 @@ class SpeakerController extends Controller
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
             $users = Speaker::orderBy('order_by', 'ASC')->orderBy('created_at', 'DESC');
-            if ($request->search) {
-                $users = $users->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('mobile', 'LIKE', '%' . $request->search . '%');
-                    $query->orWhere('email', 'LIKE', '%' . $request->search . '%');
+            if ($search !== '') {
+                $users = $users->where(function ($query) use ($search) {
+                    $query->where('name', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('lastname', 'LIKE', '%' . $search . '%');
+                    $query->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', '%' . $search . '%');
+                    $query->orWhere('designation', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('company', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('mobile', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('email', 'LIKE', '%' . $search . '%');
                 });
             }
 
