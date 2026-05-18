@@ -375,7 +375,7 @@ Admin | Edit Attendee Data
                         @foreach($speakers as $speaker)
                           <option value="{{ $speaker->id }}"
                             {{ in_array((string)$speaker->id, $selectedSpeakerIds, true) ? 'selected' : '' }}>
-                            {{ $speaker->full_name }}
+                            {{ $speaker->display_label ?? $speaker->full_name }}
                           </option>
                         @endforeach
                       </select>
@@ -396,7 +396,7 @@ Admin | Edit Attendee Data
                           @foreach($exhibitors as $exhibitor)
                             <option value="{{ $exhibitor->id }}"
                               {{ in_array((string)$exhibitor->id, $selectedExhibitorIds, true) ? 'selected' : '' }}>
-                              {{ $exhibitor->name }}
+                              {{ $exhibitor->display_label ?? $exhibitor->name }}
                             </option>
                           @endforeach
                         </select>
@@ -427,7 +427,7 @@ Admin | Edit Attendee Data
                         @foreach($sponsors as $sponsor)
                           <option value="{{ $sponsor->id }}"
                             {{ in_array((string)$sponsor->id, $selectedSponsorIds, true) ? 'selected' : '' }}>
-                            {{ $sponsor->name }}
+                              {{ $sponsor->display_label ?? $sponsor->name }}
                           </option>
                         @endforeach
                       </select>

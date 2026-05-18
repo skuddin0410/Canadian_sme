@@ -64,8 +64,9 @@
 </head>
 <body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;">
   @php
-    $headerImage = $event?->eventLogo?->file_path ?: $event?->photo?->file_path ?: asset('images/footer-logo.png');
-    $headerTitle = $event?->title ?: (getKeyValue('company_name')->value ?? config('app.name'));
+    $mailEvent = $event ?? null;
+    $headerImage = $mailEvent?->eventLogo?->file_path ?: $mailEvent?->photo?->file_path ?: asset('images/footer-logo.png');
+    $headerTitle = $mailEvent?->title ?: (getKeyValue('company_name')->value ?? config('app.name'));
   @endphp
 
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f4f6f8">

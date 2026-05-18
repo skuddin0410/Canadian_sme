@@ -188,12 +188,6 @@ class AttendeeUserController extends Controller
      */
     public function create()
     {
-        $speakers = Speaker::select('id', 'name', 'lastname')->orderBy('created_at', 'DESC')->get();
-
-        $exhibitors = Company::select('id', 'name')->where('is_sponsor', 0)->orderBy('created_at', 'DESC')->get();
-
-        $sponsors = Company::select('id', 'name')->where('is_sponsor', 1)->orderBy('created_at', 'DESC')->get();
-
         $groups = config('roles.groups');
 
         $events = collect();
@@ -211,6 +205,11 @@ class AttendeeUserController extends Controller
                     ->get();
             }
         }
+
+        $scopeEventIds = $events->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $speakers = $this->getSpeakerAccessOptions($scopeEventIds);
+        $exhibitors = $this->getCompanyAccessOptions($scopeEventIds, false);
+        $sponsors = $this->getCompanyAccessOptions($scopeEventIds, true);
 
         return view('users.attendee_users.create', compact('groups', 'exhibitors', 'sponsors', 'speakers', 'events'));
     }
@@ -481,54 +480,6 @@ class AttendeeUserController extends Controller
             ->pluck('event_id')
             ->toArray();
 
-        $speakers = Speaker::select('speakers.id', 'speakers.name', 'speakers.lastname')
-            ->when(!empty($perticipantEvents), function ($query) use ($perticipantEvents) {
-                $query->whereExists(function ($q) use ($perticipantEvents) {
-                    $q->select(DB::raw(1))
-                        ->from('event_and_entity_link')
-                        ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
-                        ->where('event_and_entity_link.entity_type', 'speakers')
-                        ->whereIn('event_and_entity_link.event_id', $perticipantEvents);
-                });
-            }, function ($query) {
-                $query->whereRaw('1 = 0');
-            })
-            ->orderBy('speakers.name')
-            ->orderBy('speakers.lastname')
-            ->get();
-
-        $exhibitors = Company::select('companies.id', 'companies.name')
-            ->where('companies.is_sponsor', 0)
-            ->when(!empty($perticipantEvents), function ($query) use ($perticipantEvents) {
-                $query->whereExists(function ($q) use ($perticipantEvents) {
-                    $q->select(DB::raw(1))
-                        ->from('event_and_entity_link')
-                        ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
-                        ->where('event_and_entity_link.entity_type', 'companies')
-                        ->whereIn('event_and_entity_link.event_id', $perticipantEvents);
-                });
-            }, function ($query) {
-                $query->whereRaw('1 = 0');
-            })
-            ->orderBy('companies.name')
-            ->get();
-
-        $sponsors = Company::select('companies.id', 'companies.name')
-            ->where('companies.is_sponsor', 1)
-            ->when(!empty($perticipantEvents), function ($query) use ($perticipantEvents) {
-                $query->whereExists(function ($q) use ($perticipantEvents) {
-                    $q->select(DB::raw(1))
-                        ->from('event_and_entity_link')
-                        ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
-                        ->where('event_and_entity_link.entity_type', 'companies')
-                        ->whereIn('event_and_entity_link.event_id', $perticipantEvents);
-                });
-            }, function ($query) {
-                $query->whereRaw('1 = 0');
-            })
-            ->orderBy('companies.name')
-            ->get();
-
         $events = collect();
         $oldEvents = collect();
         $currentSubEventIds = [];
@@ -563,7 +514,118 @@ class AttendeeUserController extends Controller
             }
         }
 
+        $accessScopeEventIds = collect($perticipantEvents)
+            ->merge($events->pluck('id'))
+            ->merge($oldEvents->pluck('id'))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        $speakers = $this->getSpeakerAccessOptions($accessScopeEventIds);
+        $exhibitors = $this->getCompanyAccessOptions($accessScopeEventIds, false);
+        $sponsors = $this->getCompanyAccessOptions($accessScopeEventIds, true);
+
         return view('users.attendee_users.edit', compact('user', 'groups', 'exhibitors', 'sponsors', 'speakers', 'events', 'perticipantEvents', 'oldEvents'));
+    }
+
+    protected function getSpeakerAccessOptions(array $eventIds)
+    {
+        $eventIds = array_values(array_unique(array_map('intval', $eventIds)));
+        $eventTitles = empty($eventIds)
+            ? collect()
+            : DB::table('events')->whereIn('id', $eventIds)->pluck('title', 'id');
+
+        return Speaker::select('speakers.id', 'speakers.name', 'speakers.lastname', 'speakers.email')
+            ->with(['eventAndEntityLinks' => function ($query) use ($eventIds) {
+                if (!empty($eventIds)) {
+                    $query->whereIn('event_id', $eventIds);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            }])
+            ->when(!empty($eventIds), function ($query) use ($eventIds) {
+                $query->whereExists(function ($q) use ($eventIds) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
+                        ->where('event_and_entity_link.entity_type', 'speakers')
+                        ->whereIn('event_and_entity_link.event_id', $eventIds);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('speakers.name')
+            ->orderBy('speakers.lastname')
+            ->get()
+            ->map(function ($speaker) use ($eventTitles) {
+                $speaker->display_label = $this->buildAccessOptionLabel(
+                    trim($speaker->full_name),
+                    $speaker->email,
+                    $speaker->eventAndEntityLinks->pluck('event_id')->map(fn ($id) => $eventTitles[$id] ?? null)->filter()->values()->all(),
+                    $speaker->id
+                );
+
+                return $speaker;
+            });
+    }
+
+    protected function getCompanyAccessOptions(array $eventIds, bool $isSponsor)
+    {
+        $eventIds = array_values(array_unique(array_map('intval', $eventIds)));
+        $eventTitles = empty($eventIds)
+            ? collect()
+            : DB::table('events')->whereIn('id', $eventIds)->pluck('title', 'id');
+
+        return Company::select('companies.id', 'companies.name', 'companies.email')
+            ->where('companies.is_sponsor', $isSponsor ? 1 : 0)
+            ->with(['eventAndEntityLinks' => function ($query) use ($eventIds) {
+                if (!empty($eventIds)) {
+                    $query->whereIn('event_id', $eventIds);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            }])
+            ->when(!empty($eventIds), function ($query) use ($eventIds) {
+                $query->whereExists(function ($q) use ($eventIds) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+                        ->where('event_and_entity_link.entity_type', 'companies')
+                        ->whereIn('event_and_entity_link.event_id', $eventIds);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('companies.name')
+            ->get()
+            ->map(function ($company) use ($eventTitles) {
+                $company->display_label = $this->buildAccessOptionLabel(
+                    trim($company->name),
+                    $company->email,
+                    $company->eventAndEntityLinks->pluck('event_id')->map(fn ($id) => $eventTitles[$id] ?? null)->filter()->values()->all(),
+                    $company->id
+                );
+
+                return $company;
+            });
+    }
+
+    protected function buildAccessOptionLabel(string $name, ?string $email, array $eventTitles, int $id): string
+    {
+        $parts = [trim($name) !== '' ? trim($name) : 'Unnamed'];
+
+        if (!empty($email)) {
+            $parts[] = $email;
+        }
+
+        if (!empty($eventTitles)) {
+            $parts[] = implode(', ', array_unique($eventTitles));
+        }
+
+        $parts[] = 'ID: ' . $id;
+
+        return implode(' | ', $parts);
     }
 
     /**
