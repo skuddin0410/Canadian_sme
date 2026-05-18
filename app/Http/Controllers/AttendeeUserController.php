@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\SendScheduledBulkEmailJob;
 use App\Jobs\SendScheduledBulkNotificationJob;
 use Carbon\Carbon as CarbonCarbon;
+use App\Jobs\UpdateUserQrCodeJob;
 
 class AttendeeUserController extends Controller
 {
@@ -1351,20 +1352,32 @@ class AttendeeUserController extends Controller
 
     public function generateQrCodeManually()
     {
-        $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
-        if (!empty($users)) {
-            foreach ($users as $user) {
-                if (empty($user->qr_code)) {
-                    qrCode($user->id, 'user');
-                }
+        // $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
+        // if (!empty($users)) {
+        //     foreach ($users as $user) {
+        //         if (empty($user->qr_code)) {
+        //             qrCode($user->id, 'user');
+        //         }
+        //
+        //         if (!$user->hasRole('Attendee')) {
+        //             $user->assignRole('Attendee');
+        //         }
+        //     }
+        // }
+        //
+        // return redirect()->back()->with('success', "Qr Code generated sent successfully.");
 
-                if (!$user->hasRole('Attendee')) {
-                    $user->assignRole('Attendee');
-                }
-            }
+        $pendingCount = User::whereNull('qr_code')->orWhere('qr_code', '')->count();
+
+        if ($pendingCount === 0) {
+            return redirect()->back()->with('success', 'All attendee QR codes are already generated.');
         }
 
-        return redirect()->back()->with('success', "Qr Code generated sent successfully.");
+        app()->terminating(function () {
+            UpdateUserQrCodeJob::dispatchSync();
+        });
+
+        return redirect()->back()->with('success', "QR code generation started for {$pendingCount} attendee(s). Please refresh after a short while.");
     }
 
 
