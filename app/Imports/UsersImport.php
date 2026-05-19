@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Row;
+use App\Jobs\CreateCometChatUserJob;
 use App\Jobs\UpdateUserQrCodeJob;
 
 // class UsersImport implements ToModel, WithStartRow, WithEvents
@@ -197,6 +198,8 @@ class UsersImport implements OnEachRow, WithStartRow, WithEvents
                 $user->assignRole('Attendee');
             }
 
+            CreateCometChatUserJob::dispatch($user->id);
+
             $this->added[] = $emailRaw;
         } else {
             $user->name = trim($row[0]);
@@ -219,6 +222,10 @@ class UsersImport implements OnEachRow, WithStartRow, WithEvents
 
             if (method_exists($user, 'assignRole') && !$user->hasRole('Attendee')) {
                 $user->assignRole('Attendee');
+            }
+
+            if (empty($user->cometchat_id)) {
+                CreateCometChatUserJob::dispatch($user->id);
             }
 
             $this->duplicates[] = $emailRaw;
