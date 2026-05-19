@@ -32,6 +32,7 @@ use App\Models\EmailTemplate;
 use OneSignal;
 use App\Models\Speaker;
 use App\Models\NewBadge;
+use App\Jobs\CreateCometChatUserJob;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -314,11 +315,7 @@ class AttendeeUserController extends Controller
         $user->save();
 
         if ($isNewUser || empty($user->cometchat_id)) {
-            $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
-            if ($cometChatID && isset($cometChatID['uid'])) {
-                $user->cometchat_id = $cometChatID['uid'];
-                $user->save();
-            }
+            CreateCometChatUserJob::dispatch($user->id);
         }
 
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
@@ -405,53 +402,6 @@ class AttendeeUserController extends Controller
     }
 
 
-
-    private function createCometChatUser($userId, $name, $email, $mobile)
-    {
-        $appID = env('COMETCHAT_APP_ID');
-        $apiKey = env('COMETCHAT_API_KEY');
-        $region = env('COMETCHAT_REGION');
-
-        $user = User::find($userId);
-        $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/noImage.png');
-
-        $data = [
-            'uid' => "SME_CometChat_{$userId}",
-            'name' => $name,
-            'avatar' => $avatarUrl,
-            // 'link' => "https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg",
-            'role' => 'default',
-            'statusMessage' => 'default',
-            'metadata' => [
-                '@private' => [
-                    'email' => $email,
-                    'contactNumber' => $mobile,
-                ]
-            ],
-            'tags' => [],
-            'withAuthToken' => true
-        ];
-
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'apikey' => $apiKey,
-        ])->post(
-            "https://{$appID}.api-{$region}.cometchat.io/v3/users",
-            $data
-        );
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-            // Return relevant data
-            return [
-                'uid' => $responseData['data']['uid'],
-                'status' => $responseData['data']['status'],
-                'authToken' => $responseData['data']['authToken']
-            ];
-        }
-
-        return null;
-    }
 
     /**
      * Display the specified resource.
