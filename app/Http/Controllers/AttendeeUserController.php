@@ -32,13 +32,15 @@ use App\Models\EmailTemplate;
 use OneSignal;
 use App\Models\Speaker;
 use App\Models\NewBadge;
+use App\Jobs\CreateCometChatUserJob;
+use App\Jobs\GenerateUserQrCodeJob;
+use App\Jobs\UpdateUserQrCodeJob;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendScheduledBulkEmailJob;
 use App\Jobs\SendScheduledBulkNotificationJob;
 use Carbon\Carbon as CarbonCarbon;
-use App\Jobs\UpdateUserQrCodeJob;
 
 class AttendeeUserController extends Controller
 {
@@ -318,11 +320,7 @@ class AttendeeUserController extends Controller
         $user->save();
 
         if ($isNewUser || empty($user->cometchat_id)) {
-            $cometChatID = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
-            if ($cometChatID && isset($cometChatID['uid'])) {
-                $user->cometchat_id = $cometChatID['uid'];
-                $user->save();
-            }
+            CreateCometChatUserJob::dispatch($user->id);
         }
 
         if ($request->has('edit_permission') && $request->has('access_exhibitor_ids') && $request->edit_permission == 'Edit Company' && !empty($request->access_exhibitor_ids)) {
@@ -376,7 +374,10 @@ class AttendeeUserController extends Controller
             if ($isNewUser) {
                 sendNotification("Welcome Email", $user);
             }
-            qrCode($user->id);
+
+            if (empty($user->qr_code)) {
+                GenerateUserQrCodeJob::dispatch($user->id);
+            }
 
             // Sync Event Links
             if ($request->has('event_id')) {
@@ -409,53 +410,6 @@ class AttendeeUserController extends Controller
     }
 
 
-
-    private function createCometChatUser($userId, $name, $email, $mobile)
-    {
-        $appID = env('COMETCHAT_APP_ID');
-        $apiKey = env('COMETCHAT_API_KEY');
-        $region = env('COMETCHAT_REGION');
-
-        $user = User::find($userId);
-        $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/noImage.png');
-
-        $data = [
-            'uid' => "SME_CometChat_{$userId}",
-            'name' => $name,
-            'avatar' => $avatarUrl,
-            // 'link' => "https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg",
-            'role' => 'default',
-            'statusMessage' => 'default',
-            'metadata' => [
-                '@private' => [
-                    'email' => $email,
-                    'contactNumber' => $mobile,
-                ]
-            ],
-            'tags' => [],
-            'withAuthToken' => true
-        ];
-
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'apikey' => $apiKey,
-        ])->post(
-            "https://{$appID}.api-{$region}.cometchat.io/v3/users",
-            $data
-        );
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-            // Return relevant data
-            return [
-                'uid' => $responseData['data']['uid'],
-                'status' => $responseData['data']['status'],
-                'authToken' => $responseData['data']['authToken']
-            ];
-        }
-
-        return null;
-    }
 
     /**
      * Display the specified resource.
@@ -1373,9 +1327,7 @@ class AttendeeUserController extends Controller
             return redirect()->back()->with('success', 'All attendee QR codes are already generated.');
         }
 
-        app()->terminating(function () {
-            UpdateUserQrCodeJob::dispatchSync();
-        });
+        UpdateUserQrCodeJob::dispatch();
 
         return redirect()->back()->with('success', "QR code generation started for {$pendingCount} attendee(s). Please refresh after a short while.");
     }

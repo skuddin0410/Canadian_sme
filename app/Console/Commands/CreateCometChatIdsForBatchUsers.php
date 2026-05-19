@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
  
 use Illuminate\Console\Command;
- 
+use App\Jobs\CreateCometChatUserJob;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
  
 class CreateCometChatIdsForBatchUsers extends Command
@@ -30,122 +29,16 @@ class CreateCometChatIdsForBatchUsers extends Command
     public function handle()
     {
         $batchSize = (int) $this->argument('batch_size');
-        // dd($batchSize);
-        $processedCount = 0;
- 
-        // Get users without a CometChat ID, in batches
-        $users = User::whereNull('cometchat_id')->chunk($batchSize, function ($users) use (&$processedCount) {
-            // dd($users);
-            Log::info('Chunk of users fetched for CometChat ID creation: ' . count($users));
+        $dispatchedCount = 0;
+
+        User::whereNull('cometchat_id')->chunk($batchSize, function ($users) use (&$dispatchedCount) {
+            Log::info('Chunk of users fetched for CometChat job dispatch: ' . count($users));
             foreach ($users as $user) {
-                // Call the method to create CometChat user and get the response
-                $cometChatResponse = $this->createCometChatUser($user->id, $user->name, $user->email, $user->mobile);
-               
-                if ($cometChatResponse) {
-                    // Update the user with CometChat details
-                    $user->cometchat_id = $cometChatResponse['uid'];
-                    // $user->cometchat_status = $cometChatResponse['status'];
-                    // $user->cometchat_auth_token = $cometChatResponse['authToken'];
-                    $user->save();
- 
-                    // Output a success message
-                    $this->info("CometChat ID created for user: {$user->id} ({$user->name})");
-                } else {
-                    // Output a failure message if the user creation fails
-                    Log::error('Failed to create CometChat ID for user.', [
-                        'user_id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'mobile' => $user->mobile,
-                    ]);
-                    $this->error("Failed to create CometChat ID for user: {$user->id} ({$user->name})");
-                }
- 
-                $processedCount++;
+                CreateCometChatUserJob::dispatch($user->id);
+                $dispatchedCount++;
             }
         });
- 
-        $this->info("Batch processing completed. Total users processed: {$processedCount}");
-    }
- 
-    /**
-     * Method to call the createCometChatUser logic
-     *
-     * @param int $userId
-     * @param string $name
-     * @param string $email
-     * @return array|null
-     */
-    private function createCometChatUser($userId, $name, $email, $mobile)
-    {
-        try{
-            $appID = env('COMETCHAT_APP_ID');
-            $apiKey = env('COMETCHAT_API_KEY');
-            $region = env('COMETCHAT_REGION');
 
-            if (empty($appID) || empty($apiKey) || empty($region)) {
-                Log::error('CometChat credentials are missing.', [
-                    'user_id' => $userId,
-                    'app_id_present' => !empty($appID),
-                    'api_key_present' => !empty($apiKey),
-                    'region_present' => !empty($region),
-                ]);
-                return null;
-            }
- 
-            // Get the user's photo URL using the `photo` relationship
-            $user = User::find($userId);
-            $avatarUrl = $user->photo ? $user->photo->mobile_path : asset('images/noImage.png');
- 
-            $data = [
-                'uid' => "SME_CometChat_{$userId}",
-                'name' => $name ?? '',
-                'avatar' => $avatarUrl,
-                // 'link' => "https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg",
-                'role' => 'default',
-                'statusMessage' => 'default',
-                'metadata' => [
-                    '@private' => [
-                        'email' => $email,
-                        'contactNumber' => $mobile,
-                    ]
-                ],
-                'tags' => [],
-                'withAuthToken' => true
-            ];
- 
-            // Make API call to create the CometChat user
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'apikey' => $apiKey,
-            ])->post(
-                "https://{$appID}.api-{$region}.cometchat.io/v3/users",
-                $data
-            );
- 
-            if ($response->successful()) {
-                $responseData = $response->json();
-                return [
-                    'uid' => $responseData['data']['uid'],
-                    'status' => $responseData['data']['status'],
-                    'authToken' => $responseData['data']['authToken']
-                ];
-            }
-
-            Log::error('CometChat API user creation failed.', [
-                'user_id' => $userId,
-                'email' => $email,
-                'status' => $response->status(),
-                'response' => $response->body(),
-            ]);
- 
-            return null;
-        } catch (\Exception $e) {
-            Log::error("Error creating CometChat user for user ID {$userId}: " . $e->getMessage(), [
-                'user_id' => $userId,
-                'email' => $email,
-            ]);
-            return null;
-        }  
+        $this->info("Queued CometChat creation jobs: {$dispatchedCount}");
     }
 }
