@@ -1128,12 +1128,17 @@ public function readAllNotifications(Request $request){
             ], 401);
         }
         
-        $eventId = (int) ($request->event_id ?: 1);
+        $eventId = $request->filled('event_id') ? (int) $request->event_id : null;
+        $event = $eventId ? Event::with(['eventLogo', 'photo'])->find($eventId) : null;
         if($request->qr_code == 'm' ){
             $connections = UserConnection::with('connection')
-                ->where('user_id', $user->id)
-                ->where('event_id', $eventId)
-                ->get();
+                ->where('user_id', $user->id);
+
+            if ($event) {
+                $connections->where('event_id', $event->id);
+            }
+
+            $connections = $connections->get();
             if(empty($connections)){
 
                 return response()->json([
@@ -1166,7 +1171,8 @@ public function readAllNotifications(Request $request){
             $mailData = [
                 'csvContent' => $csvContent,
                 'filename' => $filename,
-                'user' => $user
+                'user' => $user,
+                'event' => $event,
             ];
 
             Mail::to($user->email)->send(new UserConnectionsExportMail($mailData));
@@ -1175,9 +1181,13 @@ public function readAllNotifications(Request $request){
         }else{
 
             $connection = UserConnection::with('connection')
-                ->where('connection_id', $request->qr_code)
-                ->where('event_id', $eventId)
-                ->first();
+                ->where('connection_id', $request->qr_code);
+
+            if ($event) {
+                $connection->where('event_id', $event->id);
+            }
+
+            $connection = $connection->first();
 
             if (!$connection) {
               return response()->json(['message' => 'Connection not found'], 404);
