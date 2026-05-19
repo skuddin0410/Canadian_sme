@@ -1197,69 +1197,69 @@ class AttendeeUserController extends Controller
             }
             */
 
-            foreach ($users as $user) {
-                $message = $emailTemplate->message ?? '';
-                $message = str_replace('{{name}}', $user->full_name, $message);
-                $message = str_replace('{{site_name}}', config('app.name'), $message);
+            // foreach ($users as $user) {
+            //     $message = $emailTemplate->message ?? '';
+            //     $message = str_replace('{{name}}', $user->full_name, $message);
+            //     $message = str_replace('{{site_name}}', config('app.name'), $message);
 
-                $message = $message; // dynamic message from database
-                $notificationMessage = trim(
-                    preg_replace(
-                        '/\s+/',
-                        ' ',
-                        strip_tags(
-                            html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8')
-                        )
-                    )
-                );
-                Log::info('' . $notificationMessage . '');
+            //     $message = $message; // dynamic message from database
+            //     $notificationMessage = trim(
+            //         preg_replace(
+            //             '/\s+/',
+            //             ' ',
+            //             strip_tags(
+            //                 html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+            //             )
+            //         )
+            //     );
+            //     Log::info('' . $notificationMessage . '');
 
-                $title = 'Hi, ' . ($user->full_name ?? '') . ',';
+            //     $title = 'Hi, ' . ($user->full_name ?? '') . ',';
 
-                notification($user->id, $type = 'push_notification', null, $title, $message, (int)$request->event_id);
+            //     notification($user->id, $type = 'push_notification', null, $title, $message, (int)$request->event_id);
 
-                if (!empty($user->onesignal_userid)) {
-                    $payload = [
-                        // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
-                        'app_id' => env('ONESIGNAL_APP_ID'),
-                        'contents' => [
-                            'en' => $notificationMessage ?? 'Default message.',
-                        ],
-                        'headings' => [
-                            'en' => $title ?? 'Notification',
-                        ],
-                        'target_channel' => 'push',
-                        'include_subscription_ids' => [
-                            $user->onesignal_userid,
-                        ],
-                    ];
+            //     if (!empty($user->onesignal_userid)) {
+            //         $payload = [
+            //             // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+            //             'app_id' => env('ONESIGNAL_APP_ID'),
+            //             'contents' => [
+            //                 'en' => $notificationMessage ?? 'Default message.',
+            //             ],
+            //             'headings' => [
+            //                 'en' => $title ?? 'Notification',
+            //             ],
+            //             'target_channel' => 'push',
+            //             'include_subscription_ids' => [
+            //                 $user->onesignal_userid,
+            //             ],
+            //         ];
 
-                    $response = Http::withHeaders([
-                        'Authorization' => 'Key ' . env('ONESIGNAL_REST_API_KEY'),
-                        'Content-Type'  => 'application/json',
-                    ])
-                        ->post('https://api.onesignal.com/notifications?c=push', $payload);
+            //         $response = Http::withHeaders([
+            //             'Authorization' => 'Key ' . env('ONESIGNAL_REST_API_KEY'),
+            //             'Content-Type'  => 'application/json',
+            //         ])
+            //             ->post('https://api.onesignal.com/notifications?c=push', $payload);
 
-                    if ($response->failed()) {
-                        Log::error('OneSignal push failed', [
-                            'status' => $response->status(),
-                            'body'   => $response->body(),
-                        ]);
-                    }
-                }
-            }
+            //         if ($response->failed()) {
+            //             Log::error('OneSignal push failed', [
+            //                 'status' => $response->status(),
+            //                 'body'   => $response->body(),
+            //             ]);
+            //         }
+            //     }
+            // }
 
             // Use Job for background processing
-            // $userIdsArray = ($request->user_ids == 'all') ? ['all'] : (is_array($userIds) ? $userIds : [$userIds]);
-            // dispatch(new \App\Jobs\SendScheduledBulkNotificationJob($userIdsArray, $emailTemplate->template_name, (int)$request->event_id));
+            $userIdsArray = ($request->user_ids == 'all') ? ['all'] : (is_array($userIds) ? $userIds : [$userIds]);
+            dispatch(new \App\Jobs\SendScheduledBulkNotificationJob($userIdsArray, $emailTemplate->template_name, (int)$request->event_id));
         }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 // 'message' => "Sending mails in the background"
-                // 'message' => "Process are running in the background"
-                'message' => "Successfully sent to " . count($users) . " users."
+                'message' => "Process are running in the background"
+                // 'message' => "Successfully sent to " . count($users) . " users."
             ]);
         }
 
