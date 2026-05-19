@@ -33,13 +33,14 @@ use OneSignal;
 use App\Models\Speaker;
 use App\Models\NewBadge;
 use App\Jobs\CreateCometChatUserJob;
+use App\Jobs\GenerateUserQrCodeJob;
+use App\Jobs\UpdateUserQrCodeJob;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendScheduledBulkEmailJob;
 use App\Jobs\SendScheduledBulkNotificationJob;
 use Carbon\Carbon as CarbonCarbon;
-use App\Jobs\UpdateUserQrCodeJob;
 
 class AttendeeUserController extends Controller
 {
@@ -373,7 +374,10 @@ class AttendeeUserController extends Controller
             if ($isNewUser) {
                 sendNotification("Welcome Email", $user);
             }
-            qrCode($user->id);
+
+            if (empty($user->qr_code)) {
+                GenerateUserQrCodeJob::dispatch($user->id);
+            }
 
             // Sync Event Links
             if ($request->has('event_id')) {
@@ -1323,9 +1327,7 @@ class AttendeeUserController extends Controller
             return redirect()->back()->with('success', 'All attendee QR codes are already generated.');
         }
 
-        app()->terminating(function () {
-            UpdateUserQrCodeJob::dispatchSync();
-        });
+        UpdateUserQrCodeJob::dispatch();
 
         return redirect()->back()->with('success', "QR code generation started for {$pendingCount} attendee(s). Please refresh after a short while.");
     }
