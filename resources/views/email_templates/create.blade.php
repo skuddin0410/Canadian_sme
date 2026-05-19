@@ -41,7 +41,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label>Message (supported tags: name, site_name, profile_update_link, qr_code)</label>
+                            <!-- <label>Message (supported tags: name, site_name, profile_update_link, qr_code)</label> -->
+                            <label>Message (supported tags: name, profile_update_link, qr_code)</label>
                             <textarea id="messageBox" name="message" class="form-control description-cls" rows="20" required></textarea>
                         </div>
 

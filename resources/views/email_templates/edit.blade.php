@@ -57,7 +57,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label>Message (supported tags: name, site_name, profile_update_link, qr_code)</label>
+                            <!-- <label>Message (supported tags: name, site_name, profile_update_link, qr_code)</label> -->
+                            <label>Message (supported tags: name, profile_update_link, qr_code)</label>
 
                             {{-- One dynamic textarea only --}}
                             <textarea id="messageBox" name="message" 

@@ -125,6 +125,9 @@ class JWTAuthController extends Controller
                     ->filter()
                     ->unique()
                     ->values(),
+                'is_speaker_id'   => (int) ($user->access_speaker_ids ?? 0),
+                'is_exhibitor_id' => (int) ($user->access_exhibitor_ids ?? 0),
+                'is_sponsor_id'   => (int) ($user->access_sponsor_ids ?? 0),
             ]);
 
         } catch (TokenExpiredException $e) {

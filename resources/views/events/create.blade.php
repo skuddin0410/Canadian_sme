@@ -255,10 +255,52 @@
                   type="file"
                   class="form-control"
                   name="image"
-                  id="image"/>
+                  id="image"
+                  accept="image/*"/>
+              </div>
+              <div id="event-image-preview-container" class="mt-2 d-none">
+                <img id="event-image-preview-img" src="#" alt="Event Image Preview" class="img-thumbnail" style="max-height: 150px;">
               </div>
               @if ($errors->has('image'))
                 <span class="text-danger text-left">{{ $errors->first('image') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="event_logo">Event Logo Image <span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }})</span></label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-image"></i></span>
+                <input
+                  type="file"
+                  class="form-control"
+                  name="event_logo"
+                  id="event_logo"
+                  accept="image/*"/>
+              </div>
+              <div id="event-logo-preview-container" class="mt-2 d-none">
+                <img id="event-logo-preview-img" src="#" alt="Event Logo Preview" class="img-thumbnail" style="max-height: 150px;">
+              </div>
+              @if ($errors->has('event_logo'))
+                <span class="text-danger text-left">{{ $errors->first('event_logo') }}</span>
+              @endif
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="sponsor_banner">Sponsor Banner Image <span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }})</span></label>
+              <div class="input-group input-group-merge">
+                <span id="title-icon" class="input-group-text"><i class="bx bx-image-alt"></i></span>
+                <input
+                  type="file"
+                  class="form-control"
+                  name="sponsor_banner"
+                  id="sponsor_banner"
+                  accept="image/*"/>
+              </div>
+              <div id="sponsor-banner-preview-container" class="mt-2 d-none">
+                <img id="sponsor-banner-preview-img" src="#" alt="Sponsor Banner Preview" class="img-thumbnail" style="max-height: 150px;">
+              </div>
+              @if ($errors->has('sponsor_banner'))
+                <span class="text-danger text-left">{{ $errors->first('sponsor_banner') }}</span>
               @endif
             </div>
 
@@ -491,12 +533,44 @@
           });
       }
 
-      // ── Map Image Preview ──
+      // ── Image Previews ──
+      const eventImageInput = document.getElementById('image');
+      const eventImagePreviewContainer = document.getElementById('event-image-preview-container');
+      const eventImagePreviewImg = document.getElementById('event-image-preview-img');
+      const eventLogoInput = document.getElementById('event_logo');
+      const eventLogoPreviewContainer = document.getElementById('event-logo-preview-container');
+      const eventLogoPreviewImg = document.getElementById('event-logo-preview-img');
+      const sponsorBannerInput = document.getElementById('sponsor_banner');
+      const sponsorBannerPreviewContainer = document.getElementById('sponsor-banner-preview-container');
+      const sponsorBannerPreviewImg = document.getElementById('sponsor-banner-preview-img');
       const mapInput = document.getElementById('map_image');
       const previewContainer = document.getElementById('map-preview-container');
       const previewImg = document.getElementById('map-preview-img');
       const previewPdf = document.getElementById('map-preview-pdf');
       const previewPdfName = document.getElementById('map-preview-pdf-name');
+
+      const bindImagePreview = (input, container, img) => {
+          if (!input || !container || !img) {
+              return;
+          }
+
+          input.addEventListener('change', function() {
+              const file = this.files[0];
+              if (file && file.type.startsWith('image/')) {
+                  container.classList.remove('d-none');
+                  const reader = new FileReader();
+                  reader.onload = e => img.src = e.target.result;
+                  reader.readAsDataURL(file);
+              } else {
+                  container.classList.add('d-none');
+                  img.src = '#';
+              }
+          });
+      };
+
+      bindImagePreview(eventImageInput, eventImagePreviewContainer, eventImagePreviewImg);
+      bindImagePreview(eventLogoInput, eventLogoPreviewContainer, eventLogoPreviewImg);
+      bindImagePreview(sponsorBannerInput, sponsorBannerPreviewContainer, sponsorBannerPreviewImg);
 
       if (mapInput) {
           mapInput.addEventListener('change', function() {

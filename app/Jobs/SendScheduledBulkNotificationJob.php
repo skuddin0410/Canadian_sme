@@ -70,6 +70,7 @@ class SendScheduledBulkNotificationJob implements ShouldQueue
                 // 1. Create internal database notification record via GeneralNotification model
                 \App\Models\GeneralNotification::create([
                     'user_id' => $user->id,
+                    'event_id' => $this->eventId,
                     'title'   => $notificationTemplate->title ?? $title,
                     'body'    => $message,
                     'is_read' => 0,
@@ -95,17 +96,18 @@ class SendScheduledBulkNotificationJob implements ShouldQueue
         }
 
         $payload = [
-            'app_id'             => $appId,
-            'include_player_ids' => [$playerId],
-            'headings'           => ['en' => $title],
-            'contents'           => ['en' => $message],
+            'app_id'                   => $appId,
+            'include_subscription_ids' => [$playerId],
+            'target_channel'           => 'push',
+            'headings'                 => ['en' => $title],
+            'contents'                 => ['en' => $message],
         ];
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Basic ' . $apiKey,
-                'Content-Type'  => 'application/json',
-            ])->post('https://onesignal.com/api/v1/notifications', $payload);
+                'Authorization' => 'Key ' . $apiKey,
+                'Content-Type'  => 'application/json', 
+            ])->post('https://api.onesignal.com/notifications?c=push', $payload);
 
             if (!$response->successful()) {
                 Log::error('OneSignal push failed', [

@@ -17,6 +17,11 @@
     table {
       border-collapse: collapse !important;
     }
+    p {
+      margin: 0;
+      /* padding: 0; */
+    }
+
     /* Mobile Styles */
     @media only screen and (max-width:600px) {
       .container {
@@ -34,10 +39,35 @@
         font-size: 14px !important;
         padding: 10px 16px !important;
       }
+      .footer-links,
+      .footer-links tbody,
+      .footer-links tr,
+      .footer-link-cell {
+        display: block !important;
+        width: 100% !important;
+      }
+      .footer-link-cell {
+        padding: 0 0 12px 0 !important;
+      }
+      .footer-link-cell:last-child {
+        padding-bottom: 0 !important;
+      }
+      .store-badge,
+      .website-button {
+        margin: 0 auto !important;
+      }
+      .website-button {
+        width: 100% !important;
+      }
     }
   </style>
 </head>
 <body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;">
+  @php
+    $mailEvent = $event ?? null;
+    $headerImage = $mailEvent?->eventLogo?->file_path ?: $mailEvent?->photo?->file_path ?: asset('images/footer-logo.png');
+    $headerTitle = $mailEvent?->title ?: (getKeyValue('company_name')->value ?? config('app.name'));
+  @endphp
 
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f4f6f8">
     <tr>
@@ -47,15 +77,20 @@
           
           <!-- Header -->
           <tr>
-           <td align="left" bgcolor="#002364" style="padding:20px; display: flex; align-items: center; color: white;">
-    <img src="{{asset('images/footer-logo.png')}}" alt="Company Logo" width="180" height="61"
-  style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:180px !important;height:61px !important;max-width:100%;margin-right:15px;margin-top:23px;">
-    <div style="color:white;text-decoration: none;">
-      <p style="font-size: 15px;margin-top: 25px">{!! getKeyValue('company_name')->value !!}</p>
-      {{-- <p style="font-size: 15px;">{{ getKeyValue('company_address')->value }}</p> --}}
-    </div>
-  </td>
-</tr>
+            <td bgcolor="#004fb8" style="padding:20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td width="190" valign="middle">
+                    <img src="{{ $headerImage }}" alt="{{ $headerTitle }}" width="180"
+                      style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:180px !important;height:auto !important;max-width:100%;">
+                  </td>
+                  <td valign="middle" style="color:white; padding-left:15px;">
+                    <p style="font-size:22px; line-height:1.3; margin:0; font-weight:700;">{{ $headerTitle }}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
           <!-- Content -->
           <tr>

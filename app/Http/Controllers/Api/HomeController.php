@@ -193,6 +193,20 @@ class HomeController extends Controller
             "imageUrl" => asset('images/noImage.png'),
         ];
 
+        // ================= Splash Screen =================
+        $splashScreenRecord = \App\Models\SplashScreen::with([
+            'iosIphone', 'iosIpad', 'androidHdpi', 'androidMdpi', 'androidXhdpi', 'androidXxhdpi'
+        ])->where('event_id', $eventId)->first();
+
+        $splashScreen = $splashScreenRecord ? [
+            'ios_iphone' => $splashScreenRecord->iosIphone?->file_path,
+            'ios_ipad' => $splashScreenRecord->iosIpad?->file_path,
+            'android_hdpi' => $splashScreenRecord->androidHdpi?->file_path,
+            'android_mdpi' => $splashScreenRecord->androidMdpi?->file_path,
+            'android_xhdpi' => $splashScreenRecord->androidXhdpi?->file_path,
+            'android_xxhdpi' => $splashScreenRecord->androidXxhdpi?->file_path,
+        ] : null;
+
         // ================= Upcoming Session =================
         $upcomingSession = Session::with(['attendees', 'sponsors'])
             ->where('event_id', $eventId)
@@ -240,23 +254,39 @@ class HomeController extends Controller
         // ================= Home Connections =================
         $user = auth()->user();
 
-        $homeConnections = $user->connections()
-            ->wherePivot('event_id', $eventId)
+        // $homeConnections = $user->connections()
+        //     ->wherePivot('event_id', $eventId)
+        //     ->get()
+        //     ->map(function ($connection) {
+        //         return [
+        //             "id" => $connection->id,
+        //             "name" => $connection->full_name ?? $connection->name,
+        //             "avatarUrl" => $connection->photo && $connection->photo->mobile_path
+        //                 ? $connection->photo->mobile_path
+        //                 : asset('images/noImage.png')
+        //         ];
+        //     });
+
+        $homeConnections = User::join('event_and_entity_link', 'users.id', '=', 'event_and_entity_link.entity_id')
+            ->where('event_and_entity_link.event_id', $eventId)
+            ->where('event_and_entity_link.entity_type', 'users')
+            ->select('users.*')
+            ->with('photo')
+            ->orderBy('event_and_entity_link.id', 'DESC')
+            ->take(7)
             ->get()
-            ->map(function ($connection) {
-                return [
-                    "id" => $connection->id,
-                    "name" => $connection->full_name ?? $connection->name,
-                    "avatarUrl" => $connection->photo && $connection->photo->mobile_path
-                        ? $connection->photo->mobile_path
-                        : asset('images/noImage.png')
-                ];
-            });
+            ->map(fn($attendee) => [
+                "id"        => $attendee->id,
+                "name"      => $attendee->full_name ?? $attendee->name,
+                "avatarUrl" => $attendee->photo ? $attendee->photo->mobile_path : asset('images/noImage.png')
+            ]);
 
         // ================= Notifications =================
         $notificationsQuery = GeneralNotification::where('is_read', 0)
             ->where('user_id', $user->id)
-            ->where('event_id', $eventId)
+            ->when($eventId, function ($q) use ($eventId) {
+                $q->where('event_id', $eventId);
+            })
             ->latest();
 
         $notificationsList = $notificationsQuery->get()->map(function ($n) {
@@ -296,7 +326,8 @@ class HomeController extends Controller
             "home_sessions" => $homeSessions,
             "home_connections" => $homeConnections,
             "myStats" => $myStats,
-            "notifications" => $notifications
+            "notifications" => $notifications,
+            "splash_screen" => $splashScreen
         ]);
     }
 
@@ -319,7 +350,9 @@ public function getNotifications(Request $request)
         ->where(function ($q) use ($user) {        
             $q->Where('user_id', $user->id); 
         })
-        ->where('event_id', $eventId)
+        ->when($eventId, function ($q) use ($eventId) {
+            $q->where('event_id', $eventId);
+        })
         ->latest()
         ->take(20)
         ->get()
@@ -796,36 +829,129 @@ public function scanDetails(Request $request){
     }
 }
 
-public function scanDetailsUpdate(Request $request){
-    try {
-        if (!$user = JWTAuth::parseToken()->authenticate()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 401);
-        }
-        $eventId = (int) ($request->event_id ?: 1);
-        $connetion = UserConnection::where('connection_id',$request->qrData)
-            ->where('user_id',$user->id)
-            ->where('event_id', $eventId)
-            ->first();
-        if(!$connetion){
-           return response()->json([
-            "message"=> "Fail to add note!",
-           ]);
-        }
-        $connetion->note =$request->note ?? '';
-        $connetion->save(); 
-        return response()->json([
-            "message"=> "Connection note added!",
-        ]);
+// public function scanDetailsUpdate(Request $request){
+//     try {
+//         Log::info($request->all());
+//         if (!$user = JWTAuth::parseToken()->authenticate()) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'Unauthorized'
+//             ], 401);
+//         }
+//         Log::info("Authenticated user: " . $user->id);
+//          $validator = Validator::make($request->all(), [
+//             'qrData' => 'required'
+//         ]);
+//         $eventId = (int) ($request->event_id ?? 1);
+//         $connetion = UserConnection::where('connection_id',$request->qrData)
+//             ->where('user_id',$user->id)
+//             ->where('event_id', $eventId)
+//             ->first();
+//         if(!$connetion){
+//            return response()->json([
+//             "message"=> "Fail to add note!",
+//            ]);
+//         }
+//         $connetion->note =$request->note ?? '';
+//         $connetion->save(); 
+//         return response()->json([
+//             "message"=> "Connection note added!",
+//         ]);
     
 
-    } catch (\Exception $e) {
-        return response()->json(["message" => "Fail to add note!"]);
-    }
-}
+//     } catch (\Exception $e) {
+//         return response()->json(["message" => "Fail to add note!"]);
+//     }
+// }
 
+
+    public function scanDetailsUpdate(Request $request){
+        try {
+            Log::info('scanDetailsUpdate request:', $request->all());
+
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], 401);
+            }
+
+            Log::info('Authenticated user: ' . $user->id);
+
+            $validator = Validator::make($request->all(), [
+                'qrData'   => 'required|integer',
+                'event_id' => 'required|integer',
+                'note'     => 'nullable|string|max:500',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
+
+            $connectionId = (int) $request->qrData;
+            $eventId = (int) $request->event_id;
+
+            $connection = UserConnection::updateOrCreate(
+                [
+                    'user_id'       => $user->id,
+                    'connection_id' => $connectionId,
+                    'event_id'      => $eventId,
+                ],
+                [
+                    'note' => $request->note ?? '',
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => $connection->wasRecentlyCreated
+                    ? 'Connection note created!'
+                    : 'Connection note updated!',
+                'data' => [
+                    'id'            => $connection->id,
+                    'user_id'       => $connection->user_id,
+                    'connection_id' => $connection->connection_id,
+                    'event_id'      => $connection->event_id,
+                    'note'          => $connection->note,
+                ],
+            ], 200);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token expired',
+            ], 401);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token invalid',
+            ], 401);
+
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token missing or invalid',
+            ], 401);
+
+        } catch (\Exception $e) {
+            Log::error('scanDetailsUpdate error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fail to add note!',
+            ], 500);
+        }
+    }
 public function connectionUpdate(Request $request){
     try {
         if (!$user = JWTAuth::parseToken()->authenticate()) {
@@ -1086,11 +1212,12 @@ public function sendPushNotificationTest(Request $request)
 {
     try {
         $response = Http::withHeaders([
-            'Authorization' => 'Basic os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa',
+            'Authorization' => 'Key os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa',
             'Content-Type' => 'application/json; charset=utf-8',
-        ])->post('https://api.onesignal.com/api/v1/notifications', [
+        ])->post('https://api.onesignal.com/notifications?c=push', [
             'app_id' => '45726252-6dce-4f91-bb5e-58f9d6f75f2d',
-            'include_player_ids' => ['232d65bd-4636-498c-86c1-4df3421b6c60'],
+            'include_subscription_ids' => ['232d65bd-4636-498c-86c1-4df3421b6c60'],
+            'target_channel' => 'push',
             'headings' => ['en' => 'Hi Subhabrata'],
             'contents' => ['en' => 'Test'],
         ]);
@@ -1125,18 +1252,18 @@ public function sendPushNotificationTest(Request $request)
      
         $fields = array(
             'app_id' => "53dd6ba7-9382-469d-8ada-7256eddc5998",
-            'include_player_ids' => array($playerId),
+            'include_subscription_ids' => array($playerId),
+            'target_channel' => 'push',
             'headings' => $headings,
             'contents' => $content
         );
 
         $fields = json_encode($fields);
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq'
-
+            'Authorization: Key os_v2_app_kpowxj4tqjdj3cw2ojlo3xcztbvqqzmpvq7ulsutlinxbwmof45kuk27i3lgzjxo4zjppv3kauksfgrqs6rd3fng7zvt43dxsshuvmq'
         ));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1148,14 +1275,14 @@ public function sendPushNotificationTest(Request $request)
         curl_close($ch);
      
         return $response;
-
     }
 
     public static function sendNotificationTest()
     {
         $content = [
             "app_id" => "45726252-6dce-4f91-bb5e-58f9d6f75f2d",
-            "include_player_ids" => ['c562d159-5963-4611-bda4-19a4c8dd5a0a'],
+            "include_subscription_ids" => ['c562d159-5963-4611-bda4-19a4c8dd5a0a'],
+            "target_channel" => "push",
             "headings" => ["en" => 'Hi'],
             "contents" => ["en" => 'Hello']
         ];
@@ -1163,10 +1290,10 @@ public function sendPushNotificationTest(Request $request)
         $fields = json_encode($content);
      
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_URL, "https://api.onesignal.com/notifications?c=push");
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa'
+            'Authorization: Key os_v2_app_ivzgeutnzzhzdo26ld45n527fvblhchvs65epwesg4drmkmqwc7f3wqvycv7tw46ybwbnuux63rba2qc7klalndof5oswckibmfojfa'
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -1181,7 +1308,7 @@ public function sendPushNotificationTest(Request $request)
     }
 
 
-    public function addFavoriteConnection(Request $request){
+    public function addFavoriteConnection(Request $request){ 
 
         if (!$user = JWTAuth::parseToken()->authenticate()) {
             return response()->json([

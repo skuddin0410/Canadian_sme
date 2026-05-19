@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\SendScheduledBulkEmailJob;
 use App\Jobs\SendScheduledBulkNotificationJob;
 use Carbon\Carbon as CarbonCarbon;
+use App\Jobs\UpdateUserQrCodeJob;
 
 class AttendeeUserController extends Controller
 {
@@ -130,6 +131,10 @@ class AttendeeUserController extends Controller
                     }
                 }
 
+                if ($request->boolean('missing_cometchat_id')) {
+                    $users = $users->whereNull('cometchat_id');
+                }
+
                 // Filters (triggered by filter button, add your filter logic here)
                 if ($request->filled('start_at') && $request->filled('end_at')) {
                     $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
@@ -185,12 +190,6 @@ class AttendeeUserController extends Controller
      */
     public function create()
     {
-        $speakers = Speaker::select('id', 'name', 'lastname')->orderBy('created_at', 'DESC')->get();
-
-        $exhibitors = Company::select('id', 'name')->where('is_sponsor', 0)->orderBy('created_at', 'DESC')->get();
-
-        $sponsors = Company::select('id', 'name')->where('is_sponsor', 1)->orderBy('created_at', 'DESC')->get();
-
         $groups = config('roles.groups');
 
         $events = collect();
@@ -208,6 +207,11 @@ class AttendeeUserController extends Controller
                     ->get();
             }
         }
+
+        $scopeEventIds = $events->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $speakers = $this->getSpeakerAccessOptions($scopeEventIds);
+        $exhibitors = $this->getCompanyAccessOptions($scopeEventIds, false);
+        $sponsors = $this->getCompanyAccessOptions($scopeEventIds, true);
 
         return view('users.attendee_users.create', compact('groups', 'exhibitors', 'sponsors', 'speakers', 'events'));
     }
@@ -420,13 +424,12 @@ class AttendeeUserController extends Controller
     {
 
         $user = User::findOrFail($id);
-        $speakers = Speaker::select('id', 'name', 'lastname')->orderBy('created_at', 'DESC')->get();
-
-        $exhibitors = Company::select('id', 'name')->where('is_sponsor', 0)->orderBy('created_at', 'DESC')->get();
-
-        $sponsors = Company::select('id', 'name')->where('is_sponsor', 1)->orderBy('created_at', 'DESC')->get();
-
         $groups = config('roles.groups');
+        $perticipantEvents = $user->eventAndEntityLinks()
+            ->where('entity_type', 'users')
+            ->where('entity_id', $user->id)
+            ->pluck('event_id')
+            ->toArray();
 
         $events = collect();
         $oldEvents = collect();
@@ -462,14 +465,118 @@ class AttendeeUserController extends Controller
             }
         }
 
-        $perticipantEvents = $user->eventAndEntityLinks()
-            ->where('entity_type', 'users')
-            ->where('entity_id', $user->id)
-            ->pluck('event_id')
-            ->toArray();
-        // dd($perticipantEvents);
+        $accessScopeEventIds = collect($perticipantEvents)
+            ->merge($events->pluck('id'))
+            ->merge($oldEvents->pluck('id'))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        $speakers = $this->getSpeakerAccessOptions($accessScopeEventIds);
+        $exhibitors = $this->getCompanyAccessOptions($accessScopeEventIds, false);
+        $sponsors = $this->getCompanyAccessOptions($accessScopeEventIds, true);
 
         return view('users.attendee_users.edit', compact('user', 'groups', 'exhibitors', 'sponsors', 'speakers', 'events', 'perticipantEvents', 'oldEvents'));
+    }
+
+    protected function getSpeakerAccessOptions(array $eventIds)
+    {
+        $eventIds = array_values(array_unique(array_map('intval', $eventIds)));
+        $eventTitles = empty($eventIds)
+            ? collect()
+            : DB::table('events')->whereIn('id', $eventIds)->pluck('title', 'id');
+
+        return Speaker::select('speakers.id', 'speakers.name', 'speakers.lastname', 'speakers.email')
+            ->with(['eventAndEntityLinks' => function ($query) use ($eventIds) {
+                if (!empty($eventIds)) {
+                    $query->whereIn('event_id', $eventIds);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            }])
+            ->when(!empty($eventIds), function ($query) use ($eventIds) {
+                $query->whereExists(function ($q) use ($eventIds) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'speakers.id')
+                        ->where('event_and_entity_link.entity_type', 'speakers')
+                        ->whereIn('event_and_entity_link.event_id', $eventIds);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('speakers.name')
+            ->orderBy('speakers.lastname')
+            ->get()
+            ->map(function ($speaker) use ($eventTitles) {
+                $speaker->display_label = $this->buildAccessOptionLabel(
+                    trim($speaker->full_name),
+                    $speaker->email,
+                    $speaker->eventAndEntityLinks->pluck('event_id')->map(fn ($id) => $eventTitles[$id] ?? null)->filter()->values()->all(),
+                    $speaker->id
+                );
+
+                return $speaker;
+            });
+    }
+
+    protected function getCompanyAccessOptions(array $eventIds, bool $isSponsor)
+    {
+        $eventIds = array_values(array_unique(array_map('intval', $eventIds)));
+        $eventTitles = empty($eventIds)
+            ? collect()
+            : DB::table('events')->whereIn('id', $eventIds)->pluck('title', 'id');
+
+        return Company::select('companies.id', 'companies.name', 'companies.email')
+            ->where('companies.is_sponsor', $isSponsor ? 1 : 0)
+            ->with(['eventAndEntityLinks' => function ($query) use ($eventIds) {
+                if (!empty($eventIds)) {
+                    $query->whereIn('event_id', $eventIds);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            }])
+            ->when(!empty($eventIds), function ($query) use ($eventIds) {
+                $query->whereExists(function ($q) use ($eventIds) {
+                    $q->select(DB::raw(1))
+                        ->from('event_and_entity_link')
+                        ->whereColumn('event_and_entity_link.entity_id', 'companies.id')
+                        ->where('event_and_entity_link.entity_type', 'companies')
+                        ->whereIn('event_and_entity_link.event_id', $eventIds);
+                });
+            }, function ($query) {
+                $query->whereRaw('1 = 0');
+            })
+            ->orderBy('companies.name')
+            ->get()
+            ->map(function ($company) use ($eventTitles) {
+                $company->display_label = $this->buildAccessOptionLabel(
+                    trim($company->name),
+                    $company->email,
+                    $company->eventAndEntityLinks->pluck('event_id')->map(fn ($id) => $eventTitles[$id] ?? null)->filter()->values()->all(),
+                    $company->id
+                );
+
+                return $company;
+            });
+    }
+
+    protected function buildAccessOptionLabel(string $name, ?string $email, array $eventTitles, int $id): string
+    {
+        $parts = [trim($name) !== '' ? trim($name) : 'Unnamed'];
+
+        if (!empty($email)) {
+            $parts[] = $email;
+        }
+
+        if (!empty($eventTitles)) {
+            $parts[] = implode(', ', array_unique($eventTitles));
+        }
+
+        $parts[] = 'ID: ' . $id;
+
+        return implode(' | ', $parts);
     }
 
     /**
@@ -666,9 +773,9 @@ class AttendeeUserController extends Controller
         }
         return back()->withErrors('You do not have permission to perform this action.');
     }
-    public function exportAttendees()
+    public function exportAttendees(Request $request)
     {
-        return Excel::download(new AttendeesExport, 'attendees.xlsx');
+        return Excel::download(new AttendeesExport($request), 'attendees.xlsx');
     }
     public function allowAccess(string $id)
     {
@@ -746,9 +853,10 @@ class AttendeeUserController extends Controller
             $users = User::whereIn('id', $userIds)->get();
         }
 
-        $emailTemplate = EmailTemplate::where('template_name', $request->template_name)
+        $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->where('template_name', $request->template_name)
             ->where('event_id', $request->event_id)
             ->first();
+        $event = $emailTemplate?->event;
         $subject = $emailTemplate->subject ?? '';
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
         $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -844,7 +952,7 @@ class AttendeeUserController extends Controller
                 // Use Mailable which implements ShouldQueue for background processing
 
                 // new system to queue
-                Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, $mailLog->id));
+                Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, $mailLog->id, $event));
             }
         } else if (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
             /*
@@ -1085,15 +1193,69 @@ class AttendeeUserController extends Controller
             }
             */
 
+            foreach ($users as $user) {
+                $message = $emailTemplate->message ?? '';
+                $message = str_replace('{{name}}', $user->full_name, $message);
+                $message = str_replace('{{site_name}}', config('app.name'), $message);
+
+                $message = $message; // dynamic message from database
+                $notificationMessage = trim(
+                    preg_replace(
+                        '/\s+/',
+                        ' ',
+                        strip_tags(
+                            html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                        )
+                    )
+                );
+                Log::info('' . $notificationMessage . '');
+
+                $title = 'Hi, ' . ($user->full_name ?? '') . ',';
+
+                notification($user->id, $type = 'push_notification', null, $title, $message, (int)$request->event_id);
+
+                if (!empty($user->onesignal_userid)) {
+                    $payload = [
+                        // 'app_id' => '53dd6ba7-9382-469d-8ada-7256eddc5998',
+                        'app_id' => env('ONESIGNAL_APP_ID'),
+                        'contents' => [
+                            'en' => $notificationMessage ?? 'Default message.',
+                        ],
+                        'headings' => [
+                            'en' => $title ?? 'Notification',
+                        ],
+                        'target_channel' => 'push',
+                        'include_subscription_ids' => [
+                            $user->onesignal_userid,
+                        ],
+                    ];
+
+                    $response = Http::withHeaders([
+                        'Authorization' => 'Key ' . env('ONESIGNAL_REST_API_KEY'),
+                        'Content-Type'  => 'application/json',
+                    ])
+                        ->post('https://api.onesignal.com/notifications?c=push', $payload);
+
+                    if ($response->failed()) {
+                        Log::error('OneSignal push failed', [
+                            'status' => $response->status(),
+                            'body'   => $response->body(),
+                        ]);
+                    }
+                }
+            }
+
             // Use Job for background processing
-            $userIdsArray = ($request->user_ids == 'all') ? ['all'] : (is_array($userIds) ? $userIds : [$userIds]);
-            dispatch(new \App\Jobs\SendScheduledBulkNotificationJob($userIdsArray, $emailTemplate->template_name, (int)$request->event_id));
+            // $userIdsArray = ($request->user_ids == 'all') ? ['all'] : (is_array($userIds) ? $userIds : [$userIds]);
+            // dispatch(new \App\Jobs\SendScheduledBulkNotificationJob($userIdsArray, $emailTemplate->template_name, (int)$request->event_id));
         }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => "Sending mails in the background"
+                // 'message' => "Sending mails in the background"
+                // 'message' => "Process are running in the background"
+                'message' => "Successfully sent to " . count($users) . " users."
             ]);
         }
 
@@ -1140,20 +1302,32 @@ class AttendeeUserController extends Controller
 
     public function generateQrCodeManually()
     {
-        $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
-        if (!empty($users)) {
-            foreach ($users as $user) {
-                if (empty($user->qr_code)) {
-                    qrCode($user->id, 'user');
-                }
+        // $users = User::whereNull('qr_code')->orWhere('qr_code', '')->get();
+        // if (!empty($users)) {
+        //     foreach ($users as $user) {
+        //         if (empty($user->qr_code)) {
+        //             qrCode($user->id, 'user');
+        //         }
+        //
+        //         if (!$user->hasRole('Attendee')) {
+        //             $user->assignRole('Attendee');
+        //         }
+        //     }
+        // }
+        //
+        // return redirect()->back()->with('success', "Qr Code generated sent successfully.");
 
-                if (!$user->hasRole('Attendee')) {
-                    $user->assignRole('Attendee');
-                }
-            }
+        $pendingCount = User::whereNull('qr_code')->orWhere('qr_code', '')->count();
+
+        if ($pendingCount === 0) {
+            return redirect()->back()->with('success', 'All attendee QR codes are already generated.');
         }
 
-        return redirect()->back()->with('success', "Qr Code generated sent successfully.");
+        app()->terminating(function () {
+            UpdateUserQrCodeJob::dispatchSync();
+        });
+
+        return redirect()->back()->with('success', "QR code generation started for {$pendingCount} attendee(s). Please refresh after a short while.");
     }
 
 
@@ -1342,7 +1516,7 @@ class AttendeeUserController extends Controller
         $pdf = \PDF::loadView('DragAndDropBadge.pdf', compact('badge', 'layout', 'users'))
             ->setPaper([0, 0, $widthPt, $heightPt]);
 
-        return $pdf->download('attendee_badges.pdf');
+        return $pdf->stream('attendee_badges.pdf');
     }
 
     /**

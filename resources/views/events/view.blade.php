@@ -45,6 +45,20 @@ Admin | Event Details
                                         alt="Map Image" height="100px;"></span>
                                 @endif
                             </li>
+                            <li class="mb-3">
+                                <span class="fw-medium me-2">Event Logo:</span>
+                                @if(!empty($event->eventLogo) && $event->eventLogo->file_path)
+                                <span class="fw-medium me-2"><img src="{{ $event->eventLogo->file_path }}"
+                                        alt="Event Logo" height="100px;"></span>
+                                @endif
+                            </li>
+                            <li class="mb-3">
+                                <span class="fw-medium me-2">Sponsor Banner:</span>
+                                @if(!empty($event->sponsorBanner) && $event->sponsorBanner->file_path)
+                                <span class="fw-medium me-2"><img src="{{ $event->sponsorBanner->file_path }}"
+                                        alt="Sponsor Banner" height="100px;"></span>
+                                @endif
+                            </li>
                             <li class="mb-3"><span class="fw-medium me-2">Location:</span>
                                 <span>{{ $event->location ?? '' }}</span></li>
                             <li class="mb-3"><span class="fw-medium me-2">Status:</span>

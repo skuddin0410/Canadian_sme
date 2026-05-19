@@ -288,13 +288,33 @@ class OtpController extends Controller
                 }
             }
             if ($otp) {
-            $otp->delete();
+                $otp->delete();
             }
+
+            $splashScreen = null;
+            if ($request->filled('event_id')) {
+                $splashScreenRecord = \App\Models\SplashScreen::with([
+                    'iosIphone', 'iosIpad', 'androidHdpi', 'androidMdpi', 'androidXhdpi', 'androidXxhdpi'
+                ])->where('event_id', (int) $request->event_id)->first();
+
+                if ($splashScreenRecord) {
+                    $splashScreen = [
+                        'ios_iphone' => $splashScreenRecord->iosIphone?->file_path,
+                        'ios_ipad' => $splashScreenRecord->iosIpad?->file_path,
+                        'android_hdpi' => $splashScreenRecord->androidHdpi?->file_path,
+                        'android_mdpi' => $splashScreenRecord->androidMdpi?->file_path,
+                        'android_xhdpi' => $splashScreenRecord->androidXhdpi?->file_path,
+                        'android_xxhdpi' => $splashScreenRecord->androidXxhdpi?->file_path,
+                    ];
+                }
+            }
+
             return response()->json([
                 'success'    => true,
                 'message'    => 'Login successful',
                 'token'      => $token,
                 'expires_at' => $session->expires_at,
+                'splash_screen' => $splashScreen,
             ]);
 
         } catch (JWTException $e) {

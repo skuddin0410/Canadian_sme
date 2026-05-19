@@ -25,7 +25,7 @@
                             <button type="button" class="btn btn-outline-info btn-pill" onclick="openScheduledNotificationsModal()">
                                 <i class="bx bx-bell me-1"></i>Scheduled Notifications
                             </button>
-                            <a href="{{ route('attendee-users.export') }}" class="btn btn-outline-primary btn-pill">Export
+                            <a href="{{ route('attendee-users.export') }}" class="btn btn-outline-primary btn-pill" id="export-link">Export
                                 Users</a>
                             <a href="#" class="btn btn-outline-primary btn-pill" id="importusers"
                                 onclick="openImportModal()">Import Users</a>
@@ -64,6 +64,15 @@
                                         @endforeach
                                         </select>
                                     </div>
+                                    <!-- <div class="col-auto">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" value="1"
+                                                id="missing_cometchat_id" name="missing_cometchat_id">
+                                            <label class="form-check-label" for="missing_cometchat_id">
+                                                CometChat ID missing
+                                            </label>
+                                        </div>
+                                    </div> -->
                                     <div class="col-auto">
                                         <button type="button" class="btn btn-md btn-primary"
                                             id="search-btn">Search</button>
@@ -448,11 +457,19 @@
         if (savedParams.event_id) {
             $('#event_id').val(savedParams.event_id).trigger('change');
         }
+        if (savedParams.missing_cometchat_id) {
+            $('#missing_cometchat_id').prop('checked', true);
+        }
         loadUsers(savedParams);
 
         function loadUsers(params = {}) {
             localStorage.setItem('attendeeParams', JSON.stringify(params));
             $(".spinner-border").fadeIn(300);
+
+            // Update export link
+            let exportUrl = "{{ route('attendee-users.export') }}";
+            let queryString = $.param(params);
+            $('#export-link').attr('href', exportUrl + (queryString ? '?' + queryString : ''));
 
             $.ajax({
                 url: "{{ route('attendee-users.index') }}",
@@ -525,10 +542,12 @@
             $('#search-btn, #filter-btn').click(function() {
                 const searchVal = $('#search').val().trim();
                 const eventId   = $('#event_id').val();
+                const missingCometChatId = $('#missing_cometchat_id').is(':checked') ? 1 : 0;
 
                 loadUsers({
                     search: searchVal,
                     event_id: eventId,
+                    missing_cometchat_id: missingCometChatId,
                     page: 1
                 });
             });
@@ -536,6 +555,7 @@
             $('.reset-filter').click(function() {
                 $('#search').val('');
                 $('#event_id').val('').trigger('change');
+                $('#missing_cometchat_id').prop('checked', false);
                 localStorage.removeItem('attendeeParams');
                 loadUsers();
             });
@@ -612,6 +632,10 @@
             }
 
             window.openImportModal = function() {
+                const mainEventId = $('#event_id').val();
+                if (mainEventId) {
+                    $('#importEventId').val(mainEventId).trigger('change');
+                }
                 $('#openImportModal').modal('show');
             }
             window.closeImportModal = function() {
@@ -1009,7 +1033,12 @@
 
     // Collect selected user IDs (from checkboxes)
     const selectedUserIds = [];
+    /*
     $('input[name="user_checkbox[]"]:checked').each(function() {
+        selectedUserIds.push($(this).val());
+    });
+    */
+    $('.user-checkbox:checked').each(function() {
         selectedUserIds.push($(this).val());
     });
 
@@ -1048,8 +1077,19 @@
     form.submit();
 };
         window.openBadgeModal = function() {
+            /*
             closeModal(); // closes other modals
             $('#bulkBadgeModal').modal('show'); // opens badge modal
+            */
+
+            // Auto-select latest badge and submit
+            const latestBadgeId = $('#badge_id option:eq(1)').val(); 
+            if (!latestBadgeId) {
+                Swal.fire('No Badge Found', 'Please create a badge template first.', 'warning');
+                return;
+            }
+            $('#badge_id').val(latestBadgeId);
+            window.submitBadgeAction();
         };
     </script>
 

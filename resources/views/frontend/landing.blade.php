@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>landing</title>
+    <title>Promotional Page</title>
     <!-- bootstrap css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -28,8 +28,8 @@
                   $setting = getLandingPageSettings();
                 @endphp
                 <div class="left-inner">
-                    <a href="javascript:void()">
-                        <img class="landing-page-logo" src="{{asset('frontend/images/logo.png')}}" alt="">
+                    <a href="https://eventzen.io">
+                        <img class="landing-page-logo" src="{{asset('/eventzen-logo.svg')}}" alt="">
                     </a>
                     <h2 class="h2-black mt-4 mb-3">
                        {{$setting->title ?? ''}}
@@ -63,7 +63,7 @@
                     <div class="app-grid mt-3">
                         <div class="cell">
                             <div>
-                              <a href="https://apps.apple.com/us/app/sme-summit-2025/id6753012008">  <img class="h-100 w-100" src="{{asset('frontend/images/apple-store.svg')}}" alt=""></a>
+                              <a href="https://apps.apple.com/in/app/eventzen/id6753012008">  <img class="h-100 w-100" src="{{asset('frontend/images/apple-store.svg')}}" alt=""></a>
                             </div>
                         </div>
                         <div class="cell">
@@ -90,7 +90,8 @@
                 </div>
             </div>
             <div class="right">
-                <img class="mobile-img" src="{{asset('frontend/images/mobile-image.svg')}}" alt="">
+                <!-- <img class="mobile-img" src="{{asset('frontend/images/mobile-image.svg')}}" alt=""> -->
+                <img class="mobile-img" src="{{asset('images/promo-event.png')}}" alt="">
             </div>
         </div>
     </section>

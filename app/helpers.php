@@ -28,6 +28,8 @@ use App\Models\LandingPageSetting;
 use App\Services\IOSPushService;
 use App\Models\FavoriteConnection;
 use App\Models\NewBadge;
+use App\Models\Subscription;
+
 
 if (!function_exists('getCategory')) {
     function getCategory($type=null)
@@ -483,7 +485,7 @@ if (!function_exists('sendNotification')) {
     function sendNotification($template_name, $user)
     {  
       
-        $emailTemplate = EmailTemplate::where('template_name', $template_name)->first();
+        $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->where('template_name', $template_name)->first();
         if (!empty($emailTemplate) && $emailTemplate->type == 'email') {
             $subject = $emailTemplate->subject ?? '';
             $subject = str_replace('{{site_name}}', config('app.name'), $subject);
@@ -503,7 +505,7 @@ if (!function_exists('sendNotification')) {
             }
 
             $message = Purifier::clean($message, 'default');
-            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message));
+            Mail::to($user->email)->send(new UserWelcome($user, $subject, $message, null, $emailTemplate->event));
  
         } elseif (!empty($emailTemplate) && $emailTemplate->type == 'notifications') {
             foreach ($users as $user) {
@@ -658,18 +660,19 @@ if (!function_exists('getEventIds')) {
             return \App\Models\Event::pluck('id')->toArray();
         }
 
-        // $linkedIds = \App\Models\EventAndEntityLink::where('entity_type', 'users')
-        //     ->where('entity_id', $user->id)
-        //     ->pluck('event_id')
-        //     ->toArray();
+        $subscription = Subscription::active()
+            ->where('user_id', $user->id)
+            ->latest()
+            ->first();
 
-        // $createdIds = \App\Models\Event::where('created_by', $user->id)
-        //     ->pluck('id')
-        //     ->toArray();
+        if ($subscription) {
+            return \App\Models\Event::where('subscription_id', $subscription->id)
+                ->pluck('id')
+                ->toArray();
+        }
 
-        $events = isSuperAdmin() ? DB::table('events')->select('id', 'title')->get() : DB::table('events')->select('id', 'title')->where('created_by', auth()->user()->id)->get();
-
-        return $events->pluck('id')
+        return \App\Models\Event::where('created_by', $user->id)
+            ->pluck('id')
             ->toArray();
     }
 }

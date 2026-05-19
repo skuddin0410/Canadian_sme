@@ -14,6 +14,7 @@ Route::post('change-user-password', [App\Http\Controllers\HomeController::class,
 
 Route::any('brand', [App\Http\Controllers\HomeController::class, 'brand'])->name('brand');
 Route::any('splash', [App\Http\Controllers\HomeController::class, 'splash'])->name('splash');
+Route::post('splash/delete-photo', [App\Http\Controllers\HomeController::class, 'removeSplashScreenPhoto'])->name('splash.deletePhoto');
 use App\Http\Controllers\HomeController;
 
 Route::post('/brand/delete-media', [HomeController::class, 'deleteMedia'])->name('brand.deleteMedia');
