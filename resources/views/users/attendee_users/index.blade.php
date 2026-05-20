@@ -96,8 +96,20 @@
                                 @csrf
                                 <input type="hidden" name="user_ids" id="selectedUserIds">
                                 <input type="hidden" name="event_id" id="selectedEventIdForSend">
+                                <input type="hidden" name="selection_mode" id="selectionMode" value="selected">
 
                                 <div class="d-inline-block">
+                                    <button type="button" class="btn btn-outline-dark" id="selectAllFilteredBtn">
+                                        Select All Filtered
+                                    </button>
+                                    @if(isSuperAdmin())
+                                    <button type="button" class="btn btn-outline-danger" id="selectAllExceptEventBtn">
+                                        Select All Except Event
+                                    </button>
+                                    @endif
+                                    <button type="button" class="btn btn-outline-secondary" id="clearSelectionBtn">
+                                        Clear Selection
+                                    </button>
                                     <button type="button" class="btn btn-primary" onclick="openModal('email')">
                                         Send Email (<span id="emailCount">0</span>)
                                     </button>
@@ -160,7 +172,7 @@
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>No users was selected.</strong>The email will be sent to all users.
+                            <strong>No users selected.</strong>&nbsp;<span id="emailScopeMessage">Please select users or use one of the select-all options before sending email.</span>
                         </div>
                     </div>
            
@@ -210,7 +222,7 @@
                       
                         <div class="alert alert-warning d-flex align-items-center mt-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>No users was selected.</strong>The notification will be sent to all users.
+                            <strong>No users selected.</strong>&nbsp;<span id="notificationScopeMessage">Please select users or use one of the select-all options before sending notification.</span>
                         </div>
                     </div>
 
@@ -382,6 +394,7 @@
                         @endforeach
                     @endif
                 </select>
+                <small class="text-muted d-block mt-2">You can generate badges for up to 50 users at a time.</small>
             </div>
 
             <div class="modal-footer">
@@ -447,7 +460,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const badgeBatchLimit = 50;
         let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
+        let appliedFilters = Object.assign({}, savedParams);
+        let filtersDirty = false;
+        let bulkSelectionMode = 'selected';
+        let bulkSelectedIds = [];
+        let bulkFilteredCount = 0;
+        let bulkAllExceptEventCount = 0;
+        let lastLoadedParams = Object.assign({}, savedParams);
+        const isSuperAdmin = @json(isSuperAdmin());
         // 🔹 Restore search input
         if (savedParams.search) {
             $('#search').val(savedParams.search);
@@ -464,6 +486,11 @@
 
         function loadUsers(params = {}) {
             localStorage.setItem('attendeeParams', JSON.stringify(params));
+            lastLoadedParams = Object.assign({}, params);
+            appliedFilters = Object.assign({}, params);
+            filtersDirty = false;
+            bulkSelectionMode = 'selected';
+            bulkSelectedIds = [];
             $(".spinner-border").fadeIn(300);
 
             // Update export link
@@ -482,7 +509,10 @@
                 }, params),
                 dataType: "json",
                 success: function(data) {
+                    bulkFilteredCount = parseInt(data.totalUsers || 0, 10);
+                    bulkAllExceptEventCount = parseInt(data.allExceptEventCount || 0, 10);
                     $("#user-table").html(data.html);
+                    syncBulkUiState();
                 },
                 error: function(xhr) {
                     console.error('Error loading users:', xhr.responseText);
@@ -507,6 +537,80 @@
         }
 
         $(document).ready(function() {
+            $('#search, #event_id').on('change keyup', function() {
+                filtersDirty = true;
+            });
+
+            function getCurrentScopePayload() {
+                return {
+                    event_id: $('#event_id').val() || '',
+                    search: $('#search').val().trim(),
+                    missing_cometchat_id: $('#missing_cometchat_id').is(':checked') ? 1 : 0
+                };
+            }
+
+            window.getBulkSelectedIds = function() {
+                if (bulkSelectionMode === 'selected') {
+                    return bulkSelectedIds;
+                }
+                return [];
+            };
+
+            window.getBulkSelectionMode = function() {
+                return bulkSelectionMode;
+            };
+
+            window.syncBulkUiState = function() {
+                const selectedCount = bulkSelectionMode === 'selected'
+                    ? bulkSelectedIds.length
+                    : (bulkSelectionMode === 'all_except_event' ? bulkAllExceptEventCount : bulkFilteredCount);
+                $('#emailCount').text(selectedCount);
+                $('#notifCount').text(selectedCount);
+                $('#badgeCount').text(selectedCount);
+                $('#selectionMode').val(bulkSelectionMode);
+
+                let scopeMessage = 'Please select users or use one of the select-all options before sending email.';
+                if (bulkSelectionMode === 'all_except_event') {
+                    scopeMessage = 'The email will be sent to all users except the selected event users.';
+                } else if (bulkSelectionMode === 'all_filtered') {
+                    scopeMessage = 'The email will be sent to the selected filtered users.';
+                } else if (bulkSelectionMode === 'selected' && bulkSelectedIds.length > 0) {
+                    scopeMessage = 'The email will be sent only to the selected users.';
+                }
+                $('#emailScopeMessage').text(scopeMessage);
+                $('#notificationScopeMessage').text(scopeMessage.replace('email', 'notification'));
+            };
+
+            function hasExplicitBulkSelection() {
+                if (bulkSelectionMode === 'selected') {
+                    return bulkSelectedIds.length > 0;
+                }
+
+                return bulkSelectionMode === 'all_filtered' || bulkSelectionMode === 'all_except_event';
+            }
+
+            function resetBulkSelection() {
+                bulkSelectionMode = 'selected';
+                bulkSelectedIds = [];
+                syncBulkUiState();
+            }
+
+            window.ensureFiltersApplied = function() {
+                const eventId = $('#event_id').val();
+                const searchVal = $('#search').val().trim();
+
+                if (!eventId && !searchVal) {
+                    Swal.fire('Apply Filter First', 'Please choose an event or enter a search and click Search first.', 'warning');
+                    return false;
+                }
+
+                if (filtersDirty) {
+                    Swal.fire('Apply Filter First', 'Please click Search to apply the latest event/search filter before using this action.', 'warning');
+                    return false;
+                }
+
+                return true;
+            }
 
 
             // let savedParams = JSON.parse(localStorage.getItem('attendeeParams')) || {};
@@ -557,7 +661,48 @@
                 $('#event_id').val('').trigger('change');
                 $('#missing_cometchat_id').prop('checked', false);
                 localStorage.removeItem('attendeeParams');
+                filtersDirty = false;
                 loadUsers();
+            });
+
+            $('#selectAllFilteredBtn').click(function() {
+                if (!ensureFiltersApplied()) {
+                    return;
+                }
+
+                bulkSelectionMode = 'all_filtered';
+                bulkSelectedIds = [];
+                syncBulkUiState();
+            });
+
+            $('#clearSelectionBtn').click(function() {
+                resetBulkSelection();
+                document.querySelectorAll('.user-checkbox').forEach(cb => {
+                    cb.checked = false;
+                });
+                const selectAll = document.getElementById('select-all');
+                if (selectAll) {
+                    selectAll.checked = false;
+                }
+            });
+
+            $('#selectAllExceptEventBtn').click(function() {
+                if (!isSuperAdmin) {
+                    return;
+                }
+
+                if (!ensureFiltersApplied()) {
+                    return;
+                }
+
+                if (!$('#event_id').val()) {
+                    Swal.fire('Choose Event First', 'Please select an event and click Search first.', 'warning');
+                    return;
+                }
+
+                bulkSelectionMode = 'all_except_event';
+                bulkSelectedIds = [];
+                syncBulkUiState();
             });
 
             $(document).on("click", ".custom_pagination .pagination-link", function(e) {
@@ -607,8 +752,12 @@
 
             window.openModal = function(actionType) {
                 const eventId = $('#event_id').val();
+                if (!ensureFiltersApplied()) {
+                    return;
+                }
+
                 if (!eventId) {
-                    Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+                    Swal.fire('Choose Event First', 'Please select an event and click Search first.', 'warning');
                     return;
                 }
 
@@ -648,6 +797,15 @@
 
 
             window.submitBulkActionBoth = function() {
+                if (!ensureFiltersApplied()) {
+                    return;
+                }
+
+                if (!hasExplicitBulkSelection()) {
+                    Swal.fire('Select Users First', 'Please select users or use a select-all option first.', 'warning');
+                    return;
+                }
+
                 const emailTemplate = $('#emailTemplateBoth').val();
                 const notificationTemplate = $('#notificationTemplateBoth').val();
 
@@ -658,15 +816,18 @@
 
                 const eventId = $('#event_id').val();
                 if (!eventId) {
-                    Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+                    Swal.fire('Choose Event First', 'Please select an event and click Search first.', 'warning');
                     return;
                 }
 
                 const scheduleTime = $('#schedule_time_both').val();
                 const confirmTitle = scheduleTime ? 'Schedule Both?' : 'Send Both Now?';
+                const scopedText = bulkSelectionMode === 'all_except_event'
+                    ? 'all users except the selected event users'
+                    : (bulkSelectionMode === 'all_filtered' ? `${bulkFilteredCount} filtered users` : `${bulkSelectedIds.length} selected users`);
                 const confirmText = scheduleTime 
-                    ? 'This will schedule both email and notification for all users.' 
-                    : 'This will send both email and notification to all users immediately.';
+                    ? `This will schedule both email and notification for ${scopedText}.` 
+                    : `This will send both email and notification to ${scopedText} immediately.`;
 
                 Swal.fire({
                     title: confirmTitle,
@@ -678,8 +839,10 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let data = {
-                            user_ids: 'all',
+                            user_ids: JSON.stringify(getBulkSelectedIds()),
+                            selection_mode: getBulkSelectionMode(),
                             event_id: eventId,
+                            search: $('#search').val().trim(),
                             _token: '{{ csrf_token() }}'
                         };
 
@@ -713,18 +876,18 @@
             }
 
             window.submitBulkAction = function(actionType) {
-                let selected = [];
-                document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
-                    selected.push(cb.value);
-                });
+                if (!ensureFiltersApplied()) {
+                    return;
+                }
 
-                if (selected.length === 0) {
-                    selected.push('all');
+                if (!hasExplicitBulkSelection()) {
+                    Swal.fire('Select Users First', 'Please select users or use a select-all option first.', 'warning');
+                    return;
                 }
 
                 const eventId = document.getElementById('event_id').value;
                 if (!eventId) {
-                    Swal.fire('Choose Event First', 'Please select an event first.', 'warning');
+                    Swal.fire('Choose Event First', 'Please select an event and click Search first.', 'warning');
                     return;
                 }
 
@@ -777,9 +940,11 @@
                                 url: scheduleUrl,
                                 method: 'POST',
                                 data: {
-                                    user_ids: JSON.stringify(selected),
+                                    user_ids: JSON.stringify(getBulkSelectedIds()),
+                                    selection_mode: getBulkSelectionMode(),
                                     template_name: template_name,
                                     event_id: eventId,
+                                    search: $('#search').val().trim(),
                                     schedule_time: schedule_time,
                                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                                     _token: '{{ csrf_token() }}'
@@ -798,9 +963,12 @@
                 }
 
                 // Normal send now (confirm before AJAX send)
+                const scopedText = bulkSelectionMode === 'all_except_event'
+                    ? 'all users except the selected event users'
+                    : (bulkSelectionMode === 'all_filtered' ? `${bulkFilteredCount} filtered user(s)` : `${bulkSelectedIds.length} selected user(s)`);
                 Swal.fire({
                     title: 'Send ' + (type === 'email' ? 'Email' : 'Notification') + ' Now?',
-                    text: 'This will be sent to ' + (selected[0] === 'all' ? 'all users' : selected.length + ' selected user(s)') + ' immediately.',
+                    text: 'This will be sent to ' + scopedText + ' immediately.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, send it!',
@@ -817,8 +985,10 @@
                             url: "{{ route('attendee-users.bulkAction') }}?template_name=" + template_name + "&type=" + type,
                             method: "POST",
                             data: {
-                                user_ids: JSON.stringify(selected),
+                                user_ids: JSON.stringify(getBulkSelectedIds()),
+                                selection_mode: getBulkSelectionMode(),
                                 event_id: eventId,
+                                search: $('#search').val().trim(),
                                 _token: '{{ csrf_token() }}'
                             },
                             success: function(resp) {
@@ -1024,6 +1194,10 @@
 
     <script>
         window.submitBadgeAction = function() {
+    if (typeof ensureFiltersApplied === 'function' && !ensureFiltersApplied()) {
+        return;
+    }
+
     const selectedBadgeId = $('#badge_id').val();
 
     if (!selectedBadgeId) {
@@ -1031,19 +1205,19 @@
         return;
     }
 
-    // Collect selected user IDs (from checkboxes)
-    const selectedUserIds = [];
-    /*
-    $('input[name="user_checkbox[]"]:checked').each(function() {
-        selectedUserIds.push($(this).val());
-    });
-    */
-    $('.user-checkbox:checked').each(function() {
-        selectedUserIds.push($(this).val());
-    });
+    const currentSelectionMode = window.getBulkSelectionMode ? window.getBulkSelectionMode() : 'selected';
+    const selectedUserIds = window.getBulkSelectedIds ? window.getBulkSelectedIds() : [];
+    const selectedCount = currentSelectionMode === 'selected'
+        ? selectedUserIds.length
+        : (currentSelectionMode === 'all_except_event' ? bulkAllExceptEventCount : bulkFilteredCount);
 
-    if (selectedUserIds.length === 0) {
-        alert('⚠️ Please select at least one user to generate badges for.');
+    if (currentSelectionMode === 'selected' && selectedUserIds.length === 0) {
+        alert('⚠️ Please select users or use Select All Filtered before generating badges.');
+        return;
+    }
+
+    if (selectedCount > badgeBatchLimit) {
+        Swal.fire('Limit Reached', `You can generate badges for up to ${badgeBatchLimit} users at a time. Current selection: ${selectedCount}.`, 'warning');
         return;
     }
 
@@ -1072,6 +1246,24 @@
     userIdsInput.name = 'user_ids';
     userIdsInput.value = JSON.stringify(selectedUserIds);
     form.appendChild(userIdsInput);
+
+    const selectionModeInput = document.createElement('input');
+    selectionModeInput.type = 'hidden';
+    selectionModeInput.name = 'selection_mode';
+    selectionModeInput.value = currentSelectionMode;
+    form.appendChild(selectionModeInput);
+
+    const eventIdInput = document.createElement('input');
+    eventIdInput.type = 'hidden';
+    eventIdInput.name = 'event_id';
+    eventIdInput.value = $('#event_id').val() || '';
+    form.appendChild(eventIdInput);
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'hidden';
+    searchInput.name = 'search';
+    searchInput.value = $('#search').val().trim();
+    form.appendChild(searchInput);
 
     document.body.appendChild(form);
     form.submit();

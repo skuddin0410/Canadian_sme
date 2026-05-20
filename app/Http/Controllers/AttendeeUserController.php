@@ -44,6 +44,150 @@ use Carbon\Carbon as CarbonCarbon;
 
 class AttendeeUserController extends Controller
 {
+    private const BADGE_BATCH_LIMIT = 50;
+
+    private function buildAttendeeIndexQuery(Request $request, bool $isSuperAdmin)
+    {
+        if ($request->has('show_admins') && $request->show_admins == 'true') {
+            return User::with('roles')
+                ->whereHas('roles', function ($query) {
+                    $query->where('name', 'Admin');
+                })
+                ->orderBy('id', 'DESC');
+        }
+
+        if ($isSuperAdmin) {
+            $users = User::with('roles')
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Admin');
+                })
+                ->orderBy('id', 'DESC');
+        } else {
+            $eventIds = getEventIds();
+            $attendeeIds = DB::table('event_and_entity_link')
+                ->where('entity_type', 'users')
+                ->whereIn('event_id', $eventIds)
+                ->pluck('entity_id')
+                ->toArray();
+
+            $users = User::with('roles')
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Admin');
+                })
+                ->where(function ($q) use ($attendeeIds) {
+                    $q->whereIn('users.id', $attendeeIds)
+                        ->orWhere('created_by', auth()->id());
+                })
+                ->orderBy('id', 'DESC');
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $users = $users->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('email', 'LIKE', '%' . $search . '%')
+                    ->orWhere('lastname', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', "%{$search}%")
+                    ->orWhere('designation', 'LIKE', '%' . $search . '%')
+                    ->orWhere('mobile', 'LIKE', '%' . $search . '%')
+                    ->orWhere('company', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('event_id')) {
+            $eventId = (int) $request->event_id;
+            if (!$isSuperAdmin && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+
+            if (!$isSuperAdmin) {
+                $filteredAttendeeIds = DB::table('event_and_entity_link')
+                    ->where('event_id', $eventId)
+                    ->where('entity_type', 'users')
+                    ->pluck('entity_id')
+                    ->toArray();
+                $users = $users->whereIn('users.id', $filteredAttendeeIds);
+            } else {
+                $users = $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
+                    $q->where('event_id', $eventId)
+                        ->where('entity_type', 'users');
+                });
+            }
+        }
+
+        if ($request->boolean('missing_cometchat_id')) {
+            $users = $users->whereNull('cometchat_id');
+        }
+
+        if ($request->filled('start_at') && $request->filled('end_at')) {
+            $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
+        }
+
+        if ($request->has('exhibitor_id')) {
+            $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
+        }
+
+        if ($request->has('onsignal') && $request->onsignal == 1) {
+            $users = $users->whereNotNull('onesignal_userid');
+        }
+
+        return $users;
+    }
+
+    private function resolveBulkTargetUserIds(Request $request): array
+    {
+        $selectionMode = $request->input('selection_mode', 'selected');
+        $selectedUserIds = json_decode($request->input('user_ids', '[]'), true) ?: [];
+        $isSuperAdmin = isSuperAdmin();
+
+        if ($selectionMode === 'all_except_event' && $isSuperAdmin) {
+            $query = User::query()
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Admin');
+                });
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'LIKE', '%' . $search . '%')
+                        ->orWhere('email', 'LIKE', '%' . $search . '%')
+                        ->orWhere('lastname', 'LIKE', '%' . $search . '%')
+                        ->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', "%{$search}%")
+                        ->orWhere('designation', 'LIKE', '%' . $search . '%')
+                        ->orWhere('mobile', 'LIKE', '%' . $search . '%')
+                        ->orWhere('company', 'LIKE', '%' . $search . '%');
+                });
+            }
+
+            if ($request->filled('event_id')) {
+                $eventId = (int) $request->event_id;
+                $query->whereDoesntHave('eventAndEntityLinks', function ($q) use ($eventId) {
+                    $q->where('event_id', $eventId)
+                        ->where('entity_type', 'users');
+                });
+            }
+
+            return $query->pluck('users.id')->all();
+        }
+
+        if ($selectionMode === 'all_filtered') {
+            return $this->buildAttendeeIndexQuery($request, $isSuperAdmin)
+                ->pluck('users.id')
+                ->all();
+        }
+
+        return array_values(array_filter($selectedUserIds, fn($id) => is_numeric($id)));
+    }
+
+    public function bulkSelectionCount(Request $request)
+    {
+        $count = count($this->resolveBulkTargetUserIds($request));
+
+        return response()->json([
+            'count' => $count,
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -57,98 +201,7 @@ class AttendeeUserController extends Controller
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
         if ($request->ajax() && $request->ajax_request == true) {
-            // $users = User::with("roles")->whereHas("roles", function ($q) {
-            //   $q->whereIn("name", ['Attendee']);
-            // })->orderBy('id', 'DESC');
-
-            // $users = User::with('roles')->whereNotIn('id',[1,2])->orderBy('id', 'DESC'); //subabrata da code
-            // Check if "admins" filter is applied
-
-            if ($request->has('show_admins') && $request->show_admins == 'true') {
-                // Filter users by the 'Admin' role
-                $users = User::with('roles')
-                    ->whereHas('roles', function ($query) {
-                        $query->where('name', 'Admin');  // Filter by Admin role
-                    })
-                    ->orderBy('id', 'DESC');
-            } else {
-                if ($isSuperAdmin) {
-                    $users = User::with('roles')
-                        ->whereDoesntHave('roles', function ($q) {
-                            $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
-                        })
-                        ->orderBy('id', 'DESC');
-                } else {
-                    $eventIds = getEventIds();
-                    $attendeeIds = DB::table('event_and_entity_link')
-                        ->where('entity_type', 'users')
-                        ->whereIn('event_id', $eventIds)
-                        ->pluck('entity_id')
-                        ->toArray();
-
-                    $users = User::with('roles')
-                        ->whereDoesntHave('roles', function ($q) {
-                            $q->where('name', 'Admin');  // Exclude users with the 'Admin' role
-                        })
-                        ->where(function($q) use ($attendeeIds) {
-                            $q->whereIn('users.id', $attendeeIds)
-                            ->orWhere('created_by', auth()->id());
-                        })
-                        ->orderBy('id', 'DESC');
-                }
-
-                // dd($users->get());
-
-                if ($request->filled('search')) {
-                    $users = $users->where(function ($query) use ($request) {
-                        $query->where('name', 'LIKE', '%' . $request->search . '%')
-                            ->orWhere('email', 'LIKE', '%' . $request->search . '%')
-                            ->orWhere('lastname', 'LIKE', '%' . $request->search . '%')
-                            ->orWhere(DB::raw("CONCAT(name, ' ', lastname)"), 'LIKE', "%{$request->search}%")
-                            ->orWhere('designation', 'LIKE', '%' . $request->search . '%')
-                            ->orWhere('mobile', 'LIKE', '%' . $request->search . '%')
-                            ->orWhere('company', 'LIKE', '%' . $request->search . '%');
-                    });
-                }
-
-                if ($request->filled('event_id')) {
-                    $eventId = $request->event_id;
-                    if (!$isSuperAdmin && !in_array($eventId, getEventIds())) {
-                        $eventId = 0;
-                    }
-
-                    if (!$isSuperAdmin) {
-                        $filteredAttendeeIds = DB::table('event_and_entity_link')
-                            ->where('event_id', $eventId)
-                            ->where('entity_type', 'users')
-                            ->pluck('entity_id')
-                            ->toArray();
-                        $users = $users->whereIn('users.id', $filteredAttendeeIds);
-                    } else {
-                        $users = $users->whereHas('eventAndEntityLinks', function ($q) use ($eventId) {
-                            $q->where('event_id', $eventId)
-                                ->where('entity_type', 'users');
-                        });
-                    }
-                }
-
-                if ($request->boolean('missing_cometchat_id')) {
-                    $users = $users->whereNull('cometchat_id');
-                }
-
-                // Filters (triggered by filter button, add your filter logic here)
-                if ($request->filled('start_at') && $request->filled('end_at')) {
-                    $users = $users->whereBetween('created_at', [$request->start_at, $request->end_at]);
-                }
-
-                if ($request->has('exhibitor_id')) {
-                    $users = $users->where('created_by_exhibitor_id', $request->exhibitor_id);
-                }
-
-                if ($request->has('onsignal') && $request->onsignal == 1) {
-                    $users = $users->whereNotNull('onesignal_userid');
-                }
-            }
+            $users = $this->buildAttendeeIndexQuery($request, $isSuperAdmin);
 
             $usersCount = clone $users;
             $totalRecords = $usersCount->count(DB::raw('DISTINCT(users.id)'));
@@ -167,6 +220,15 @@ class AttendeeUserController extends Controller
             // Prepare response data
             $data['totalUsers'] = $totalRecords; // Total number of users
             $data['totalAppUsers'] = $totalAppUsers;
+            $data['allExceptEventCount'] = null;
+            if ($isSuperAdmin && $request->filled('event_id')) {
+                $countRequest = new Request([
+                    'selection_mode' => 'all_except_event',
+                    'event_id' => $request->event_id,
+                    'search' => $request->search,
+                ]);
+                $data['allExceptEventCount'] = count($this->resolveBulkTargetUserIds($countRequest));
+            }
             $data['offset'] = $offset;
             $data['pageNo'] = $pageNo;
             $range = $data['range'] = "$startRange-$endRange";
@@ -845,16 +907,13 @@ class AttendeeUserController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
         ]);
-        // dd($request->all());
-
-        $userIds = json_decode($request->user_ids, true);
-
+        $userIds = $this->resolveBulkTargetUserIds($request);
 
         $type = $request->query('type'); // email or notification
-        if (in_array('all', $userIds, true)) {
-            $users = User::get();
-        } else {
-            $users = User::whereIn('id', $userIds)->get();
+        $users = User::whereIn('id', $userIds)->get();
+
+        if ($users->isEmpty()) {
+            return response()->json(['message' => 'No users found for the selected scope.'], 422);
         }
 
         $emailTemplate = EmailTemplate::with('event.eventLogo', 'event.photo')->where('template_name', $request->template_name)
@@ -1250,7 +1309,7 @@ class AttendeeUserController extends Controller
             // }
 
             // Use Job for background processing
-            $userIdsArray = ($request->user_ids == 'all') ? ['all'] : (is_array($userIds) ? $userIds : [$userIds]);
+            $userIdsArray = is_array($userIds) ? $userIds : [$userIds];
             dispatch(new \App\Jobs\SendScheduledBulkNotificationJob($userIdsArray, $emailTemplate->template_name, (int)$request->event_id));
         }
 
@@ -1347,6 +1406,11 @@ class AttendeeUserController extends Controller
         $emailTemplateName = $request->email_template;
         $notificationTemplateName = $request->notification_template;
         $scheduleTime = $request->schedule_time;
+        $targetUserIds = $this->resolveBulkTargetUserIds($request);
+
+        if (empty($targetUserIds)) {
+            return response()->json(['message' => 'No users found for the selected scope.'], 422);
+        }
 
         // Handle scheduling
         if ($scheduleTime) {
@@ -1364,13 +1428,13 @@ class AttendeeUserController extends Controller
             }
 
             if ($emailTemplateName) {
-                SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName, (int) $request->event_id)
+                SendScheduledBulkEmailJob::dispatch($targetUserIds, $emailTemplateName, (int) $request->event_id)
                     ->delay($time)
                     ->onQueue('default');
             }
 
             if ($notificationTemplateName) {
-                SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName, (int) $request->event_id)
+                SendScheduledBulkNotificationJob::dispatch($targetUserIds, $notificationTemplateName, (int) $request->event_id)
                     ->delay($time)
                     ->onQueue('default');
             }
@@ -1378,10 +1442,7 @@ class AttendeeUserController extends Controller
             return response()->json(['message' => 'Mails scheduled successfully.']);
         }
 
-        // Immediate send for 'all'
-        $usersQuery = User::query();
-
-        if ($usersQuery->count() === 0) {
+        if (count($targetUserIds) === 0) {
             return response()->json(['message' => 'No users found to send.'], 404);
         }
 
@@ -1458,11 +1519,11 @@ class AttendeeUserController extends Controller
         });*/
 
         if ($emailTemplateName) {
-            SendScheduledBulkEmailJob::dispatch(['all'], $emailTemplateName, (int) $request->event_id);
+            SendScheduledBulkEmailJob::dispatch($targetUserIds, $emailTemplateName, (int) $request->event_id);
         }
 
         if ($notificationTemplateName) {
-            SendScheduledBulkNotificationJob::dispatch(['all'], $notificationTemplateName, (int) $request->event_id);
+            SendScheduledBulkNotificationJob::dispatch($targetUserIds, $notificationTemplateName, (int) $request->event_id);
         }
 
         return response()->json(['message' => 'Sending mails in the background']);
@@ -1501,10 +1562,14 @@ class AttendeeUserController extends Controller
         ]);
 
         $badge = NewBadge::findOrFail($request->badge_id);
-        $userIds = json_decode($request->user_ids, true);
+        $userIds = $this->resolveBulkTargetUserIds($request);
 
         if (empty($userIds)) {
             return back()->with('error', 'No users selected.');
+        }
+
+        if (count($userIds) > self::BADGE_BATCH_LIMIT) {
+            return back()->with('error', 'You can generate badges for a maximum of ' . self::BADGE_BATCH_LIMIT . ' users at a time.');
         }
 
         $users = User::whereIn('id', $userIds)->get();
@@ -1534,8 +1599,9 @@ class AttendeeUserController extends Controller
         ]);
 
         $userIds = json_decode($request->user_ids, true);
+        $userIds = $this->resolveBulkTargetUserIds($request);
         if (empty($userIds)) {
-            $userIds = ['all'];
+            return response()->json(['message' => 'No users found for the selected scope.'], 422);
         }
 
         $tz = $request->timezone ?? 'UTC';
@@ -1571,9 +1637,9 @@ class AttendeeUserController extends Controller
             'timezone'      => 'nullable|string',
         ]);
 
-        $userIds = json_decode($request->user_ids, true);
+        $userIds = $this->resolveBulkTargetUserIds($request);
         if (empty($userIds)) {
-            $userIds = ['all'];
+            return response()->json(['message' => 'No users found for the selected scope.'], 422);
         }
 
         $tz = $request->timezone ?? 'UTC';

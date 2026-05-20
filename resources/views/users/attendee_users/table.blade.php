@@ -239,11 +239,21 @@
 
 <script>
 function updateCounts() {
-    let selected = document.querySelectorAll('.user-checkbox:checked').length;
-    document.getElementById('emailCount').innerText = selected;
-    document.getElementById('notifCount').innerText = selected;
-    document.getElementById('badgeCount').innerText = selected;
-    if(selected){
+    const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+
+    if (typeof bulkSelectedIds !== 'undefined') {
+        bulkSelectedIds = selectedIds;
+    }
+
+    if (typeof bulkSelectionMode !== 'undefined' && bulkSelectionMode !== 'selected' && selectedIds.length > 0) {
+        bulkSelectionMode = 'selected';
+    }
+
+    if (typeof window.syncBulkUiState === 'function') {
+        window.syncBulkUiState();
+    }
+
+    if(selectedIds.length){
        document.getElementById('sendAllEmailCheckboxId').style.display = 'none';
        document.getElementById('sendAllotificationCheckboxId').style.display = 'none';
        
@@ -266,67 +276,125 @@ document.querySelectorAll('.user-checkbox').forEach(cb => {
     cb.addEventListener('change', updateCounts);
 });
 
+updateCounts();
+
 
 
 function submitBadgeAction() {
-    let selected = [];
-    document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
-        selected.push(cb.value);
-    });
-     
-    if (selected.length === 0) {
-       selected.push('all');
+    if (typeof window.ensureFiltersApplied === 'function' && !window.ensureFiltersApplied()) {
+        return;
     }
 
-    const badge = document.getElementById('badge_id').value; // can be dynamic if needed
-    const template_name = badge || '';
-    const type = 'badge';
+    const selected = typeof window.getBulkSelectedIds === 'function' ? window.getBulkSelectedIds() : [];
+    const selectionMode = typeof window.getBulkSelectionMode === 'function' ? window.getBulkSelectionMode() : 'selected';
+    const selectedCount = selectionMode === 'selected'
+        ? selected.length
+        : (typeof bulkSelectionMode !== 'undefined' && bulkSelectionMode === 'all_except_event' ? bulkAllExceptEventCount : bulkFilteredCount);
 
-    // Set selected IDs
-    document.getElementById('selectedUserIds').value = JSON.stringify(selected);
+    if (selectionMode === 'selected' && selected.length === 0) {
+        Swal.fire('Select Users First', 'Please select users or use Select All Filtered.', 'warning');
+        return;
+    }
 
-    // Configure form
-    let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('new.badges.print') }}?template_name=" + template_name + "&type=" + type;
+    if (selectedCount > 50) {
+        Swal.fire('Limit Reached', `You can generate badges for up to 50 users at a time. Current selection: ${selectedCount}.`, 'warning');
+        return;
+    }
 
-    // ✅ Open submission in a new tab
+    const selectedBadgeId = $('#badge_id').val();
+    if (!selectedBadgeId) {
+        Swal.fire('Badge Required', 'Please select a badge template first.', 'warning');
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ route('attendee-users.generateBadge') }}";
     form.target = "_blank";
 
-    // Submit the form
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = '_token';
+    csrf.value = '{{ csrf_token() }}';
+    form.appendChild(csrf);
+
+    const badgeInput = document.createElement('input');
+    badgeInput.type = 'hidden';
+    badgeInput.name = 'badge_id';
+    badgeInput.value = selectedBadgeId;
+    form.appendChild(badgeInput);
+
+    const userIdsInput = document.createElement('input');
+    userIdsInput.type = 'hidden';
+    userIdsInput.name = 'user_ids';
+    userIdsInput.value = JSON.stringify(selected);
+    form.appendChild(userIdsInput);
+
+    const selectionModeInput = document.createElement('input');
+    selectionModeInput.type = 'hidden';
+    selectionModeInput.name = 'selection_mode';
+    selectionModeInput.value = selectionMode;
+    form.appendChild(selectionModeInput);
+
+    const eventInput = document.createElement('input');
+    eventInput.type = 'hidden';
+    eventInput.name = 'event_id';
+    eventInput.value = document.getElementById('event_id').value || '';
+    form.appendChild(eventInput);
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'hidden';
+    searchInput.name = 'search';
+    searchInput.value = document.getElementById('search').value || '';
+    form.appendChild(searchInput);
+
+    document.body.appendChild(form);
     form.submit();
 }
 
 function submitBadgeActionNew() {
-  // alert('Badge generation initiated. Please wait 123...');
-    let selected = [];
-    document.querySelectorAll('.user-checkbox:checked').forEach(cb => {
-        selected.push(cb.value);
-    });
-     
-    if (selected.length === 0) {
-       selected.push('all');
+    const selectedBadgeId = $('#badge_id').val();
+    if (!selectedBadgeId) {
+        Swal.fire('Badge Required', 'Please select a badge template first.', 'warning');
+        return;
     }
 
-    const badge = document.getElementById('badge_id').value; // can be dynamic if needed
-    const template_name = badge || '';
-    const type = 'badge';
+    const selectedUserId = event.currentTarget.getAttribute('data-id');
+    if (!selectedUserId) {
+        Swal.fire('Select User First', 'Unable to find the selected user for badge generation.', 'warning');
+        return;
+    }
 
-    // Set selected IDs
-    // document.getElementById('selectedUserIds').value = JSON.stringify(selected);
-    
-    let selectedUserIds = [];
-        selectedUserIds.push(event.currentTarget.getAttribute('data-id'));
-    
-    document.getElementById('selectedUserIds').value = JSON.stringify(selectedUserIds);
-
-    // Configure form
-    let form = document.getElementById('bulkActionForm');
-    form.action = "{{ route('new.badges.print') }}?template_name=" + template_name + "&type=" + type;
-
-    // ✅ Open submission in a new tab
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ route('attendee-users.generateBadge') }}";
     form.target = "_blank";
 
-    // Submit the form
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = '_token';
+    csrf.value = '{{ csrf_token() }}';
+    form.appendChild(csrf);
+
+    const badgeInput = document.createElement('input');
+    badgeInput.type = 'hidden';
+    badgeInput.name = 'badge_id';
+    badgeInput.value = selectedBadgeId;
+    form.appendChild(badgeInput);
+
+    const userIdsInput = document.createElement('input');
+    userIdsInput.type = 'hidden';
+    userIdsInput.name = 'user_ids';
+    userIdsInput.value = JSON.stringify([selectedUserId]);
+    form.appendChild(userIdsInput);
+
+    const selectionModeInput = document.createElement('input');
+    selectionModeInput.type = 'hidden';
+    selectionModeInput.name = 'selection_mode';
+    selectionModeInput.value = 'selected';
+    form.appendChild(selectionModeInput);
+
+    document.body.appendChild(form);
     form.submit();
 }
 
