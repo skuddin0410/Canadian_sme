@@ -1176,7 +1176,7 @@ public function readAllNotifications(Request $request){
             ];
 
             Mail::to($user->email)->send(new UserConnectionsExportMail($mailData));
-            return response()->json(["message" => "The connections list has been successfully exported and sent to your email for your reference."]);
+            return response()->json(["message" => "The connections list has been successfully exported and sent to your email."]);
             
         }else{
 
