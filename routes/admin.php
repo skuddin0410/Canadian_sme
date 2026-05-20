@@ -184,6 +184,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     ->name('attendee-users.sendMail');
   Route::post('/attendee-users/bulk-action', [AttendeeUserController::class, 'bulkAction'])
     ->name('attendee-users.bulkAction');
+  Route::post('/attendee-users/bulk-selection-count', [AttendeeUserController::class, 'bulkSelectionCount'])
+    ->name('attendee-users.bulkSelectionCount');
 
   Route::post('/attendee-users/schedule-email', [AttendeeUserController::class, 'scheduleEmail'])
     ->name('attendee-users.scheduleEmail');
