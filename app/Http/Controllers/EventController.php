@@ -108,6 +108,7 @@ class EventController extends Controller
             'slug' => 'required|string|unique:events,slug',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
+            'timezone' => 'required|timezone',
             'map_query' => 'nullable|string|max:500',
             'about' => 'nullable|string',
             'terms_condition' => 'nullable|string',
@@ -411,6 +412,7 @@ class EventController extends Controller
             'slug' => 'nullable|string|unique:events,slug,' . $event->id,
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'timezone' => 'required|timezone',
             'map_query' => 'nullable|string|max:500',
             'about' => 'nullable|string',
             'privacy_policy' => 'nullable|string',
@@ -467,6 +469,7 @@ class EventController extends Controller
         $event->slug         = $validated['slug'] ?? $event->slug;
         $event->description  = $validated['description'] ?? null;
         $event->location     = $validated['location'] ?? null;
+        $event->timezone     = $validated['timezone'];
         $event->map_query    = !empty($validated['map_query']) ? trim($validated['map_query']) : null;
         $event->start_date   = $validated['start_date'];
         $event->end_date     = $validated['end_date'];

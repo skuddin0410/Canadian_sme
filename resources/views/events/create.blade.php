@@ -107,6 +107,45 @@
             </div>
           </div>
           </div>
+
+           @php
+             $defaultTimezone = old('timezone', $e->timezone ?? config('app.timezone'));
+             $preferredTimezones = [
+               'America/Toronto',
+               'America/New_York',
+               'America/Chicago',
+               'America/Denver',
+               'America/Los_Angeles',
+               'America/Vancouver',
+               'Europe/London',
+               'Europe/Paris',
+               'Asia/Dubai',
+               'Asia/Kolkata',
+               'Asia/Singapore',
+               'Australia/Sydney',
+               'UTC',
+             ];
+             $timezoneOptions = array_values(array_unique(array_merge($preferredTimezones, \DateTimeZone::listIdentifiers())));
+           @endphp
+
+           <div class="row">
+            <div class="col-12">
+              <div class="mb-3">
+                <label class="form-label" for="timezone">Time Zone<span class="text-danger">*</span></label>
+                <div class="input-group input-group-merge">
+                  <span id="title-icon" class="input-group-text"><i class="bx bx-world"></i></span>
+                  <select class="form-control" name="timezone" id="timezone">
+                    @foreach($timezoneOptions as $timezone)
+                      <option value="{{ $timezone }}" @selected($defaultTimezone === $timezone)>{{ $timezone }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                @if ($errors->has('timezone'))
+                  <span class="text-danger text-left">{{ $errors->first('timezone') }}</span>
+                @endif
+              </div>
+            </div>
+           </div>
              
            <div class="row">
   <div class="col-6">
