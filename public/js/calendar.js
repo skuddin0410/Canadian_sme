@@ -280,6 +280,9 @@ class LaravelEventCalendar {
                     status: session.extendedProps.status,
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
+                    timezone: session.extendedProps.timezone || this.config.timezone,
+                    start_input: session.extendedProps.start_input || '',
+                    end_input: session.extendedProps.end_input || '',
                     speakers: session.extendedProps.speakers || [],
                     exhibitors: session.extendedProps.exhibitors || [],
                     sponsors: session.extendedProps.sponsors || [],
@@ -528,6 +531,7 @@ class LaravelEventCalendar {
             document.getElementById('venueSelect').value = eventData.extendedProps?.location || '';
             document.getElementById('status').value = eventData.extendedProps?.status || 'draft';
             document.getElementById('tracks').value = eventData.extendedProps?.track || '';
+            document.getElementById('sessionTimezone').value = eventData.extendedProps?.timezone || this.config.timezone || 'UTC';
             //document.getElementById('keynote2').value = eventData.extendedProps?.keynote || '';
             //document.getElementById('panels2').value = eventData.extendedProps?.demoes || '';
             //document.getElementById('demoes2').value = eventData.extendedProps?.panels || '';
@@ -549,10 +553,10 @@ class LaravelEventCalendar {
         }
 
         if (eventData.start) {
-            document.getElementById('startTime').value = moment(eventData.start).format('YYYY-MM-DDTHH:mm');
+            document.getElementById('startTime').value = eventData.extendedProps?.start_input || moment(eventData.start).format('YYYY-MM-DDTHH:mm');
         }
         if (eventData.end) {
-            document.getElementById('endTime').value = moment(eventData.end).format('YYYY-MM-DDTHH:mm');
+            document.getElementById('endTime').value = eventData.extendedProps?.end_input || moment(eventData.end).format('YYYY-MM-DDTHH:mm');
         }
 
         modal.show();
@@ -672,6 +676,9 @@ class LaravelEventCalendar {
                     status: session.extendedProps.status,
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
+                    timezone: session.extendedProps.timezone || this.config.timezone,
+                    start_input: session.extendedProps.start_input || '',
+                    end_input: session.extendedProps.end_input || '',
                     speakers: session.extendedProps.speakers || [],
                     exhibitors: session.extendedProps.exhibitors || [],
                     sponsors: session.extendedProps.sponsors || [],
@@ -714,6 +721,9 @@ class LaravelEventCalendar {
                     status: session.extendedProps.status,
                     venue:  session.extendedProps.venue,
                     venue_id: session.extendedProps.venue_id,
+                    timezone: session.extendedProps.timezone || this.config.timezone,
+                    start_input: session.extendedProps.start_input || '',
+                    end_input: session.extendedProps.end_input || '',
                     speakers: session.extendedProps.speakers || [],
                     exhibitors: session.extendedProps.exhibitors || [],
                     sponsors: session.extendedProps.sponsors || [],
@@ -760,17 +770,8 @@ class LaravelEventCalendar {
 
             const sessionData = Object.fromEntries(formData.entries());
 
-            // Attach browser timezone offset so server knows the exact moment
-            // e.g. '2026-04-24T16:00' becomes '2026-04-24T16:00:00+05:30'
-            if (sessionData.start_time) {
-                sessionData.start_time = moment(sessionData.start_time).format();
-            }
-            if (sessionData.end_time) {
-                sessionData.end_time = moment(sessionData.end_time).format();
-            }
-
             // Validate required fields
-            if (!sessionData.title || !sessionData.start_time || !sessionData.end_time) {
+            if (!sessionData.title || !sessionData.start_time || !sessionData.end_time || !sessionData.timezone) {
                 this.showAlert('Please fill in all required fields', 'danger');
                 return;
             }
@@ -1168,6 +1169,7 @@ class LaravelEventCalendar {
         if (form) {
             form.reset();
             document.getElementById('sessionId').value = '';
+            document.getElementById('sessionTimezone').value = this.config.timezone || 'UTC';
        
             const preview = document.getElementById('profileImagePreview');
             preview.src = '';  // Clear the base64 image
@@ -1175,7 +1177,11 @@ class LaravelEventCalendar {
           
         }
         this.selectedSpeakers = [];
+        this.selectedExhibitors = [];
+        this.selectedSponsors = [];
         this.renderSelectedSpeakers();
+        this.renderSelectedExhibitors();
+        this.renderSelectedSponsors();
     }
 
     showAlert(message, type = 'success') {

@@ -234,6 +234,37 @@
                             <input type="datetime-local" class="form-control" id="endTime" name="end_time" required>
                         </div>
 
+                        <div class="col-md-6">
+                            <label for="sessionTimezone" class="form-label">Time Zone *</label>
+                            <select class="form-select" id="sessionTimezone" name="timezone" required>
+                                @php
+                                    $defaultTimezone = config('app.timezone');
+                                    $preferredTimezones = [
+                                        'America/Toronto',
+                                        'America/New_York',
+                                        'America/Chicago',
+                                        'America/Denver',
+                                        'America/Los_Angeles',
+                                        'America/Vancouver',
+                                        'Europe/London',
+                                        'Europe/Paris',
+                                        'Asia/Dubai',
+                                        'Asia/Kolkata',
+                                        'Asia/Singapore',
+                                        'Australia/Sydney',
+                                        'UTC',
+                                    ];
+                                    $allTimezones = \DateTimeZone::listIdentifiers();
+                                    $timezoneOptions = array_values(array_unique(array_merge($preferredTimezones, $allTimezones)));
+                                @endphp
+                                @foreach($timezoneOptions as $timezone)
+                                    <option value="{{ $timezone }}" {{ $timezone === $defaultTimezone ? 'selected' : '' }}>
+                                        {{ $timezone }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
 
                       {{--   <div class="col-md-6">
                             <label for="capacity" class="form-label">Capacity</label>
