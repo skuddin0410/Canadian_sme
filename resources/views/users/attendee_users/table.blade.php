@@ -353,7 +353,14 @@ function submitBadgeAction() {
 }
 
 function submitBadgeActionNew() {
-    const selectedBadgeId = $('#badge_id').val();
+    let selectedBadgeId = $('#badge_id').val();
+    if (!selectedBadgeId) {
+        selectedBadgeId = $('#badge_id option:eq(1)').val();
+        if (selectedBadgeId) {
+            $('#badge_id').val(selectedBadgeId);
+        }
+    }
+
     if (!selectedBadgeId) {
         Swal.fire('Badge Required', 'Please select a badge template first.', 'warning');
         return;
