@@ -6,17 +6,64 @@ use Illuminate\Http\Request;
 use App\Models\MailLog;
 use App\Models\EmailEngagement;
 use App\Mail\CustomSpeakerMail;
+use App\Models\Event;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use  Illuminate\Support\Facades\Log;
 
 class EmailTrackingController extends Controller
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        $baseQuery = MailLog::query();
+        $baseQuery = MailLog::query()->with('user');
         if (!isSuperAdmin()) {
             $baseQuery->where('send_by', auth()->id());
+        }
+
+        if ($request->filled('event_id')) {
+            $eventId = (int) $request->event_id;
+            if (!isSuperAdmin() && !in_array($eventId, getEventIds())) {
+                $eventId = 0;
+            }
+
+            $baseQuery->whereHas('user.eventAndEntityLinks', function ($query) use ($eventId) {
+                $query->where('event_id', $eventId)
+                    ->where('entity_type', 'users');
+            });
+        }
+
+        if ($request->filled('user_id')) {
+            $baseQuery->where('user_id', (int) $request->user_id);
+        }
+
+        if ($request->filled('q')) {
+            $search = trim($request->q);
+            $baseQuery->where(function ($query) use ($search) {
+                $query->where('email', 'like', '%' . $search . '%')
+                    ->orWhere('subject', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('lastname', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%')
+                            ->orWhereRaw("CONCAT(name, ' ', lastname) LIKE ?", ["%{$search}%"]);
+                    });
+            });
+        }
+
+        if ($request->filled('opened_status')) {
+            if ($request->opened_status === 'opened') {
+                $baseQuery->where('opened', true);
+            } elseif ($request->opened_status === 'unopened') {
+                $baseQuery->where('opened', false);
+            }
+        }
+
+        if ($request->filled('date_from')) {
+            $baseQuery->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $baseQuery->whereDate('created_at', '<=', $request->date_to);
         }
 
         $totalSent = (clone $baseQuery)->count();
@@ -29,9 +76,23 @@ class EmailTrackingController extends Controller
 
         $clickRate = $totalSent > 0 ? round(($totalClicks / $totalSent) * 100, 2) : 0;
 
-        $emailLogs = (clone $baseQuery)->with('user')
+        $emailLogs = (clone $baseQuery)
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->appends($request->query());
+
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
+
+        $filterUserIds = (clone $baseQuery)
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->pluck('user_id');
+
+        $users = User::whereIn('id', $filterUserIds)
+            ->orderBy('name')
+            ->get(['id', 'name', 'lastname', 'email']);
 
         return view('admin.analytics.email', compact(
             'totalSent',
@@ -39,7 +100,9 @@ class EmailTrackingController extends Controller
             'totalClicks',
             'openRate',
             'clickRate',
-            'emailLogs'
+            'emailLogs',
+            'events',
+            'users'
         ));
     }
   public function trackOpen($mailLogId)
