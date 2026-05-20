@@ -287,6 +287,15 @@
         justify-content: flex-end;
     }
     .pagination-wrap .pagination { margin: 0; }
+
+    .filter-bar {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
 </style>
 
 
@@ -301,6 +310,62 @@
         </div>
         <span class="live-dot">Live data</span>
     </div>
+
+    <form method="GET" action="{{ route('admin.analytics.email') }}" class="filter-bar">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Event</label>
+                <select name="event_id" class="form-select">
+                    <option value="">All Events</option>
+                    @foreach($events as $event)
+                        <option value="{{ $event->id }}" @selected((string) request('event_id') === (string) $event->id)>
+                            {{ $event->title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input
+                    type="text"
+                    name="q"
+                    class="form-control"
+                    value="{{ request('q') }}"
+                    placeholder="Recipient, user, subject">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">User</label>
+                <select name="user_id" class="form-select select2-email-filter" data-placeholder="All Users">
+                    <option value="">All Users</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" @selected((string) request('user_id') === (string) $user->id)>
+                            {{ trim(($user->name ?? '') . ' ' . ($user->lastname ?? '')) ?: $user->email }}{{ $user->email ? ' - ' . $user->email : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Open Status</label>
+                <select name="opened_status" class="form-select">
+                    <option value="">All</option>
+                    <option value="opened" @selected(request('opened_status') === 'opened')>Opened</option>
+                    <option value="unopened" @selected(request('opened_status') === 'unopened')>Unopened</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sent From</label>
+                <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sent To</label>
+                <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+                <a href="{{ route('admin.analytics.email') }}" class="btn btn-outline-secondary w-100">Reset</a>
+            </div>
+        </div>
+    </form>
 
     {{-- ── Stat Cards ── --}}
     <div class="stat-grid">
@@ -425,4 +490,26 @@
     </div>
 
 </div>
+@endsection
+
+@section('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof $ === 'undefined' || !$('.select2-email-filter').length) {
+        return;
+    }
+
+    $('.select2-email-filter').each(function () {
+        $(this).select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: $(this).data('placeholder') || 'Select',
+            allowClear: true,
+        });
+    });
+});
+</script>
 @endsection
