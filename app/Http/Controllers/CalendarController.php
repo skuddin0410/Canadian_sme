@@ -76,7 +76,7 @@ class CalendarController extends Controller
         $start = $request->get('start');
         $end = $request->get('end');
 
-        $query = Session::with(['speakers','exhibitors','sponsors','photo'])
+        $query = Session::with(['speakers','exhibitors','sponsors','photo','event'])
             ->where('event_id', $eventId);
 
         if ($start && $end) {
@@ -91,7 +91,11 @@ class CalendarController extends Controller
 
         
         $events = $sessions->map(function ($session) {
-            $sessionTimezone = data_get($session->metadata, 'timezone', config('app.timezone'));
+            $sessionTimezone = data_get(
+                $session->metadata,
+                'timezone',
+                $session->event->timezone ?? config('app.timezone')
+            );
 
             return [
                 'id' => $session->id,

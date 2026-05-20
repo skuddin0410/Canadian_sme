@@ -410,7 +410,7 @@
         eventName: '{{ $event->title ?? '' }}',
         eventStart: "{{ isset($event) ? $event->start_date->format('Y-m-d') : '' }}",
         eventEnd:  "{{ isset($event) ? $event->end_date->copy()->addDay()->format('Y-m-d') : '' }}",
-        timezone: '{{ config("app.timezone")}}',
+        timezone: '{{ $event->timezone ?? config("app.timezone") }}',
         {{-- tracks: @json($event->tracks), --}}
         venues: @json(isset($event) ? $event->venues : []),
         apiUrls: {
