@@ -91,6 +91,8 @@ class CalendarController extends Controller
 
         
         $events = $sessions->map(function ($session) {
+            $sessionTimezone = data_get($session->metadata, 'timezone', config('app.timezone'));
+
             return [
                 'id' => $session->id,
                 'title' => $session->title,
@@ -120,6 +122,9 @@ class CalendarController extends Controller
                     'type' => $session->type,
                     'venue' => $session->location ,
                     'venue_id' => '' ,
+                    'timezone' => $sessionTimezone,
+                    'start_input' => optional($session->start_time)->copy()->timezone($sessionTimezone)->format('Y-m-d\TH:i'),
+                    'end_input' => optional($session->end_time)->copy()->timezone($sessionTimezone)->format('Y-m-d\TH:i'),
                     'speakers' => $session->speakers->map(function ($speaker) {
                         return [
                             'id' => $speaker->id,
@@ -192,6 +197,7 @@ class CalendarController extends Controller
             'title' => 'required|string|max:255',
             'start_time' => ['required','date'],
             'end_time' => 'required|date|after:start_time',
+            'timezone' => 'required|timezone',
             'track' => 'required',
             'description' => 'nullable|string',
             'speaker_ids' => 'required|array',
@@ -207,23 +213,30 @@ class CalendarController extends Controller
             'end_time.required' => 'End time is required.',
             'end_time.date' => 'End time must be a valid date.',
             'end_time.after' => 'End time must be after start time.',
+            'timezone.required' => 'Please select a timezone.',
+            'timezone.timezone' => 'Please select a valid timezone.',
             'track.required' => 'Please select a track.',
             'description.string' => 'Description must be a valid string.',
             'speaker_ids.required' => 'Please select at least one speaker.',
             'speaker_ids.array' => 'Speakers must be an array.',
             'speaker_ids.*.exists' => 'One or more selected speakers do not exist.'
         ]);
+
+        $sessionTimezone = $request->timezone;
+        $startTime = Carbon::parse($request->start_time, $sessionTimezone)->setTimezone(config('app.timezone'));
+        $endTime = Carbon::parse($request->end_time, $sessionTimezone)->setTimezone(config('app.timezone'));
+
         // Check for venue conflicts
         if ($request->booth_id) {
             $conflicts = Session::where('booth_id', $request->booth_id)
                 ->where('event_id', $request->event_id)
                 ->where('status', '!=', 'cancelled')
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('start_time', [$request->start_time, $request->end_time])
-                          ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                          ->orWhere(function ($q) use ($request) {
-                              $q->where('start_time', '<=', $request->start_time)
-                                ->where('end_time', '>=', $request->end_time);
+                ->where(function ($query) use ($startTime, $endTime) {
+                    $query->whereBetween('start_time', [$startTime, $endTime])
+                          ->orWhereBetween('end_time', [$startTime, $endTime])
+                          ->orWhere(function ($q) use ($startTime, $endTime) {
+                              $q->where('start_time', '<=', $startTime)
+                                ->where('end_time', '>=', $endTime);
                           });
                 })
                 ->exists();
@@ -235,9 +248,12 @@ class CalendarController extends Controller
             }
         }
 
-        $data = $request->except(['speaker_ids','exhibitor_ids','sponsor_ids']);
-        $data['start_time'] = Carbon::parse($request->start_time)->setTimezone(config('app.timezone'));
-        $data['end_time'] = Carbon::parse($request->end_time)->setTimezone(config('app.timezone'));
+        $data = $request->except(['speaker_ids','exhibitor_ids','sponsor_ids','timezone']);
+        $data['start_time'] = $startTime;
+        $data['end_time'] = $endTime;
+        $data['metadata'] = array_merge((array) ($request->input('metadata') ?? []), [
+            'timezone' => $sessionTimezone,
+        ]);
 
         $session = Session::create($data);
         $session->slug = createUniqueSlug('event_sessions', $session->title,'slug', $session->id);
@@ -302,6 +318,7 @@ class CalendarController extends Controller
     'title' => 'required|string|max:255',
     'start_time' => ['required','date'],
     'end_time' => 'required|date|after:start_time',
+    'timezone' => 'required|timezone',
     'track' => 'required',
     'description' => 'nullable|string',
     'speaker_ids' => 'required|array',
@@ -317,6 +334,8 @@ class CalendarController extends Controller
     'end_time.required' => 'End time is required.',
     'end_time.date' => 'End time must be a valid date.',
     'end_time.after' => 'End time must be after start time.',
+    'timezone.required' => 'Please select a timezone.',
+    'timezone.timezone' => 'Please select a valid timezone.',
     'track.required' => 'Please select a track.',
     'description.string' => 'Description must be a valid string.',
     'speaker_ids.required' => 'Please select at least one speaker.',
@@ -324,11 +343,12 @@ class CalendarController extends Controller
     'speaker_ids.*.exists' => 'One or more selected speakers do not exist.'
 ]);
 
+        $sessionTimezone = $request->timezone;
+        $startTime = Carbon::parse($request->start_time, $sessionTimezone)->setTimezone(config('app.timezone'));
+        $endTime = Carbon::parse($request->end_time, $sessionTimezone)->setTimezone(config('app.timezone'));
+
       
         if (( $request->has('start_time') || $request->has('end_time')) && $request->booth_id) {
-            $startTime = $request->start_time ?? $session->start_time;
-            $endTime = $request->end_time ?? $session->end_time;
-            
             $conflicts = Session::where('booth_id', $request->booth_id)
                 ->where('event_id', $session->event_id)
                 ->where('id', '!=', $session->id)
@@ -351,13 +371,12 @@ class CalendarController extends Controller
             }
         }
         
-        $updateData = $request->all();
-        if ($request->has('start_time')) {
-            $updateData['start_time'] = Carbon::parse($request->start_time)->setTimezone(config('app.timezone'));
-        }
-        if ($request->has('end_time')) {
-            $updateData['end_time'] = Carbon::parse($request->end_time)->setTimezone(config('app.timezone'));
-        }
+        $updateData = $request->except(['speaker_ids','exhibitor_ids','sponsor_ids','timezone']);
+        $updateData['start_time'] = $startTime;
+        $updateData['end_time'] = $endTime;
+        $updateData['metadata'] = array_merge((array) ($session->metadata ?? []), (array) ($request->input('metadata') ?? []), [
+            'timezone' => $sessionTimezone,
+        ]);
 
         $session->update($updateData);
 
