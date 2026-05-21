@@ -14,6 +14,86 @@ use App\Models\Speaker;
 
 class CalendarController extends Controller
 {
+    private function accessibleCalendarEventIds(?int $eventId = null): array
+    {
+        if (isSuperAdmin()) {
+            return [];
+        }
+
+        $eventIds = array_map('intval', getEventIds());
+
+        if ($eventId && in_array($eventId, $eventIds, true)) {
+            return [$eventId];
+        }
+
+        return $eventIds;
+    }
+
+    private function getScopedSpeakers(?int $eventId = null)
+    {
+        $eventIds = $this->accessibleCalendarEventIds($eventId);
+
+        $query = Speaker::query()
+            ->select('speakers.id', 'speakers.name', 'speakers.lastname', 'speakers.email')
+            ->with([
+                'eventAndEntityLinks' => function ($query) use ($eventIds) {
+                    if (!isSuperAdmin()) {
+                        $query->whereIn('event_id', $eventIds);
+                    }
+
+                    $query->with('event:id,title');
+                }
+            ])
+            ->orderBy('speakers.created_at', 'DESC');
+
+        if (!isSuperAdmin()) {
+            $query->whereHas('eventAndEntityLinks', function ($query) use ($eventIds) {
+                $query->whereIn('event_id', $eventIds);
+            });
+        }
+
+        return $query->get()->each(function ($speaker) {
+            $speaker->event_names_text = $speaker->eventAndEntityLinks
+                ->pluck('event.title')
+                ->filter()
+                ->unique()
+                ->implode(', ');
+        });
+    }
+
+    private function getScopedCompanies(bool $isSponsor, ?int $eventId = null)
+    {
+        $eventIds = $this->accessibleCalendarEventIds($eventId);
+
+        $query = Company::query()
+            ->select('companies.id', 'companies.name', 'companies.email')
+            ->where('companies.is_sponsor', $isSponsor ? 1 : 0)
+            ->with([
+                'eventAndEntityLinks' => function ($query) use ($eventIds) {
+                    if (!isSuperAdmin()) {
+                        $query->whereIn('event_id', $eventIds);
+                    }
+
+                    $query->with('event:id,title');
+                }
+            ])
+            ->orderBy('companies.created_at', 'DESC');
+
+        if (!isSuperAdmin()) {
+            $query->whereHas('eventAndEntityLinks', function ($query) use ($eventIds) {
+                $query->whereIn('event_id', $eventIds);
+            });
+        }
+
+        return $query->get()->each(function ($company) {
+            $company->event_names_text = $company->eventAndEntityLinks
+                ->pluck('event.title')
+                ->filter()
+                ->unique()
+                ->implode(', ');
+        });
+    }
+
     public function index(Request $request)
     {
         $slug = $request->get('slug');
@@ -38,35 +118,57 @@ class CalendarController extends Controller
         // dd($event, $events);
         
         $booths = Booth::all();
+        $selectedEventId = $event?->id ? (int) $event->id : null;
 
-        $speakers = Speaker::select('id','name')->orderBy('created_at', 'DESC')->get();
-
-        $exhibitors = Company::select('id','name','email')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
-
-        $sponsors = Company::select('id','name','email')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
+        $speakers = $this->getScopedSpeakers($selectedEventId);
+        $exhibitors = $this->getScopedCompanies(false, $selectedEventId);
+        $sponsors = $this->getScopedCompanies(true, $selectedEventId);
         $tracks = Track::orderBy('created_at', 'DESC')->get();
         return view('calendar.index', compact('event','events','speakers','exhibitors','sponsors','booths','tracks'));
     }
 
     public function speakers(Request $request)
     {
+        $speakers = $this->getScopedSpeakers($request->integer('event_id'))->map(function ($speaker) {
+            return [
+                'id' => $speaker->id,
+                'name' => $speaker->full_name,
+                'full_name' => $speaker->full_name,
+                'email' => $speaker->email,
+                'event_names_text' => $speaker->event_names_text,
+            ];
+        });
 
-        $speakers = Speaker::select('id',DB::raw('CONCAT(name, " ", lastname) as name'),'email')->orderBy('created_at', 'DESC')->get();
         return response()->json($speakers);
         
     }
 
     public function exhibitors(Request $request)
     {
+        $exhibitors = $this->getScopedCompanies(false, $request->integer('event_id'))->map(function ($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->name,
+                'email' => $company->email,
+                'event_names_text' => $company->event_names_text,
+            ];
+        });
 
-        $exhibitors = Company::select('id','name','email')->where('is_sponsor',0)->orderBy('created_at', 'DESC')->get();
         return response()->json($exhibitors);
         
     }
 
     public function sponsors(Request $request)
     {
-        $sponsors = Company::select('id','name','email')->where('is_sponsor',1)->orderBy('created_at', 'DESC')->get();
+        $sponsors = $this->getScopedCompanies(true, $request->integer('event_id'))->map(function ($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->name,
+                'email' => $company->email,
+                'event_names_text' => $company->event_names_text,
+            ];
+        });
+
         return response()->json($sponsors);
     }
 
@@ -164,23 +266,20 @@ class CalendarController extends Controller
 
     public function createSession(Request $request): JsonResponse
     {   
-        // dd($request->except(['speaker_ids','exhibitor_ids','sponsor_ids']));
-       
-        $speakerIds = collect($request->all())
-        ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
-        ->values()
-        ->all();
+        $speakerIds = collect($request->input('speaker_ids', []))
+            ->filter(fn ($value) => filled($value))
+            ->values()
+            ->all();
 
-        $exhibitorIds = collect($request->all())
-        ->filter(fn($value, $key) => str_starts_with($key, 'exhibitor_ids['))
-        ->values()
-        ->all();
+        $exhibitorIds = collect($request->input('exhibitor_ids', []))
+            ->filter(fn ($value) => filled($value))
+            ->values()
+            ->all();
 
-        $sponsorIds = collect($request->all())
-        ->filter(fn($value, $key) => str_starts_with($key, 'sponsor_ids['))
-        ->values()
-        ->all();
-        // dd($speakerIds,$exhibitorIds,$sponsorIds);
+        $sponsorIds = collect($request->input('sponsor_ids', []))
+            ->filter(fn ($value) => filled($value))
+            ->values()
+            ->all();
 
         $calendarColors = config('calendar.colors');
 
@@ -291,21 +390,20 @@ class CalendarController extends Controller
 
     public function updateSession(Request $request, Session $session): JsonResponse
     {    
-        
-        $speakerIds = collect($request->all())
-        ->filter(fn($value, $key) => str_starts_with($key, 'speaker_ids['))
-        ->values()
-        ->all();
+        $speakerIds = collect($request->input('speaker_ids', []))
+            ->filter(fn ($value) => filled($value))
+            ->values()
+            ->all();
 
-        $exhibitorIds = collect($request->all())
-        ->filter(fn($value, $key) => str_starts_with($key, 'exhibitor_ids['))
-        ->values()
-        ->all();
+        $exhibitorIds = collect($request->input('exhibitor_ids', []))
+            ->filter(fn ($value) => filled($value))
+            ->values()
+            ->all();
 
-        $sponsorIds = collect($request->all())
-        ->filter(fn($value, $key) => str_starts_with($key, 'sponsor_ids['))
-        ->values()
-        ->all();
+        $sponsorIds = collect($request->input('sponsor_ids', []))
+            ->filter(fn ($value) => filled($value))
+            ->values()
+            ->all();
  
         $request->merge([
          'speaker_ids' =>  $speakerIds,

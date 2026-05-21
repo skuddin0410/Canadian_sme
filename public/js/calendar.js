@@ -24,9 +24,6 @@ class LaravelEventCalendar {
         
         this.initializeCalendar();
         this.bindEvents();
-        this.loadSpeakers();
-        this.loadExhibitor();
-        this.loadSponsors();
         this.loadSessions();
     }
 
@@ -184,29 +181,34 @@ class LaravelEventCalendar {
             this.filterByStatus(e.target.value);
         });
 
-        // Speaker management
-        document.getElementById('addSpeakerBtn')?.addEventListener('click', () => {
-            this.addSelectedSpeaker();
+        // Multi-select entity sync
+        document.getElementById('speakerSelect')?.addEventListener('change', () => {
+            this.syncSelectedSpeakers();
         });
 
-         document.getElementById('addExhibitorBtn')?.addEventListener('click', () => {
-            this.addSelectedExhibitor();
+        document.getElementById('exhibitorSelect')?.addEventListener('change', () => {
+            this.syncSelectedExhibitors();
         });
 
-          document.getElementById('addSponsorBtn')?.addEventListener('click', () => {
-            this.addSelectedSponsor();
+        document.getElementById('sponsorSelect')?.addEventListener('change', () => {
+            this.syncSelectedSponsors();
         });
 
         // Time field auto-calculation
         document.getElementById('startTime')?.addEventListener('change', (e) => {
             this.autoCalculateEndTime(e.target.value);
         });
+
+        document.querySelector('#sessionForm select[name="event_id"]')?.addEventListener('change', () => {
+            this.clearEntitySelections();
+            this.loadSpeakers();
+            this.loadExhibitor();
+            this.loadSponsors();
+        });
     }
 
     async loadSessions() {
         try {
-            this.showLoading(true);
-            
             const response = await this.apiCall('GET', this.config.apiUrls.sessions, {
                 event_id: this.config.eventId
             });
@@ -223,14 +225,14 @@ class LaravelEventCalendar {
         } catch (error) {
             console.error('Error loading sessions:', error);
             this.showAlert('Error loading sessions', 'danger');
-        } finally {
-            this.showLoading(false);
         }
     }
 
     async loadSpeakers() {
         try {
-            const response = await this.apiCall('GET', this.config.apiUrls.speakers);
+            const response = await this.apiCall('GET', this.config.apiUrls.speakers, {
+                event_id: this.getSessionEventId()
+            });
             this.speakers = response.data || response;
             this.populateSpeakerSelect();
         } catch (error) {
@@ -240,7 +242,9 @@ class LaravelEventCalendar {
 
     async loadExhibitor() {
         try {
-            const response = await this.apiCall('GET', this.config.apiUrls.exhibitors);
+            const response = await this.apiCall('GET', this.config.apiUrls.exhibitors, {
+                event_id: this.getSessionEventId()
+            });
             this.exhibitors = response.data || response;
             this.populateExhibitorSelect();
         } catch (error) {
@@ -250,7 +254,9 @@ class LaravelEventCalendar {
 
     async loadSponsors() {
         try {
-            const response = await this.apiCall('GET', this.config.apiUrls.sponsors);
+            const response = await this.apiCall('GET', this.config.apiUrls.sponsors, {
+                event_id: this.getSessionEventId()
+            });
             this.sponsors = response.data || response;
             this.populateSponsorSelect();
         } catch (error) {
@@ -509,7 +515,6 @@ class LaravelEventCalendar {
 
     openSessionModal(eventData = {}) {
         this.isEditing = !!eventData.id;
-        this.selectedSpeakers = [];
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionModal'));
         const title = document.getElementById('modalTitle');
         const deleteBtn = document.getElementById('deleteBtn');
@@ -543,13 +548,9 @@ class LaravelEventCalendar {
             preview.classList.remove('d-none');  // Optionally, hide the preview image
             // Set selected speakers
             this.selectedSpeakers = eventData.extendedProps?.speakers || [];
-            this.renderSelectedSpeakers();
-            
             this.selectedSponsors = eventData.extendedProps?.sponsors || [];
-            this.renderSelectedSponsors();
-
             this.selectedExhibitors = eventData.extendedProps?.exhibitors || [];
-            this.renderSelectedExhibitors();
+            this.applySelectedEntitiesToDropdowns();
         }
 
         if (eventData.start) {
@@ -756,28 +757,26 @@ class LaravelEventCalendar {
             if (base64Image) {
                formData.append('session_image',base64Image)
             }
-            this.selectedSpeakers.forEach((speaker, index) => {
-                formData.append(`speaker_ids[${index}]`, speaker.id);
+            this.collectSelectedValues('speakerSelect').forEach((speakerId, index) => {
+                formData.append(`speaker_ids[${index}]`, speakerId);
             });
           
-            this.selectedExhibitors.forEach((exhibitor, index) => {
-                formData.append(`exhibitor_ids[${index}]`, exhibitor.id);
+            this.collectSelectedValues('exhibitorSelect').forEach((exhibitorId, index) => {
+                formData.append(`exhibitor_ids[${index}]`, exhibitorId);
             });
 
-            this.selectedSponsors.forEach((sponsor, index) => {
-                formData.append(`sponsor_ids[${index}]`, sponsor.id);
+            this.collectSelectedValues('sponsorSelect').forEach((sponsorId, index) => {
+                formData.append(`sponsor_ids[${index}]`, sponsorId);
             });  
 
-            const sessionData = Object.fromEntries(formData.entries());
-
             // Validate required fields
-            if (!sessionData.title || !sessionData.start_time || !sessionData.end_time || !sessionData.timezone) {
+            if (!formData.get('title') || !formData.get('start_time') || !formData.get('end_time') || !formData.get('timezone')) {
                 this.showAlert('Please fill in all required fields', 'danger');
                 return;
             }
 
             // Validate time
-            if (new Date(sessionData.start_time) >= new Date(sessionData.end_time)) {
+            if (new Date(formData.get('start_time')) >= new Date(formData.get('end_time'))) {
                 this.showAlert('End time must be after start time', 'danger');
                 return;
             }
@@ -786,10 +785,11 @@ class LaravelEventCalendar {
 
             let response;
             if (this.isEditing) {
-                const url = this.config.apiUrls.updateSession.replace(':id', sessionData.session_id);
-                response = await this.apiCall('PUT', url, sessionData);
+                formData.append('_method', 'PUT');
+                const url = this.config.apiUrls.updateSession.replace(':id', formData.get('session_id'));
+                response = await this.apiCall('POST', url, formData);
             } else {
-                response = await this.apiCall('POST', this.config.apiUrls.createSession, sessionData);
+                response = await this.apiCall('POST', this.config.apiUrls.createSession, formData);
             }
 
             this.showAlert(
@@ -951,13 +951,20 @@ class LaravelEventCalendar {
         const select = document.getElementById('speakerSelect');
         if (!select) return;
 
-        select.innerHTML = '<option value="">Select a speaker...</option>';
+        select.innerHTML = '';
         this.speakers.forEach(speaker => {
             const option = document.createElement('option');
             option.value = speaker.id;
-            option.textContent = `${speaker.full_name} - ${speaker.email || 'Speaker'}`;
+            const eventSuffix = speaker.event_names_text ? ` | ${speaker.event_names_text}` : '';
+            option.textContent = `${speaker.full_name || speaker.name}${eventSuffix}`;
             select.appendChild(option);
         });
+
+        this.applySelectedEntitiesToDropdowns();
+
+        if (typeof $ !== 'undefined') {
+            $(select).trigger('change.select2');
+        }
     }
 
     populateExhibitorSelect() {
@@ -965,164 +972,127 @@ class LaravelEventCalendar {
         const select = document.getElementById('exhibitorSelect');
         if (!select) return;
 
-        select.innerHTML = '<option value="">Select a exibitor...</option>';
+        select.innerHTML = '';
         this.exhibitors.forEach(exibitor => {
             const option = document.createElement('option');
             option.value = exibitor.id;
-            option.textContent = `${exibitor.name}`;
+            const eventSuffix = exibitor.event_names_text ? ` | ${exibitor.event_names_text}` : '';
+            option.textContent = `${exibitor.name}${eventSuffix}`;
             select.appendChild(option);
         });
+
+        this.applySelectedEntitiesToDropdowns();
+
+        if (typeof $ !== 'undefined') {
+            $(select).trigger('change.select2');
+        }
     }
 
      populateSponsorSelect() {
         const select = document.getElementById('sponsorSelect');
         if (!select) return;
 
-        select.innerHTML = '<option value="">Select a sponsor...</option>';
+        select.innerHTML = '';
         this.sponsors.forEach(sponsor => {
             const option = document.createElement('option');
             option.value = sponsor.id;
-            option.textContent = `${sponsor.name}`;
+            const eventSuffix = sponsor.event_names_text ? ` | ${sponsor.event_names_text}` : '';
+            option.textContent = `${sponsor.name}${eventSuffix}`;
             select.appendChild(option);
         });
+
+        this.applySelectedEntitiesToDropdowns();
+
+        if (typeof $ !== 'undefined') {
+            $(select).trigger('change.select2');
+        }
     }
 
-    addSelectedSpeaker() {
+    addSelectedSpeaker(selectedId = null) {
+        this.syncSelectedSpeakers();
+    }
+
+    addSelectedExhibitor(selectedId = null) {
+        this.syncSelectedExhibitors();
+    }
+
+      addSelectedSponsor(selectedId = null) {
+        this.syncSelectedSponsors();
+    }
+
+    syncSelectedSpeakers() {
         const select = document.getElementById('speakerSelect');
-        const speakerId = select.value;
-        if (!speakerId) return;
-        
-        const speaker = this.speakers.find(s => s.id == speakerId);
-        if (!speaker) return;
+        if (!select) return;
 
-        // Check if speaker is already selected
-        if (this.selectedSpeakers.find(s => s.id == speakerId)) {
-            this.showAlert('Speaker is already selected', 'warning');
-            return;
-        }
-
-        this.selectedSpeakers.push(speaker);
-        this.renderSelectedSpeakers();
-        select.value = '';
+        const selectedIds = Array.from(select.selectedOptions).map((option) => String(option.value));
+        this.selectedSpeakers = this.speakers.filter((speaker) => selectedIds.includes(String(speaker.id)));
     }
 
-    addSelectedExhibitor() {
+    syncSelectedExhibitors() {
         const select = document.getElementById('exhibitorSelect');
-        const exibitorId = select.value;
-        if (!exibitorId) return;
-        
-        const exhibitor = this.exhibitors.find(s => s.id == exibitorId);
-        if (!exhibitor) return;
+        if (!select) return;
 
-        // Check if speaker is already selected
-        if (this.selectedSpeakers.find(s => s.id == exibitorId)) {
-            this.showAlert('Exhibitor is already selected', 'warning');
-            return;
-        }
-
-        this.selectedExhibitors.push(exhibitor);
-        this.renderSelectedExhibitors();
-        select.value = '';
+        const selectedIds = Array.from(select.selectedOptions).map((option) => String(option.value));
+        this.selectedExhibitors = this.exhibitors.filter((exhibitor) => selectedIds.includes(String(exhibitor.id)));
     }
 
-      addSelectedSponsor() {
+    syncSelectedSponsors() {
         const select = document.getElementById('sponsorSelect');
-        const sponsorId = select.value;
-        if (!sponsorId) return;
-        
-        const sponsor = this.sponsors.find(s => s.id == sponsorId);
-        if (!sponsor) return;
+        if (!select) return;
 
-        // Check if speaker is already selected
-        if (this.selectedSponsors.find(s => s.id == sponsorId)) {
-            this.showAlert('Sponsors is already selected', 'warning');
-            return;
-        }
-
-        this.selectedSponsors.push(sponsor);
-        this.renderSelectedSponsors();
-        select.value = '';
+        const selectedIds = Array.from(select.selectedOptions).map((option) => String(option.value));
+        this.selectedSponsors = this.sponsors.filter((sponsor) => selectedIds.includes(String(sponsor.id)));
     }
 
+    applySelectedEntitiesToDropdowns() {
+        const speakerSelect = document.getElementById('speakerSelect');
+        const exhibitorSelect = document.getElementById('exhibitorSelect');
+        const sponsorSelect = document.getElementById('sponsorSelect');
 
-    renderSelectedSpeakers() {
-        const container = document.getElementById('selectedSpeakers');
-        if (!container) return;
-
-        if (this.selectedSpeakers.length === 0) {
-            container.innerHTML = '<div class="text-muted small">No speakers selected</div>';
-            return;
+        if (speakerSelect) {
+            const speakerIds = this.selectedSpeakers.map((speaker) => String(speaker.id));
+            Array.from(speakerSelect.options).forEach((option) => {
+                option.selected = speakerIds.includes(String(option.value));
+            });
         }
 
-        container.innerHTML = this.selectedSpeakers.map((speaker, index) => `
-            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
-                <div>
-                    <strong>${speaker.name}</strong>
-                    ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSpeaker(${index})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `).join('');
-    }
-
-    renderSelectedExhibitors() {
-        const container = document.getElementById('selectedExhibitors');
-        if (!container) return;
-
-        if (this.selectedExhibitors.length === 0) {
-            container.innerHTML = '<div class="text-muted small">No exhibitors selected</div>';
-            return;
+        if (exhibitorSelect) {
+            const exhibitorIds = this.selectedExhibitors.map((exhibitor) => String(exhibitor.id));
+            Array.from(exhibitorSelect.options).forEach((option) => {
+                option.selected = exhibitorIds.includes(String(option.value));
+            });
         }
 
-        container.innerHTML = this.selectedExhibitors.map((speaker, index) => `
-            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
-                <div>
-                    <strong>${speaker.name}</strong>
-                    ${speaker.title ? `<span class="text-muted">- ${speaker.title}</span>` : ''}
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeExhibitor(${index})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `).join('');
-    }
-
-    renderSelectedSponsors() {
-        const container = document.getElementById('selectedSponsors');
-        if (!container) return;
-
-        if (this.selectedSponsors.length === 0) {
-            container.innerHTML = '<div class="text-muted small">No exhibitors selected</div>';
-            return;
+        if (sponsorSelect) {
+            const sponsorIds = this.selectedSponsors.map((sponsor) => String(sponsor.id));
+            Array.from(sponsorSelect.options).forEach((option) => {
+                option.selected = sponsorIds.includes(String(option.value));
+            });
         }
-
-        container.innerHTML = this.selectedSponsors.map((sponsor, index) => `
-            <div class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-1">
-                <div>
-                    <strong>${sponsor.name}</strong>
-                    ${sponsor.title ? `<span class="text-muted">- ${sponsor.title}</span>` : ''}
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eventCalendar.removeSponsor(${index})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `).join('');
     }
+
 
     removeSpeaker(index) {
         this.selectedSpeakers.splice(index, 1);
-        this.renderSelectedSpeakers();
+        this.applySelectedEntitiesToDropdowns();
+        if (typeof $ !== 'undefined') {
+            $('#speakerSelect').trigger('change.select2');
+        }
     }
 
     removeSponsor(index) {
         this.selectedSponsors.splice(index, 1);
-        this.renderSelectedSponsors();
+        this.applySelectedEntitiesToDropdowns();
+        if (typeof $ !== 'undefined') {
+            $('#sponsorSelect').trigger('change.select2');
+        }
     }
     removeExhibitor(index) {
         this.selectedExhibitors.splice(index, 1);
-        this.renderSelectedExhibitors();
+        this.applySelectedEntitiesToDropdowns();
+        if (typeof $ !== 'undefined') {
+            $('#exhibitorSelect').trigger('change.select2');
+        }
     }
     
 
@@ -1179,9 +1149,29 @@ class LaravelEventCalendar {
         this.selectedSpeakers = [];
         this.selectedExhibitors = [];
         this.selectedSponsors = [];
-        this.renderSelectedSpeakers();
-        this.renderSelectedExhibitors();
-        this.renderSelectedSponsors();
+        this.applySelectedEntitiesToDropdowns();
+    }
+
+    clearEntitySelections() {
+        this.selectedSpeakers = [];
+        this.selectedExhibitors = [];
+        this.selectedSponsors = [];
+        this.applySelectedEntitiesToDropdowns();
+    }
+
+    getSessionEventId() {
+        const sessionEventSelect = document.querySelector('#sessionForm select[name="event_id"]');
+
+        return sessionEventSelect?.value || this.config.eventId || 0;
+    }
+
+    collectSelectedValues(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return [];
+
+        return Array.from(select.selectedOptions)
+            .map((option) => option.value)
+            .filter((value) => value !== '');
     }
 
     showAlert(message, type = 'success') {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventAndEntityLink extends Model
 {
@@ -14,10 +15,8 @@ class EventAndEntityLink extends Model
         'entity_id',
     ];
 
-    // You can define any necessary relationships here as well, e.g., 
-    // if you need to fetch related `event` data, you can use:
-    // public function event()
-    // {
-    //     return $this->belongsTo(Event::class, 'event_id');
-    // }
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'event_id');
+    }
 }
