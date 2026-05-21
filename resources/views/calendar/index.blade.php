@@ -8,6 +8,8 @@
 @section('content')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 
 <style>
   .dz{
@@ -45,6 +47,18 @@
 
 .event-tooltip .tooltip {
     font-weight: 500;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+  min-height: calc(2.25rem + 2px);
+}
+
+#sessionModal .select2-container {
+  width: 100% !important;
+}
+
+#sessionModal .select2-dropdown {
+  z-index: 2000;
 }
 </style>
 <div class="container">
@@ -276,51 +290,51 @@
                         <div class="col-4">
                             <label class="form-label">Choose Speakers *</label>
                             <div id="speakerSelection">
-                                <div class="input-group mb-2">
-                                    <select class="form-select" id="speakerSelect">
+                                <div class="mb-2">
+                                    <select class="form-select session-select2" id="speakerSelect" data-placeholder="Select speakers..." multiple>
                                         <option value="">Select a speaker...</option>
                                          @foreach($speakers as $speaker)
-                                          <option value="{{ $speaker->id }}">{{ $speaker->full_name }}</option>
+                                          <option value="{{ $speaker->id }}">
+                                              {{ $speaker->full_name }}@if($speaker->event_names_text) | {{ $speaker->event_names_text }}@endif
+                                          </option>
                                          @endforeach 
                                        
                                     </select>
-                                    <button type="button" class="btn btn-outline-secondary" id="addSpeakerBtn">Add</button>
                                 </div>
-                                 <div id="selectedSpeakers"></div>
                             </div>
                         </div>
 
                          <div class="col-4">
                             <label class="form-label">Link Exhibitors </label>
                             <div id="exhibitorSelection">
-                                <div class="input-group mb-2">
-                                    <select class="form-select" id="exhibitorSelect">
+                                <div class="mb-2">
+                                    <select class="form-select session-select2" id="exhibitorSelect" data-placeholder="Select exhibitors..." multiple>
                                         <option value="">Select a exhibitor...</option>
                                          @foreach($exhibitors as $exhibitor)
-                                          <option value="{{ $exhibitor->id }}">{{ $exhibitor->name }}</option>
+                                          <option value="{{ $exhibitor->id }}">
+                                              {{ $exhibitor->name }}@if($exhibitor->event_names_text) | {{ $exhibitor->event_names_text }}@endif
+                                          </option>
                                          @endforeach 
                                        
                                     </select>
-                                    <button type="button" class="btn btn-outline-secondary" id="addExhibitorBtn">Add</button>
                                 </div>
-                                 <div id="selectedExhibitors"></div>
                             </div>
                         </div>
 
                         <div class="col-4">
                             <label class="form-label">Link Sponsors</label>
                             <div id="SponsorSelection">
-                                <div class="input-group mb-2">
-                                    <select class="form-select" id="sponsorSelect">
+                                <div class="mb-2">
+                                    <select class="form-select session-select2" id="sponsorSelect" data-placeholder="Select sponsors..." multiple>
                                         <option value="">Select a sponsors...</option>
                                          @foreach($sponsors as $sponsor)
-                                          <option value="{{ $sponsor->id }}">{{ $sponsor->name }}</option>
+                                          <option value="{{ $sponsor->id }}">
+                                              {{ $sponsor->name }}@if($sponsor->event_names_text) | {{ $sponsor->event_names_text }}@endif
+                                          </option>
                                          @endforeach 
                                        
                                     </select>
-                                    <button type="button" class="btn btn-outline-secondary" id="addSponsorBtn">Add</button>
                                 </div>
-                                 <div id="selectedSponsors"></div>
                             </div>
                         </div>
                         <div class="col-12">
@@ -426,6 +440,45 @@
     };
 </script>
 <script src="{{ asset('js/calendar.js') }}?v={{ time() }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof $ === 'undefined') {
+      return;
+    }
+
+    const $sessionModal = $('#sessionModal');
+
+    function initSessionSelect2() {
+      $('.session-select2').each(function () {
+        const $select = $(this);
+
+        if ($select.hasClass('select2-hidden-accessible')) {
+          $select.select2('destroy');
+        }
+
+        $select.select2({
+          theme: 'bootstrap-5',
+          width: '100%',
+          dropdownParent: $sessionModal.find('.modal-content'),
+          placeholder: $select.data('placeholder') || 'Search...',
+          allowClear: true,
+          closeOnSelect: false
+        });
+      });
+    }
+
+    initSessionSelect2();
+
+    $sessionModal.on('shown.bs.modal', function () {
+      initSessionSelect2();
+    });
+
+    $(document).on('select2:open', '.session-select2', function () {
+      document.querySelector('.select2-container--open .select2-search__field')?.focus();
+    });
+  });
+</script>
 
 <script>
   (function () {
