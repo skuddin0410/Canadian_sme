@@ -31,11 +31,19 @@ class LandingController extends Controller
         return "https://www.google.com/maps/embed/v1/place?key={$googleApiKey}&q=" . urlencode($query);
     }
 
+    protected function orderedSessionsQuery(?int $eventId = null)
+    {
+        return Session::query()
+            ->when($eventId, fn ($query) => $query->where('event_id', $eventId))
+            ->orderBy('start_time', 'ASC')
+            ->orderBy('end_time', 'ASC')
+            ->orderBy('id', 'ASC');
+    }
+
     protected function eventSidebarData(Event $event): array
     {
-        $sessions = Session::where('start_time', '>=', now())
-            ->where('event_id', $event->id)
-            ->inRandomOrder()
+        $sessions = $this->orderedSessionsQuery($event->id)
+            ->where('start_time', '>=', now())
             ->take(2)
             ->get();
 
@@ -250,18 +258,13 @@ class LandingController extends Controller
         // ---- Sessions for this event only ----
         // $sessionIds = $linkedIds('session');
 
-        $session = Session::with(['photo', 'speakers', 'exhibitors', 'sponsors', 'attendees'])
-            // ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
-            ->where('event_id', $event->id) // direct filter by event_id
+        $session = $this->orderedSessionsQuery($event->id)
+            ->with(['photo', 'speakers', 'exhibitors', 'sponsors', 'attendees'])
             ->where('start_time', '>=', now())
-            ->orderBy('start_time', 'ASC')
             ->first();
 
-        $schedules = Session::query()
-            // ->when(!empty($sessionIds), fn ($q) => $q->whereIn('id', $sessionIds))
-            ->where('event_id', $event->id) // direct filter by event_id
+        $schedules = $this->orderedSessionsQuery($event->id)
             ->where('start_time', '>=', now())
-            ->orderBy('start_time', 'ASC')
             ->take(6)
             ->get();
 
@@ -520,7 +523,11 @@ class LandingController extends Controller
         // 🔹 Get ALL sessions (filtered by event)
         $allSessionsQuery = Session::with(['photo', 'speakers', 'exhibitors', 'sponsors', 'attendees']);
         $allSessionsQuery->where('event_id', $event->id);
-        $allSessions = $allSessionsQuery->orderBy('start_time', 'ASC')->get();
+        $allSessions = $allSessionsQuery
+            ->orderBy('start_time', 'ASC')
+            ->orderBy('end_time', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->get();
 
         // 🔹 Get filtered sessions (today / next available date)
         $schedules = $this->schedules($slug);
@@ -536,11 +543,7 @@ class LandingController extends Controller
         $startOfYear = $now->copy()->startOfYear();
         $endOfYear   = $now->copy()->endOfYear();
 
-        $baseQuery = Session::with(['speakers']);
-
-        if ($event) {
-            $baseQuery->where('event_id', $event->id);
-        }
+        $baseQuery = $this->orderedSessionsQuery($event?->id)->with(['speakers']);
 
         // Try to fetch sessions within the current year (ongoing or upcoming)
         $schedules = (clone $baseQuery)
@@ -552,14 +555,12 @@ class LandingController extends Controller
                             ->where('start_time', '>=', $now);
                     });
             })
-            ->orderBy('start_time')
             ->paginate(10);
 
         // If no sessions found, fetch from next available date
         if ($schedules->isEmpty()) {
             $nextSession = (clone $baseQuery)
                 ->where('start_time', '>', $endOfYear)
-                ->orderBy('start_time')
                 ->first();
 
             if ($nextSession) {
@@ -567,7 +568,6 @@ class LandingController extends Controller
 
                 $schedules = (clone $baseQuery)
                     ->whereDate('start_time', $targetDate)
-                    ->orderBy('start_time')
                     ->paginate(10);
             }
         }
@@ -605,13 +605,8 @@ class LandingController extends Controller
             $event = Event::with('photo')->first();
         }
 
-        $sessionsQuery = Session::query();
-        if ($event) {
-            $sessionsQuery->where('event_id', $event->id);
-        }
-
-        $sessions = $sessionsQuery->where('start_time', '>=', now())
-            ->inRandomOrder()
+        $sessions = $this->orderedSessionsQuery($event?->id)
+            ->where('start_time', '>=', now())
             ->take(2)
             ->get();
 
@@ -626,8 +621,11 @@ class LandingController extends Controller
             ->join('session_speakers as ss', 'es.id', '=', 'ss.session_id')
             ->where('ss.speaker_id', $speaker->id)
             ->where('es.start_time', '>', now())
-            ->orderBy('es.start_time', 'asc')
             ->select('es.*')
+            ->distinct()
+            ->orderBy('es.start_time', 'asc')
+            ->orderBy('es.end_time', 'asc')
+            ->orderBy('es.id', 'asc')
             ->get();
 
         // Get the specific event context
@@ -657,8 +655,11 @@ class LandingController extends Controller
             ->join('session_exhibitors as ss', 'es.id', '=', 'ss.session_id')
             ->where('ss.company_id', $company->id)
             ->where('es.start_time', '>', now())
-            ->orderBy('es.start_time', 'asc')
             ->select('es.*')
+            ->distinct()
+            ->orderBy('es.start_time', 'asc')
+            ->orderBy('es.end_time', 'asc')
+            ->orderBy('es.id', 'asc')
             ->get();
 
         // Get the specific event context
@@ -688,8 +689,11 @@ class LandingController extends Controller
             ->join('session_sponsors as ss', 'es.id', '=', 'ss.session_id')
             ->where('ss.company_id', $company->id)
             ->where('es.start_time', '>', now())
-            ->orderBy('es.start_time', 'asc')
             ->select('es.*')
+            ->distinct()
+            ->orderBy('es.start_time', 'asc')
+            ->orderBy('es.end_time', 'asc')
+            ->orderBy('es.id', 'asc')
             ->get();
 
         // Get the specific event context
