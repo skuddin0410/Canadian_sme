@@ -13,9 +13,9 @@
          <div class="mb-4 d-flex justify-content-between align-items-center">
 
         <div>
-        <a href="{{ route('user-connections.export', $user->id) }}" class="btn btn-success"><i class="bi bi-download"></i> Export CSV</a>
+        <a href="{{ route('user-connections.export', ['user' => $user->id, 'event_id' => request('event_id')]) }}" class="btn btn-success"><i class="bi bi-download"></i> Export CSV</a>
 
-        <a href="{{ route('user-connections.index') }}" class="btn btn-primary"><i class="fa fa-arrow-left me-1"></i>Back</a>
+        <a href="{{ route('user-connections.index', ['event_id' => request('event_id')]) }}" class="btn btn-primary"><i class="fa fa-arrow-left me-1"></i>Back</a>
 
         </div>
     </div>
