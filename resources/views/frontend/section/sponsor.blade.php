@@ -2,6 +2,15 @@
     <section class="sponsors">
         <div class="container">
             <span class="small-heading-white">Sponsors</span>
+            @if(!empty($event->sponsorBanner) && !empty($event->sponsorBanner->file_path))
+                <div class="mb-4 mb-lg-5">
+                    <img
+                        src="{{ $event->sponsorBanner->file_path }}"
+                        alt="{{ $event->title ?? 'Sponsor Banner' }}"
+                        class="img-fluid w-100 sponsor-banner-image"
+                    >
+                </div>
+            @endif
             <div class="row">
                 <div class="col-lg-6">
                     <div>
@@ -105,4 +114,12 @@
     color: #fff;
 }
 
+</style>
+
+<style>
+.sponsor-banner-image {
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 20px;
+}
 </style>
