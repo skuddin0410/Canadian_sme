@@ -40,6 +40,33 @@ class LandingController extends Controller
             ->orderBy('id', 'ASC');
     }
 
+    protected function prioritizedThenRandom($baseQuery, int $limit)
+    {
+        $prioritized = (clone $baseQuery)
+            ->whereNotNull('order_by')
+            ->orderBy('order_by', 'ASC')
+            ->orderBy('id', 'DESC')
+            ->take($limit)
+            ->get();
+
+        $remaining = $limit - $prioritized->count();
+
+        if ($remaining <= 0) {
+            return $prioritized;
+        }
+
+        $fallback = (clone $baseQuery)
+            ->where(function ($query) {
+                $query->whereNull('order_by')
+                    ->orWhere('order_by', '');
+            })
+            ->inRandomOrder()
+            ->take($remaining)
+            ->get();
+
+        return $prioritized->concat($fallback);
+    }
+
     protected function eventSidebarData(Event $event): array
     {
         $sessions = $this->orderedSessionsQuery($event->id)
@@ -271,7 +298,7 @@ class LandingController extends Controller
         // ---- Gallery for this event ----
         $galleryItems = GalleryItem::where('event_id', $event->id)
             ->where('is_approved', 1)
-            ->orderBy('id', 'DESC')
+            ->inRandomOrder()
             ->take(12)
             ->get();
 
@@ -279,37 +306,36 @@ class LandingController extends Controller
         $speakerIds = $linkedIds('speakers');
         // dd($speakerIds);
 
-        $speakers = Speaker::query()
+        $speakers = $this->prioritizedThenRandom(
+            Speaker::query()
             ->whereIn('id', $speakerIds)   // ONLY these IDs
-            ->with(['photo'])
-            ->orderBy('order_by', 'ASC')
-            ->orderBy('id', 'DESC')
-            ->take(10)
-            ->get();
+            ->with(['photo']),
+            10
+        );
 
         // ---- Exhibitors for this event only (Company model, is_sponsor = 0) ----
         $exhibitorIds = $linkedIds('companies');
         // dd($exhibitorIds);
 
-        $exhibitors = Company::query()
+        $exhibitors = $this->prioritizedThenRandom(
+            Company::query()
             ->where('is_sponsor', 0)
             ->whereIn('id', $exhibitorIds)   // ONLY these IDs
-            ->orderBy('order_by', 'ASC')
-            ->orderBy('id', 'DESC')
-            ->take(6)
-            ->get();
+            ,
+            6
+        );
 
         // ---- Sponsors for this event only (Company model, is_sponsor = 1) ----
         $sponsorIds = $linkedIds('companies');
         // dd($sponsorIds);
 
-        $sponsors = Company::with(['category'])
+        $sponsors = $this->prioritizedThenRandom(
+            Company::with(['category'])
             ->where('is_sponsor', 1)
             ->whereIn('id', $sponsorIds)   // ONLY these IDs
-            ->orderBy('order_by', 'ASC')
-            ->orderBy('id', 'DESC')
-            ->take(6)
-            ->get();
+            ,
+            6
+        );
 
         // ---- Attendees for this event only ----
         $attendeeIds = $linkedIds('users');
@@ -322,6 +348,7 @@ class LandingController extends Controller
             })
             ->whereNotNull('name')
             ->whereNotNull('slug')
+            ->inRandomOrder()
             ->take(5)
             ->get();
         // dd($attendees);
