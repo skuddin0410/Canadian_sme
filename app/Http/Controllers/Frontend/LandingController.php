@@ -232,7 +232,7 @@ class LandingController extends Controller
         $user = auth()->user();
         $userId = $user?->id;
 
-        $eventQuery = Event::with(['photo'])->where('slug', $slug);
+        $eventQuery = Event::with(['photo', 'sponsorBanner'])->where('slug', $slug);
 
         if ($user && $user->hasRole('Admin')) {
             $eventQuery->select('*')->selectRaw('1 as is_registered');
