@@ -81,7 +81,7 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                <a href="{{ route('user-connections.show', $connection->connection_id) }}" class="btn btn-sm btn-outline-info">
+                                <a href="{{ route('user-connections.show', ['user_connection' => $connection->connection_id, 'event_id' => request('event_id')]) }}" class="btn btn-sm btn-outline-info">
                                     View
                                 </a>
                             </td>

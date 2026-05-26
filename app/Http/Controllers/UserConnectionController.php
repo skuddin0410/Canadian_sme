@@ -43,24 +43,37 @@ class UserConnectionController extends Controller
 
     }
 
-    public function show(UserConnection $userConnection)
-    {   
+    public function show(Request $request, UserConnection $userConnection)
+    {
         $user = User::findOrFail($userConnection->user_id);
         $query = UserConnection::with('connection')->where('user_id', $user->id);
+
         if (!isSuperAdmin()) {
             $query->whereIn('event_id', getEventIds());
         }
+
+        if ($request->filled('event_id')) {
+            $query->where('event_id', $request->event_id);
+        }
+
         $connections = $query->get();
+
         return view('user_connections.show', compact('user', 'connections'));
     }
 
-    public function export($user_id)
+    public function export(Request $request, $user_id)
     {
     $user = User::findOrFail($user_id);
     $query = UserConnection::with('connection')->where('user_id', $user->id);
+
     if (!isSuperAdmin()) {
         $query->whereIn('event_id', getEventIds());
     }
+
+    if ($request->filled('event_id')) {
+        $query->where('event_id', $request->event_id);
+    }
+
     $connections = $query->get();
 
     $filename = 'connections_' . $user->id . '.csv';
