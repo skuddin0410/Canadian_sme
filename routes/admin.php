@@ -99,6 +99,8 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::resource('user-connections', UserConnectionController::class);
   Route::get('/user-connections/{user}/export', [UserConnectionController::class, 'export'])
     ->name('user-connections.export');
+  Route::post('/user-connections/{user}/send-mail', [UserConnectionController::class, 'sendInMail'])
+    ->name('user-connections.send-mail');
 
   Route::any('/webview', [App\Http\Controllers\PageController::class, 'webview'])->name('webview');
   Route::resource('pages',   App\Http\Controllers\PageController::class);

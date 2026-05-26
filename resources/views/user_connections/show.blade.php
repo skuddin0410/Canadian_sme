@@ -14,6 +14,10 @@
 
         <div>
         <a href="{{ route('user-connections.export', ['user' => $user->id, 'event_id' => request('event_id')]) }}" class="btn btn-success"><i class="bi bi-download"></i> Export CSV</a>
+        <form action="{{ route('user-connections.send-mail', ['user' => $user->id, 'event_id' => request('event_id')]) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-warning">Send in Mail</button>
+        </form>
 
         <a href="{{ route('user-connections.index', ['event_id' => request('event_id')]) }}" class="btn btn-primary"><i class="fa fa-arrow-left me-1"></i>Back</a>
 
