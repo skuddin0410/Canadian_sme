@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserConnectionsExportMail;
+use App\Models\Event;
 use App\Models\UserConnection;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\User;
 use DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 
 class UserConnectionController extends Controller
@@ -61,6 +65,45 @@ class UserConnectionController extends Controller
         return view('user_connections.show', compact('user', 'connections'));
     }
 
+    public function sendInMail(Request $request, $user_id)
+    {
+        $user = User::findOrFail($user_id);
+        $query = UserConnection::with('connection')->where('user_id', $user->id);
+
+        if (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
+        }
+
+        if ($request->filled('event_id')) {
+            $query->where('event_id', $request->event_id);
+        }
+
+        $connections = $query->get();
+
+        if ($connections->isEmpty()) {
+            return back()->with('error', 'No connections found for sending.');
+        }
+
+        if (empty($user->email)) {
+            return back()->with('error', 'User email not found.');
+        }
+
+        $mailData = [
+            'csvContent' => $this->buildCsvContent($connections),
+            'filename' => 'connections_' . $user->id . '.csv',
+            'user' => $user,
+            'event' => $request->filled('event_id') ? Event::find($request->event_id) : null,
+        ];
+
+        try {
+            Mail::to($user->email)->send(new UserConnectionsExportMail($mailData));
+        } catch (Exception $e) {
+            return back()->with('error', 'Mail could not be sent. Please check mail configuration.');
+        }
+
+        return back()->with('success', 'Connections CSV has been sent to ' . $user->email . '.');
+    }
+
     public function export(Request $request, $user_id)
     {
     $user = User::findOrFail($user_id);
@@ -111,5 +154,31 @@ class UserConnectionController extends Controller
 
     return Response::stream($callback, 200, $headers);
    }
+
+    private function buildCsvContent($connections): string
+    {
+        $columns = ['Connection Name', 'Email', 'Company', 'Designation', 'Rating', 'Note'];
+        $stream = fopen('php://temp', 'r+');
+        fputcsv($stream, $columns);
+
+        foreach ($connections as $connection) {
+            if (!empty($connection->connection)) {
+                fputcsv($stream, [
+                    $connection->connection->full_name ?? '',
+                    $connection->connection->email ?? '',
+                    $connection->connection->company ?? '',
+                    $connection->connection->designation ?? '',
+                    $connection->rating ?? '',
+                    $connection->note ?? '',
+                ]);
+            }
+        }
+
+        rewind($stream);
+        $csvContent = stream_get_contents($stream);
+        fclose($stream);
+
+        return $csvContent ?: '';
+    }
 
 }
