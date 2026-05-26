@@ -28,8 +28,17 @@
                     <form action="#" class="" method="GET" id="event-guide-filter">        
                         <div class="row">
                             <div class="col-4"></div>
-                            <div class="col-3"></div>          
-                            <div class="col-3 text-center">  
+                            <div class="col-3">
+                                <div class="mb-3">
+                                    <select class="form-select" name="event_id" id="event_id">
+                                        <option value="">All Events</option>
+                                        @foreach($events as $event)
+                                            <option value="{{ $event->id }}">{{ $event->title }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3 text-center">
                                 <div class="mb-3">
                                     <input
                                         type="text"
@@ -103,7 +112,6 @@
 
     // Filter
     $(document).on("click", ".filter", function(e) {
-       var search = $('#search').val();
        $(".spinner-border").fadeIn(300);
        $.ajax({
             url: "{{ route('event-guides.index') }}" + '?' + $("#event-guide-filter").serialize(),

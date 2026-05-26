@@ -35,6 +35,7 @@ Route::get('/payment/success', [PaymentController::class, 'success'])->name('pay
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 Route::middleware(['event.access'])->group(function () {
     Route::get('/gallery/{slug}', [LandingController::class, 'galleryIndex'])->name('gallery-index');
+    Route::get('/event-guide/{slug}', [LandingController::class, 'eventGuideIndex'])->name('event-guide-index');
     Route::get('/schedule/{slug}', [LandingController::class, 'scheduleIndex'])->name('schedule-index');
     Route::get('/session/{slug}', [LandingController::class, 'session'])->name('session');
 

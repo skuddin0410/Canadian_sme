@@ -30,14 +30,30 @@
           <form action="{{ route('event-guides.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
-              
-              {{-- <div class="col-6">
+              <div class="col-6">
                 <div class="mb-3">
-                  <label class="form-label">Category<span class="text-danger">*</span></label>
-                  <input type="text" name="category" class="form-control" value="{{ old('category') }}">
+                  <label class="form-label">Event</label>
+                  <select name="event_id" class="form-select">
+                    @if(isSuperAdmin())
+                      <option value="">Global Guides</option>
+                    @endif
+                    @foreach($events as $event)
+                      <option value="{{ $event->id }}" {{ (string) old('event_id') === (string) $event->id ? 'selected' : '' }}>
+                        {{ $event->title }}
+                      </option>
+                    @endforeach
+                  </select>
+                  @error('event_id') <span class="text-danger">{{ $message }}</span> @enderror
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Section Title</label>
+                  <input type="text" name="category" class="form-control" value="{{ old('category') }}" placeholder="Example: Registration 101 or Files to Download">
                   @error('category') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-              </div> --}}
+              </div>
 
               <div class="col-6">
                 <div class="mb-3">
