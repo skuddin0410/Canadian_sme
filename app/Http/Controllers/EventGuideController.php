@@ -22,6 +22,21 @@ use Illuminate\Support\Facades\Auth;
 
 class EventGuideController extends Controller
 {
+    protected function ensureGuideAccess(EventGuide $eventGuide, bool $allowGlobal = true): void
+    {
+        if (isSuperAdmin()) {
+            return;
+        }
+
+        if (empty($eventGuide->event_id)) {
+            abort($allowGlobal ? 403 : 404);
+        }
+
+        if (!in_array((int) $eventGuide->event_id, getEventIds(), true)) {
+            abort(403);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -30,14 +45,32 @@ class EventGuideController extends Controller
         $perPage = (int) $request->input('perPage', 20);
         $pageNo = (int) $request->input('page', 1);
         $offset = $perPage * ($pageNo - 1);
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
 
         if ($request->ajax() && $request->ajax_request == true) {
-            $guides = EventGuide::orderBy('id', 'DESC');
+            $guides = EventGuide::with('event')->orderBy('id', 'DESC');
+
+            if (!isSuperAdmin()) {
+                $guides->where(function ($query) {
+                    $query->whereIn('event_id', getEventIds())
+                        ->orWhereNull('event_id');
+                });
+            }
+
+            if ($request->filled('event_id')) {
+                $guides->where('event_id', $request->event_id);
+            }
 
             // Search filter
             if ($request->search) {
                 $guides = $guides->where(function ($query) use ($request) {
-                    $query->where('title', 'LIKE', '%' . $request->search . '%');
+                    $query->where('title', 'LIKE', '%' . $request->search . '%')
+                        ->orWhere('category', 'LIKE', '%' . $request->search . '%')
+                        ->orWhereHas('event', function ($eventQuery) use ($request) {
+                            $eventQuery->where('title', 'LIKE', '%' . $request->search . '%');
+                        });
                 });
             }
 
@@ -68,7 +101,7 @@ class EventGuideController extends Controller
             return response($data);
         }
 
-        return view('event_guide.index');
+        return view('event_guide.index', compact('events'));
     }
 
     /**
@@ -76,7 +109,11 @@ class EventGuideController extends Controller
      */
     public function create()
     {
-        return view('event_guide.create');
+        $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
+
+        return view('event_guide.create', compact('events'));
     }
 
     /**
@@ -89,9 +126,10 @@ class EventGuideController extends Controller
 public function store(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        // 'category' => 'required|string|max:255',
+        'event_id'  => 'nullable|exists:events,id',
+        'category' => 'nullable|string|max:255',
         'title'    => 'required|string|max:255',
-        'type'     => 'required|string|max:100',
+        'type'     => 'required|string|max:5000',
         'weblink'  => 'nullable|url|max:255',
         'doc'      => 'nullable|file|mimes:jpg,png,pdf,doc,docx|max:2048',
     ]);
@@ -102,9 +140,24 @@ public function store(Request $request)
             ->withErrors($validator);
     }
 
+    if (!isSuperAdmin()) {
+        if (!$request->filled('event_id')) {
+            return redirect()->route('event-guides.create')
+                ->withInput()
+                ->withErrors(['event_id' => 'Please select an event.']);
+        }
+
+        if (!in_array((int) $request->event_id, getEventIds(), true)) {
+            return redirect()->route('event-guides.create')
+                ->withInput()
+                ->withErrors(['event_id' => 'You cannot assign this event guide to the selected event.']);
+        }
+    }
+
   
     $eventGuide = new EventGuide();
-    // $eventGuide->category = $request->category;
+    $eventGuide->event_id = $request->event_id;
+    $eventGuide->category = $request->category;
     $eventGuide->title    = $request->title;
     $eventGuide->type     = $request->type;
     $eventGuide->weblink  = $request->weblink;
@@ -144,6 +197,7 @@ public function store(Request $request)
     public function show(string $id)
     {
          $eventGuide = EventGuide::findOrFail($id);
+         $this->ensureGuideAccess($eventGuide);
 
         return view('event_guide.view', compact('eventGuide'));
     }
@@ -154,8 +208,12 @@ public function store(Request $request)
     public function edit(string $id)
     {
          $eventGuide = EventGuide::findOrFail($id);
+         $this->ensureGuideAccess($eventGuide, false);
+         $events = isSuperAdmin()
+            ? Event::orderBy('title')->get(['id', 'title'])
+            : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
 
-        return view('event_guide.edit', compact('eventGuide'));
+        return view('event_guide.edit', compact('eventGuide', 'events'));
     }
 
     /**
@@ -164,9 +222,10 @@ public function store(Request $request)
    public function update(Request $request, string $id)
 {
     $validator = Validator::make($request->all(), [
-        // 'category' => 'required|string|max:255',
+        'event_id'  => 'nullable|exists:events,id',
+        'category' => 'nullable|string|max:255',
         'title'    => 'required|string|max:255',
-        'type'     => 'required|string|max:100',
+        'type'     => 'required|string|max:5000',
         'weblink'  => 'nullable|url|max:255',
         'doc'      => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
     ]);
@@ -177,9 +236,25 @@ public function store(Request $request)
             ->withErrors($validator);
     }
 
-    $eventGuide = EventGuide::findOrFail($id);
+    if (!isSuperAdmin()) {
+        if (!$request->filled('event_id')) {
+            return redirect()->route('event-guides.edit', $id)
+                ->withInput()
+                ->withErrors(['event_id' => 'Please select an event.']);
+        }
 
-    // $eventGuide->category = $request->category;
+        if (!in_array((int) $request->event_id, getEventIds(), true)) {
+            return redirect()->route('event-guides.edit', $id)
+                ->withInput()
+                ->withErrors(['event_id' => 'You cannot assign this event guide to the selected event.']);
+        }
+    }
+
+    $eventGuide = EventGuide::findOrFail($id);
+    $this->ensureGuideAccess($eventGuide, false);
+
+    $eventGuide->event_id = $request->event_id;
+    $eventGuide->category = $request->category;
     $eventGuide->title    = $request->title;
     $eventGuide->type     = $request->type;
     $eventGuide->weblink  = $request->weblink;
@@ -216,7 +291,9 @@ public function store(Request $request)
      */
     public function destroy(string $id)
     {
-         EventGuide::findOrFail($id)->delete();
+         $eventGuide = EventGuide::findOrFail($id);
+         $this->ensureGuideAccess($eventGuide, false);
+         $eventGuide->delete();
         return back()->with('success', 'EventGuide deleted successfully.');
         
     }

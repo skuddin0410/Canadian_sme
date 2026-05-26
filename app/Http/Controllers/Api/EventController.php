@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Event;
+use App\Models\EventGuide;
 use App\Http\Requests\EventRequest;
 use App\Http\Resources\EventResource;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\GalleryItem;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -184,6 +186,77 @@ class EventController extends Controller
             'filter'   => $type ?? 'all',
             'total'    => $data->count(),
             'data'     => $data,
+        ]);
+    }
+
+    public function eventGuide(Event $event)
+    {
+        $guides = EventGuide::with(['documentFile'])
+            ->where(function ($query) use ($event) {
+                $query->where('event_id', $event->id)
+                    ->orWhereNull('event_id');
+            })
+            ->orderByRaw("CASE WHEN category IS NULL OR category = '' THEN 1 ELSE 0 END")
+            ->orderBy('category', 'ASC')
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        $downloadGuides = $guides->filter(function ($guide) {
+            $section = Str::lower(trim((string) $guide->category));
+            $hasDownload = !empty($guide->weblink) || !empty($guide->doc) || !empty(optional($guide->documentFile)->file_path);
+
+            return $section === 'files to download' || ($hasDownload && blank($guide->type));
+        })->values();
+
+        $guideSections = $guides
+            ->reject(fn ($guide) => $downloadGuides->contains('id', $guide->id))
+            ->groupBy(function ($guide) {
+                return trim((string) ($guide->category ?: 'Event Guide'));
+            })
+            ->map(function ($items, $sectionTitle) {
+                return [
+                    'title' => $sectionTitle,
+                    'items' => $items->values()->map(function ($guide) {
+                        $fileUrl = optional($guide->documentFile)->file_path;
+
+                        return [
+                            'id' => $guide->id,
+                            'title' => $guide->title,
+                            'description' => $guide->type,
+                            'link' => $guide->weblink,
+                            'file_url' => $fileUrl,
+                            'file_name' => $fileUrl ? basename(parse_url($fileUrl, PHP_URL_PATH)) : null,
+                        ];
+                    }),
+                ];
+            })
+            ->values();
+
+        $downloads = $downloadGuides->map(function ($guide) {
+            $fileUrl = optional($guide->documentFile)->file_path;
+            $downloadUrl = $guide->weblink ?: $fileUrl;
+
+            return [
+                'id' => $guide->id,
+                'section' => $guide->category ?: 'Files to Download',
+                'title' => $guide->title,
+                'description' => $guide->type,
+                'link' => $guide->weblink,
+                'file_url' => $fileUrl,
+                'download_url' => $downloadUrl,
+                'file_name' => $fileUrl ? basename(parse_url($fileUrl, PHP_URL_PATH)) : null,
+            ];
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'event' => [
+                'id' => $event->id,
+                'title' => $event->title,
+                'slug' => $event->slug,
+            ],
+            'sections' => $guideSections,
+            'downloads' => $downloads,
         ]);
     }
 

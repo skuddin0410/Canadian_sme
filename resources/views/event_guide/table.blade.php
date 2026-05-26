@@ -32,7 +32,8 @@
 <table class="table table-striped table-bordered dt-responsive display nowrap">
 <thead>
 	<tr>
-	
+		<th>Event</th>
+		<th>Section</th>
 		<th>Title</th>
 		<th>Type</th>
 		<th width="10%">Action</th>
@@ -41,7 +42,8 @@
 <tbody>	
     @foreach($guides as $guide)
     <tr> 
-     
+        <td>{{ $guide->event->title ?? 'Global Guides' }}</td>
+        <td>{{ $guide->category ?? '-' }}</td>
     	<td>{{ $guide->title }}</td>
     	<td>{{ $guide->type }}</td>
     	
@@ -52,14 +54,18 @@
         
 				</div>
 				<div class="col-4 p-1">
-					<a href="{{ route('event-guides.edit', $guide->id) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit" title="Edit"></i></a>
+                    @if(isSuperAdmin() || !empty($guide->event_id))
+					    <a href="{{ route('event-guides.edit', $guide->id) }}" class="btn btn-sm btn-icon item-edit"><i class="bx bxs-edit" title="Edit"></i></a>
+                    @endif
 				</div>
 				<div class="col-4 p-1">
-					<form action="{{ route('event-guides.destroy', $guide->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this?');">
-						@csrf
-						@method('DELETE')
-						<button type="submit" class="btn btn-sm btn-icon btn-danger"><i class="bx bxs-trash"></i></button>
-					</form>
+                    @if(isSuperAdmin() || !empty($guide->event_id))
+					    <form action="{{ route('event-guides.destroy', $guide->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this?');">
+						    @csrf
+						    @method('DELETE')
+						    <button type="submit" class="btn btn-sm btn-icon btn-danger"><i class="bx bxs-trash"></i></button>
+					    </form>
+                    @endif
 				</div>
 			</div>    
 		</td>
@@ -68,7 +74,7 @@
 
 	@if(count($guides) <= 0)
 	    <tr>
-          <td colspan="7" class="text-center">No data available</td>
+          <td colspan="5" class="text-center">No data available</td>
         </tr>
 	@endif
 </tbody>

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Models\Session;
 use App\Models\Speaker;
+use App\Models\EventGuide;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
@@ -905,6 +906,55 @@ class LandingController extends Controller
             ->paginate(12);
 
         return view('frontend.page.gallery', compact('event', 'galleryItems'));
+    }
+
+    public function eventGuideIndex($slug)
+    {
+        $event = Event::with(['photo'])->where('slug', $slug)->firstOrFail();
+        [$sessions, $event] = $this->eventSidebarData($event);
+
+        $guides = EventGuide::with(['documentFile'])
+            ->where(function ($query) use ($event) {
+                $query->where('event_id', $event->id)
+                    ->orWhereNull('event_id');
+            })
+            ->orderByRaw("CASE WHEN category IS NULL OR category = '' THEN 1 ELSE 0 END")
+            ->orderBy('category', 'ASC')
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        $downloadGuides = $guides->filter(function ($guide) {
+            $section = Str::lower(trim((string) $guide->category));
+            $hasDownload = !empty($guide->weblink) || !empty($guide->doc) || !empty(optional($guide->documentFile)->file_path);
+
+            return $section === 'files to download' || ($hasDownload && blank($guide->type));
+        })->values();
+
+        $guideSections = $guides
+            ->reject(fn ($guide) => $downloadGuides->contains('id', $guide->id))
+            ->groupBy(function ($guide) {
+                return trim((string) ($guide->category ?: 'Event Guide'));
+            });
+
+        $section = 'event-guide';
+        $title = 'Event Guide';
+        $content = null;
+        $showMap = false;
+        $location = $event->location ?? '';
+        $mapUrl = null;
+
+        return view('frontend.venue', compact(
+            'location',
+            'mapUrl',
+            'sessions',
+            'event',
+            'section',
+            'title',
+            'content',
+            'showMap',
+            'guideSections',
+            'downloadGuides'
+        ));
     }
 
     public function search(Request $request)

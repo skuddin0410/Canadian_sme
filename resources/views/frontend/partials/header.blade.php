@@ -37,7 +37,7 @@
                     </button>
                     <ul class="navbar-nav mb-2 mb-md-0 gap-3 gap-lg-5 align-items-center ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link p-0 {{ request()->is('event*') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('user.front.events', ['slug' => $event->slug]) : url('/') }}">Home</a>
+                            <a class="nav-link p-0 {{ request()->routeIs('user.front.events') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('user.front.events', ['slug' => $event->slug]) : url('/') }}">Home</a>
                         </li>
 
 
@@ -52,6 +52,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link p-0 {{ request()->routeIs('event.about') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('event.about', ['slug' => $event->slug]) : '#' }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link p-0 {{ request()->routeIs('event-guide-index') ? 'active' : '' }}" href="{{ isset($event) && !empty($event->slug) ? route('event-guide-index', ['slug' => $event->slug]) : '#' }}">Guide</a>
                         </li>
                         <li class="nav-item">
                             @isset($event)

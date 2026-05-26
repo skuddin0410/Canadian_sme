@@ -18,13 +18,20 @@ class EventGuide extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
+        'event_id',
         'category',
         'title',
         'type',
         'weblink',
         'doc',
     ];
-    public function doc()
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function documentFile()
     {
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'event_guides')

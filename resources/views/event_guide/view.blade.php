@@ -22,8 +22,8 @@
       </p>
 
       <p><strong>Document:</strong> 
-        @if($eventGuide->doc)
-          <a href="{{ asset('storage/event_guides/'.$eventGuide->doc) }}" target="_blank" class="btn btn-sm btn-primary">
+        @if($eventGuide->documentFile?->file_path)
+          <a href="{{ $eventGuide->documentFile->file_path }}" target="_blank" class="btn btn-sm btn-primary">
             View Document
           </a>
         @else

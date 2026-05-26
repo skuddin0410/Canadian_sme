@@ -19,6 +19,7 @@ Route::prefix('password')->group(function () {
 
 Route::get("/all-events", [App\Http\Controllers\Api\EventController::class, 'index']);
 Route::get('/events/{event}/gallery', [EventController::class, 'eventGallery']);
+Route::get('/events/{event}/event-guide', [EventController::class, 'eventGuide']);
 Route::get('/events/{event}/floor-plan', [EventFloorPlanController::class, 'show']);
 
 Route::middleware(['auth:api', 'jwtauth'])->group(function () {

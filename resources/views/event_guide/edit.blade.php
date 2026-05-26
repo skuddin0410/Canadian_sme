@@ -37,8 +37,34 @@
             @method('PUT')
 
             <div class="row">
-            
-          
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="event_id">Event</label>
+                  <select name="event_id" class="form-select" id="event_id">
+                    @if(isSuperAdmin())
+                      <option value="">Global Guides</option>
+                    @endif
+                    @foreach($events as $event)
+                      <option value="{{ $event->id }}" {{ (string) old('event_id', $eventGuide->event_id) === (string) $event->id ? 'selected' : '' }}>
+                        {{ $event->title }}
+                      </option>
+                    @endforeach
+                  </select>
+                  @error('event_id')
+                    <span class="text-danger text-left">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" for="category">Section Title</label>
+                  <input type="text" name="category" id="category" class="form-control" value="{{ old('category', $eventGuide->category) }}" placeholder="Example: Registration 101 or Files to Download">
+                  @error('category')
+                    <span class="text-danger text-left">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
 
               <!-- Title -->
               <div class="col-6">
@@ -80,9 +106,9 @@
                 <div class="mb-3">
                   <label class="form-label" for="doc">Document</label>
                   <input type="file" name="doc" class="form-control" accept=".pdf,.jpg,.png,.doc,.docx">
-                  @if($eventGuide->doc)
+                  @if($eventGuide->documentFile?->file_path)
                     <p class="mt-2">
-                      <a href="{{ asset('storage/event_guides/'.$eventGuide->doc) }}" target="_blank">
+                      <a href="{{ $eventGuide->documentFile->file_path }}" target="_blank">
                        View Current Document
                       </a>
 
