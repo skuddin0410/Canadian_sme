@@ -163,6 +163,7 @@
                <img src="{{ asset('frontend/images/banner.png') }}" alt="Event" class="img-fluid rounded mt-2">
             @endif
             <p class="fw-bold text-muted mt-2">{{ $event->location ?? '' }}</p>
+            <hr>
             <p class="text-muted mt-2">{!! $event->description ?? '' !!}</p>
           </div>
         </div>

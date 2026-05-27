@@ -19,6 +19,10 @@ class RedirectIfNotAuthenticated
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return redirect()->guest(route('admin.login'));
+            }
+
             $eventId = null;
 
             if ($request->route('slug')) {

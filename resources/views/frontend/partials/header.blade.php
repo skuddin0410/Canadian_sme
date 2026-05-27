@@ -78,7 +78,7 @@
                 @else
                 <a class="heroBtn ms-3" @if(auth()->user()->hasRole('Admin')) href="{{ route('home') }}" @else href="{{ route('user.home') }}" @endif>
                     <img class="d-xl-none" src="{{ asset('frontend/images/login.png') }}" alt="">
-                    <span class="d-none d-xl-block">Dashboard</span>
+                    <span class="d-none d-xl-block">{{ auth()->user()->hasRole('Admin') ? 'Dashboard' : 'Profile' }}</span>
                 </a>
                 @endif
 
