@@ -25,6 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminOnly::class,
             'event.access' => \App\Http\Middleware\CheckEventAccess::class,
         ]);
+
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return route('admin.login');
+            }
+
+            return route('login');
+        });
     })->withMiddleware(function (Middleware $middleware) {
         $middleware
         ->web(append: [

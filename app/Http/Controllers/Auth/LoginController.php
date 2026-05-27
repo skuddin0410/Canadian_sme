@@ -108,8 +108,30 @@ class LoginController extends Controller
     $this->middleware('auth')->only('logout');
   }
 
+  public function logout(Request $request)
+  {
+    $user = $this->guard()->user();
+    $wasAdminUser = $user && $user->hasAnyRole([
+      'Admin',
+      'Super Admin',
+      'Exhibitor',
+      'Representative',
+      'Speaker',
+      'Support Staff Or Helpdesk',
+      'Registration Desk',
+    ]);
+
+    $request->attributes->set('was_admin_user', $wasAdminUser);
+
+    return $this->performLogout($request);
+  }
+
   protected function loggedOut(Request $request)
   {
-    return redirect(route('front.landing'));
+    if ($request->attributes->get('was_admin_user')) {
+      return redirect()->route('admin.login');
+    }
+
+    return redirect()->route('front.allEvents');
   }
 }
