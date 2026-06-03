@@ -9,6 +9,16 @@
 .ql-editor {
      width: 100%;
 }
+
+.event-guide-icon-preview {
+     max-width: 100px;
+     max-height: 100px;
+     object-fit: contain;
+     border-radius: 8px;
+     border: 1px solid #d9dee3;
+     padding: 4px;
+     background: #fff;
+}
 </style>
 <div class="container-xxl flex-grow-1 container-p-y pt-0">
   <h4 class="py-3 mb-4"><span class="text-muted fw-light">Add/</span>Event Guide</h4>
@@ -91,6 +101,17 @@
                 </div>
               </div>
 
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Icon (JPG/PNG/SVG/WEBP)</label>
+                  <input type="file" name="icon" id="icon" class="form-control" accept=".jpg,.jpeg,.png,.svg,.webp">
+                  <div class="mt-2 d-none" id="icon-preview-wrapper">
+                    <img src="" alt="Icon preview" id="icon-preview" class="event-guide-icon-preview">
+                  </div>
+                  @error('icon') <span class="text-danger">{{ $message }}</span> @enderror
+                </div>
+              </div>
+
             </div>
 
             <div class="d-flex pt-3 justify-content-end">
@@ -104,4 +125,35 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('icon');
+    const preview = document.getElementById('icon-preview');
+    const wrapper = document.getElementById('icon-preview-wrapper');
+
+    if (!input || !preview || !wrapper) {
+      return;
+    }
+
+    input.addEventListener('change', function (event) {
+      const file = event.target.files && event.target.files[0];
+
+      if (!file) {
+        preview.src = '';
+        wrapper.classList.add('d-none');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        wrapper.classList.remove('d-none');
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+</script>
 @endsection

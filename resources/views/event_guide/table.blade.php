@@ -34,6 +34,7 @@
 	<tr>
 		<th>Event</th>
 		<th>Section</th>
+		<th>Icon</th>
 		<th>Title</th>
 		<th>Type</th>
 		<th width="10%">Action</th>
@@ -44,6 +45,13 @@
     <tr> 
         <td>{{ $guide->event->title ?? 'Global Guides' }}</td>
         <td>{{ $guide->category ?? '-' }}</td>
+        <td>
+          @if($guide->iconFile?->file_path)
+            <img src="{{ $guide->iconFile->file_path }}" alt="{{ $guide->title }} icon" style="width: 42px; height: 42px; object-fit: contain; border-radius: 8px;">
+          @else
+            -
+          @endif
+        </td>
     	<td>{{ $guide->title }}</td>
     	<td>{{ $guide->type }}</td>
     	
@@ -74,7 +82,7 @@
 
 	@if(count($guides) <= 0)
 	    <tr>
-          <td colspan="5" class="text-center">No data available</td>
+          <td colspan="6" class="text-center">No data available</td>
         </tr>
 	@endif
 </tbody>

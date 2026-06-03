@@ -30,6 +30,18 @@
           N/A
         @endif
       </p>
+
+      <p><strong>Icon:</strong>
+        @if($eventGuide->iconFile?->file_path)
+          <div class="mt-2">
+            <a href="{{ $eventGuide->iconFile->file_path }}" target="_blank">
+              <img src="{{ $eventGuide->iconFile->file_path }}" alt="{{ $eventGuide->title }} icon" class="img-fluid rounded border" style="max-width: 140px; max-height: 140px; object-fit: contain;">
+            </a>
+          </div>
+        @else
+          N/A
+        @endif
+      </p>
       {{-- <p><strong>Document:</strong> 
     @if($eventGuide->doc)
         @php

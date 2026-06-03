@@ -191,7 +191,7 @@ class EventController extends Controller
 
     public function eventGuide(Event $event)
     {
-        $guides = EventGuide::with(['documentFile'])
+        $guides = EventGuide::with(['documentFile', 'iconFile'])
             ->where(function ($query) use ($event) {
                 $query->where('event_id', $event->id)
                     ->orWhereNull('event_id');
@@ -218,11 +218,13 @@ class EventController extends Controller
                     'title' => $sectionTitle,
                     'items' => $items->values()->map(function ($guide) {
                         $fileUrl = optional($guide->documentFile)->file_path;
+                        $iconUrl = optional($guide->iconFile)->file_path;
 
                         return [
                             'id' => $guide->id,
                             'title' => $guide->title,
                             'description' => $guide->type,
+                            'icon_url' => $iconUrl,
                             'link' => $guide->weblink,
                             'file_url' => $fileUrl,
                             'file_name' => $fileUrl ? basename(parse_url($fileUrl, PHP_URL_PATH)) : null,
@@ -234,6 +236,7 @@ class EventController extends Controller
 
         $downloads = $downloadGuides->map(function ($guide) {
             $fileUrl = optional($guide->documentFile)->file_path;
+            $iconUrl = optional($guide->iconFile)->file_path;
             $downloadUrl = $guide->weblink ?: $fileUrl;
 
             return [
@@ -241,6 +244,7 @@ class EventController extends Controller
                 'section' => $guide->category ?: 'Files to Download',
                 'title' => $guide->title,
                 'description' => $guide->type,
+                'icon_url' => $iconUrl,
                 'link' => $guide->weblink,
                 'file_url' => $fileUrl,
                 'download_url' => $downloadUrl,
