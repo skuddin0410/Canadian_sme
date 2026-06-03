@@ -50,7 +50,7 @@ class EventGuideController extends Controller
             : Event::whereIn('id', getEventIds())->orderBy('title')->get(['id', 'title']);
 
         if ($request->ajax() && $request->ajax_request == true) {
-            $guides = EventGuide::with('event')->orderBy('id', 'DESC');
+            $guides = EventGuide::with(['event', 'iconFile'])->orderBy('id', 'DESC');
 
             if (!isSuperAdmin()) {
                 $guides->where(function ($query) {
@@ -132,6 +132,7 @@ public function store(Request $request)
         'type'     => 'required|string|max:5000',
         'weblink'  => 'nullable|url|max:255',
         'doc'      => 'nullable|file|mimes:jpg,png,pdf,doc,docx|max:2048',
+        'icon'     => 'nullable|file|mimes:jpg,jpeg,png,svg,webp|max:2048',
     ]);
 
     if ($validator->fails()) {
@@ -186,6 +187,17 @@ public function store(Request $request)
          $eventGuide->save();
     }
 
+    if ($request->hasFile('icon')) {
+        $this->imageUpload(
+            $request->file('icon'),
+            'event_guides',
+            $eventGuide->id,
+            'event_guides',
+            'icon',
+            $eventGuide->id
+        );
+    }
+
     return redirect()->route('event-guides.index')
         ->withSuccess('Event Guide has been created successfully');
 }
@@ -196,7 +208,7 @@ public function store(Request $request)
      */
     public function show(string $id)
     {
-         $eventGuide = EventGuide::findOrFail($id);
+         $eventGuide = EventGuide::with(['documentFile', 'iconFile'])->findOrFail($id);
          $this->ensureGuideAccess($eventGuide);
 
         return view('event_guide.view', compact('eventGuide'));
@@ -207,7 +219,7 @@ public function store(Request $request)
      */
     public function edit(string $id)
     {
-         $eventGuide = EventGuide::findOrFail($id);
+         $eventGuide = EventGuide::with(['documentFile', 'iconFile'])->findOrFail($id);
          $this->ensureGuideAccess($eventGuide, false);
          $events = isSuperAdmin()
             ? Event::orderBy('title')->get(['id', 'title'])
@@ -228,6 +240,7 @@ public function store(Request $request)
         'type'     => 'required|string|max:5000',
         'weblink'  => 'nullable|url|max:255',
         'doc'      => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+        'icon'     => 'nullable|file|mimes:jpg,jpeg,png,svg,webp|max:2048',
     ]);
 
     if ($validator->fails()) {
@@ -277,6 +290,17 @@ public function store(Request $request)
         if (!empty($path)) {
             $eventGuide->doc = $path;
         }
+    }
+
+    if ($request->hasFile('icon')) {
+        $this->imageUpload(
+            $request->file('icon'),
+            'event_guides',
+            $eventGuide->id,
+            'event_guides',
+            'icon',
+            $eventGuide->id
+        );
     }
 
     $eventGuide->save();
