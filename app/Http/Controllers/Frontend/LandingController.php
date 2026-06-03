@@ -913,7 +913,7 @@ class LandingController extends Controller
         $event = Event::with(['photo'])->where('slug', $slug)->firstOrFail();
         [$sessions, $event] = $this->eventSidebarData($event);
 
-        $guides = EventGuide::with(['documentFile'])
+        $guides = EventGuide::with(['documentFile', 'iconFile'])
             ->where(function ($query) use ($event) {
                 $query->where('event_id', $event->id)
                     ->orWhereNull('event_id');
