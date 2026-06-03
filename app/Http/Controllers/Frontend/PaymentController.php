@@ -29,6 +29,14 @@ class PaymentController extends Controller
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
+        $productData = [
+            'name' => $ticket->name,
+        ];
+
+        if (!blank($ticket->description)) {
+            $productData['description'] = $ticket->description;
+        }
+
         // Create Stripe Checkout Session
         $session = CheckoutSession::create([
             'payment_method_types' => ['card'],
@@ -36,10 +44,7 @@ class PaymentController extends Controller
                 'price_data' => [
                     'currency' => 'usd', // change if needed
                     'unit_amount' => $ticketPurchase->amount * 100, // in cents
-                    'product_data' => [
-                        'name' => $ticket->name,
-                        'description' => $ticket->description ?? '',
-                    ],
+                    'product_data' => $productData,
                 ],
                 'quantity' => 1,
             ]],
