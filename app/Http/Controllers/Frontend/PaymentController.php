@@ -39,7 +39,6 @@ class PaymentController extends Controller
 
         // Create Stripe Checkout Session
         $session = CheckoutSession::create([
-            'payment_method_types' => ['card'],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'usd', // change if needed
