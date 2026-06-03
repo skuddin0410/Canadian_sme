@@ -39,17 +39,30 @@
                                 $collapseId = 'guide-item-' . $guide->id;
                                 $hasAnswer = filled($guide->type);
                                 $fileUrl = optional($guide->documentFile)->file_path;
+                                $iconUrl = optional($guide->iconFile)->file_path;
                             @endphp
                             <div class="accordion-item guide-card">
                                 <h3 class="accordion-header">
                                     @if($hasAnswer)
                                         <button class="accordion-button collapsed guide-question" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $collapseId }}" aria-expanded="false" aria-controls="{{ $collapseId }}">
-                                            <span class="guide-mark"><i class="fa-solid fa-circle-question"></i></span>
+                                            <span class="guide-mark {{ $iconUrl ? 'guide-mark-has-image' : '' }}">
+                                                @if($iconUrl)
+                                                    <img src="{{ $iconUrl }}" alt="{{ $guide->title }} icon" class="guide-mark-img">
+                                                @else
+                                                    <i class="fa-solid fa-circle-question"></i>
+                                                @endif
+                                            </span>
                                             <span>{{ $guide->title }}</span>
                                         </button>
                                     @else
                                         <div class="guide-question guide-question-static">
-                                            <span class="guide-mark"><i class="fa-solid fa-circle-question"></i></span>
+                                            <span class="guide-mark {{ $iconUrl ? 'guide-mark-has-image' : '' }}">
+                                                @if($iconUrl)
+                                                    <img src="{{ $iconUrl }}" alt="{{ $guide->title }} icon" class="guide-mark-img">
+                                                @else
+                                                    <i class="fa-solid fa-circle-question"></i>
+                                                @endif
+                                            </span>
                                             <span>{{ $guide->title }}</span>
                                         </div>
                                     @endif
@@ -87,13 +100,20 @@
                         @foreach($downloadGuides as $guide)
                             @php
                                 $fileUrl = optional($guide->documentFile)->file_path;
+                                $iconUrl = optional($guide->iconFile)->file_path;
                                 $downloadUrl = $guide->weblink ?: $fileUrl;
                                 $downloadLabel = $fileUrl ? basename(parse_url($fileUrl, PHP_URL_PATH)) : parse_url($guide->weblink, PHP_URL_HOST);
                             @endphp
                             @if($downloadUrl)
                                 <div class="guide-download-card">
                                     <div class="d-flex align-items-center gap-3">
-                                        <span class="guide-mark guide-mark-download"><i class="fa-solid fa-download"></i></span>
+                                        <span class="guide-mark guide-mark-download {{ $iconUrl ? 'guide-mark-has-image' : '' }}">
+                                            @if($iconUrl)
+                                                <img src="{{ $iconUrl }}" alt="{{ $guide->title }} icon" class="guide-mark-img">
+                                            @else
+                                                <i class="fa-solid fa-download"></i>
+                                            @endif
+                                        </span>
                                         <div>
                                             <div class="guide-download-title">{{ $guide->title }}</div>
                                             @if($guide->type)
@@ -230,6 +250,19 @@
     background: linear-gradient(135deg, #2f6fff 0%, #69a1ff 100%);
     color: #fff;
     flex-shrink: 0;
+}
+
+.guide-mark-has-image {
+    padding: 4px;
+    background: #fff;
+    border: 1px solid rgba(38, 61, 107, 0.1);
+}
+
+.guide-mark-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
 .guide-mark-download {

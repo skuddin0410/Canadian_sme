@@ -28,13 +28,20 @@
                               @php
                                 $collapseId = 'guide-item-' . $guide->id;
                                 $fileUrl = optional($guide->documentFile)->file_path;
+                                $iconUrl = optional($guide->iconFile)->file_path;
                                 $isFirstGuide = $loop->first && $loop->parent->first;
                               @endphp
                               <div class="accordion-item guide-accordion-item">
                                 <h2 class="accordion-header">
                                   <button class="accordion-button {{ $isFirstGuide ? '' : 'collapsed' }} guide-accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $collapseId }}" aria-expanded="{{ $isFirstGuide ? 'true' : 'false' }}" aria-controls="{{ $collapseId }}">
                                     <span class="guide-question-wrap">
-                                      <span class="guide-question-icon"><i class="fa-solid fa-circle-question"></i></span>
+                                      <span class="guide-question-icon {{ $iconUrl ? 'guide-question-icon-has-image' : '' }}">
+                                        @if($iconUrl)
+                                          <img src="{{ $iconUrl }}" alt="{{ $guide->title }} icon" class="guide-question-icon-img">
+                                        @else
+                                          <i class="fa-solid fa-circle-question"></i>
+                                        @endif
+                                      </span>
                                       <span class="guide-question-text">{{ $guide->title }}</span>
                                     </span>
                                   </button>
@@ -72,12 +79,19 @@
                           @foreach($downloadGuides as $guide)
                             @php
                               $fileUrl = optional($guide->documentFile)->file_path;
+                              $iconUrl = optional($guide->iconFile)->file_path;
                               $downloadUrl = $guide->weblink ?: $fileUrl;
                             @endphp
                             @if($downloadUrl)
                               <a href="{{ $downloadUrl }}" target="_blank" rel="noopener" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 mb-2 guide-download-row">
                                 <span class="guide-download-wrap">
-                                  <span class="guide-download-icon"><i class="fa-solid fa-download"></i></span>
+                                  <span class="guide-download-icon {{ $iconUrl ? 'guide-download-icon-has-image' : '' }}">
+                                    @if($iconUrl)
+                                      <img src="{{ $iconUrl }}" alt="{{ $guide->title }} icon" class="guide-download-icon-img">
+                                    @else
+                                      <i class="fa-solid fa-download"></i>
+                                    @endif
+                                  </span>
                                   <span>
                                   <strong>{{ $guide->title }}</strong>
                                   @if($guide->type)
@@ -255,6 +269,22 @@
   color: #fff;
   flex-shrink: 0;
   box-shadow: 0 10px 22px rgba(49, 94, 251, 0.25);
+}
+
+.guide-question-icon-has-image,
+.guide-download-icon-has-image {
+  padding: 4px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(31, 55, 102, 0.12);
+  border: 1px solid rgba(38, 61, 107, 0.1);
+}
+
+.guide-question-icon-img,
+.guide-download-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .guide-question-text {
