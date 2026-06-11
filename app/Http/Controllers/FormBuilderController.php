@@ -10,12 +10,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\TicketType;
-use App\Models\TicketPurchase;
+use App\Models\PendingRegistration;
+use App\Models\PromoCodeRedemption;
+use App\Models\EventWaitlist;
+use App\Models\Subscription;
+use App\Mail\RegistrationCredentialsMail;
+use App\Services\PromoCodeService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use App\Models\UserTicket;
 use App\Models\Event;
 use App\Models\EventAndEntityLink;
+use Illuminate\Support\Str;
 
 
 
@@ -123,12 +130,17 @@ class FormBuilderController extends Controller
     {
         $eventId = session('event_id');
         if (!$eventId) {
-            return back()->with('error', 'Invalid access. Please start from event page.');
+            return back()->withInput()->with('error', 'Invalid access. Please start from event page.');
         }
+        $event = Event::findOrFail($eventId);
         $form = Form::findOrFail($id);
 
 
         $data = $request->all();
+        $registrationMode = $data['registration_mode'] ?? 'single';
+        $coordinatorAttending = $request->boolean('coordinator_attending');
+        $submissionAction = $data['submission_action'] ?? 'register';
+        $isWaitlistSubmission = $submissionAction === 'waitlist';
 
         /*
     |--------------------------------------------------------------------------
@@ -138,32 +150,183 @@ class FormBuilderController extends Controller
         $rules = [
             'first_name'        => 'required|string|max:255',
             'last_name'         => 'required|string|max:255',
-            'email'             => 'required|email|unique:users,email',
+            'email'             => [
+                'required',
+                'email',
+                Rule::when(
+                    ($registrationMode === 'single' || $coordinatorAttending) && !$isWaitlistSubmission,
+                    ['unique:users,email']
+                ),
+            ],
             'mobile'            => 'nullable|string|max:20',
             'designation'       => 'nullable|string|max:255',
             'company'           => 'nullable|string|max:255',
             'bio'               => 'nullable|string|max:500',
-            'password'          => 'required',
+            'password'          => 'nullable|string|max:255',
+            'submission_action' => 'nullable|in:register,waitlist',
+            'registration_mode' => 'required|in:single,team',
+            'coordinator_attending' => 'nullable|boolean',
             'registration_type' => 'required|in:free,paid',
+            'promo_code' => 'nullable|string|max:100',
             'selected_ticket_id' => [
                 'nullable',
-                'required_if:registration_type,paid',
+                Rule::requiredIf(fn () => ($data['registration_type'] ?? null) === 'paid' && !$isWaitlistSubmission),
                 Rule::exists('ticket_types', 'id')->where(function ($q) use ($eventId) {
                     $q->where('event_id', $eventId);
                 }),
             ],
+            'team_members' => 'nullable|array|min:1',
         ];
 
+        $rules = array_merge($rules, $this->buildTeamMemberRules($form));
+
         $validator = Validator::make($data, $rules);
+
+        $validator->after(function ($validator) use ($data, $registrationMode, $coordinatorAttending, $eventId, $event, $isWaitlistSubmission) {
+            $submittedTeamMembers = $this->extractFilledTeamMembers($data['team_members'] ?? []);
+            $teamMembers = $submittedTeamMembers
+                ->filter(fn ($member) => filled($member['email'] ?? null))
+                ->values();
+
+            if ($registrationMode === 'team' && $submittedTeamMembers->isEmpty()) {
+                $validator->errors()->add('team_members', 'Please add at least one team member for team registration.');
+            }
+
+            foreach ($submittedTeamMembers as $index => $member) {
+                if (blank($member['email'] ?? null)) {
+                    $validator->errors()->add("team_members.$index.email", 'Email is required for each team member.');
+                }
+            }
+
+            $primaryEmail = Str::lower(trim((string) ($data['email'] ?? '')));
+            $memberEmails = $teamMembers
+                ->map(fn ($member) => Str::lower(trim((string) ($member['email'] ?? ''))))
+                ->filter();
+
+            if ($primaryEmail !== '' && $memberEmails->contains($primaryEmail)) {
+                $validator->errors()->add('team_members', 'Primary attendee email cannot be reused for a team member.');
+            }
+
+            if ($registrationMode === 'team' && !$event->enable_team_registration) {
+                $validator->errors()->add('registration_mode', 'Team registration is disabled for this event.');
+            }
+
+            if (($data['registration_type'] ?? 'free') === 'free' && !$event->enable_free_registration) {
+                $validator->errors()->add('registration_type', 'Free registration is disabled for this event.');
+            }
+
+            if (($data['registration_type'] ?? null) === 'paid' && !$event->enable_paid_registration) {
+                $validator->errors()->add('registration_type', 'Paid registration is disabled for this event.');
+            }
+
+            $attendeeCountForCapacity = $registrationMode === 'team'
+                ? $teamMembers->count() + ($coordinatorAttending ? 1 : 0)
+                : 1;
+
+            if ($isWaitlistSubmission) {
+                if (!$this->canJoinWaitlist($event, $attendeeCountForCapacity)) {
+                    $validator->errors()->add('registration_type', 'Registration capacity is currently available. Please submit registration instead.');
+                }
+
+                return;
+            }
+
+            if (!$this->registrationCanFitSubscription($event, $attendeeCountForCapacity)) {
+                $validator->errors()->add('registration_type', 'Attendee limit has been reached for this event. Please join the waitlist.');
+                return;
+            }
+
+            if (($data['registration_type'] ?? null) === 'paid' && !empty($data['selected_ticket_id'])) {
+                $ticket = TicketType::where('event_id', $eventId)->find($data['selected_ticket_id']);
+                $attendeeCount = $registrationMode === 'team'
+                    ? $teamMembers->count() + ($coordinatorAttending ? 1 : 0)
+                    : 1;
+
+                if (!$ticket || !$ticket->isSaleOpen()) {
+                    $validator->errors()->add('selected_ticket_id', 'The selected ticket is not available for purchase.');
+                    return;
+                }
+
+                if ($attendeeCount < (int) $ticket->min_quantity_per_order) {
+                    $validator->errors()->add('selected_ticket_id', 'This ticket requires at least ' . $ticket->min_quantity_per_order . ' attendee(s).');
+                }
+
+                if ($ticket->max_quantity_per_order && $attendeeCount > (int) $ticket->max_quantity_per_order) {
+                    $validator->errors()->add('selected_ticket_id', 'This ticket allows a maximum of ' . $ticket->max_quantity_per_order . ' attendee(s) per registration.');
+                }
+
+                if ($ticket->available_quantity < $attendeeCount) {
+                    $validator->errors()->add('selected_ticket_id', 'Not enough ticket quantity is available for this registration.');
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
+        $teamMembers = $registrationMode === 'team'
+            ? $this->extractFilledTeamMembers($data['team_members'] ?? [])
+                ->filter(fn ($member) => filled($member['email'] ?? null))
+                ->values()
+                ->all()
+            : [];
+        $attendeeCount = $registrationMode === 'team'
+            ? count($teamMembers) + ($coordinatorAttending ? 1 : 0)
+            : 1;
+
+        if ($isWaitlistSubmission) {
+            FormSubmission::create([
+                'form_id'         => $form->id,
+                'submission_data' => $data,
+                'ip_address'      => $request->ip(),
+                'user_agent'      => $request->userAgent(),
+            ]);
+
+            EventWaitlist::create([
+                'event_id' => $eventId,
+                'ticket_type_id' => $data['selected_ticket_id'] ?? null,
+                'form_id' => $form->id,
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => Str::lower(trim((string) $data['email'])),
+                'mobile' => $data['mobile'] ?? null,
+                'company' => $data['company'] ?? null,
+                'designation' => $data['designation'] ?? null,
+                'registration_mode' => $registrationMode,
+                'attendee_count' => $attendeeCount,
+                'coordinator_attending' => $coordinatorAttending,
+                'team_members' => $teamMembers,
+                'request' => $data,
+                'status' => 'waiting',
+                'joined_at' => now(),
+            ]);
+
+            return back()->with('success', 'You have joined the waitlist. We will contact you if a spot becomes available.');
+        }
+
+        $pricingSummary = null;
+
+        $appliedPromoCode = null;
 
         if ($data['registration_type'] === 'paid') {
             $ticket = TicketType::findOrFail($data['selected_ticket_id']);
             $eventId = $ticket->event_id;
+            try {
+                $promoPricing = app(PromoCodeService::class)->applyToTicket(
+                    $ticket,
+                    $attendeeCount,
+                    $data['promo_code'] ?? null,
+                    $data['email'] ?? null
+                );
+            } catch (\RuntimeException $e) {
+                return back()->withInput()->withErrors([
+                    'promo_code' => $e->getMessage(),
+                ]);
+            }
+
+            $pricingSummary = $promoPricing['pricing'];
+            $appliedPromoCode = $promoPricing['promo_code'];
         }
 
         // Save form submission data
@@ -178,60 +341,138 @@ class FormBuilderController extends Controller
         if ($data['registration_type'] === 'free') {
             DB::beginTransaction();
             try {
-                $user = User::create([
-                    'name'        => $data['first_name'],
-                    'lastname'    => $data['last_name'],
-                    'email'       => $data['email'],
-                    'mobile'      => $data['mobile'] ?? null,
-                    'designation' => $data['designation'] ?? null,
-                    'company'     => $data['company'] ?? null,
-                    'bio'         => $data['bio'] ?? null,
-                    'password'    => Hash::make($data['password']),
-                ]);
+                $createdUsers = collect();
+                $registeredAttendees = [];
 
-                $user->assignRole('Attendee');
-                EventAndEntityLink::create([
-                    'event_id'    => $eventId,
-                    'entity_type' => 'users',
-                    'entity_id'   => $user->id,
-                ]);
+                if ($registrationMode === 'single' || $coordinatorAttending) {
+                    $user = User::create([
+                        'name'        => $data['first_name'],
+                        'lastname'    => $data['last_name'],
+                        'email'       => $data['email'],
+                        'mobile'      => $data['mobile'] ?? null,
+                        'designation' => $data['designation'] ?? null,
+                        'company'     => $data['company'] ?? null,
+                        'bio'         => $data['bio'] ?? null,
+                        'password'    => Hash::make(Str::random(32)),
+                    ]);
+
+                    $user->assignRole('Attendee');
+                    EventAndEntityLink::create([
+                        'event_id'    => $eventId,
+                        'entity_type' => 'users',
+                        'entity_id'   => $user->id,
+                    ]);
+
+                    $createdUsers->push($user);
+                    $registeredAttendees[] = [
+                        'name' => trim($user->name . ' ' . $user->lastname),
+                        'email' => $user->email,
+                    ];
+                }
+
+                foreach ($teamMembers as $member) {
+                    $teamUser = User::create([
+                        'name'        => $member['first_name'],
+                        'lastname'    => $member['last_name'],
+                        'email'       => $member['email'],
+                        'mobile'      => $member['mobile'] ?? null,
+                        'designation' => $member['designation'] ?? null,
+                        'company'     => $member['company'] ?? ($data['company'] ?? null),
+                        'bio'         => $member['bio'] ?? null,
+                        'password'    => Hash::make(Str::random(32)),
+                    ]);
+
+                    $teamUser->assignRole('Attendee');
+                    EventAndEntityLink::create([
+                        'event_id'    => $eventId,
+                        'entity_type' => 'users',
+                        'entity_id'   => $teamUser->id,
+                    ]);
+
+                    $createdUsers->push($teamUser);
+                    $registeredAttendees[] = [
+                        'name' => trim($teamUser->name . ' ' . $teamUser->lastname),
+                        'email' => $teamUser->email,
+                    ];
+                }
 
                 DB::commit();
-
-                if (qrCode($user->id)) {
-                    sendNotification("Welcome Email", $user);
-                }
-
-                // Notification to Event Admin and Super Admin
                 $event = Event::find($eventId);
-                if ($event) {
-                    $superAdminId = 1;
-                    $eventAdminId = $event->created_by;
+                $createdUserIds = $createdUsers->pluck('id')->all();
+                $totalRegistrations = $createdUsers->count();
+                $coordinatorName = trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''));
 
-                    $notificationData = [
-                        'title' => 'New Self-Registration',
-                        'body' => 'A new attendee "' . $user->full_name . '" has self-registered for the event "' . $event->title . '"',
-                        'related_type' => 'event',
-                        'related_id' => $event->id,
-                        'is_read' => 0
-                    ];
+                $response = redirect()
+                    ->route(($registrationMode === 'single' || $coordinatorAttending) ? 'event.user.login' : 'event.user.register', ['event' => Event::findOrFail($eventId)->slug])
+                    ->with('success', ($registrationMode === 'single' || $coordinatorAttending)
+                        ? 'Registration successful.'
+                        : 'Team registration successful.');
 
-                    // Notify Super Admin
-                    \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $superAdminId]));
+                $isTeamRegistration = $registrationMode === 'team';
+                $mailRecipientEmail = $isTeamRegistration ? ($data['email'] ?? null) : ($registeredAttendees[0]['email'] ?? null);
+                $mailRecipientName = $isTeamRegistration ? $coordinatorName : ($registeredAttendees[0]['name'] ?? '');
+                $loginUrl = route('event.user.login', ['event' => $event->slug]);
 
-                    // Notify Event Admin (if different from Super Admin)
-                    if ($eventAdminId && $eventAdminId != $superAdminId) {
-                        \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $eventAdminId]));
+                dispatch(function () use ($createdUserIds, $event, $totalRegistrations, $coordinatorName, $mailRecipientEmail, $mailRecipientName, $registeredAttendees, $isTeamRegistration, $loginUrl) {
+                    $users = User::whereIn('id', $createdUserIds)->get();
+
+                    foreach ($users as $createdUser) {
+                        try {
+                            if (qrCode($createdUser->id)) {
+                                sendNotification("Welcome Email", $createdUser);
+                            }
+                        } catch (\Throwable $e) {
+                            report($e);
+                        }
                     }
-                }
-                return redirect()
-                    ->route('event.user.login', ['event' => $eventId])
-                    ->with('success', 'Form submitted successfully and attendee created!');
+
+                    if ($mailRecipientEmail && !empty($registeredAttendees)) {
+                        try {
+                            Mail::to($mailRecipientEmail)->send(
+                                new RegistrationCredentialsMail(
+                                    $mailRecipientName ?: 'Participant',
+                                    $event,
+                                    $loginUrl,
+                                    $registeredAttendees,
+                                    $isTeamRegistration
+                                )
+                            );
+                        } catch (\Throwable $e) {
+                            report($e);
+                        }
+                    }
+
+                    if ($event) {
+                        $superAdminId = 1;
+                        $eventAdminId = $event->created_by;
+
+                        $notificationData = [
+                            'title' => 'New Self-Registration',
+                            'body' => $totalRegistrations > 1
+                                ? $totalRegistrations . ' attendees have been registered for the event "' . $event->title . '" by coordinator "' . ($coordinatorName ?: 'Unknown') . '"'
+                                : 'A new attendee has self-registered for the event "' . $event->title . '"',
+                            'related_type' => 'event',
+                            'related_id' => $event->id,
+                            'is_read' => 0
+                        ];
+
+                        \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $superAdminId]));
+
+                        if ($eventAdminId && $eventAdminId != $superAdminId) {
+                            \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $eventAdminId]));
+                        }
+                    }
+                })->afterResponse();
+
+                return $response;
 
                 // return back()->with('success', 'Form submitted successfully!');
             } catch (\Exception $e) {
                 DB::rollBack();
-                return back()->with('error', $e->getMessage());
+                report($e);
+                return back()->withInput()->with('error', app()->environment('local')
+                    ? 'Registration failed: ' . $e->getMessage()
+                    : 'Registration failed due to a server error. Please try again.');
             }
         }
 
@@ -240,68 +481,64 @@ class FormBuilderController extends Controller
 
             DB::beginTransaction();
             try {
-                // 1. Create user
-                $user = User::create([
-                    'name'        => $data['first_name'],
-                    'lastname'    => $data['last_name'],
-                    'email'       => $data['email'],
-                    'mobile'      => $data['mobile'] ?? null,
-                    'designation' => $data['designation'] ?? null,
-                    'company'     => $data['company'] ?? null,
-                    'bio'         => $data['bio'] ?? null,
-                    'password'    => Hash::make($data['password']),
-                ]);
+                // 1. Use the promo-adjusted pricing already validated above.
+                $ticket = $ticket ?? TicketType::findOrFail($data['selected_ticket_id']);
+                $amount = (float) ($pricingSummary['total'] ?? 0);
 
-                $user->assignRole('Attendee');
-                EventAndEntityLink::create([
-                    'event_id'    => $eventId,
-                    'entity_type' => 'users',
-                    'entity_id'   => $user->id,
-                ]);
-
-                // 2. Get ticket & price from base_price
-                $ticket = TicketType::findOrFail($data['selected_ticket_id']);
-                $amount = $ticket->base_price;
-
-                // 3. Create TicketPurchase
-                $ticketPurchase = TicketPurchase::create([
-                    'user_id'        => $user->id,
+                // 2. Store pending registration payload until payment succeeds
+                $pendingRegistration = PendingRegistration::create([
                     'ticket_type_id' => $ticket->id,
                     'event_id'       => $eventId,
                     'amount'         => $amount,
+                    'request'        => [
+                        'first_name' => $data['first_name'],
+                        'last_name' => $data['last_name'],
+                        'email' => $data['email'],
+                        'mobile' => $data['mobile'] ?? null,
+                        'designation' => $data['designation'] ?? null,
+                        'company' => $data['company'] ?? null,
+                        'bio' => $data['bio'] ?? null,
+                        'registration_mode' => $data['registration_mode'],
+                        'coordinator_attending' => $coordinatorAttending,
+                        'registration_type' => $data['registration_type'],
+                        'promo_code' => $appliedPromoCode?->code,
+                        'promo_code_id' => $appliedPromoCode?->id,
+                        'selected_ticket_id' => $ticket->id,
+                        'team_members' => $teamMembers,
+                        'attendee_count' => $attendeeCount,
+                        'pricing_summary' => $pricingSummary,
+                        'form_id' => $form->id,
+                    ],
                     'status'         => 'pending_payment',
                 ]);
 
-                DB::commit();
-
-                // Notification to Event Admin and Super Admin
-                $event = Event::find($eventId);
-                if ($event) {
-                    $superAdminId = 1;
-                    $eventAdminId = $event->created_by;
-
-                    $notificationData = [
-                        'title' => 'New Self-Registration (Paid)',
-                        'body' => 'A new attendee "' . $user->full_name . '" has self-registered for the event "' . $event->title . '" (Pending Payment)',
-                        'related_type' => 'event',
-                        'related_id' => $event->id,
-                        'is_read' => 0
-                    ];
-
-                    // Notify Super Admin
-                    \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $superAdminId]));
-
-                    // Notify Event Admin (if different from Super Admin)
-                    if ($eventAdminId && $eventAdminId != $superAdminId) {
-                        \App\Models\GeneralNotification::create(array_merge($notificationData, ['user_id' => $eventAdminId]));
-                    }
+                if ($appliedPromoCode && (float) ($pricingSummary['promo_discount'] ?? 0) > 0) {
+                    PromoCodeRedemption::create([
+                        'promo_code_id' => $appliedPromoCode->id,
+                        'event_id' => $eventId,
+                        'ticket_type_id' => $ticket->id,
+                        'pending_registration_id' => $pendingRegistration->id,
+                        'email' => Str::lower(trim((string) ($data['email'] ?? ''))),
+                        'code' => $appliedPromoCode->code,
+                        'attendee_count' => $attendeeCount,
+                        'discount_amount' => $pricingSummary['promo_discount'] ?? 0,
+                        'final_total' => $pricingSummary['total'] ?? $amount,
+                        'status' => 'pending',
+                    ]);
                 }
 
-                // 4. Redirect to Stripe checkout
-                return redirect('/payment/checkout?ticket_purchase_id=' . $ticketPurchase->id);
+                DB::commit();
+
+                // 3. Redirect to Stripe checkout
+                return redirect()->route('payment.checkout', [
+                    'pending_registration_id' => $pendingRegistration->id,
+                ]);
             } catch (\Exception $e) {
                 DB::rollBack();
-                return back()->with('error', $e->getMessage());
+                report($e);
+                return back()->withInput()->with('error', app()->environment('local')
+                    ? 'Registration failed: ' . $e->getMessage()
+                    : 'Registration failed due to a server error. Please try again.');
             }
         }
     }
@@ -488,6 +725,109 @@ class FormBuilderController extends Controller
         return $data;
     }
 
+    private function buildTeamMemberRules(Form $form): array
+    {
+        $rules = [];
+
+        foreach (($form->form_data ?? []) as $field) {
+            $type = $field['type'] ?? 'text';
+            $label = $field['label'] ?? ucfirst($type);
+            $name = Str::slug($label, '_');
+
+            if ($name === 'password') {
+                continue;
+            }
+
+            $isRequired = in_array('required', $field['validation'] ?? []);
+            $baseKey = "team_members.*.$name";
+            $options = array_values($field['options'] ?? []);
+            $ruleSet = [];
+
+            switch ($type) {
+                case 'email':
+                    $ruleSet[] = 'nullable';
+                    $ruleSet[] = 'email';
+                    $ruleSet[] = 'distinct';
+                    $ruleSet[] = 'unique:users,email';
+                    break;
+
+                case 'number':
+                    $ruleSet[] = $isRequired ? 'required_with:team_members.*.email' : 'nullable';
+                    $ruleSet[] = 'numeric';
+                    if (isset($field['min']) && $field['min'] !== '') {
+                        $ruleSet[] = 'min:' . $field['min'];
+                    }
+                    if (isset($field['max']) && $field['max'] !== '') {
+                        $ruleSet[] = 'max:' . $field['max'];
+                    }
+                    break;
+
+                case 'date':
+                    $ruleSet[] = $isRequired ? 'required_with:team_members.*.email' : 'nullable';
+                    $ruleSet[] = 'date';
+                    break;
+
+                case 'select':
+                case 'radio':
+                    $ruleSet[] = $isRequired ? 'required_with:team_members.*.email' : 'nullable';
+                    $ruleSet[] = 'string';
+                    if (!empty($options)) {
+                        $ruleSet[] = Rule::in($options);
+                    }
+                    break;
+
+                case 'checkbox':
+                    $ruleSet[] = $isRequired ? 'required_with:team_members.*.email' : 'nullable';
+                    $ruleSet[] = 'array';
+                    $rules[$baseKey] = $ruleSet;
+                    if (!empty($options)) {
+                        $rules[$baseKey . '.*'] = [Rule::in($options)];
+                    }
+                    continue 2;
+
+                case 'textarea':
+                case 'text':
+                default:
+                    $ruleSet[] = $isRequired ? 'required_with:team_members.*.email' : 'nullable';
+                    $ruleSet[] = 'string';
+                    if (isset($field['min']) && $field['min'] !== '') {
+                        $ruleSet[] = 'min:' . $field['min'];
+                    }
+                    if (isset($field['max']) && $field['max'] !== '') {
+                        $ruleSet[] = 'max:' . $field['max'];
+                    }
+                    break;
+            }
+
+            $rules[$baseKey] = $ruleSet;
+        }
+
+        return $rules;
+    }
+
+    private function extractFilledTeamMembers(array $members)
+    {
+        return collect($members)
+            ->filter(function ($member) {
+                if (!is_array($member)) {
+                    return false;
+                }
+
+                foreach ($member as $value) {
+                    if (is_array($value) && collect($value)->filter(fn ($item) => filled($item))->isNotEmpty()) {
+                        return true;
+                    }
+
+                    if (!is_array($value) && filled($value)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->values();
+    }
+
 
     private function evaluateCondition($sourceValue, string $operator, $value): bool
     {
@@ -532,19 +872,186 @@ class FormBuilderController extends Controller
         }
 
         $eventId = session('event_id');
+        $event = Event::findOrFail($eventId);
+
+        if (!$event->enable_free_registration && !$event->enable_paid_registration) {
+            return redirect()->back()->with('error', 'Registration is currently disabled for this event.');
+        }
 
         $form = Form::where('is_active', true)->firstOrFail();
 
-        $tickets = TicketType::where('event_id', $eventId)->get();
-        return view('formbuilder.showform', compact('form', 'tickets'));
+        $tickets = TicketType::where('event_id', $eventId)
+            ->where('is_active', 1)
+            ->get();
+
+        return view('formbuilder.showform', compact('form', 'tickets', 'event'));
     }
 
     public function available(Event $event)
     {
+        $attendeeCount = max((int) request('attendee_count', 1), 1);
+
+        if (!$this->registrationCanFitSubscription($event, $attendeeCount)) {
+            return response()->json([]);
+        }
+
         $tickets = TicketType::where('event_id', $event->id)
             ->where('is_active', 1)
             ->get();
 
-        return response()->json($tickets);
+        return response()->json(
+            $tickets
+                ->filter(fn ($ticket) => $ticket->isSaleOpen())
+                ->filter(function ($ticket) use ($attendeeCount) {
+                    if ($attendeeCount < (int) $ticket->min_quantity_per_order) {
+                        return false;
+                    }
+
+                    if ($ticket->max_quantity_per_order && $attendeeCount > (int) $ticket->max_quantity_per_order) {
+                        return false;
+                    }
+
+                    return $ticket->available_quantity >= $attendeeCount;
+                })
+                ->map(function ($ticket) use ($attendeeCount) {
+                    $pricing = $ticket->getRegistrationPricing($attendeeCount);
+
+                    return [
+                        'id' => $ticket->id,
+                        'name' => $ticket->name,
+                        'description' => $ticket->description,
+                        'base_price' => (float) $ticket->base_price,
+                        'available_quantity' => (int) $ticket->available_quantity,
+                        'pricing' => $pricing,
+                        'formatted_total' => number_format($pricing['total'], 2, '.', ''),
+                    ];
+                })
+                ->values()
+        );
+    }
+
+    public function pricingSummary(Request $request, Event $event)
+    {
+        $request->validate([
+            'ticket_id' => [
+                'required',
+                Rule::exists('ticket_types', 'id')->where(function ($query) use ($event) {
+                    $query->where('event_id', $event->id);
+                }),
+            ],
+            'attendee_count' => 'required|integer|min:1',
+            'promo_code' => 'nullable|string|max:100',
+            'email' => 'nullable|email',
+        ]);
+
+        $ticket = TicketType::findOrFail($request->ticket_id);
+        try {
+            $result = app(PromoCodeService::class)->applyToTicket(
+                $ticket,
+                max((int) $request->attendee_count, 1),
+                $request->promo_code,
+                $request->email
+            );
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'ticket_id' => $ticket->id,
+            'ticket_name' => $ticket->name,
+            'pricing' => $result['pricing'],
+            'promo_code' => $result['promo_code']?->only(['id', 'code', 'discount_type', 'discount_value']),
+        ]);
+    }
+
+    public function registrationCapacity(Request $request, Event $event)
+    {
+        $request->validate([
+            'attendee_count' => 'required|integer|min:1',
+        ]);
+
+        return response()->json($this->getSubscriptionCapacity($event, (int) $request->attendee_count));
+    }
+
+    protected function canJoinWaitlist(Event $event, int $attendeeCount): bool
+    {
+        return !$this->registrationCanFitSubscription($event, $attendeeCount);
+    }
+
+    protected function registrationCanFitSubscription(Event $event, int $attendeeCount): bool
+    {
+        return (bool) $this->getSubscriptionCapacity($event, $attendeeCount)['can_register'];
+    }
+
+    protected function getSubscriptionCapacity(Event $event, int $attendeeCount): array
+    {
+        $attendeeCount = max($attendeeCount, 1);
+
+        if ((int) $event->created_by === 1) {
+            return [
+                'can_register' => true,
+                'is_unlimited' => true,
+                'limit' => null,
+                'used' => null,
+                'remaining' => null,
+                'requested' => $attendeeCount,
+            ];
+        }
+
+        $subscription = $event->subscription_id
+            ? Subscription::active()->whereKey($event->subscription_id)->first()
+            : Subscription::active()->where('user_id', $event->created_by)->latest()->first();
+
+        if (!$subscription) {
+            return [
+                'can_register' => false,
+                'is_unlimited' => false,
+                'limit' => 0,
+                'used' => 0,
+                'remaining' => 0,
+                'requested' => $attendeeCount,
+            ];
+        }
+
+        $subscriptionEventIds = Event::where('subscription_id', $subscription->id)->pluck('id');
+        if ($subscriptionEventIds->isEmpty()) {
+            $subscriptionEventIds = collect([$event->id]);
+        }
+
+        $used = EventAndEntityLink::where('entity_type', 'users')
+            ->whereIn('event_id', $subscriptionEventIds)
+            ->distinct('entity_id')
+            ->count('entity_id');
+
+        $limit = (int) $subscription->attendee_count;
+        $remaining = max($limit - $used, 0);
+
+        return [
+            'can_register' => $remaining >= $attendeeCount,
+            'is_unlimited' => false,
+            'limit' => $limit,
+            'used' => $used,
+            'remaining' => $remaining,
+            'requested' => $attendeeCount,
+        ];
+    }
+
+    protected function ticketCanFitAttendeeCount(TicketType $ticket, int $attendeeCount): bool
+    {
+        if (!$ticket->isSaleOpen()) {
+            return false;
+        }
+
+        if ($attendeeCount < (int) $ticket->min_quantity_per_order) {
+            return false;
+        }
+
+        if ($ticket->max_quantity_per_order && $attendeeCount > (int) $ticket->max_quantity_per_order) {
+            return false;
+        }
+
+        return (int) $ticket->available_quantity >= $attendeeCount;
     }
 }

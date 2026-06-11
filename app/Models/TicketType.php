@@ -17,13 +17,19 @@ class TicketType extends Model
         'event_id', 'category_id', 'name', 'slug', 'description',
         'base_price', 'total_quantity', 'available_quantity',
         'min_quantity_per_order', 'max_quantity_per_order',
+        'is_group', 'group_size', 'discount_percentage',
+        'is_earlybird', 'earlybird_amount', 'earlybird_quantity',
         'is_active', 'requires_approval', 'access_permissions',
         'sale_start_date', 'sale_end_date', 'sort_order', 'created_by'
     ];
 
     protected $casts = [
         'base_price' => 'decimal:2',
+        'discount_percentage' => 'decimal:2',
+        'earlybird_amount' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_group' => 'boolean',
+        'is_earlybird' => 'boolean',
         'requires_approval' => 'boolean',
         'access_permissions' => 'array',
         'sale_start_date' => 'datetime',
@@ -66,6 +72,11 @@ class TicketType extends Model
         return $this->hasMany(TicketPurchase::class);
     }
 
+    public function promoCodes()
+    {
+        return $this->hasMany(PromoCode::class);
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'ticket_purchases', 'ticket_type_id', 'user_id')
@@ -90,6 +101,83 @@ class TicketType extends Model
                         $q->whereNull('sale_end_date')
                           ->orWhere('sale_end_date', '>=', now());
                     });
+    }
+
+    public function isSaleOpen(): bool
+    {
+        if (!$this->is_active || $this->available_quantity <= 0) {
+            return false;
+        }
+
+        if ($this->sale_start_date && $this->sale_start_date->isFuture()) {
+            return false;
+        }
+
+        if ($this->sale_end_date && $this->sale_end_date->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getRegistrationPricing(int $quantity = 1): array
+    {
+        $quantity = max($quantity, 1);
+        $basePrice = round((float) $this->base_price, 2);
+        $earlyBirdUnits = 0;
+        $earlyBirdPrice = $this->is_earlybird && $this->earlybird_amount !== null
+            ? round((float) $this->earlybird_amount, 2)
+            : null;
+
+        if ($earlyBirdPrice !== null && (int) $this->earlybird_quantity > 0) {
+            $soldCount = max((int) $this->total_quantity - (int) $this->available_quantity, 0);
+            $remainingEarlyBird = max((int) $this->earlybird_quantity - $soldCount, 0);
+            $earlyBirdUnits = min($quantity, $remainingEarlyBird);
+        }
+
+        $regularUnits = max($quantity - $earlyBirdUnits, 0);
+        $groupDiscountPercent = 0.0;
+
+        if ($this->is_group && (int) $this->group_size > 1 && $quantity >= (int) $this->group_size) {
+            $groupDiscountPercent = round((float) ($this->discount_percentage ?? 0), 2);
+        }
+
+        $regularUnitPrice = $basePrice;
+        $earlyBirdUnitPrice = $earlyBirdPrice ?? $basePrice;
+
+        if ($groupDiscountPercent > 0) {
+            $multiplier = (100 - $groupDiscountPercent) / 100;
+            $regularUnitPrice = round($regularUnitPrice * $multiplier, 2);
+            $earlyBirdUnitPrice = round($earlyBirdUnitPrice * $multiplier, 2);
+        }
+
+        $perAttendeeAmounts = [];
+        for ($i = 0; $i < $earlyBirdUnits; $i++) {
+            $perAttendeeAmounts[] = $earlyBirdUnitPrice;
+        }
+        for ($i = 0; $i < $regularUnits; $i++) {
+            $perAttendeeAmounts[] = $regularUnitPrice;
+        }
+
+        $subtotal = round(array_sum($perAttendeeAmounts), 2);
+        $baseSubtotal = round($basePrice * $quantity, 2);
+
+        return [
+            'quantity' => $quantity,
+            'base_price' => $basePrice,
+            'base_subtotal' => $baseSubtotal,
+            'subtotal' => $subtotal,
+            'total' => $subtotal,
+            'savings' => round($baseSubtotal - $subtotal, 2),
+            'early_bird_units' => $earlyBirdUnits,
+            'regular_units' => $regularUnits,
+            'early_bird_unit_price' => $earlyBirdUnitPrice,
+            'regular_unit_price' => $regularUnitPrice,
+            'group_discount_percentage' => $groupDiscountPercent,
+            'is_group_discount_applied' => $groupDiscountPercent > 0,
+            'is_early_bird_applied' => $earlyBirdUnits > 0,
+            'per_attendee_amounts' => $perAttendeeAmounts,
+        ];
     }
 
     // Methods

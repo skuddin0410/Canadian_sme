@@ -83,7 +83,7 @@ Route::get('/email/img/{id}', [EmailTrackingController::class, 'trackOpen'])->na
 
 Route::get('/email/click/{id}', [EmailTrackingController::class, 'trackClick'])->name('email.track.click');
 
-Route::prefix('events/{event}')->group(function () {
+Route::prefix('events/{event:slug}')->group(function () {
 
     Route::get('/login', [EventUserAuthController::class, 'showLogin'])
         ->name('event.user.login');

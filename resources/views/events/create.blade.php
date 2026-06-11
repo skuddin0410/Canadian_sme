@@ -421,6 +421,37 @@
               @endif
             </div>
 
+            <div class="card border shadow-sm mb-3">
+              <div class="card-header">
+                <h6 class="mb-0">Registration Settings</h6>
+              </div>
+              <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="enable_team_registration" name="enable_team_registration" value="1" {{ old('enable_team_registration', true) ? 'checked' : '' }}>
+                  <label class="form-check-label" for="enable_team_registration">
+                    <strong>Enable Team Registration</strong>
+                    <div class="text-muted small">Show the team register option on the event registration form.</div>
+                  </label>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="enable_free_registration" name="enable_free_registration" value="1" {{ old('enable_free_registration', true) ? 'checked' : '' }}>
+                  <label class="form-check-label" for="enable_free_registration">
+                    <strong>Enable Free Registration</strong>
+                    <div class="text-muted small">Allow attendees to register without payment when free mode is selected.</div>
+                  </label>
+                </div>
+
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="enable_paid_registration" name="enable_paid_registration" value="1" {{ old('enable_paid_registration', true) ? 'checked' : '' }}>
+                  <label class="form-check-label" for="enable_paid_registration">
+                    <strong>Enable Paid Registration</strong>
+                    <div class="text-muted small">Allow ticket-based checkout for this event.</div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
              <div class="mb-3">
               <label class="form-label" for="meta_title">Meta title</label>
               <div class="input-group input-group-merge">

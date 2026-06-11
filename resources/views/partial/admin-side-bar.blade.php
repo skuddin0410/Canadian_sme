@@ -304,7 +304,7 @@
     </li>
 
 
-    <li class="menu-item {{ request()->is('admin/tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-purchases*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }}">
+    <li class="menu-item {{ request()->is('admin/tickets*') ? 'active open' : '' }} {{ request()->is('admin/ticket-categories*') ? 'active open' : '' }} {{ request()->is('admin/ticket-types*') ? 'active open' : '' }} {{ request()->is('admin/ticket-purchases*') ? 'active open' : '' }} {{ request()->is('admin/waitlists*') ? 'active open' : '' }} {{ request()->is('admin/ticket-inventory*') ? 'active open' : '' }} {{ request()->is('admin/ticket-pricing*') ? 'active open' : '' }} {{ request()->is('admin/promo-codes*') ? 'active open' : '' }} {{ request()->is('admin/promo-code-redemptions*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class=" menu-link menu-toggle">
             <i class="menu-icon tf-icons fa fa-list" style="font-size: 24px;"></i>
             <div data-i18n="tickets">Tickets Management</div>
@@ -323,6 +323,21 @@
             <li class="menu-item {{ request()->is('admin/ticket-purchases*') ? 'active open' : '' }}">
                 <a href="{{ route('admin.ticket-purchases.index') }}" class="menu-link">
                     <div data-i18n="ticket-purchases"> Ticket Purchases</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->is('admin/waitlists*') ? 'active open' : '' }}">
+                <a href="{{ route('admin.waitlists.index') }}" class="menu-link">
+                    <div data-i18n="waitlists"> Waitlist</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->is('admin/promo-codes*') ? 'active open' : '' }}">
+                <a href="{{ route('admin.promo-codes.index') }}" class="menu-link">
+                    <div data-i18n="promo-codes"> Promo Codes</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->is('admin/promo-code-redemptions*') ? 'active open' : '' }}">
+                <a href="{{ route('admin.promo-codes.redemptions') }}" class="menu-link">
+                    <div data-i18n="promo-code-redemptions"> Promo Redemptions</div>
                 </a>
             </li>
         </ul>

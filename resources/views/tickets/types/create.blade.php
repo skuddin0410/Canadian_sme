@@ -65,36 +65,18 @@
                                     </div>
                                 </div>
                                 <div class="row">
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                    <label for="name" class="form-label">Ticket Type Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                           id="name" name="name" value="{{ old('name') }}" 
-                                           placeholder="e.g., General Admission, VIP Pass" required>
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="name" class="form-label">Ticket Type Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                                   id="name" name="name" value="{{ old('name') }}" 
+                                                   placeholder="e.g., General Admission, VIP Pass" required>
+                                            @error('name')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
-                                </div>
-
-                                           <div class="col-md-6">
-    <div class="form-group">
-    <label for="session_id" class="font-weight-bold">
-        Session <span class="text-danger">*</span>
-    </label>
-    <select name="session_id" id="session_id" class="form-control" required>
-        <option value="">Select Session</option>
-    </select>
-    @error('session_id')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
-
-</div>
-
-
-                               </div>
 
                                 
 
@@ -222,29 +204,29 @@
                     <div class="card-body">
                         <div class="form-group">
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="enable_early_bird" 
-                                       name="enable_early_bird" value="1" {{ old('enable_early_bird') ? 'checked' : '' }}>
-                                <label class="custom-control-label font-weight-bold" for="enable_early_bird">
+                                <input type="checkbox" class="custom-control-input" id="is_earlybird" 
+                                       name="is_earlybird" value="1" {{ old('is_earlybird') ? 'checked' : '' }}>
+                                <label class="custom-control-label font-weight-bold" for="is_earlybird">
                                     Enable Early Bird Pricing
                                 </label>
                             </div>
                             <small class="form-text text-muted">Offer discounted pricing for early bookings</small>
                         </div>
 
-                        <div id="earlyBirdSettings" style="display: {{ old('enable_early_bird') ? 'block' : 'none' }};">
+                        <div id="earlyBirdSettings" style="display: {{ old('is_earlybird') ? 'block' : 'none' }};">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="early_bird_price" class="font-weight-bold">Early Bird Price</label>
+                                        <label for="earlybird_amount" class="font-weight-bold">Early Bird Price</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">$</span>
                                             </div>
-                                            <input type="number" class="form-control @error('early_bird_price') is-invalid @enderror" 
-                                                   id="early_bird_price" name="early_bird_price" 
-                                                   value="{{ old('early_bird_price', '0.00') }}" step="0.01" min="0">
+                                            <input type="number" class="form-control @error('earlybird_amount') is-invalid @enderror" 
+                                                   id="earlybird_amount" name="earlybird_amount" 
+                                                   value="{{ old('earlybird_amount', '0.00') }}" step="0.01" min="0">
                                         </div>
-                                        @error('early_bird_price')
+                                        @error('earlybird_amount')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -252,12 +234,12 @@
                     
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="early_bird_quantity" class="font-weight-bold">Early Bird Quantity</label>
-                                        <input type="number" class="form-control @error('early_bird_quantity') is-invalid @enderror" 
-                                               id="early_bird_quantity" name="early_bird_quantity" 
-                                               value="{{ old('early_bird_quantity', '50') }}" min="1">
+                                        <label for="earlybird_quantity" class="font-weight-bold">Early Bird Quantity</label>
+                                        <input type="number" class="form-control @error('earlybird_quantity') is-invalid @enderror" 
+                                               id="earlybird_quantity" name="earlybird_quantity" 
+                                               value="{{ old('earlybird_quantity', '50') }}" min="1">
                                         <small class="form-text text-muted">Limited quantity at early bird price</small>
-                                        @error('early_bird_quantity')
+                                        @error('earlybird_quantity')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -301,12 +283,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="group_discount" class="font-weight-bold">Group Discount (%)</label>
-                                        <input type="number" class="form-control @error('group_discount') is-invalid @enderror" 
-                                               id="group_discount" name="group_discount" value="{{ old('group_discount', '10') }}" 
+                                        <label for="discount_percentage" class="font-weight-bold">Group Discount (%)</label>
+                                        <input type="number" class="form-control @error('discount_percentage') is-invalid @enderror" 
+                                               id="discount_percentage" name="discount_percentage" value="{{ old('discount_percentage', '10') }}" 
                                                min="0" max="100" step="0.01">
                                         <small class="form-text text-muted">Discount percentage for group bookings</small>
-                                        @error('group_discount')
+                                        @error('discount_percentage')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -450,57 +432,10 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    const events = @json($events); 
-
-    document.getElementById('event_id').addEventListener('change', function() {
-        const eventId = this.value;
-        const sessionSelect = document.getElementById('session_id');
-
-        // Clear old options
-        sessionSelect.innerHTML = '<option value="">Select Session</option>';
-
-        if (eventId) {
-            const selectedEvent = events.find(e => e.id == eventId);
-            if (selectedEvent && selectedEvent.sessions.length) {
-                selectedEvent.sessions.forEach(session => {
-                    const opt = document.createElement('option');
-                    opt.value = session.id;
-                    opt.textContent = session.title;
-                    sessionSelect.appendChild(opt);
-                });
-            }
-        }
-    });
-</script>
-
-<script>
 $(document).ready(function() {
-
-  $('#event_id').on('change', function () {
-    var eventId = $(this).val();
-    if (eventId) {
-        $.ajax({
-            url: '/admin/events/' + eventId + '/sessions',
-            type: 'GET',
-            success: function (data) {
-                $('#session_id').empty().append('<option value="">Select Session</option>');
-                $.each(data, function (key, session) {
-                    $('#session_id').append('<option value="'+ session.id +'">'+ session.title +'</option>');
-                });
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-            }
-        });
-    } else {
-        $('#session_id').empty().append('<option value="">Select Session</option>');
-    }
-});
-
-
     // Initialize toggles based on old input
     $('#groupSettings').toggle($('#is_group').is(':checked'));
-    $('#earlyBirdSettings').toggle($('#enable_early_bird').is(':checked'));
+    $('#earlyBirdSettings').toggle($('#is_earlybird').is(':checked'));
 
     // Group ticket toggle
     $('#is_group').change(function() {
@@ -508,7 +443,7 @@ $(document).ready(function() {
     });
 
     // Early bird toggle
-    $('#enable_early_bird').change(function() {
+    $('#is_earlybird').change(function() {
         $('#earlyBirdSettings').slideToggle(this.checked);
     });
 
@@ -539,44 +474,5 @@ $(document).ready(function() {
 
 });
 </script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const events = @json($events);
-    const eventSelect = document.getElementById('event_id');
-    const sessionSelect = document.getElementById('session_id');
-
-    function populateSessions(eventId) {
-        sessionSelect.innerHTML = '<option value="">Select Session</option>';
-        const selectedEvent = events.find(e => e.id == eventId);
-
-        if (selectedEvent && selectedEvent.sessions.length > 0) {
-            selectedEvent.sessions.forEach(session => {
-                const opt = document.createElement('option');
-                opt.value = session.id;
-                opt.textContent = session.title;
-                if (session.id == "{{ old('session_id') }}") {
-                    opt.selected = true;
-                }
-                sessionSelect.appendChild(opt);
-            });
-        }
-    }
-
-    // Load sessions when event changes
-    eventSelect.addEventListener('change', function () {
-        populateSessions(this.value);
-    });
-
-    // Restore sessions if old value exists
-    if (eventSelect.value) {
-        populateSessions(eventSelect.value);
-    }
-});
-</script>
-
-
-
 
 @endsection
