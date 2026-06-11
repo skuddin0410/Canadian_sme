@@ -35,6 +35,18 @@
                 <div class="card-header {{ isset($isAdmin) && $isAdmin ? 'bg-primary text-white' : '' }}">{{ isset($isAdmin) && $isAdmin ? __('Admin Login') : __('Login') }}</div>
 
                 <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     @if(isset($isAdmin) && $isAdmin)
                         {{-- Admin Password Login --}}
                         <form method="POST" action="{{ route('admin.login.submit') }}">
@@ -89,7 +101,7 @@
                         </form>
                     @else
                         {{-- Attendee OTP Login --}}
-                        <form method="POST" action="{{ isset($event) ? route('event.user.login.submit', $event->id) : route('login') }}">
+                        <form method="POST" action="{{ isset($event) ? route('event.user.login.submit', $event->slug) : route('login') }}">
                             @csrf
                             <div id="login-form-container">
                                 <div id="email-step">
@@ -150,7 +162,7 @@
                 @if(isset($event))
                 <h3 class="mt-3">
                     Don't have an account?
-                    <a href="{{ route('event.user.register', $event->id) }}">Register here</a>
+                    <a href="{{ route('event.user.register', $event->slug) }}">Register here</a>
                 </h3>
                 @else
                 <h3 class="mt-3">

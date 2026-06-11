@@ -3,17 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\TicketType;
-use App\Models\Event;
 
-class TicketPurchase extends Model
+class PendingRegistration extends Model
 {
     protected $fillable = [
-        'ticket_order_id',
-        'user_id',
-        'ticket_type_id',
         'event_id',
+        'ticket_type_id',
         'amount',
         'request',
         'response',
@@ -26,14 +21,9 @@ class TicketPurchase extends Model
         'response' => 'array',
     ];
 
-    public function user()
+    public function event()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function order()
-    {
-        return $this->belongsTo(TicketOrder::class, 'ticket_order_id');
+        return $this->belongsTo(Event::class);
     }
 
     public function ticketType()
@@ -41,8 +31,8 @@ class TicketPurchase extends Model
         return $this->belongsTo(TicketType::class);
     }
 
-    public function event()
+    public function promoCodeRedemptions()
     {
-        return $this->belongsTo(Event::class);
+        return $this->hasMany(PromoCodeRedemption::class);
     }
 }

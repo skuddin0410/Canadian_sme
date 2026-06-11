@@ -36,7 +36,7 @@ class RedirectIfNotAuthenticated
             }
 
             if ($eventId) {
-                return redirect()->guest(route('event.user.login', ['event' => $eventId]));
+                return redirect()->guest(route('event.user.login', ['event' => optional(\App\Models\Event::find($eventId))->slug ?? $eventId]));
             }
 
             return redirect()->guest(route('login'));

@@ -131,10 +131,17 @@ class EventController extends Controller
             'event_logo' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
             'sponsor_banner' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.user_image_size'),
-            'section_order' => 'nullable|array'
+            'section_order' => 'nullable|array',
+            'enable_team_registration' => 'boolean',
+            'enable_free_registration' => 'boolean',
+            'enable_paid_registration' => 'boolean',
         ]);
         $admin = auth()->user();
         $subscription = null;
+
+        if (!$request->boolean('enable_free_registration') && !$request->boolean('enable_paid_registration')) {
+            return back()->withErrors(['enable_paid_registration' => 'Enable at least one of free or paid registration.'])->withInput();
+        }
 
         if ((int) $admin->id !== 1) {
             $subscription = Subscription::active()
@@ -180,6 +187,9 @@ class EventController extends Controller
         $validated['subscription_id'] = $subscription?->id;
         $validated['map_query'] = !empty($validated['map_query']) ? trim($validated['map_query']) : null;
         $validated['section_order'] = !empty($validated['section_order']) ? json_encode($validated['section_order']) : null;
+        $validated['enable_team_registration'] = $request->boolean('enable_team_registration');
+        $validated['enable_free_registration'] = $request->boolean('enable_free_registration');
+        $validated['enable_paid_registration'] = $request->boolean('enable_paid_registration');
 
         $event = Event::create($validated);
 
@@ -433,10 +443,17 @@ class EventController extends Controller
             'event_logo' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
             'sponsor_banner' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.banner_image_size'),
-            'section_order' => 'nullable|array'
+            'section_order' => 'nullable|array',
+            'enable_team_registration' => 'boolean',
+            'enable_free_registration' => 'boolean',
+            'enable_paid_registration' => 'boolean',
         ]);
 
         // New Logic for update: check subscription bounds if not superadmin
+        if (!$request->boolean('enable_free_registration') && !$request->boolean('enable_paid_registration')) {
+            return back()->withErrors(['enable_paid_registration' => 'Enable at least one of free or paid registration.'])->withInput();
+        }
+
         if (!isSuperAdmin()) {
             $admin = auth()->user();
             $subscription = Subscription::active()
@@ -482,6 +499,9 @@ class EventController extends Controller
         $event->terms_condition = $validated['terms_condition'] ?? null;
         $event->help_support = $validated['help_support'] ?? null;
         $event->section_order = !empty($validated['section_order']) ? json_encode($validated['section_order']) : null;
+        $event->enable_team_registration = $request->boolean('enable_team_registration');
+        $event->enable_free_registration = $request->boolean('enable_free_registration');
+        $event->enable_paid_registration = $request->boolean('enable_paid_registration');
         $event->save();
         if ($request->file("image")) {
             $this->imageUpload($request->file("image"), 'events', $event->id, 'events', 'photo', $idForUpdate = $event->id);

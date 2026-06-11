@@ -42,13 +42,8 @@ class TicketTypeController extends Controller
     public function create()
     {
         $events = isSuperAdmin()
-            ? Event::with('sessions')->get()
-            : Event::with('sessions')->whereIn('id', getEventIds())->get();
-
-
-    //    $events = Event::whereIn('status',['draft', 'published'])
-    //     ->with('sessions')
-    //     ->get(); 
+            ? Event::get()
+            : Event::whereIn('id', getEventIds())->get();
         $categories = isSuperAdmin() 
             ? TicketCategory::active()->ordered()->get()
             : TicketCategory::active()->where('created_by', auth()->id())->ordered()->get();
@@ -60,16 +55,6 @@ class TicketTypeController extends Controller
 {
     $request->validate([
     'event_id' => 'required|exists:events,id',
-    'session_id' => [
-        'required',
-        'integer',
-        function ($attribute, $value, $fail) use ($request) {
-            $event = Event::with('sessions')->find($request->event_id);
-            if (!$event || !$event->sessions->pluck('id')->contains($value)) {
-                $fail('The selected session does not belong to the selected event.');
-            }
-        },
-    ],
     'category_id' => 'nullable|exists:ticket_categories,id',
     'name' => 'required|string|max:255',
     'description' => 'nullable|string',
@@ -77,12 +62,26 @@ class TicketTypeController extends Controller
     'total_quantity' => 'required|integer|min:1',
     'min_quantity_per_order' => 'required|integer|min:1',
     'max_quantity_per_order' => 'nullable|integer|min:1',
-    'sale_start_date' =>['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
+    'is_group' => 'boolean',
+    'group_size' => 'nullable|integer|min:2',
+    'discount_percentage' => 'nullable|numeric|min:0|max:100',
+    'is_earlybird' => 'boolean',
+    'earlybird_amount' => 'nullable|numeric|min:0',
+    'earlybird_quantity' => 'nullable|integer|min:1',
+    'sale_start_date' => ['required', 'date'],
     'sale_end_date' => 'nullable|date|after:sale_start_date',
     'requires_approval' => 'boolean',
     'is_active' => 'boolean',
     'access_permissions' => 'nullable|array'
 ]);
+
+    if ($request->boolean('is_group') && (!$request->filled('group_size') || !$request->filled('discount_percentage'))) {
+        return back()->withErrors(['is_group' => 'Please set both group size and group discount percentage.'])->withInput();
+    }
+
+    if ($request->boolean('is_earlybird') && (!$request->filled('earlybird_amount') || !$request->filled('earlybird_quantity'))) {
+        return back()->withErrors(['is_earlybird' => 'Please set both early bird price and early bird quantity.'])->withInput();
+    }
 
     $slug = Str::slug($request->name);
     $eventId = $request->event_id;
@@ -96,7 +95,6 @@ class TicketTypeController extends Controller
 
     $ticketType = TicketType::create([
         'event_id' => $eventId,
-        'session_id' => $request->session_id, 
         'category_id' => $request->category_id,
         'name' => $request->name,
         'slug' => $slug,
@@ -106,6 +104,12 @@ class TicketTypeController extends Controller
         'available_quantity' => $request->total_quantity,
         'min_quantity_per_order' => $request->min_quantity_per_order,
         'max_quantity_per_order' => $request->max_quantity_per_order,
+        'is_group' => $request->boolean('is_group'),
+        'group_size' => $request->boolean('is_group') ? $request->group_size : null,
+        'discount_percentage' => $request->boolean('is_group') ? $request->discount_percentage : null,
+        'is_earlybird' => $request->boolean('is_earlybird'),
+        'earlybird_amount' => $request->boolean('is_earlybird') ? $request->earlybird_amount : null,
+        'earlybird_quantity' => $request->boolean('is_earlybird') ? $request->earlybird_quantity : null,
         'sale_start_date' => $request->sale_start_date,
         'sale_end_date' => $request->sale_end_date,
         'requires_approval' => $request->boolean('requires_approval'),
@@ -156,12 +160,26 @@ class TicketTypeController extends Controller
             'total_quantity' => 'required|integer|min:1',
             'min_quantity_per_order' => 'required|integer|min:1',
             'max_quantity_per_order' => 'nullable|integer|min:1',
-            'sale_start_date' => ['required','date','after_or_equal:'.Carbon::now()->toDateTimeString()],
+            'is_group' => 'boolean',
+            'group_size' => 'nullable|integer|min:2',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+            'is_earlybird' => 'boolean',
+            'earlybird_amount' => 'nullable|numeric|min:0',
+            'earlybird_quantity' => 'nullable|integer|min:1',
+            'sale_start_date' => ['required', 'date'],
             'sale_end_date' => 'nullable|date|after:sale_start_date',
             'requires_approval' => 'boolean',
             'is_active' => 'boolean',
             'access_permissions' => 'nullable|array'
         ]);
+
+        if ($request->boolean('is_group') && (!$request->filled('group_size') || !$request->filled('discount_percentage'))) {
+            return back()->withErrors(['is_group' => 'Please set both group size and group discount percentage.'])->withInput();
+        }
+
+        if ($request->boolean('is_earlybird') && (!$request->filled('earlybird_amount') || !$request->filled('earlybird_quantity'))) {
+            return back()->withErrors(['is_earlybird' => 'Please set both early bird price and early bird quantity.'])->withInput();
+        }
 
         // Handle quantity changes
         $quantityDifference = $request->total_quantity - $ticketType->total_quantity;
@@ -183,6 +201,12 @@ class TicketTypeController extends Controller
             'total_quantity' => $request->total_quantity,
             'min_quantity_per_order' => $request->min_quantity_per_order,
             'max_quantity_per_order' => $request->max_quantity_per_order,
+            'is_group' => $request->boolean('is_group'),
+            'group_size' => $request->boolean('is_group') ? $request->group_size : null,
+            'discount_percentage' => $request->boolean('is_group') ? $request->discount_percentage : null,
+            'is_earlybird' => $request->boolean('is_earlybird'),
+            'earlybird_amount' => $request->boolean('is_earlybird') ? $request->earlybird_amount : null,
+            'earlybird_quantity' => $request->boolean('is_earlybird') ? $request->earlybird_quantity : null,
             'sale_start_date' => $request->sale_start_date,
             'sale_end_date' => $request->sale_end_date,
             'requires_approval' => $request->boolean('requires_approval'),

@@ -9,7 +9,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
                 <div>
                     <h1 class="h3 mb-1">Ticket Purchase Analytics</h1>
-                    <p class="text-muted mb-0">Track ticket sales, revenue, status mix, and top-performing events and ticket types.</p>
+                    <p class="text-muted mb-0">Track payment transactions, revenue, status mix, and top-performing events and ticket types.</p>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
                 <div class="col-md-3">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="text-muted small mb-1">Total Purchases</div>
+                            <div class="text-muted small mb-1">Total Transactions</div>
                             <div class="fs-3 fw-bold">{{ number_format($kpis['total_purchases']) }}</div>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                 <div class="col-md-3">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="text-muted small mb-1">Completed Purchases</div>
+                            <div class="text-muted small mb-1">Completed Transactions</div>
                             <div class="fs-3 fw-bold text-success">{{ number_format($kpis['completed_purchases']) }}</div>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                 <div class="col-md-3">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="text-muted small mb-1">Pending Payments</div>
+                            <div class="text-muted small mb-1">Pending Transactions</div>
                             <div class="fs-3 fw-bold text-warning">{{ number_format($kpis['pending_purchases']) }}</div>
                         </div>
                     </div>
@@ -152,7 +152,7 @@
                                     <thead>
                                         <tr>
                                             <th>Status</th>
-                                            <th>Purchases</th>
+                                            <th>Transactions</th>
                                             <th>Amount</th>
                                         </tr>
                                     </thead>
@@ -186,7 +186,7 @@
                                     <thead>
                                         <tr>
                                             <th>Ticket Type</th>
-                                            <th>Purchases</th>
+                                            <th>Transactions</th>
                                             <th>Amount</th>
                                         </tr>
                                     </thead>
@@ -220,7 +220,7 @@
                                     <thead>
                                         <tr>
                                             <th>Event</th>
-                                            <th>Purchases</th>
+                                            <th>Transactions</th>
                                             <th>Amount</th>
                                         </tr>
                                     </thead>
@@ -246,7 +246,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0">Recent Purchases</h5>
+                            <h5 class="mb-0">Recent Transactions</h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -254,11 +254,12 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>User</th>
+                                            <th>Coordinator</th>
                                             <th>Event</th>
                                             <th>Ticket Type</th>
+                                            <th>Attendees</th>
                                             <th>Status</th>
-                                            <th>Amount</th>
+                                            <th>Total Amount</th>
                                             <th>Date</th>
                                         </tr>
                                     </thead>
@@ -267,18 +268,19 @@
                                             <tr>
                                                 <td>{{ $purchase->id }}</td>
                                                 <td>
-                                                    <div class="fw-semibold">{{ trim(($purchase->user->name ?? '') . ' ' . ($purchase->user->lastname ?? '')) ?: 'N/A' }}</div>
-                                                    <small class="text-muted">{{ $purchase->user->email ?? 'No email' }}</small>
+                                                    <div class="fw-semibold">{{ $purchase->coordinator_name ?: trim(($purchase->coordinatorUser->name ?? '') . ' ' . ($purchase->coordinatorUser->lastname ?? '')) ?: 'N/A' }}</div>
+                                                    <small class="text-muted">{{ $purchase->coordinator_email ?? $purchase->coordinatorUser->email ?? 'No email' }}</small>
                                                 </td>
                                                 <td>{{ $purchase->event->title ?? 'N/A' }}</td>
                                                 <td>{{ $purchase->ticketType->name ?? 'N/A' }}</td>
+                                                <td>{{ number_format((int) $purchase->attendee_count) }}</td>
                                                 <td>{{ ucwords(str_replace('_', ' ', $purchase->status)) }}</td>
-                                                <td>${{ number_format((float) $purchase->amount, 2) }}</td>
+                                                <td>${{ number_format((float) $purchase->total_amount, 2) }}</td>
                                                 <td>{{ optional($purchase->created_at)->format('M d, Y h:i A') }}</td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center text-muted">No recent purchases found.</td>
+                                                <td colspan="8" class="text-center text-muted">No recent transactions found.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>

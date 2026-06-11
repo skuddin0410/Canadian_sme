@@ -41,12 +41,18 @@ class Event extends Model
         'about',
         'help_support',
         'subscription_id',
-        'section_order'
+        'section_order',
+        'enable_team_registration',
+        'enable_free_registration',
+        'enable_paid_registration',
     ];
 
     protected $casts = [
         //'tags' => 'array',
         'is_featured' => 'boolean',
+        'enable_team_registration' => 'boolean',
+        'enable_free_registration' => 'boolean',
+        'enable_paid_registration' => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         // 'section_order' => 'array', // handled manually via json_decode/json_encode due to AutoHtmlDecode trait

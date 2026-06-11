@@ -218,6 +218,110 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="card shadow mb-4" id="earlyBird">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-bolt me-2"></i>Early Bird Configuration
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="is_earlybird"
+                                               name="is_earlybird" value="1" {{ old('is_earlybird', $ticketType->is_earlybird) ? 'checked' : '' }}>
+                                        <label class="form-check-label font-weight-bold" for="is_earlybird">
+                                            Enable Early Bird Pricing
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Offer discounted pricing for a limited number of attendees.</small>
+                                </div>
+
+                                <div id="earlyBirdSettings" style="display: {{ old('is_earlybird', $ticketType->is_earlybird) ? 'block' : 'none' }};">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="earlybird_amount" class="font-weight-bold">Early Bird Price</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">$</span>
+                                                    </div>
+                                                    <input type="number" class="form-control @error('earlybird_amount') is-invalid @enderror"
+                                                           id="earlybird_amount" name="earlybird_amount"
+                                                           value="{{ old('earlybird_amount', $ticketType->earlybird_amount) }}" step="0.01" min="0">
+                                                </div>
+                                                @error('earlybird_amount')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="earlybird_quantity" class="font-weight-bold">Early Bird Quantity</label>
+                                                <input type="number" class="form-control @error('earlybird_quantity') is-invalid @enderror"
+                                                       id="earlybird_quantity" name="earlybird_quantity"
+                                                       value="{{ old('earlybird_quantity', $ticketType->earlybird_quantity) }}" min="1">
+                                                <small class="form-text text-muted">Only this many attendees can get early bird price.</small>
+                                                @error('earlybird_quantity')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow mb-4" id="grouptTicket">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-users me-2"></i>Group Ticket Configuration
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="is_group" name="is_group"
+                                               value="1" {{ old('is_group', $ticketType->is_group) ? 'checked' : '' }}>
+                                        <label class="form-check-label font-weight-bold" for="is_group">
+                                            Enable Group Discount
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Apply a percentage discount when the team size reaches the configured threshold.</small>
+                                </div>
+
+                                <div id="groupSettings" style="display: {{ old('is_group', $ticketType->is_group) ? 'block' : 'none' }};">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="group_size" class="font-weight-bold">Minimum Group Size</label>
+                                                <input type="number" class="form-control @error('group_size') is-invalid @enderror"
+                                                       id="group_size" name="group_size" value="{{ old('group_size', $ticketType->group_size) }}"
+                                                       min="2">
+                                                <small class="form-text text-muted">Discount starts when attendee count reaches this size.</small>
+                                                @error('group_size')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="discount_percentage" class="font-weight-bold">Group Discount (%)</label>
+                                                <input type="number" class="form-control @error('discount_percentage') is-invalid @enderror"
+                                                       id="discount_percentage" name="discount_percentage"
+                                                       value="{{ old('discount_percentage', $ticketType->discount_percentage) }}"
+                                                       min="0" max="100" step="0.01">
+                                                <small class="form-text text-muted">Discount percentage applied to the calculated ticket price.</small>
+                                                @error('discount_percentage')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Settings Sidebar -->
@@ -231,7 +335,7 @@
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" class="form-check-input" id="is_active" 
-                                               name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                                               name="is_active" value="1" {{ old('is_active', $ticketType->is_active) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="is_active">
                                             <strong>Active</strong>
                                             <div class="form-text">Ticket type is available for purchase</div>
@@ -242,7 +346,7 @@
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" class="form-check-input" id="requires_approval" 
-                                               name="requires_approval" value="1" {{ old('requires_approval') ? 'checked' : '' }}>
+                                               name="requires_approval" value="1" {{ old('requires_approval', $ticketType->requires_approval) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="requires_approval">
                                             <strong>Requires Approval</strong>
                                             <div class="form-text">Bookings need manual approval</div>
@@ -356,7 +460,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Form elements
@@ -374,6 +478,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewDescription = document.getElementById('previewDescription');
     const previewPrice = document.getElementById('previewPrice');
     const previewQuantity = document.getElementById('previewQuantity');
+    const isGroupInput = document.getElementById('is_group');
+    const isEarlyBirdInput = document.getElementById('is_earlybird');
+    const groupSettings = document.getElementById('groupSettings');
+    const earlyBirdSettings = document.getElementById('earlyBirdSettings');
     
     // Update preview in real-time
     function updatePreview() {
@@ -414,6 +522,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initial preview update
     updatePreview();
+
+    function syncPricingToggles() {
+        if (groupSettings && isGroupInput) {
+            groupSettings.style.display = isGroupInput.checked ? 'block' : 'none';
+        }
+        if (earlyBirdSettings && isEarlyBirdInput) {
+            earlyBirdSettings.style.display = isEarlyBirdInput.checked ? 'block' : 'none';
+        }
+    }
+
+    syncPricingToggles();
+    isGroupInput?.addEventListener('change', syncPricingToggles);
+    isEarlyBirdInput?.addEventListener('change', syncPricingToggles);
     
     // Form validation
     document.getElementById('ticketTypeForm').addEventListener('submit', function(e) {
@@ -440,6 +561,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         }
+
+        if (isGroupInput.checked) {
+            const groupSize = document.getElementById('group_size');
+            const discountPercentage = document.getElementById('discount_percentage');
+            if (!groupSize.value || parseInt(groupSize.value, 10) < 2) {
+                e.preventDefault();
+                alert('Please set a valid minimum group size of at least 2.');
+                groupSize.focus();
+                return false;
+            }
+            if (!discountPercentage.value) {
+                e.preventDefault();
+                alert('Please set the group discount percentage.');
+                discountPercentage.focus();
+                return false;
+            }
+        }
+
+        if (isEarlyBirdInput.checked) {
+            const earlyBirdAmount = document.getElementById('earlybird_amount');
+            const earlyBirdQuantity = document.getElementById('earlybird_quantity');
+            if (!earlyBirdAmount.value) {
+                e.preventDefault();
+                alert('Please set the early bird price.');
+                earlyBirdAmount.focus();
+                return false;
+            }
+            if (!earlyBirdQuantity.value || parseInt(earlyBirdQuantity.value, 10) < 1) {
+                e.preventDefault();
+                alert('Please set the early bird quantity.');
+                earlyBirdQuantity.focus();
+                return false;
+            }
+        }
     });
     
     // Access permissions logic
@@ -461,4 +616,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endsection
