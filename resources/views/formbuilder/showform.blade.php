@@ -1033,14 +1033,24 @@ use Illuminate\Support\Str;
                     $hasLenRule = in_array($type, ['text','email','textarea','number']) && ($min || $max);
                     $isPasswordField = $type === 'password';
                     $displayRequired = $isRequired && !$isPasswordField;
+                    $isPhoneField = in_array($name, ['mobile', 'phone', 'phone_number'], true);
+                    $inputType = $isPhoneField ? 'tel' : $type;
 
-                    $autocomplete = match($type) {
-                    'text' => 'name',
+                    $autocomplete = match($name) {
+                    'first_name' => 'given-name',
+                    'last_name' => 'family-name',
                     'email' => 'email',
-                    'number' => 'off',
-                    'date' => 'bday',
-                    'password' => 'new-password',
-                    default => 'off',
+                    'mobile', 'phone', 'phone_number' => 'tel',
+                    'company' => 'organization',
+                    'designation', 'job_title', 'title' => 'organization-title',
+                    default => match($type) {
+                        'text' => 'off',
+                        'email' => 'email',
+                        'number' => 'off',
+                        'date' => 'bday',
+                        'password' => 'new-password',
+                        default => 'off',
+                    },
                     };
 
                     $hintParts = [];
@@ -1079,12 +1089,13 @@ use Illuminate\Support\Str;
                             {{ $label }} @if($displayRequired)<span class="req">*</span>@endif
                         </label>
                         <input
-                            type="{{ $type }}"
+                            type="{{ $inputType }}"
                             id="{{ $idBase }}"
                             name="{{ $name }}"
                             class="df-input"
                             placeholder="Enter {{ strtolower($label) }}"
                             autocomplete="{{ $autocomplete }}"
+                            @if($isPhoneField) inputmode="tel" @endif
                             value="{{ $type !== 'password' ? $oldValue : '' }}"
                             @if($displayRequired) required @endif
                             @if($min && in_array($type,['text','email','textarea'])) minlength="{{ $min }}" @endif
@@ -1365,10 +1376,13 @@ use Illuminate\Support\Str;
                 'min' => $field['min'] ?? null,
                 'max' => $field['max'] ?? null,
                 'is_full_width' => in_array($type, ['textarea', 'checkbox', 'radio', 'select']) || $isBioField,
-                'autocomplete' => match ($type) {
-                    'text' => 'name',
+                'autocomplete' => match ($name) {
+                    'first_name' => 'given-name',
+                    'last_name' => 'family-name',
                     'email' => 'email',
-                    'number', 'date', 'textarea', 'select', 'radio', 'checkbox' => 'off',
+                    'mobile', 'phone', 'phone_number' => 'tel',
+                    'company' => 'organization',
+                    'designation', 'job_title', 'title' => 'organization-title',
                     default => 'off',
                 },
             ];
@@ -1532,6 +1546,9 @@ use Illuminate\Support\Str;
             const requiredMarker = field.required ? '<span class="req">*</span>' : '';
             const requiredAttr = field.required ? ' data-team-required="1"' : '';
             const fullWidthClass = field.is_full_width ? ' df-field-full' : '';
+            const autocomplete = field.autocomplete && field.autocomplete !== 'off'
+                ? `section-team-${index} ${field.autocomplete}`
+                : 'off';
             const hintParts = [];
 
             if (field.required) {
@@ -1632,18 +1649,21 @@ use Illuminate\Support\Str;
             const maxAttr = field.type === 'number' && field.max !== null && field.max !== '' ? ` max="${escapeHtml(field.max)}"` : '';
             const minlengthAttr = ['text', 'email'].includes(field.type) && field.min !== null && field.min !== '' ? ` minlength="${escapeHtml(field.min)}"` : '';
             const maxlengthAttr = ['text', 'email'].includes(field.type) && field.max !== null && field.max !== '' ? ` maxlength="${escapeHtml(field.max)}"` : '';
+            const isPhoneField = ['mobile', 'phone', 'phone_number'].includes(field.name);
+            const inputType = isPhoneField ? 'tel' : field.type;
+            const inputModeAttr = isPhoneField ? ' inputmode="tel"' : '';
 
             return `
                 <div class="df-field${fullWidthClass}">
                     <label class="df-label" for="${fieldId}">${escapeHtml(field.label)} ${requiredMarker}</label>
                     <input
-                        type="${escapeHtml(field.type)}"
+                        type="${escapeHtml(inputType)}"
                         id="${fieldId}"
                         name="${fieldName}"
                         class="df-input"
                         placeholder="Enter ${escapeHtml(String(field.label).toLowerCase())}"
-                        autocomplete="${escapeHtml(field.autocomplete || 'off')}"
-                        value="${escapeHtml(value ?? '')}"${requiredAttr}${minAttr}${maxAttr}${minlengthAttr}${maxlengthAttr}>
+                        autocomplete="${escapeHtml(autocomplete)}"
+                        value="${escapeHtml(value ?? '')}"${requiredAttr}${minAttr}${maxAttr}${minlengthAttr}${maxlengthAttr}${inputModeAttr}>
                     ${hintMarkup}
                 </div>`;
         }
