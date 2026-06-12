@@ -131,7 +131,8 @@
                                         </div>
                                         <input type="hidden" id="otp" name="otp">
                                         <span class="invalid-feedback d-block mb-2" role="alert" id="otp-error"></span>
-                                        <p class="text-muted small mb-4">{{ __('A 4-digit code has been sent to your email.') }}</p>
+                                        <p class="text-muted small mb-1">{{ __('A 4-digit code has been sent to your email.') }}</p>
+                                        <p class="text-muted small mb-4">{{ __('** Please check your spam if you have not received the email in your inbox.') }}</p>
                                         
                                         <div class="form-check d-inline-block mb-4">
                                             <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>

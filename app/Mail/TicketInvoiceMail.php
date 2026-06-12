@@ -6,6 +6,7 @@ use App\Models\TicketInvoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class TicketInvoiceMail extends Mailable
 {
@@ -34,10 +35,10 @@ class TicketInvoiceMail extends Mailable
                     ?->map(fn ($purchase) => $purchase->user)
                     ->filter()
                     ->values() ?? collect(),
-            ]);
+        ]);
 
         if ($this->invoice->pdf_path) {
-            $mail->attach(storage_path('app/' . $this->invoice->pdf_path), [
+            $mail->attach(Storage::disk('local')->path($this->invoice->pdf_path), [
                 'as' => $this->invoice->invoice_number . '.pdf',
                 'mime' => 'application/pdf',
             ]);
