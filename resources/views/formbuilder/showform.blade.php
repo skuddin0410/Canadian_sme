@@ -1319,7 +1319,7 @@ use Illuminate\Support\Str;
         </div>
 
         <div class="df-footer-link">
-            Already have an account? <a href="{{ route('login', ['event_id' => session('event_id')]) }}">
+            Already have an account? <a href="{{ route('event.user.login', ['event' => $event->slug]) }}">
                 Sign in
             </a>
         </div>
