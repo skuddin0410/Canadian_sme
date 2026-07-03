@@ -182,6 +182,23 @@ class HomeController extends Controller
         return redirect()->route('user.home');
     }
 
+    public function loginActivity()
+    {
+        $user = Auth::user();
+
+        abort_unless($user && $user->hasRole('Admin'), 403);
+
+        $loginLogsQuery = UserLogin::with('user')->orderBy('created_at', 'desc');
+
+        if (!isSuperAdmin()) {
+            $loginLogsQuery->where('user_id', $user->id);
+        }
+
+        $loginLogs = $loginLogsQuery->paginate(15);
+
+        return view('login-activity.index', compact('loginLogs'));
+    }
+
     public function accountInfo(Request $request)
     {
         return view('account_settings.account_information');

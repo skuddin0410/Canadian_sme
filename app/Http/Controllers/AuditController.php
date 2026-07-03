@@ -10,10 +10,6 @@ class AuditController extends Controller
     public function index(Request $request)
     {   
         $query = AuditLog::query();
-
-        if (!isSuperAdmin()) {
-            $query->where('user_id', auth()->id());
-        }
         
         // Filter by event type
         if ($request->has('event') && $request->event != null) {
@@ -39,6 +35,8 @@ class AuditController extends Controller
             $query->where('user_id', $request->user_id);
         }
         
+        $query->visibleTo(auth()->user());
+
         $logs = $query->with('user')->orderBy('created_at', 'desc')->paginate(15);
         
         return view('audit.index', compact('logs'));
@@ -46,15 +44,25 @@ class AuditController extends Controller
     
     public function show(AuditLog $log)
     {
+        abort_unless(
+            AuditLog::query()
+                ->whereKey($log->id)
+                ->visibleTo(auth()->user())
+                ->exists(),
+            403
+        );
+
         return view('audit.show', compact('log'));
     }
     
     public function entityLogs(Request $request, $entityType, $entityId)
     {
-        $logs = AuditLog::where('auditable_type', $entityType)
-                      ->where('auditable_id', $entityId)
-                      ->orderBy('created_at', 'desc')
-                      ->paginate(15);
+        $logs = AuditLog::query()
+            ->where('auditable_type', $entityType)
+            ->where('auditable_id', $entityId)
+            ->visibleTo(auth()->user())
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
                       
         return view('audit.entity-logs', compact('logs', 'entityType', 'entityId'));
     }
