@@ -118,6 +118,8 @@ class TicketTypeController extends Controller
         'created_by' => auth()->id()
     ]);
 
+    notifyContentMenuChange('Ticket', 'created', $ticketType->name, $ticketType->id, 'ticket_type', $ticketType->event_id);
+
     return redirect()->route('admin.ticket-types.index')
                     ->with('success', 'Ticket type created successfully.');
 }

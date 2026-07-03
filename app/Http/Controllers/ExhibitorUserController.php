@@ -213,6 +213,8 @@ public function index(Request $request)
             );
         }
 
+            notifyContentMenuChange('Exhibitor', 'created', $company->name, $company->id, 'content_exhibitor', (int) ($request->event_id[0] ?? 0) ?: null);
+
 
         return redirect(route('exhibitor-users.index'))
             ->withSuccess('Exhibitor Created');
@@ -347,6 +349,8 @@ public function show($exhibitor_user, Request $request){
                 );
             }
 
+            notifyContentMenuChange('Exhibitor', 'updated', $company->name, $company->id, 'content_exhibitor', (int) ($request->event_id[0] ?? 0) ?: null);
+
 
             return redirect(route('exhibitor-users.index'))
                 ->withSuccess('Exhibitor updated successfully.');
@@ -458,8 +462,14 @@ public function deleteDoc($id)
 
     public function destroy($exhibitor_id)
     {   
-        $company = Company::findOrFail($exhibitor_id); 
+        $company = Company::findOrFail($exhibitor_id);
+        $eventId = \App\Models\EventAndEntityLink::where('entity_type', 'companies')
+            ->where('entity_id', $company->id)
+            ->value('event_id');
+        $companyName = $company->name;
+        $companyId = $company->id;
         $company->delete();
+        notifyContentMenuChange('Exhibitor', 'deleted', $companyName, $companyId, 'content_exhibitor', $eventId);
 
         return back()->withErrors('Exhibitor deleted successfully.');
     }

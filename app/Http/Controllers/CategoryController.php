@@ -83,6 +83,7 @@ class CategoryController extends Controller
         $category->type = $request->type;
         $category->color = $request->color ?? '';
         $category->save();
+        notifyContentMenuChange('Category', 'created', $category->name, $category->id, 'content_category');
         return redirect(route('categories.index'))->withSuccess("Category has been saved successfully");
     }
 
@@ -122,6 +123,7 @@ class CategoryController extends Controller
         $category->type = $request->type;
         $category->color = $request->color ?? '';
         $category->save();
+        notifyContentMenuChange('Category', 'updated', $category->name, $category->id, 'content_category');
         return redirect(route('categories.index'))->withSuccess("Category has been saved successfully");
     }
 
@@ -130,7 +132,10 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {   
+        $categoryName = $category->name;
+        $categoryId = $category->id;
         $category->delete();
+        notifyContentMenuChange('Category', 'deleted', $categoryName, $categoryId, 'content_category');
         return redirect(route('categories.index'))->withSuccess("Category has been deleted successfully");
     }
 
@@ -139,6 +144,7 @@ class CategoryController extends Controller
        $category = Category::where('id',$request->id)->first();
        $category->order = $request->order == 0 ? null : $request->order;
        $category->save();
+       notifyContentMenuChange('Category Order', 'updated', $category->name, $category->id, 'content_category');
        return 'success';
     }
     
@@ -155,6 +161,7 @@ class CategoryController extends Controller
         $category->slug = $request->slug;
         $category->type = 'event';
         $category->save();
+        notifyContentMenuChange('Tag', 'created', $category->name, $category->id, 'content_tag');
         
         return response()->json([
           'data'=>Category::where('type','tags')->get()
