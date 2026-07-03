@@ -101,6 +101,7 @@ class PollController extends Controller
             }
 
             DB::commit();
+            notifyContentMenuChange('Poll', 'created', $poll->title, $poll->id, 'poll', $poll->event_id);
 
             return redirect()
                 ->route('polls.index')

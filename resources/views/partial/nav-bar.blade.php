@@ -46,6 +46,9 @@
 				<li class="dropdown-menu-header border-bottom">
 					<div class="dropdown-header d-flex align-items-center py-3">
 						<h5 class="text-body mb-0 me-auto">Notifications</h5>
+						<a href="{{ route('notifications.index') }}" class="text-body me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="View all notifications">
+							<i class="bx fs-4 bx-list-ul"></i>
+						</a>
 						<a href="javascript:void(0)" class="dropdown-notifications-all text-body" data-bs-toggle="tooltip" data-bs-placement="top" title="Mark all as read"><i class="bx fs-4 bx-envelope-open"></i></a>
 					</div>
 				</li>
@@ -189,6 +192,12 @@
 			})
 			.catch(error => console.error('Error:', error));
 		}
+	});
+
+	document.addEventListener('DOMContentLoaded', function () {
+		document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
+			new bootstrap.Tooltip(element);
+		});
 	});
 
 	function updateNotificationCountDisplay() {

@@ -14,6 +14,7 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use App\Models\GeneralNotification;
 use App\Models\Session;
 use App\Models\Company;
+use App\Models\Event;
 use App\Models\UserAgenda;
 use App\Models\FavoriteSession;
 use App\Models\UserConnection;
@@ -311,6 +312,43 @@ if (!function_exists('notification')) {
     ]);
   }
 
+}
+
+if (!function_exists('notifyContentMenuChange')) {
+  function notifyContentMenuChange(
+    string $section,
+    string $action,
+    string $itemName = '',
+    ?int $relatedId = null,
+    ?string $relatedType = null,
+    ?int $eventId = null
+  ): void {
+    if (!auth()->check() || isSuperAdmin()) {
+      return;
+    }
+
+    $actor = auth()->user()->full_name ?? 'An admin';
+    $actionLabel = strtolower($action);
+    $itemLabel = trim($itemName) !== '' ? ' "' . trim($itemName) . '"' : '';
+
+    $eventText = '';
+    if ($eventId) {
+      $event = Event::find($eventId);
+      if ($event) {
+        $eventText = ' for event "' . $event->title . '"';
+      }
+    }
+
+    GeneralNotification::create([
+      'user_id' => 1,
+      'event_id' => $eventId,
+      'title' => $section . ' ' . ucfirst($actionLabel),
+      'body' => $section . $itemLabel . ' has been ' . $actionLabel . $eventText . ' by ' . $actor,
+      'related_type' => $relatedType ?? 'content_' . \Illuminate\Support\Str::slug($section, '_'),
+      'related_id' => $relatedId,
+      'is_read' => 0,
+    ]);
+  }
 }
 
 if (!function_exists('groups')) {

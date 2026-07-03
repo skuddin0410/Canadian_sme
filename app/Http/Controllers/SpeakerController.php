@@ -210,11 +210,16 @@ class SpeakerController extends Controller
           }  
           
         }
-    
-   
+        
+        $this->notifySpeakerContentChange('created', $user, (int) ($request->event_id[0] ?? 0) ?: null);
 
       return redirect(route('speaker.index'))
         ->withSuccess('Speaker data has been saved successfully');
+    }
+
+    protected function notifySpeakerContentChange(string $action, Speaker $speaker, ?int $eventId = null): void
+    {
+        notifyContentMenuChange('Speaker', $action, $speaker->full_name, $speaker->id, 'content_speaker', $eventId);
     }
 
     /**
@@ -316,6 +321,8 @@ class SpeakerController extends Controller
             }
         }
 
+        $this->notifySpeakerContentChange('updated', $user, (int) ($request->event_id[0] ?? 0) ?: null);
+
       return redirect(route('speaker.index'))
          ->withSuccess('Speaker data has been updated successfully');
     }
@@ -326,7 +333,13 @@ class SpeakerController extends Controller
     public function destroy(string $id)
     {
         $user = Speaker::findOrFail($id);
+        $eventId = \App\Models\EventAndEntityLink::where('entity_type', 'speakers')
+            ->where('entity_id', $user->id)
+            ->value('event_id');
+        $speakerName = $user->full_name;
+        $speakerId = $user->id;
         $user->delete();
+        notifyContentMenuChange('Speaker', 'deleted', $speakerName, $speakerId, 'content_speaker', $eventId);
 
         return redirect()
             ->route('speaker.index')

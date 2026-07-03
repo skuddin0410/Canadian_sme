@@ -13,6 +13,7 @@ use Auth;
 use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\UserLogin;
+use App\Models\GeneralNotification;
 use App\Models\Page;
 use App\Models\Speaker;
 use App\Models\Company;
@@ -197,6 +198,19 @@ class HomeController extends Controller
         $loginLogs = $loginLogsQuery->paginate(15);
 
         return view('login-activity.index', compact('loginLogs'));
+    }
+
+    public function notifications()
+    {
+        $user = Auth::user();
+
+        abort_unless($user && $user->hasRole('Admin'), 403);
+
+        $notifications = GeneralNotification::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('notifications.index', compact('notifications'));
     }
 
     public function accountInfo(Request $request)

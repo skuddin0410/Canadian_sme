@@ -201,6 +201,7 @@ public function index(Request $request)
 
 
     DB::commit();
+    notifyContentMenuChange('Sponsor', 'created', $company->name, $company->id, 'content_sponsor', (int) ($request->event_id[0] ?? 0) ?: null);
 
     return redirect(route('sponsors.index'))
         ->withSuccess('Sponsor Created');
@@ -335,6 +336,7 @@ public function index(Request $request)
 
         
         DB::commit();
+        notifyContentMenuChange('Sponsor', 'updated', $company->name, $company->id, 'content_sponsor', (int) ($request->event_id[0] ?? 0) ?: null);
 
         return redirect(route('sponsors.index'))
             ->withSuccess('Sponsor Updated');
@@ -353,7 +355,13 @@ public function index(Request $request)
     public function destroy(string $id){
 
         $company = Company::findOrFail($id);
+        $eventId = \App\Models\EventAndEntityLink::where('entity_type', 'companies')
+            ->where('entity_id', $company->id)
+            ->value('event_id');
+        $companyName = $company->name;
+        $companyId = $company->id;
         $company->delete();
+        notifyContentMenuChange('Sponsor', 'deleted', $companyName, $companyId, 'content_sponsor', $eventId);
         return redirect()
             ->route('sponsors.index')
             ->withSuccess('Sponsor user deleted successfully.');

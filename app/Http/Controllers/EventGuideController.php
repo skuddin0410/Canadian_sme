@@ -198,6 +198,8 @@ public function store(Request $request)
         );
     }
 
+    notifyContentMenuChange('Event Guide', 'created', $eventGuide->title, $eventGuide->id, 'content_event_guide', $eventGuide->event_id);
+
     return redirect()->route('event-guides.index')
         ->withSuccess('Event Guide has been created successfully');
 }
@@ -304,6 +306,7 @@ public function store(Request $request)
     }
 
     $eventGuide->save();
+    notifyContentMenuChange('Event Guide', 'updated', $eventGuide->title, $eventGuide->id, 'content_event_guide', $eventGuide->event_id);
 
     return redirect()->route('event-guides.index')
         ->withSuccess('Event Guide has been updated successfully');
@@ -317,7 +320,11 @@ public function store(Request $request)
     {
          $eventGuide = EventGuide::findOrFail($id);
          $this->ensureGuideAccess($eventGuide, false);
+         $guideTitle = $eventGuide->title;
+         $guideId = $eventGuide->id;
+         $eventId = $eventGuide->event_id;
          $eventGuide->delete();
+         notifyContentMenuChange('Event Guide', 'deleted', $guideTitle, $guideId, 'content_event_guide', $eventId);
         return back()->with('success', 'EventGuide deleted successfully.');
         
     }

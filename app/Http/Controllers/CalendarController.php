@@ -382,6 +382,8 @@ class CalendarController extends Controller
 
         $session->load(['speakers','exhibitors','sponsors','photo']);
 
+        notifyContentMenuChange('Schedule', 'created', $session->title, $session->id, 'content_schedule', $session->event_id);
+
         return response()->json([
             'message' => 'Session created successfully',
             'session' => $session
@@ -510,6 +512,7 @@ class CalendarController extends Controller
         }
       
         $session->load(['speakers','exhibitors','sponsors','photo']);
+        notifyContentMenuChange('Schedule', 'updated', $session->title, $session->id, 'content_schedule', $session->event_id);
 
         return response()->json([
             'message' => 'Session updated successfully',
@@ -519,7 +522,11 @@ class CalendarController extends Controller
 
     public function deleteSession(Session $session): JsonResponse
     {
+        $sessionTitle = $session->title;
+        $sessionId = $session->id;
+        $eventId = $session->event_id;
         $session->delete();
+        notifyContentMenuChange('Schedule', 'deleted', $sessionTitle, $sessionId, 'content_schedule', $eventId);
 
         return response()->json([
             'message' => 'Session deleted successfully'
