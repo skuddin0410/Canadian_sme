@@ -250,6 +250,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
 
   Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\HomeController::class, 'markAllNotificationsAsRead'])->name('notifications.markAllAsRead');
   Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\HomeController::class, 'markNotificationAsRead'])->name('notifications.markAsRead');
+  Route::get('/login-activity', [App\Http\Controllers\HomeController::class, 'loginActivity'])->name('login-activity.index');
 
   Route::prefix('analytics')->name('admin.analytics.')->group(function () {
     Route::get('/session', [AnalyticsController::class, 'session'])->name('session');

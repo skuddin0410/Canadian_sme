@@ -12,8 +12,11 @@
 			<div class="flex-grow-1">
 				Hi,{{Auth::user()->full_name ?? '' }}
 				@if(Auth::user())
+				@php
+					$loginAsLabel = isSuperAdmin() ? 'Super Admin' : 'Event Admin';
+				@endphp
 				<br>
-				 <span> Login as a : <small class="text-muted">{{Auth::user()->getRoleNames()->first() ?? ''}}</small></span>
+				 <span> Login as a : <small class="text-muted">{{ $loginAsLabel }}</small></span>
 				 
 				 @endif
 			</div>

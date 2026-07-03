@@ -296,6 +296,7 @@
         <div class="card h-100">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0"><i class="bi bi-box-arrow-in-right"></i> Login Activity</h4>
+            <a href="{{ route('login-activity.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
           </div>
           <div class="card-body">
             <div class="list-group list-group-flush">
