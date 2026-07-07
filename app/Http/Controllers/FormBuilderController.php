@@ -279,7 +279,7 @@ class FormBuilderController extends Controller
             FormSubmission::create([
                 'form_id'         => $form->id,
                 'submission_data' => $data,
-                'ip_address'      => $request->ip(),
+                'ip_address'      => client_ip($request),
                 'user_agent'      => $request->userAgent(),
             ]);
 
@@ -333,7 +333,7 @@ class FormBuilderController extends Controller
         FormSubmission::create([
             'form_id'         => $form->id,
             'submission_data' => $data,
-            'ip_address'      => $request->ip(),
+            'ip_address'      => client_ip($request),
             'user_agent'      => $request->userAgent(),
         ]);
 

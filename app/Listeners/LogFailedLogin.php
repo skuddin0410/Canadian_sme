@@ -24,7 +24,7 @@ class LogFailedLogin
     public function handle(Failed $event): void
     {
         $email = $event->credentials['email'] ?? ($event->credentials['username'] ?? 'unknown');
-        $ip = Request::ip();
+        $ip = client_ip();
         $userAgent = Request::header('User-Agent');
         $time = now()->format('Y-m-d H:i:s');
 
