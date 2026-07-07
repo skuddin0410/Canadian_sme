@@ -266,23 +266,20 @@
           <div class="card-body">
             <div class="list-group list-group-flush">
               @forelse($logs ?? [] as $log)
-                @php
-                  $action = match($log->event) {
-                    'created' => 'New '.class_basename($log->auditable_type),
-                    'updated' => 'Updated '.class_basename($log->auditable_type),
-                    'deleted' => 'Deleted '.class_basename($log->auditable_type),
-                    default => ucfirst($log->event),
-                  };
-                @endphp
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i class="bi bi-info-circle text-primary me-2" aria-hidden="true"></i>
-                    <strong>#{{ $log->auditable_id }} {{ $action }}:</strong>
-                    “{{ $log->user?->full_name ?? 'System' }}”
-                    on {{ $log->created_at->format('M d, Y') }},
-                    {{ $log->created_at->format('h:i A') }}
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div class="d-flex gap-3">
+                      <div class="rounded-circle bg-{{ $log->event_badge_class }} bg-opacity-10 text-{{ $log->event_badge_class }} d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="bi {{ $log->event_icon }}" aria-hidden="true"></i>
+                      </div>
+                      <div>
+                        <div class="fw-semibold">{{ $log->event_label }} {{ $log->entity_label }} #{{ $log->auditable_id }}</div>
+                        <div class="text-muted small">By {{ $log->actor_label }}</div>
+                        <div class="text-muted small">{{ $log->changed_fields_summary }}</div>
+                      </div>
+                    </div>
+                    <small class="text-muted text-nowrap">{{ $log->created_at->diffForHumans() }}</small>
                   </div>
-                  <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
                 </div>
               @empty
                 <div class="text-muted">No recent activity.</div>

@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Event;
 use App\Models\User;
 use App\Models\Pricing;
+use App\Traits\Auditable;
 
 class Subscription extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'price_id',
         'user_id',
@@ -20,6 +23,11 @@ class Subscription extends Model
     protected $casts = [
         'expired_at' => 'datetime',
     ];
+
+    public function auditExclude(): array
+    {
+        return ['expired_at'];
+    }
     public function events()
     {
         return $this->hasMany(Event::class);

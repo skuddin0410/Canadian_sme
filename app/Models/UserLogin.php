@@ -11,6 +11,11 @@ class UserLogin extends Model
     use  Auditable;
     use AutoHtmlDecode;
 
+    public function auditEnabled(): bool
+    {
+        return false;
+    }
+
     protected $fillable = [
          'user_id',
          'ip_address',
