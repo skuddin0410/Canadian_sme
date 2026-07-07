@@ -19,6 +19,11 @@
      use  Auditable;
      use AutoHtmlDecode;
 
+    public function auditEnabled(): bool
+    {
+        return false;
+    }
+
 	protected $fillable = [
 	'user_id','event_id','title','body',
 	'related_type','related_id','related_name',

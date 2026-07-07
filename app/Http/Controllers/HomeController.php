@@ -92,7 +92,7 @@ class HomeController extends Controller
                 $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
                 $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
             } else {
-                $logs = AuditLog::with('user')->where('user_id', $user->id)->orderBy('created_at', 'desc')->limit(5)->get();
+                $logs = AuditLog::with('user')->visibleTo($user)->orderBy('created_at', 'desc')->limit(5)->get();
                 $loginlogs = UserLogin::with('user')->where('user_id', $user->id)->orderBy('created_at', 'desc')->limit(5)->get();
             }
 

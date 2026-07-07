@@ -9,7 +9,8 @@ class AuditController extends Controller
 {
     public function index(Request $request)
     {   
-        $query = AuditLog::query();
+        $user = auth()->user();
+        $query = AuditLog::query()->visibleTo($user);
         
         // Filter by event type
         if ($request->has('event') && $request->event != null) {
@@ -34,12 +35,12 @@ class AuditController extends Controller
         if ($request->has('user_id') && $request->user_id != null ) {
             $query->where('user_id', $request->user_id);
         }
-        
-        $query->visibleTo(auth()->user());
 
         $logs = $query->with('user')->orderBy('created_at', 'desc')->paginate(15);
+        $eventOptions = AuditLog::eventOptions();
+        $typeOptions = AuditLog::typeOptions($user);
         
-        return view('audit.index', compact('logs'));
+        return view('audit.index', compact('logs', 'eventOptions', 'typeOptions'));
     }
     
     public function show(AuditLog $log)
@@ -52,6 +53,8 @@ class AuditController extends Controller
             403
         );
 
+        $log->loadMissing('user');
+
         return view('audit.show', compact('log'));
     }
     
@@ -61,6 +64,7 @@ class AuditController extends Controller
             ->where('auditable_type', $entityType)
             ->where('auditable_id', $entityId)
             ->visibleTo(auth()->user())
+            ->with('user')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
                       

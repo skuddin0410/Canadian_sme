@@ -24,9 +24,11 @@
                         <label for="event" class="form-label fw-medium">Event Type</label>
                         <select name="event" id="event" class="form-select">
                             <option value="">All Events</option>
-                            <option value="created" {{ request('event') == 'created' ? 'selected' : '' }}>Created</option>
-                            <option value="updated" {{ request('event') == 'updated' ? 'selected' : '' }}>Updated</option>
-                            <option value="deleted" {{ request('event') == 'deleted' ? 'selected' : '' }}>Deleted</option>
+                            @foreach($eventOptions as $eventOption)
+                                <option value="{{ $eventOption }}" {{ request('event') == $eventOption ? 'selected' : '' }}>
+                                    {{ ucfirst($eventOption) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     
@@ -34,11 +36,11 @@
                         <label for="type" class="form-label fw-medium">Entity Type</label>
                         <select name="type" id="type" class="form-select">
                             <option value="">All Types</option>
-                            <option value="App\Models\Project" {{ request('type') == 'App\Models\Project' ? 'selected' : '' }}>Project</option>
-                            <option value="App\Models\InvestmentClass" {{ request('type') == 'App\Models\InvestmentClass' ? 'selected' : '' }}>Investment Class</option>
-                            <option value="App\Models\Investment" {{ request('type') == 'App\Models\Investment' ? 'selected' : '' }}>Investment</option>
-                            <option value="App\Models\Distribution" {{ request('type') == 'App\Models\Distribution' ? 'selected' : '' }}>Distribution</option>
-                            <option value="App\Models\WaterfallModel" {{ request('type') == 'App\Models\WaterfallModel' ? 'selected' : '' }}>Waterfall Model</option>
+                            @foreach($typeOptions as $typeOption)
+                                <option value="{{ $typeOption }}" {{ request('type') == $typeOption ? 'selected' : '' }}>
+                                    {{ class_basename($typeOption) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     
@@ -87,6 +89,9 @@
                                 <i class="bi bi-box me-1"></i>Entity
                             </th>
                             <th scope="col" class="px-4 py-3">
+                                <i class="bi bi-list-check me-1"></i>What Changed
+                            </th>
+                            <th scope="col" class="px-4 py-3">
                                 <i class="bi bi-person me-1"></i>User
                             </th>
                             <th scope="col" class="px-4 py-3">
@@ -101,34 +106,24 @@
                         @forelse ($logs as $log)
                             <tr>
                                 <td class="px-4 py-3">
-                                    @if($log->event == 'created')
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-plus-circle me-1"></i>Created
-                                        </span>
-                                    @elseif($log->event == 'updated')
-                                        <span class="badge bg-primary">
-                                            <i class="bi bi-pencil me-1"></i>Updated
-                                        </span>
-                                    @elseif($log->event == 'deleted')
-                                        <span class="badge bg-danger">
-                                            <i class="bi bi-trash me-1"></i>Deleted
-                                        </span>
-                                    @else
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-question-circle me-1"></i>{{ ucfirst($log->event) }}
-                                        </span>
-                                    @endif
+                                    <span class="badge bg-{{ $log->event_badge_class }}">
+                                        <i class="bi {{ $log->event_icon }} me-1"></i>{{ $log->event_label }}
+                                    </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <div class="fw-medium text-dark">{{ class_basename($log->auditable_type) }}</div>
+                                    <div class="fw-medium text-dark">{{ $log->entity_label }}</div>
                                     <small class="text-muted">#{{ $log->auditable_id }}</small>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="fw-medium">{{ $log->changed_fields_summary }}</div>
+                                    <small class="text-muted">{{ $log->change_count }} field{{ $log->change_count === 1 ? '' : 's' }}</small>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="d-flex align-items-center">
                                         <div class="me-2">
                                             @if($log->user)
                                                 <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 12px;">
-                                                    {{ substr($log->user->full_name, 0, 2) }}
+                                                    {{ $log->actor_initials }}
                                                 </div>
                                             @else
                                                 <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
@@ -137,7 +132,7 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <div class="fw-medium">{{ $log->user ? $log->user->full_name : 'System' }}</div>
+                                            <div class="fw-medium">{{ $log->actor_label }}</div>
                                             <small class="text-muted">{{ $log->user ? $log->user->email : 'Automated process' }}</small>
                                         </div>
                                     </div>
@@ -161,7 +156,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-5 text-center">
+                                <td colspan="6" class="px-4 py-5 text-center">
                                     <div class="text-muted">
                                         <i class="bi bi-inbox display-1"></i>
                                         <h5 class="mt-3">No audit logs found</h5>

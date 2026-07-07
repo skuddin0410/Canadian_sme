@@ -146,33 +146,12 @@ class SubscriptionController extends Controller
             }
         }
 
-        $oldValues = $subscription->only(['price_id', 'attendee_count', 'event_count', 'status']);
-
         $subscription->update([
             'price_id' => $request->price_id,
             'attendee_count' => $request->attendee_count,
             'event_count' => $request->event_count,
             'status' => $request->status,
         ]);
-
-        $newValues = $subscription->only(['price_id', 'attendee_count', 'event_count', 'status']);
-        
-        // Log changes if any
-        $changes = array_diff_assoc($newValues, $oldValues);
-        if (!empty($changes)) {
-            \App\Models\AuditLog::create([
-                'user_id' => auth()->id(),
-                'user_type' => get_class(auth()->user()),
-                'event' => 'updated',
-                'auditable_type' => get_class($subscription),
-                'auditable_id' => $subscription->id,
-                'old_values' => $oldValues,
-                'new_values' => $newValues,
-                'url' => request()->fullUrl(),
-                'ip_address' => client_ip(),
-                'user_agent' => request()->userAgent(),
-            ]);
-        }
 
         return redirect()->route('subscription.index')
             ->with('success', 'Subscription updated successfully.');
