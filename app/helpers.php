@@ -30,6 +30,7 @@ use App\Services\IOSPushService;
 use App\Models\FavoriteConnection;
 use App\Models\NewBadge;
 use App\Models\Subscription;
+use App\Support\ClientIp;
 
 
 if (!function_exists('getCategory')) {
@@ -41,6 +42,13 @@ if (!function_exists('getCategory')) {
        } 
        $category = $category->get();
        return $category;
+    }
+}
+
+if (!function_exists('client_ip')) {
+    function client_ip(?\Illuminate\Http\Request $request = null): ?string
+    {
+        return ClientIp::resolve($request);
     }
 }
 

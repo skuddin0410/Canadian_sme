@@ -169,7 +169,7 @@ class SubscriptionController extends Controller
                 'old_values' => $oldValues,
                 'new_values' => $newValues,
                 'url' => request()->fullUrl(),
-                'ip_address' => request()->ip(),
+                'ip_address' => client_ip(),
                 'user_agent' => request()->userAgent(),
             ]);
         }

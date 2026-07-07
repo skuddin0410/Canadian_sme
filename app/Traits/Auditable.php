@@ -34,7 +34,7 @@ trait Auditable
             'auditable_type' => get_class($model),
             'auditable_id' => $model->id,
             'url' => Request::fullUrl(),
-            'ip_address' => Request::ip(),
+            'ip_address' => client_ip(),
             'user_agent' => Request::userAgent()
         ];
         

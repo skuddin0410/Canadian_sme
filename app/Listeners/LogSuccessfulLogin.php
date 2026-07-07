@@ -23,7 +23,7 @@ class LogSuccessfulLogin
     {
         UserLogin::create([
             'user_id'     => $event->user->id,
-            'ip_address'  => request()->ip(),
+            'ip_address'  => client_ip(),
             'user_agent'  => request()->header('User-Agent'),
             'logged_in_at'=> now(),
         ]);

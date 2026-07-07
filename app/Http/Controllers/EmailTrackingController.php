@@ -114,7 +114,7 @@ class EmailTrackingController extends Controller
     }
 
     $userAgent = request()->userAgent() ?? '';
-    $ip        = request()->ip();
+    $ip        = client_ip();
 
     // Gmail prefetch user-agents — do NOT count as real open
     $botAgents = [
@@ -196,7 +196,7 @@ private function gifResponse()
                 'user_id' => $mailLog->user_id,
                 'event_type' => 'clicked',
                 'clicked_url' => $url,
-                'ip_address' => $request->ip(),
+                'ip_address' => client_ip($request),
                 'user_agent' => $request->userAgent()
             ]);
         }

@@ -846,13 +846,24 @@ public function getAttendee(Request $request)
             }
 
             // choose form event_and_entity_link table 
-            $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+            $speakers = User::with([
+                'roles',
+                'photo',
+                'ticketPurchases' => function ($query) use ($request) {
+                    $query->with('ticketType:id,name')
+                        ->where('event_id', $request->event_id);
+                },
+            ])->whereHas('roles', function ($q) {
                 $q->where('name', 'Attendee');
             })->whereNotNull('users.name')->whereHas('eventAndEntityLinks', function($q) use($request){
                 $q->where('event_id', $request->event_id);
             })->orderBy('id', 'DESC')->get();
         }else{
-            $speakers = User::with('roles','photo')->whereHas('roles', function ($q) {
+            $speakers = User::with([
+                'roles',
+                'photo',
+                'ticketPurchases.ticketType:id,name',
+            ])->whereHas('roles', function ($q) {
             $q->where('name', 'Attendee');
             })->whereNotNull('users.name')->orderBy('id', 'DESC')->get();
         }
@@ -872,7 +883,8 @@ public function getAttendee(Request $request)
                     'company_name'  => $speaker->company ?? '',
                     'role'  => $speaker->designation ?? '',
                     'image_url'   => !empty($speaker->photo) ? $speaker->photo->mobile_path  : asset('images/noImage.png'),
-                    'roles' => groups($speaker)
+                    'roles' => groups($speaker),
+                    'ticket_tag' => $this->ticketTagsForUser($speaker),
                 ];
         });
 
@@ -896,7 +908,17 @@ public function getAttendeeById(Request $request){
             ], 401);
         }
 
-        $speaker = User::with('roles','photo')->whereHas('roles', function ($q) {
+        $speaker = User::with([
+            'roles',
+            'photo',
+            'ticketPurchases' => function ($query) use ($request) {
+                $query->with('ticketType:id,name');
+
+                if ($request->filled('event_id')) {
+                    $query->where('event_id', $request->event_id);
+                }
+            },
+        ])->whereHas('roles', function ($q) {
             $q->where('name', 'Attendee');
         })->where('id', $request->id)->first();
 
@@ -934,6 +956,7 @@ public function getAttendeeById(Request $request){
             'role'           => $speaker->designation ?? '',
             'image_url'      => !empty($speaker->photo) ? $speaker->photo->mobile_path : asset('images/noImage.png'),
             'roles'          => groups($speaker),
+            'ticket_tag'      => $this->ticketTagsForUser($speaker),
             'contact_details'=> $contactDetails,
             'company_website' => $speaker->website_url ?? '',
             'comet_chat_id' => $speaker->cometchat_id, //Joydeep new addition jan12 ,2026 
@@ -949,6 +972,15 @@ public function getAttendeeById(Request $request){
         ], 500);
     }
 }
+
+    protected function ticketTagsForUser(User $user)
+    {
+        return $user->ticketPurchases
+            ->pluck('ticketType.name')
+            ->filter()
+            ->unique()
+            ->values();
+    }
 
 public function getTags()
 {
