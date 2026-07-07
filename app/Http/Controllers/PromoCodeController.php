@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\GeneralNotification;
 use App\Models\PromoCode;
 use App\Models\PromoCodeRedemption;
 use App\Models\TicketType;
@@ -60,7 +61,17 @@ class PromoCodeController extends Controller
         $data['code'] = Str::upper($data['code']);
         $data['created_by'] = auth()->id();
 
-        PromoCode::create($data);
+        $promoCode = PromoCode::create($data);
+        $creator = auth()->user();
+
+        GeneralNotification::create([
+            'user_id' => 1,
+            'title' => 'Promo Code Created',
+            'body' => 'Promo code "' . $promoCode->code . '" has been created by "' . ($creator?->full_name ?? $creator?->name ?? 'System') . '".',
+            'related_type' => 'promo_code',
+            'related_id' => $promoCode->id,
+            'is_read' => 0,
+        ]);
 
         return redirect()->route('admin.promo-codes.index')
             ->with('success', 'Promo code created successfully.');

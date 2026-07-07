@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\GeneralNotification;
 use App\Models\TicketCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -49,6 +50,17 @@ class TicketCategoryController extends Controller
             'sort_order' => $request->sort_order ?? 0,
             'is_active' => $request->boolean('is_active', true),
             'created_by' => auth()->id()
+        ]);
+
+        $creator = auth()->user();
+
+        GeneralNotification::create([
+            'user_id' => 1,
+            'title' => 'Ticket Category Created',
+            'body' => 'Ticket category "' . $category->name . '" has been created by "' . ($creator?->full_name ?? $creator?->name ?? 'System') . '".',
+            'related_type' => 'ticket_category',
+            'related_id' => $category->id,
+            'is_read' => 0,
         ]);
 
         return redirect()->route('admin.ticket-categories.index')
