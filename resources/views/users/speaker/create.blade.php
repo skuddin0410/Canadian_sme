@@ -166,7 +166,7 @@ Admin | Speaker Add
                         <div class="input-group input-group-merge mb-3">
                           <span class="input-group-text"><i class="bx bx-sort"></i></span>
                           <input type="number" name="order_by" class="form-control"
-                                 value="{{ old('order_by', 0) }}" min="0">
+                                 value="{{ old('order_by', $nextOrder ?? 1) }}" min="0">
                         </div>
                         @error('order_by') <div class="text-danger small">{{ $message }}</div> @enderror
                       </div>
@@ -616,4 +616,3 @@ zone.addEventListener('drop', (e) => {
 
 </script>
 @endsection
-

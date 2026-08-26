@@ -198,13 +198,13 @@
             </a>
             <ul class="menu-sub">
 
-                @if(isSuperAdmin())
+                {{-- @if(isSuperAdmin())
                 <li class="menu-item {{ request()->is('admin/admin/ticket-categories*') ? 'active open' : '' }}">
                     <a href="{{route('usergroup.index')}}" class="menu-link">
                         <div data-i18n="ticket-categories"> User Groups</div>
                     </a>
                 </li>
-                @endif
+                @endif --}}
                 <li class="menu-item {{ request()->is('admin/attendee-users*') ? 'active' : '' }}">
                     <a href="{{ route('attendee-users.index') }}" class="menu-link">
                         <div data-i18n="Attendee">Attendees </div>

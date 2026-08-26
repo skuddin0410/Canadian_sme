@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
 use App\Models\Track;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use App\Models\Company;
 use App\Models\Speaker;
 
@@ -92,6 +93,28 @@ class CalendarController extends Controller
                 ->unique()
                 ->implode(', ');
         });
+    }
+
+    private function validateSessionDates(Request $request): void
+    {
+        $event = Event::findOrFail($request->integer('event_id'));
+        $timezone = $request->input('timezone', config('app.timezone'));
+        $startDate = Carbon::parse($request->input('start_time'), $timezone)->toDateString();
+        $endDate = Carbon::parse($request->input('end_time'), $timezone)->toDateString();
+        $eventStartDate = $event->start_date->toDateString();
+        $eventEndDate = $event->end_date->toDateString();
+
+        if ($startDate < $eventStartDate || $startDate > $eventEndDate) {
+            throw ValidationException::withMessages([
+                'start_time' => "Session start date must be between {$eventStartDate} and {$eventEndDate}.",
+            ]);
+        }
+
+        if ($endDate < $eventStartDate || $endDate > $eventEndDate) {
+            throw ValidationException::withMessages([
+                'end_time' => "Session end date must be between {$eventStartDate} and {$eventEndDate}.",
+            ]);
+        }
     }
 
     public function index(Request $request)
@@ -321,6 +344,8 @@ class CalendarController extends Controller
             'speaker_ids.*.exists' => 'One or more selected speakers do not exist.'
         ]);
 
+        $this->validateSessionDates($request);
+
         $sessionTimezone = $request->timezone;
         $startTime = Carbon::parse($request->start_time, $sessionTimezone)->setTimezone(config('app.timezone'));
         $endTime = Carbon::parse($request->end_time, $sessionTimezone)->setTimezone(config('app.timezone'));
@@ -442,6 +467,8 @@ class CalendarController extends Controller
     'speaker_ids.array' => 'Speakers must be an array.',
     'speaker_ids.*.exists' => 'One or more selected speakers do not exist.'
 ]);
+
+        $this->validateSessionDates($request);
 
         $sessionTimezone = $request->timezone;
         $startTime = Carbon::parse($request->start_time, $sessionTimezone)->setTimezone(config('app.timezone'));

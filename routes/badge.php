@@ -11,12 +11,12 @@ Route::get('badges/{badge}/download', [BadgeController::class, 'download'])->nam
 
 Route::post('/new/badges/pdf',[NewBadgeController::class, 'generateBadgePdf'])->name('new.badges.print');
 Route::get('/new/badges/preview/{template_name}',[NewBadgeController::class, 'generateBadgePdfPreview'])->name('new.badges.preview');
+Route::post('/new/badges/preview/{template_name}',[NewBadgeController::class, 'generateBadgePdfPreview'])->name('new.badges.preview.post');
 
 Route::resource('newbadges', NewBadgeController::class);
 Route::post(
     'newbadges/{newbadge}/save-layout',
     [NewBadgeController::class, 'saveLayout']
 );
-
 
 
