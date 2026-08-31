@@ -123,7 +123,11 @@
                 <button class="btn btn-warning" onclick="duplicateItem()">Duplicate</button>
                 <button class="btn btn-danger" onclick="deleteItem()">Delete</button>
                 <button class="btn btn-success" onclick="saveLayout()">Save Layout</button>
-                <a href="{{route('new.badges.preview',['template_name'=>$newbadge->id])}}" class="btn btn-primary" target="_blank">Preview</a>
+                <form method="POST" action="{{ route('new.badges.preview.post', ['template_name' => $newbadge->id]) }}" target="_blank" id="previewForm">
+                    @csrf
+                    <input type="hidden" name="layout" id="previewLayout">
+                    <button type="submit" class="btn btn-primary w-100" onclick="preparePreview()">Preview</button>
+                </form>
             </div>
 
             <pre id="output" class="bg-dark text-white p-2 mt-3 small d-none"></pre>
@@ -308,6 +312,22 @@ function saveLayout() {
     }).finally(()=>{
         window.location.reload();
     });
+}
+
+function getLayoutData() {
+    return Array.from(document.querySelectorAll(".canvas-item")).map(el => ({
+        type: el.dataset.type,
+        x: el.style.left,
+        y: el.style.top,
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+        fontSize: el.style.fontSize,
+        color: el.style.color
+    }));
+}
+
+function preparePreview() {
+    document.getElementById("previewLayout").value = JSON.stringify(getLayoutData());
 }
 
 window.onload = function () {

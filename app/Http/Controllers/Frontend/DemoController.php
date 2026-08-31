@@ -8,11 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\DemoBookingMail;
 use Illuminate\Support\Facades\Mail;
+use App\Services\AdminInquiryAlertService;
 
 
 class DemoController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, AdminInquiryAlertService $alerts)
     {
 
 
@@ -68,7 +69,9 @@ class DemoController extends Controller
             $email = $request->email;
         }
 
-        // Send Email
+        $alerts->notifyDemoRequest($demo->loadMissing('user'));
+
+        // Send confirmation email to the requester
         Mail::to($email)->send(new DemoBookingMail($demo));
 
         return back()->with('success', 'Demo booked successfully!');

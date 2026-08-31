@@ -36,6 +36,9 @@ public function index(Request $request)
 
     
     $query = Company::with('user')
+        ->addSelect(['team_count' => User::selectRaw('count(*)')
+            ->whereRaw('FIND_IN_SET(companies.id, users.access_sponsor_ids)')
+        ])
         ->where('is_sponsor', true)
         ->orderBy('order_by', 'ASC')
         ->orderBy('created_at', 'DESC');
@@ -107,6 +110,29 @@ public function index(Request $request)
         "perPage"   => $perPage,
         "offset"    => $offset,
         "events"    => $events,
+    ]);
+}
+
+public function getTeam($id)
+{
+    $sponsor = Company::where('is_sponsor', true)->findOrFail($id);
+    $team = User::whereRaw('FIND_IN_SET(?, access_sponsor_ids)', [$id])
+        ->with('photo')
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'sponsor_name' => $sponsor->name,
+        'team' => $team->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->full_name,
+                'email' => $user->email,
+                'mobile' => $user->mobile,
+                'designation' => $user->designation,
+                'image' => $user->photo ? $user->photo->file_path : asset('images/noImage.png'),
+            ];
+        }),
     ]);
 }
 

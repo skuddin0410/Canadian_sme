@@ -45,6 +45,8 @@ class Event extends Model
         'enable_team_registration',
         'enable_free_registration',
         'enable_paid_registration',
+        'email_branding_type',
+        'email_branding_name',
     ];
 
     protected $casts = [
@@ -108,6 +110,14 @@ class Event extends Model
         return $this->hasOne(Drive::class, 'table_id', 'id')
             ->where('table_type', 'events')
             ->where('file_type', 'sponsor_banner')
+            ->whereNotNull('file_name');
+    }
+
+    public function emailBrandingLogo()
+    {
+        return $this->hasOne(Drive::class, 'table_id', 'id')
+            ->where('table_type', 'events')
+            ->where('file_type', 'email_branding_logo')
             ->whereNotNull('file_name');
     }
 

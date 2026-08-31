@@ -252,7 +252,7 @@
                             <label for="sessionTimezone" class="form-label">Time Zone *</label>
                             <select class="form-select" id="sessionTimezone" name="timezone" required>
                                 @php
-                                    $defaultTimezone = config('app.timezone');
+                                    $defaultTimezone = $event->timezone ?? config('app.timezone');
                                     $preferredTimezones = [
                                         'America/Toronto',
                                         'America/New_York',
@@ -423,8 +423,9 @@
         eventId: {{ $event->id ?? 0 }},
         eventName: '{{ $event->title ?? '' }}',
         eventStart: "{{ isset($event) ? $event->start_date->format('Y-m-d') : '' }}",
+        eventEndDate: "{{ isset($event) ? $event->end_date->format('Y-m-d') : '' }}",
         eventEnd:  "{{ isset($event) ? $event->end_date->copy()->addDay()->format('Y-m-d') : '' }}",
-        timezone: '{{ config("app.timezone") }}',
+        timezone: '{{ $event->timezone ?? config("app.timezone") }}',
         {{-- tracks: @json($event->tracks), --}}
         venues: @json(isset($event) ? $event->venues : []),
         apiUrls: {

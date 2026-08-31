@@ -14,6 +14,7 @@ class GalleryItem extends Model
         'added_by',
         'is_approved',
         'event_id',
+        'sort_order',
     ];
 
     public function getFilePathAttribute($value)

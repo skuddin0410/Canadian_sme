@@ -74,6 +74,40 @@
         </div>
     </div>
 </div>
+
+<!-- Sponsor Team Modal -->
+<div class="modal fade" id="sponsorTeamModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sponsor Team: <span id="modalSponsorName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Designation</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sponsorTeamTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="sponsorTeamLoader" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+                <div id="noSponsorTeamMessage" class="text-center d-none p-3">
+                    <p class="text-muted mb-0">No team members found for this sponsor.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -100,6 +134,42 @@ $(document).ready(function() {
 
     // Initial load
     loadUsers();
+
+    $(document).on('click', '.view-sponsor-team-btn', function() {
+        const sponsorId = $(this).data('id');
+        $('#modalSponsorName').text($(this).data('name'));
+        $('#sponsorTeamTableBody').empty();
+        $('#sponsorTeamLoader').removeClass('d-none');
+        $('#noSponsorTeamMessage').addClass('d-none');
+        $('#sponsorTeamModal').modal('show');
+
+        $.ajax({
+            url: `/admin/sponsors/${sponsorId}/team`,
+            type: 'GET',
+            success: function(response) {
+                $('#sponsorTeamLoader').addClass('d-none');
+                if (response.success && response.team.length > 0) {
+                    response.team.forEach(member => {
+                        $('#sponsorTeamTableBody').append(`
+                            <tr>
+                                <td><img src="${member.image}" alt="${member.name}" class="rounded-circle" width="40" height="40" style="object-fit: cover;"></td>
+                                <td class="fw-semibold">${member.name}</td>
+                                <td>${member.designation || '-'}</td>
+                                <td>${member.email || '-'}</td>
+                                <td>${member.mobile || '-'}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    $('#noSponsorTeamMessage').removeClass('d-none');
+                }
+            },
+            error: function() {
+                $('#sponsorTeamLoader').addClass('d-none');
+                $('#noSponsorTeamMessage').removeClass('d-none');
+            }
+        });
+    });
 
     // Search button click
     $('#search-btn').click(function() {

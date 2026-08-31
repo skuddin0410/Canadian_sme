@@ -41,8 +41,10 @@ class SpeakerController extends Controller
         $offset = $perPage * ($pageNo - 1);
         $search = $request->input('search', '');
         $kyc = $request->input('kyc', '');
+        $orderDirection = $request->input('order_direction', 'asc');
+        $orderDirection = in_array($orderDirection, ['asc', 'desc'], true) ? $orderDirection : 'asc';
         if ($request->ajax() && $request->ajax_request == true) {
-            $users = Speaker::orderBy('order_by', 'ASC')->orderBy('created_at', 'DESC');
+            $users = Speaker::orderBy('order_by', $orderDirection)->orderBy('created_at', 'DESC');
             if ($search !== '') {
                 $users = $users->where(function ($query) use ($search) {
                     $query->where('name', 'LIKE', '%' . $search . '%');
@@ -131,7 +133,23 @@ class SpeakerController extends Controller
         $events = isSuperAdmin() 
             ? DB::table('events')->select('id', 'title')->get()
             : DB::table('events')->select('id', 'title')->whereIn('id', getEventIds())->get();
-        return view('users.speaker.create', compact('events'));
+        $nextOrder = ((int) Speaker::max('order_by')) + 1;
+
+        return view('users.speaker.create', compact('events', 'nextOrder'));
+    }
+
+    public function updateOrder(Request $request, Speaker $speaker)
+    {
+        $data = $request->validate([
+            'order_by' => 'required|integer|min:0',
+        ]);
+
+        $speaker->update($data);
+
+        return response()->json([
+            'message' => 'Speaker order updated successfully.',
+            'order_by' => $speaker->order_by,
+        ]);
     }
 
     /**

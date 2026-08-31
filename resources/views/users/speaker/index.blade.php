@@ -27,6 +27,10 @@
                 <form action="#" method="GET" id="users-filter">        
                     <div class="row padding-none">
                         <div class="col-4">  
+                            <select class="form-select" name="order_direction" id="order_direction">
+                                <option value="asc" {{ request('order_direction', 'asc') === 'asc' ? 'selected' : '' }}>Order: Low to High</option>
+                                <option value="desc" {{ request('order_direction') === 'desc' ? 'selected' : '' }}>Order: High to Low</option>
+                            </select>
                         </div>
                         <div class="col-3">
                             <div class="col-auto">
@@ -83,7 +87,7 @@
             headers: {
                 'X-CSRF-Token': $('meta[name="_token"]').attr('content')
             },
-            data:{ajax_request:true},
+            data: $('#users-filter').serialize() + '&ajax_request=true',
             dataType: "json",
             success: function (data) {
                $(document).find("#user-table").html(data.html);
@@ -149,6 +153,26 @@
     
     $('.reset-filter').on('click', function() {
       window.location.href = "{{route('speaker.index')}}";
-    });   	
+    });
+
+    $(document).on('click', '.save-speaker-order', function() {
+        const button = $(this);
+        const input = button.closest('.speaker-order-control').find('.speaker-order-input');
+
+        $.ajax({
+            url: button.data('url'),
+            type: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: { order_by: input.val() },
+            success: function() {
+                GetUserList();
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON?.message || 'Unable to update speaker order.');
+            }
+        });
+    });
 </script>	
 @endsection

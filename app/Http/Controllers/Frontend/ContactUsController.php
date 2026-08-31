@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EventSupport;
 use App\Models\Event;
+use App\Services\AdminInquiryAlertService;
 
 class ContactUsController extends Controller
 {
@@ -15,7 +16,7 @@ class ContactUsController extends Controller
 
         return view("frontend.new_support", compact('event'));
     }
-    public function store(Request $request, $slug)
+    public function store(Request $request, $slug, AdminInquiryAlertService $alerts)
     {
         $event = Event::where('slug', $slug)->firstOrFail();
 
@@ -27,13 +28,15 @@ class ContactUsController extends Controller
             'message'  => 'required|string',
         ]);
 
-        EventSupport::create([
+        $support = EventSupport::create([
             'event_id' => $event->id,
             'name'     => $request->name,
             'email'    => $request->email,
             'phone'    => $request->phone,
             'message'  => $request->message,
         ]);
+
+        $alerts->notifyEventTicket($support->loadMissing('event'));
 
         return redirect()
             ->route('support', $slug)

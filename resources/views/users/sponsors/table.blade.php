@@ -36,6 +36,7 @@
       <th>Phone</th>
       <th>Type</th>
       <th>Order</th>
+      <th>Team</th>
       <th width="10%">Actions</th>
     </tr>
   </thead>
@@ -61,6 +62,19 @@
         {{$company->type}}
      </td>
       <td>{{ $company->order_by ?? 0 }}</td>
+
+      <td>
+        @if($company->team_count > 0)
+          <button type="button"
+                  class="btn btn-sm btn-outline-info view-sponsor-team-btn"
+                  data-id="{{ $company->id }}"
+                  data-name="{{ $company->name }}">
+            <i class="bx bx-group me-1"></i> View
+          </button>
+        @else
+          <span class="text-muted">-</span>
+        @endif
+      </td>
 
       <td>
         <div class="d-flex gap-2">

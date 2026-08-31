@@ -148,7 +148,7 @@ class PromoCodeController extends Controller
             PromoCode::create([
                 'event_id' => $data['event_id'],
                 'ticket_type_id' => $data['ticket_type_id'] ?? null,
-                'code' => $this->generateUniqueCode($prefix),
+                'code' => $this->generateUniqueCode($prefix, (int) $data['event_id']),
                 'discount_type' => $data['discount_type'],
                 'discount_value' => $data['discount_value'],
                 'is_active' => $request->boolean('is_active', true),
@@ -208,7 +208,9 @@ class PromoCodeController extends Controller
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('promo_codes', 'code')->ignore($promoCode?->id),
+                Rule::unique('promo_codes', 'code')
+                    ->where(fn ($query) => $query->where('event_id', $request->input('event_id')))
+                    ->ignore($promoCode?->id),
             ],
             'discount_type' => ['required', Rule::in(['percentage', 'fixed'])],
             'discount_value' => 'required|numeric|min:0',
@@ -254,11 +256,11 @@ class PromoCodeController extends Controller
         }
     }
 
-    protected function generateUniqueCode(string $prefix): string
+    protected function generateUniqueCode(string $prefix, int $eventId): string
     {
         do {
             $code = $prefix . '-' . Str::upper(Str::random(8));
-        } while (PromoCode::where('code', $code)->exists());
+        } while (PromoCode::where('event_id', $eventId)->where('code', $code)->exists());
 
         return $code;
     }

@@ -51,7 +51,14 @@
 		<th style="text-transform:none">{{$user->email ?? ''}}</th>
 		<th>{{$user->mobile ?? ''}}</th>
 	   <th>{{$user->designation ?? ''}}</th>
-	   <th>{{$user->order_by ?? 0}}</th>
+	   <th>
+        <div class="input-group input-group-sm speaker-order-control" style="min-width: 110px;">
+            <input type="number" class="form-control speaker-order-input" min="0" value="{{ $user->order_by ?? 0 }}" aria-label="Speaker order">
+            <button type="button" class="btn btn-outline-primary save-speaker-order" data-url="{{ route('speaker.order', $user) }}" title="Save order">
+                <i class="bx bx-save"></i>
+            </button>
+        </div>
+    </th>
 		{{-- <th>{{dateFormat($user->created_at) ?? '' }}</th> --}}
 		<th>
     <div class="d-flex gap-1">

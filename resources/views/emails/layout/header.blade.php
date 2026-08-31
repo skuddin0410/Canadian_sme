@@ -65,8 +65,18 @@
 <body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;">
   @php
     $mailEvent = $event ?? null;
+    $mailSponsor = $sponsor ?? null;
     $headerImage = $mailEvent?->eventLogo?->file_path ?: $mailEvent?->photo?->file_path ?: asset('images/footer-logo.png');
     $headerTitle = $mailEvent?->title ?: (getKeyValue('company_name')->value ?? config('app.name'));
+    $partnerLogo = $mailEvent?->emailBrandingLogo?->file_path ?: $mailSponsor?->logo?->file_path ?: $mailEvent?->sponsorBanner?->file_path;
+    $partnerName = $mailEvent?->email_branding_name ?: $mailSponsor?->name;
+    $partnerLabel = $mailEvent?->email_branding_type === 'powered_by'
+      ? 'Powered by'
+      : ($mailEvent?->email_branding_type === 'sponsored_by'
+        ? 'Sponsored by'
+        : ($mailSponsor
+          ? (str_contains(strtolower((string) $mailSponsor->type), 'power') ? 'Powered by' : 'Sponsored by')
+          : null));
   @endphp
 
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f4f6f8">
@@ -77,15 +87,26 @@
           
           <!-- Header -->
           <tr>
-            <td bgcolor="#004fb8" style="padding:20px;">
+            <td bgcolor="#004fb8" style="padding:24px 28px 22px 28px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td width="190" valign="middle">
-                    <img src="{{ $headerImage }}" alt="{{ $headerTitle }}" width="180"
-                      style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:180px !important;height:auto !important;max-width:100%;">
+                  <td width="235" valign="middle" style="width:235px; padding-right:20px;">
+                    <img src="{{ $headerImage }}" alt="{{ $headerTitle }}" width="215"
+                      style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:215px !important;height:auto !important;max-width:100%;max-height:88px;">
                   </td>
-                  <td valign="middle" style="color:white; padding-left:15px;">
-                    <p style="font-size:22px; line-height:1.3; margin:0; font-weight:700;">{{ $headerTitle }}</p>
+                  <td valign="middle" style="color:white; padding-left:0;">
+                    @if($mailEvent && $partnerLabel && ($partnerLogo || $partnerName))
+                      @if($partnerLogo)
+                        <img src="{{ $partnerLogo }}" alt="{{ $partnerName ?: $partnerLabel }}" width="100"
+                          style="display:block;border:0;outline:none;text-decoration:none;width:100px !important;height:auto !important;max-width:100%;max-height:48px;margin:0 0 8px 0;">
+                      @endif
+                      <p style="font-size:14px; line-height:1.35; margin:0 0 2px 0; opacity:0.85;">{{ $partnerLabel }}</p>
+                      @if($partnerName)
+                        <p style="font-size:20px; line-height:1.25; margin:0; font-weight:700;">{{ $partnerName }}</p>
+                      @endif
+                    @else
+                      <p style="font-size:23px; line-height:1.28; margin:0; font-weight:700;">{{ $headerTitle }}</p>
+                    @endif
                   </td>
                 </tr>
               </table>

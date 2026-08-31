@@ -331,9 +331,15 @@ public function store(Request $request)
 
 public function showGallery()
 {
+    $storageEventIds = isSuperAdmin() ? [] : getEventIds();
+    $storageUsedBytes = $this->galleryStorageUsedBytes($storageEventIds);
+    $storageLimitBytes = $this->galleryStorageLimitBytes();
+    $storageUsagePercent = min(100, round(($storageUsedBytes / max($storageLimitBytes, 1)) * 100, 1));
+
     // Superadmin sees everything
-    if (isSuperAdmin()) {
-        $galleryItems = GalleryItem::with(['user', 'event'])->latest()->get();
+        if (isSuperAdmin()) {
+        $galleryItems = GalleryItem::with(['user', 'event'])
+            ->orderBy('sort_order')->latest()->get();
     } else {
         $eventIds = getEventIds();
         $galleryItems = GalleryItem::with(['user', 'event'])
@@ -342,7 +348,7 @@ public function showGallery()
                 $query->where('is_approved', true)
                       ->orWhere('added_by', Auth::id());
             })
-            ->latest()
+            ->orderBy('sort_order')->latest()
             ->get();
     }
 
@@ -350,7 +356,33 @@ public function showGallery()
         ? Event::orderBy('title')->get()
         : Event::whereIn('id', getEventIds())->orderBy('title')->get();
 
-    return view('event_guide.gallery', compact('galleryItems', 'events'));
+    return view('event_guide.gallery', compact(
+        'galleryItems',
+        'events',
+        'storageUsedBytes',
+        'storageLimitBytes',
+        'storageUsagePercent'
+    ));
+}
+
+protected function galleryStorageLimitBytes(): int
+{
+    return (int) config('media.storage_limit_mb', 1024) * 1024 * 1024;
+}
+
+protected function galleryStorageUsedBytes(array $eventIds = []): int
+{
+    $query = GalleryItem::query();
+    if ($eventIds) {
+        $query->whereIn('event_id', $eventIds);
+    }
+
+    return $query->get(['file_path'])->sum(function ($item) {
+        $path = $item->getRawOriginal('file_path');
+        return $path && Storage::disk('public')->exists($path)
+            ? Storage::disk('public')->size($path)
+            : 0;
+    });
 }
 
 public function approveGalleryItem(Request $request)
@@ -402,7 +434,7 @@ public function approveAllGalleryItems(Request $request)
     return redirect()->route('event-guides.showGallery')->with('success', 'All pending files approved successfully.');
 }
 
-    public function uploadGallery(Request $request)
+public function uploadGallery(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'event_id' => 'required|exists:events,id',
@@ -432,6 +464,24 @@ public function approveAllGalleryItems(Request $request)
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $storageEventIds = isSuperAdmin() ? [] : getEventIds();
+        $usedBytes = $this->galleryStorageUsedBytes($storageEventIds);
+        $selectedBytes = collect($request->file('images', []))->sum(fn ($file) => $file->getSize());
+        $limitBytes = $this->galleryStorageLimitBytes();
+
+        if ($usedBytes + $selectedBytes > $limitBytes) {
+            $message = 'Upload exceeds the available media storage space. Please delete existing files or contact an administrator.';
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => [$message]], 422);
+            }
+
+            return redirect()->back()->with('error', $message)->withInput();
+        }
+
+        $nextOrder = (int) GalleryItem::where('event_id', $request->event_id)
+            ->where('file_type', '!=', '')
+            ->max('sort_order') + 1;
+
         foreach ($request->file('images') as $file) {
             $path = $file->store('event_guides', 'public');
             $extension = strtolower($file->getClientOriginalExtension());
@@ -450,6 +500,7 @@ public function approveAllGalleryItems(Request $request)
                 'added_by' => Auth::id(),
                 'is_approved' => isSuperAdmin() ? true : false,
                 'event_id' => $request->event_id,
+                'sort_order' => $nextOrder++,
             ]);
         }
 
@@ -476,6 +527,37 @@ public function approveAllGalleryItems(Request $request)
         }
 
         return redirect()->route('event-guides.showGallery')->with('success', 'Files uploaded successfully.');
+    }
+
+    public function reorderGallery(Request $request)
+    {
+        $ids = collect($request->input('ids', []))
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return response()->json(['message' => 'No gallery items were provided.'], 422);
+        }
+
+        $query = GalleryItem::whereIn('id', $ids->all());
+        if (!isSuperAdmin()) {
+            $query->whereIn('event_id', getEventIds());
+        }
+
+        $items = $query->get(['id']);
+        if ($items->count() !== $ids->unique()->count()) {
+            return response()->json(['message' => 'You cannot reorder one or more of these files.'], 403);
+        }
+
+        DB::transaction(function () use ($ids) {
+            foreach ($ids as $position => $id) {
+                GalleryItem::whereKey($id)->update(['sort_order' => $position + 1]);
+            }
+        });
+
+        return response()->json(['message' => 'Gallery order saved successfully.']);
     }
 
 public function deleteGalleryImage(Request $request)

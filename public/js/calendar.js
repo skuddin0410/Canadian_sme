@@ -33,18 +33,16 @@ class LaravelEventCalendar {
         
         this.calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'timeGridWeek',
-            validRange: {
-                start: this.config.eventStart,
-                end: this.config.eventEnd
-            },
+            initialDate: this.config.eventStart || undefined,
+            timeZone: this.config.timezone || 'UTC',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
             },
             height: 'auto',
-            slotMinTime: '02:00:00',
-            slotMaxTime: '23:59:00',
+            slotMinTime: '00:00:00',
+            slotMaxTime: '24:00:00',
             slotDuration: '00:15:00',
             snapDuration: '00:15:00',
             editable: true,
@@ -316,6 +314,24 @@ class LaravelEventCalendar {
         this.calendar.addEventSource(events); 
     }
 
+    formatSessionDate(value, timezone = this.config.timezone) {
+        return new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone || 'UTC', weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+        }).format(new Date(value));
+    }
+
+    formatSessionShortDate(value, timezone = this.config.timezone) {
+        return new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone || 'UTC', month: 'short', day: 'numeric', year: 'numeric'
+        }).format(new Date(value));
+    }
+
+    formatSessionTime(value, timezone = this.config.timezone) {
+        return new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone || 'UTC', hour: 'numeric', minute: '2-digit', hour12: true
+        }).format(new Date(value));
+    }
+
     switchView(viewType) {
         this.currentView = viewType;
         
@@ -355,7 +371,10 @@ class LaravelEventCalendar {
         const eventsByDay = {};
         console.log(this.events)
         this.events.forEach(session => {
-            const day = moment(session.start).format('YYYY-MM-DD');
+            const timezone = session.extendedProps?.timezone || this.config.timezone;
+            const day = new Intl.DateTimeFormat('en-CA', {
+                timeZone: timezone || 'UTC', year: 'numeric', month: '2-digit', day: '2-digit'
+            }).format(new Date(session.start));
             if (!eventsByDay[day]) {
                 eventsByDay[day] = [];
             }
@@ -372,12 +391,13 @@ class LaravelEventCalendar {
             <div class="day-section mb-5">
                 <h4 class="mb-4 text-primary border-bottom pb-2">
                     <i class="fas fa-calendar-day me-2"></i>
-                    ${moment(day).format('dddd, MMMM D, YYYY')}
+                    ${this.formatSessionDate(sessions[0].start, sessions[0].extendedProps?.timezone || this.config.timezone)}
                 </h4>
                 <div class="row g-4">
             `;
 
             sessions.forEach(session => {
+                const timezone = session.extendedProps?.timezone || this.config.timezone;
             
                 const statusBadge = this.getStatusBadge(session.status);
                 const typeBadge = this.getTypeBadge(session.track);
@@ -396,7 +416,7 @@ class LaravelEventCalendar {
                                 ${typeBadge} 
                             </div>
                             <div class="text-muted small mb-2">
-                                <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start).format('HH:mm')} - ${moment(session.end).format('HH:mm')}</div>
+                                <div style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${this.formatSessionTime(session.start, timezone)} - ${this.formatSessionTime(session.end, timezone)}</div>
                                 ${session.location ? `<div style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i>${session?.location ?? ''} </div>` : ''}
                                 ${session.capacity ? `<div style="color: ${session.textColor};"><i class="fas fa-users me-1"></i> ${session.capacity} capacity</div>` : ''}
                             </div>
@@ -453,6 +473,7 @@ class LaravelEventCalendar {
             let listHTML = '<div class="list-group">';
 
             sortedSessions.forEach(session => {
+            const timezone = session.extendedProps?.timezone || this.config.timezone;
             const statusBadge = this.getStatusBadge(session.status);
             const typeBadge = this.getTypeBadge(session.track);
            
@@ -468,8 +489,8 @@ class LaravelEventCalendar {
                     ${typeBadge} ${statusBadge}
                 </div>
                 <div class="small text-muted mb-1">
-                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${moment(session.start).format('MMM D, YYYY')}</span>
-                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${moment(session.start).format('HH:mm')} - ${moment(session.end).format('HH:mm')}</span>
+                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-calendar me-1"></i> ${this.formatSessionShortDate(session.start, timezone)}</span>
+                    <span class="me-3" style="color: ${session.textColor};"><i class="fas fa-clock me-1"></i> ${this.formatSessionTime(session.start, timezone)} - ${this.formatSessionTime(session.end, timezone)}</span>
                     ${session.location ? `<span class="me-3" style="color: ${session.textColor};"><i class="fas fa-map-marker-alt me-1"></i> ${session?.location ?? ''}</span>` : ''}
                 </div>
 
@@ -524,6 +545,7 @@ class LaravelEventCalendar {
 
         this.clearForm();
         this.clearAlerts();
+        this.setSessionDateLimits();
 
         // Populate form if editing
         if (eventData.id) {
@@ -570,6 +592,7 @@ class LaravelEventCalendar {
         const title = document.getElementById('detailsTitle');
 
         title.textContent = event.title;
+        const eventTimezone = event.extendedProps?.timezone || this.config.timezone;
 
         const speakers = event.extendedProps?.speakers || [];
         const speakersHTML = event.extendedProps?.speakers?.length
@@ -602,8 +625,8 @@ class LaravelEventCalendar {
         <div class="col-12 col-md-6">
             <div class="fw-bold">Date & Time</div>
             <div>
-                ${moment(event.start).format('dddd, MMMM D, YYYY')}<br>
-                ${moment(event.start).format('h:mm A')} - ${moment(event.end).format('h:mm A')}
+                ${this.formatSessionDate(event.start, eventTimezone)}<br>
+                ${this.formatSessionTime(event.start, eventTimezone)} - ${this.formatSessionTime(event.end, eventTimezone)}
             </div>
         </div>
         <div class="col-12 col-md-6">
@@ -1106,6 +1129,21 @@ class LaravelEventCalendar {
         const start = moment(startTime);
         const end = start.clone().add(1, 'hour');
         endTimeInput.value = end.format('YYYY-MM-DDTHH:mm');
+    }
+
+    setSessionDateLimits() {
+        const startInput = document.getElementById('startTime');
+        const endInput = document.getElementById('endTime');
+        const eventStart = this.config.eventStart;
+        const eventEnd = this.config.eventEndDate;
+
+        if (!eventStart || !eventEnd) return;
+
+        [startInput, endInput].forEach((input) => {
+            if (!input) return;
+            input.min = `${eventStart}T00:00`;
+            input.max = `${eventEnd}T23:59`;
+        });
     }
 
     calculateDuration(startTime, endTime) {

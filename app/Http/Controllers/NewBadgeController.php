@@ -68,6 +68,7 @@ class NewBadgeController extends Controller
        $badge->layout = json_encode($request->elements);
        $badge->save();
 
+       return response()->json(['success' => true]);
     }
 
 
@@ -98,12 +99,16 @@ class NewBadgeController extends Controller
         return $pdf->stream('badges.pdf');
     }
 
-     public function generateBadgePdfPreview(Request $request)
+    public function generateBadgePdfPreview(Request $request)
     {
         $badge = NewBadge::findOrFail($request->template_name);
-        $userIds = json_decode($request->user_ids, true);
-        $users = User::whereIn('id', [6])->get();
-        $layout = json_decode($badge->layout, true);
+        $userIds = json_decode($request->input('user_ids', '[]'), true);
+        $users = User::whereIn('id', $userIds ?: [6])->get();
+
+        // Preview can receive the unsaved canvas layout from the editor.
+        $layout = $request->input('layout');
+        $layout = is_string($layout) ? json_decode($layout, true) : $layout;
+        $layout = is_array($layout) ? $layout : (json_decode($badge->layout, true) ?: []);
 
         // Inch → Point
         $widthPt  = $badge->width * 72;

@@ -5,6 +5,8 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Event;
+use App\Models\Company;
+use App\Models\EventAndEntityLink;
 use App\Models\LandingPageSetting;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -22,6 +24,7 @@ class UserWelcome extends Mailable implements ShouldQueue
     public $subjectLine;
     public $mailLogId;
     public $event;
+    public $sponsor;
     public $websiteUrl;
     public $androidUrl;
     public $iosUrl;
@@ -35,7 +38,8 @@ class UserWelcome extends Mailable implements ShouldQueue
         $this->bodyText = $bodyText;
         $this->subjectLine = $subject;
         $this->mailLogId = $mailLogId;
-        $this->event = $event instanceof Event ? $event->loadMissing(['eventLogo', 'photo']) : $event;
+        $this->event = $event instanceof Event ? $event->loadMissing(['eventLogo', 'photo', 'sponsorBanner', 'emailBrandingLogo']) : $event;
+        $this->sponsor = $this->event ? $this->findEventSponsor($this->event) : null;
 
         $landingSetting = LandingPageSetting::query()->first();
         $this->websiteUrl = $landingSetting->website ?? config('app.url');
@@ -65,6 +69,7 @@ class UserWelcome extends Mailable implements ShouldQueue
                 'bodyText' => $this->bodyText,
                 'mailLogId' => $this->mailLogId,
                 'event' => $this->event,
+                'sponsor' => $this->sponsor,
                 'websiteUrl' => $this->websiteUrl,
                 'androidUrl' => $this->androidUrl,
                 'iosUrl' => $this->iosUrl,
@@ -80,5 +85,17 @@ class UserWelcome extends Mailable implements ShouldQueue
     public function attachments(): array
     {
         return [];
+    }
+
+    private function findEventSponsor(Event $event): ?Company
+    {
+        $companyIds = EventAndEntityLink::where('event_id', $event->id)
+            ->where('entity_type', 'companies')
+            ->pluck('entity_id');
+
+        return Company::with('logo')
+            ->where('is_sponsor', true)
+            ->whereIn('id', $companyIds)
+            ->first();
     }
 }

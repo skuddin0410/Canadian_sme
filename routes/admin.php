@@ -126,6 +126,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/event-guides/gallery', [EventGuideController::class, 'showGallery'])
     ->name('event-guides.showGallery');
   Route::post('/event-guides/gallery/upload', [EventGuideController::class, 'uploadGallery'])->name('event-guides.uploadGallery');
+  Route::post('/event-guides/gallery/reorder', [EventGuideController::class, 'reorderGallery'])->name('event-guides.reorderGallery');
   Route::post('/event-guides/gallery/approve', [EventGuideController::class, 'approveGalleryItem'])->name('event-guides.approveGalleryItem');
   Route::post('/event-guides/gallery/approve-all', [EventGuideController::class, 'approveAllGalleryItems'])->name('event-guides.approveAllGalleryItems');
   Route::delete('event-guides/delete-gallery-image', [EventGuideController::class, 'deleteGalleryImage'])->name('event-guides.deleteGalleryImage');
@@ -206,6 +207,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/events/{event}/sessions', [TicketTypeController::class, 'getByEvent'])->name('events.sessions');
 
 
+  Route::patch('/speaker/{speaker}/order', [SpeakerController::class, 'updateOrder'])->name('speaker.order');
   Route::resource('speaker', SpeakerController::class);
   Route::resource('booths', BoothController::class);
   Route::resource('supports', SupportController::class);
@@ -302,6 +304,7 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/attendees/generate-qr-code-manually', [AttendeeUserController::class, 'generateQrCodeManually'])
     ->name('attendee-users.generateQrCodeManually');
 
+  Route::get('/sponsors/{id}/team', [SponsorsController::class, 'getTeam'])->name('sponsors.team');
   Route::resource('sponsors', SponsorsController::class);
 
   Route::resource('speaker', SpeakerController::class);

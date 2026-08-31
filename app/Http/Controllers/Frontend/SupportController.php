@@ -9,13 +9,14 @@ use App\Http\Requests\SupportRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactQuery;
+use App\Services\AdminInquiryAlertService;
 
 class SupportController extends Controller
 { 
     public function index(){
         return view('new_contact_us');
     }
-    public function store(Request $request)
+    public function store(Request $request, AdminInquiryAlertService $alerts)
     {
        $validated = $request->validate([
             'name'        => 'required|string|max:255',
@@ -39,6 +40,8 @@ class SupportController extends Controller
 
         // Send confirmation email to user
         Mail::to($support->email)->send(new ContactQuery($support));
+
+        $alerts->notifySupportRequest($support);
 
         return redirect()->back()->with('success', 'Your request has been submitted successfully!');
     }

@@ -30,6 +30,9 @@
   .preview-card .file-name { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px; text-align: center; }
   .preview-card .file-size { font-size: 9px; color: #888; text-align: center; }
   #size-meter { font-size: 0.85rem; padding: 5px 10px; border-radius: 20px; background: #e7e7ff; color: #696cff; display: inline-block; }
+  .gallery-sortable-item { cursor: grab; }
+  .gallery-sortable-item.is-dragging { opacity: .45; }
+  .gallery-sortable-item.is-drag-over { outline: 2px dashed #696cff; outline-offset: 3px; }
 </style>
 
 @php
@@ -49,6 +52,30 @@
   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
     <h2 class="mb-0"> Gallery</h2>
     <span class="badge bg-secondary">{{ $galleryItems->count() }} file{{ $galleryItems->count() > 1 ? 's' : '' }}</span>
+  </div>
+
+  @php
+    $storageUsedMb = $storageUsedBytes / 1024 / 1024;
+    $storageLimitMb = $storageLimitBytes / 1024 / 1024;
+    $storageRemainingMb = max(0, $storageLimitMb - $storageUsedMb);
+    $storageBarClass = $storageUsagePercent >= 90 ? 'bg-danger' : ($storageUsagePercent >= 75 ? 'bg-warning' : 'bg-primary');
+  @endphp
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <div>
+          <h5 class="mb-1"><i class="bi bi-cloud-arrow-up me-2 text-primary"></i>Media Storage</h5>
+          <div class="text-muted small">
+            {{ number_format($storageUsedMb, 2) }} MB used of {{ number_format($storageLimitMb, 0) }} MB
+            ({{ number_format($storageRemainingMb, 2) }} MB remaining)
+          </div>
+        </div>
+        <strong>{{ number_format($storageUsagePercent, 1) }}%</strong>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Media storage used" aria-valuenow="{{ $storageUsagePercent }}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;">
+        <div class="progress-bar {{ $storageBarClass }}" style="width: {{ $storageUsagePercent }}%"></div>
+      </div>
+    </div>
   </div>
 
   {{-- Top-level Tabs (Superadmin: Public Gallery + Gallery Approval) --}}
@@ -170,9 +197,12 @@
                   </h2>
                   <div id="{{ $imgId }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#imagesAccordion">
                     <div class="accordion-body">
-                      <div class="row g-3">
+                      <div class="d-flex justify-content-end mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary save-gallery-order"><i class="bi bi-save me-1"></i> Save Order</button>
+                      </div>
+                      <div class="row g-3 gallery-sortable">
                         @foreach($items as $item)
-                          <div class="col-6 col-md-4 col-lg-3">
+                          <div class="col-6 col-md-4 col-lg-3 gallery-sortable-item" draggable="true" data-gallery-id="{{ $item->id }}">
                             @include('event_guide._gallery_item', ['item' => $item])
                           </div>
                         @endforeach
@@ -204,9 +234,12 @@
                   </h2>
                   <div id="{{ $vidId }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#videosAccordion">
                     <div class="accordion-body">
-                      <div class="row g-3">
+                      <div class="d-flex justify-content-end mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary save-gallery-order"><i class="bi bi-save me-1"></i> Save Order</button>
+                      </div>
+                      <div class="row g-3 gallery-sortable">
                         @foreach($items as $item)
-                          <div class="col-6 col-md-4 col-lg-3">
+                          <div class="col-6 col-md-4 col-lg-3 gallery-sortable-item" draggable="true" data-gallery-id="{{ $item->id }}">
                             @include('event_guide._gallery_item', ['item' => $item])
                           </div>
                         @endforeach
@@ -238,9 +271,12 @@
                   </h2>
                   <div id="{{ $docId }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#docsAccordion">
                     <div class="accordion-body">
-                      <div class="row g-3">
+                      <div class="d-flex justify-content-end mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary save-gallery-order"><i class="bi bi-save me-1"></i> Save Order</button>
+                      </div>
+                      <div class="row g-3 gallery-sortable">
                         @foreach($items as $item)
-                          <div class="col-6 col-md-4 col-lg-3">
+                          <div class="col-6 col-md-4 col-lg-3 gallery-sortable-item" draggable="true" data-gallery-id="{{ $item->id }}">
                             @include('event_guide._gallery_item', ['item' => $item])
                           </div>
                         @endforeach
@@ -537,6 +573,62 @@
             form.dataset.confirmed = "true";
             form.submit();
         }
+    });
+  });
+
+  // Allow each event/file-type group to be reordered independently.
+  let draggedGalleryItem = null;
+  document.querySelectorAll('.gallery-sortable').forEach((sortable) => {
+    sortable.querySelectorAll('.gallery-sortable-item').forEach((item) => {
+      item.addEventListener('dragstart', () => {
+        draggedGalleryItem = item;
+        item.classList.add('is-dragging');
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('is-dragging');
+        sortable.querySelectorAll('.is-drag-over').forEach((target) => target.classList.remove('is-drag-over'));
+        draggedGalleryItem = null;
+      });
+      item.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        if (draggedGalleryItem && draggedGalleryItem !== item) {
+          item.classList.add('is-drag-over');
+        }
+      });
+      item.addEventListener('dragleave', () => item.classList.remove('is-drag-over'));
+      item.addEventListener('drop', (event) => {
+        event.preventDefault();
+        item.classList.remove('is-drag-over');
+        if (!draggedGalleryItem || draggedGalleryItem === item) return;
+
+        const after = event.clientY > item.getBoundingClientRect().top + item.offsetHeight / 2;
+        sortable.insertBefore(draggedGalleryItem, after ? item.nextSibling : item);
+      });
+    });
+  });
+
+  document.querySelectorAll('.save-gallery-order').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const sortable = button.closest('.accordion-body')?.querySelector('.gallery-sortable');
+      const ids = Array.from(sortable?.querySelectorAll('[data-gallery-id]') || [])
+        .map((item) => item.dataset.galleryId);
+
+      try {
+        const response = await fetch('{{ route('event-guides.reorderGallery') }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ ids })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to save gallery order.');
+        Swal.fire({ icon: 'success', title: 'Order Saved', text: data.message, timer: 1200, showConfirmButton: false });
+      } catch (error) {
+        Swal.fire({ icon: 'error', title: 'Order Not Saved', text: error.message });
+      }
     });
   });
 </script>
