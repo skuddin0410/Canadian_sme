@@ -343,6 +343,28 @@
               @endif
             </div>
 
+            <div class="mb-3 border rounded p-3">
+              <h6 class="mb-3">Event Branding</h6>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="email_branding_type">Branding Label</label>
+                  <select name="email_branding_type" id="email_branding_type" class="form-select">
+                    <option value="">No branding</option>
+                    <option value="powered_by" {{ old('email_branding_type') === 'powered_by' ? 'selected' : '' }}>Powered by</option>
+                    <option value="sponsored_by" {{ old('email_branding_type') === 'sponsored_by' ? 'selected' : '' }}>Sponsored by</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="email_branding_name">Brand/Company Name</label>
+                  <input type="text" name="email_branding_name" id="email_branding_name" class="form-control" value="{{ old('email_branding_name') }}" maxlength="255">
+                </div>
+              </div>
+              <label class="form-label" for="email_branding_logo">Brand/Company Logo</label>
+              <input type="file" name="email_branding_logo" id="email_branding_logo" class="form-control" accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
+              <small class="text-muted">This logo is used in the header of emails sent for this event.</small>
+              @error('email_branding_logo') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
+
             <div class="mb-3">
               <label class="form-label" for="map_image">Map Image / PDF <span class="text-danger">(Allowed file size : {{config('app.blog_image_size')." KB and allowed file type ".config('app.image_mime_types') }}, pdf) </span> </label>
               <div class="input-group input-group-merge">

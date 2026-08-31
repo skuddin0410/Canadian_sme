@@ -130,6 +130,9 @@ class EventController extends Controller
             'image' => 'required|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
             'event_logo' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
             'sponsor_banner' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'email_branding_type' => 'nullable|in:powered_by,sponsored_by',
+            'email_branding_name' => 'nullable|string|max:255',
+            'email_branding_logo' => 'nullable|file|mimes:jpg,jpeg,png,gif,svg,webp|max:' . config('app.user_image_size'),
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.user_image_size'),
             'section_order' => 'nullable|array',
             'enable_team_registration' => 'boolean',
@@ -190,6 +193,8 @@ class EventController extends Controller
         $validated['enable_team_registration'] = $request->boolean('enable_team_registration');
         $validated['enable_free_registration'] = $request->boolean('enable_free_registration');
         $validated['enable_paid_registration'] = $request->boolean('enable_paid_registration');
+        $validated['email_branding_type'] = $validated['email_branding_type'] ?? null;
+        $validated['email_branding_name'] = $validated['email_branding_name'] ?? null;
 
         $event = Event::create($validated);
 
@@ -204,6 +209,10 @@ class EventController extends Controller
 
         if ($request->file("sponsor_banner")) {
             $this->imageUpload($request->file("sponsor_banner"), $uploadPath, $event->id, 'events', 'sponsor_banner');
+        }
+
+        if ($request->file('email_branding_logo')) {
+            $this->imageUpload($request->file('email_branding_logo'), $uploadPath, $event->id, 'events', 'email_branding_logo');
         }
 
         if ($request->file("map_image")) {
@@ -442,6 +451,9 @@ class EventController extends Controller
             'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
             'event_logo' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
             'sponsor_banner' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.banner_image_size'),
+            'email_branding_type' => 'nullable|in:powered_by,sponsored_by',
+            'email_branding_name' => 'nullable|string|max:255',
+            'email_branding_logo' => 'nullable|file|mimes:jpg,jpeg,png,gif,svg,webp|max:' . config('app.banner_image_size'),
             'map_image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . ',application/pdf|max:' . config('app.banner_image_size'),
             'section_order' => 'nullable|array',
             'enable_team_registration' => 'boolean',
@@ -498,6 +510,8 @@ class EventController extends Controller
         $event->privacy_policy = $validated['privacy_policy'] ?? null;
         $event->terms_condition = $validated['terms_condition'] ?? null;
         $event->help_support = $validated['help_support'] ?? null;
+        $event->email_branding_type = $validated['email_branding_type'] ?? null;
+        $event->email_branding_name = $validated['email_branding_name'] ?? null;
         $event->section_order = !empty($validated['section_order']) ? json_encode($validated['section_order']) : null;
         $event->enable_team_registration = $request->boolean('enable_team_registration');
         $event->enable_free_registration = $request->boolean('enable_free_registration');
@@ -513,6 +527,10 @@ class EventController extends Controller
 
         if ($request->file("sponsor_banner")) {
             $this->imageUpload($request->file("sponsor_banner"), 'events', $event->id, 'events', 'sponsor_banner', $idForUpdate = $event->id);
+        }
+
+        if ($request->file('email_branding_logo')) {
+            $this->imageUpload($request->file('email_branding_logo'), 'events', $event->id, 'events', 'email_branding_logo', $idForUpdate = $event->id);
         }
 
         if ($request->file("map_image")) {
