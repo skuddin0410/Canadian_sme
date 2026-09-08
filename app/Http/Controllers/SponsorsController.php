@@ -11,6 +11,7 @@ use App\Mail\KycMail;
 use App\Models\Booth;
 use App\Models\Drive;
 use App\Models\Company;
+use App\Models\Event;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 
@@ -398,9 +400,19 @@ public function getTeam($id)
     public function downloadQr($userid){
         return downloadQrCode($userid);
     }
-     public function exportSponsors()
+public function exportSponsors(Request $request)
 {
-    return Excel::download(new SponsorExport, 'sponsors.xlsx');
+    $eventId = (int) $request->validate([
+        'event_id' => ['required', 'integer', 'exists:events,id'],
+    ])['event_id'];
+
+    if (!isSuperAdmin() && !in_array($eventId, array_map('intval', getEventIds()), true)) {
+        abort(403, 'You do not have access to this event.');
+    }
+
+    $eventName = Str::slug(Event::findOrFail($eventId)->title) ?: "event-{$eventId}";
+
+    return Excel::download(new SponsorExport($eventId), "{$eventName}-sponsors.xlsx");
 }
 public function uploadDocs(Request $request, $companyId)
 {

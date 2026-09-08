@@ -38,6 +38,11 @@
                                 Generate Qrcode
                             </a>
 
+                            <a href="{{ route('attendee-users.generateCometChatIdsManually') }}"
+                                class="btn btn-outline-secondary dt-button create-new">
+                                Generate CometChat IDs
+                            </a>
+
                         </div>
                     </div>
 

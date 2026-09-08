@@ -14,7 +14,7 @@
 				    <h5 class="mb-0"> Speaker List</h5>
 					<div class="dt-action-buttons text-end pt-3 pt-md-0">
 						<div class="dt-buttons"> 
-                            <a href="{{route('speaker.export')}}" class="btn btn-outline-primary btn-pill">Export</a>
+                            <a href="#" data-export-url="{{ route('speaker.export') }}" class="btn btn-outline-primary btn-pill event-export">Export</a>
 							<a href="{{route('speaker.create')}}" class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button">
 								<span><i class="bx bx-plus me-sm-1"></i> 
 									<span class="d-none d-sm-inline-block">Add Speaker </span>
@@ -79,6 +79,18 @@
 
 @section('scripts')
 <script type="text/javascript">
+$(document).on('click', '.event-export', function (event) {
+    event.preventDefault();
+    const eventId = $('#users-filter [name="event_id"]').val();
+
+    if (!eventId) {
+        alert('Please select an event before exporting.');
+        return;
+    }
+
+    window.location.href = $(this).data('export-url') + '?event_id=' + encodeURIComponent(eventId);
+});
+
  function GetUserList() {
         $(".spinner-border").fadeIn(300);
         $.ajax({

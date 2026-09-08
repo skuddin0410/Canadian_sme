@@ -9,11 +9,17 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class ExhibitorsExport implements FromCollection , WithHeadings, WithMapping
 {
+    public function __construct(private readonly int $eventId)
+    {
+    }
+
     public function collection()
     {
-        // Only non-sponsors (based on your index method)
         return Company::with(['user', 'boothUsers.booth'])
             ->where('is_sponsor', 0)
+            ->whereHas('eventAndEntityLinks', function ($query) {
+                $query->where('event_id', $this->eventId);
+            })
             ->orderBy("created_at", "DESC")
             ->get();
     }

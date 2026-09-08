@@ -1391,6 +1391,31 @@ class AttendeeUserController extends Controller
         return redirect()->back()->with('success', "QR code generation started for {$pendingCount} attendee(s). Please refresh after a short while.");
     }
 
+    public function generateCometChatIdsManually()
+    {
+        $missingQuery = User::where(function ($query) {
+            $query->whereNull('cometchat_id')
+                ->orWhere('cometchat_id', '');
+        });
+
+        $pendingCount = (clone $missingQuery)->count();
+
+        if ($pendingCount === 0) {
+            return redirect()->back()->with('success', 'All users already have CometChat IDs.');
+        }
+
+        $missingQuery->chunkById(100, function ($users) {
+            foreach ($users as $user) {
+                CreateCometChatUserJob::dispatch($user->id);
+            }
+        });
+
+        return redirect()->back()->with(
+            'success',
+            "CometChat ID generation started for {$pendingCount} user(s). Please keep the queue worker running."
+        );
+    }
+
 
     public function sendBoth(Request $request)
     {

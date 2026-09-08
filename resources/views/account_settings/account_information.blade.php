@@ -44,7 +44,7 @@
 
             <div class="col-6">  
             <div class="mb-3">
-              <label class="form-label" for="name">First Name</label>
+              <label class="form-label" for="name">First Name<span class="text-danger">*</span></label>
               <div class="input-group input-group-merge">
                 
                 <input
@@ -53,7 +53,7 @@
                   name="name"
                   id="name"
                   value="{{old('name', $admin_user->name)}}"
-                  placeholder="Full Name"/>
+                  placeholder="Full Name" required minlength="2" maxlength="100"/>
               </div>
               @if ($errors->has('name'))
                 <span class="text-danger text-left">{{ $errors->first('name') }}</span>
@@ -63,7 +63,7 @@
 
             <div class="col-6">  
             <div class="mb-3">
-              <label class="form-label" for="lastname">Last Name</label>
+              <label class="form-label" for="lastname">Last Name<span class="text-danger">*</span></label>
               <div class="input-group input-group-merge">
                 
                 <input
@@ -72,7 +72,7 @@
                   name="lastname"
                   id="lastname"
                   value="{{old('lastname', $admin_user->lastname)}}"
-                  placeholder="Full Name"/>
+                  placeholder="Full Name" required maxlength="100"/>
               </div>
               @if ($errors->has('lastname'))
                 <span class="text-danger text-left">{{ $errors->first('lastname') }}</span>
@@ -101,7 +101,7 @@
 
             <div class="col-6">
             <div class="mb-3">
-              <label class="form-label" for="contact_number">Contact Number</label>
+              <label class="form-label" for="contact_number">Contact Number<span class="text-danger">*</span></label>
               <div class="input-group input-group-merge">
         
                 <input
@@ -110,7 +110,7 @@
                   id="contact_number"
                   class="form-control phone-mask"
                   placeholder=""
-                  value="{{old('contact_number', $admin_user->mobile)}}" />
+                  value="{{old('contact_number', $admin_user->mobile)}}" required maxlength="10" inputmode="numeric" />
               </div>
               <span class="text-danger text-left" id="contact_number_error"></span>
               @if ($errors->has('contact_number'))
@@ -154,7 +154,7 @@
               <div class="input-group input-group-merge">
          
                 <input
-                  type="text"
+                  type="url"
                   name="website_url"
                   id="website_url"
                   class="form-control phone-mask"
@@ -175,7 +175,7 @@
               <div class="input-group input-group-merge">
              
                 <input
-                  type="text"
+                  type="url"
                   name="linkedin_url"
                   id="linkedin_url"
                   class="form-control phone-mask"
@@ -195,7 +195,7 @@
               <div class="input-group input-group-merge">
       
                 <input
-                  type="text"
+                  type="url"
                   name="facebook_url"
                   id="facebook_url"
                   class="form-control phone-mask"
@@ -215,7 +215,7 @@
               <div class="input-group input-group-merge">
         
                 <input
-                  type="text"
+                  type="url"
                   name="instagram_url"
                   id="instagram_url"
                   class="form-control phone-mask"
@@ -235,7 +235,7 @@
               <div class="input-group input-group-merge">
      
                 <input
-                  type="text"
+                  type="url"
                   name="twitter_url"
                   id="twitter_url"
                   class="form-control phone-mask"

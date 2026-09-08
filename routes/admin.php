@@ -304,6 +304,9 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
   Route::get('/attendees/generate-qr-code-manually', [AttendeeUserController::class, 'generateQrCodeManually'])
     ->name('attendee-users.generateQrCodeManually');
 
+  Route::get('/attendees/generate-cometchat-ids-manually', [AttendeeUserController::class, 'generateCometChatIdsManually'])
+    ->name('attendee-users.generateCometChatIdsManually');
+
   Route::get('/sponsors/{id}/team', [SponsorsController::class, 'getTeam'])->name('sponsors.team');
   Route::resource('sponsors', SponsorsController::class);
 

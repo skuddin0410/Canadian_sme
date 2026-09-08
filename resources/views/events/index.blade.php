@@ -41,7 +41,7 @@
                         <div class="col-12 col-md-2">  
                          <div class="mb-3">
                             <select class="form-control" name="category" id="category">
-                                <option value="">Please select category</option>
+                                <option value="">Please select tag</option>
                               @if(!empty($catgories))
                                 @foreach($catgories as $category)
                                  <option value="{{$category->id}}">{{$category->name}}</option>

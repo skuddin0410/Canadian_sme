@@ -3,19 +3,6 @@
         alertify.success("{{ Session::get('success') }}");
     @endif
     $(document).ready(function () {
-        $('body').on('click', '#account_info_submit_btn', function() {
-            let contact_number=$("#contact_number").val();
-            $("#contact_number_error").html('');
-            if(contact_number=='') {
-                $("#contact_number_error").html('Please enter contact number!');
-            }else if(isNaN(contact_number)) {
-                $("#contact_number_error").html('Please enter only numeric number!');
-            }else if(contact_number.length<10 || contact_number.length>10) {
-                $("#contact_number_error").html('Please enter 10 digit numeric number!');
-            }else {
-                $("#account_information_frm").submit();
-            }
-        })
         $('body').on('click', '#change_password_submit_btn', function() {
             let old_password=$("#old_password").val();
             let new_password=$("#new_password").val();
@@ -37,3 +24,11 @@
         })
     });
 </script>
+@include('account_settings.scripts.profile-form-validation', [
+    'formSelector' => '#account_information_frm',
+    'phoneSelector' => '#contact_number',
+    'phoneErrorSelector' => '#contact_number_error',
+    'firstNameSelector' => '#name',
+    'lastNameSelector' => '#lastname',
+    'submitButtonSelector' => '#account_info_submit_btn',
+])

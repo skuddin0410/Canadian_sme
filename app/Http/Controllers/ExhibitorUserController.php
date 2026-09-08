@@ -12,6 +12,7 @@ use App\Models\Booth;
 use App\Models\Drive;
 
 use App\Models\Company;
+use App\Models\Event;
 use App\Models\BoothUser;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ExhibitorUserController extends Controller
@@ -454,9 +456,19 @@ public function deleteDoc($id)
         return back()->withErrors('You do not have permission to perform this action.');
     }
 
-    public function exportExhibitors()
+    public function exportExhibitors(Request $request)
     {
-    return Excel::download(new ExhibitorsExport, 'exhibitors.xlsx');
+        $eventId = (int) $request->validate([
+            'event_id' => ['required', 'integer', 'exists:events,id'],
+        ])['event_id'];
+
+        if (!isSuperAdmin() && !in_array($eventId, array_map('intval', getEventIds()), true)) {
+            abort(403, 'You do not have access to this event.');
+        }
+
+        $eventName = Str::slug(Event::findOrFail($eventId)->title) ?: "event-{$eventId}";
+
+        return Excel::download(new ExhibitorsExport($eventId), "{$eventName}-exhibitors.xlsx");
     }
 
 

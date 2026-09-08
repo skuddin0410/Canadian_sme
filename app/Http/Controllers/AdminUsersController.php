@@ -88,15 +88,7 @@ class AdminUsersController extends Controller
      */
     public function store(Request $request)
     {   
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email',
-            'mobile' => 'required|string|unique:users,mobile',
-            'bio'    => 'required|string|max:500',
-            'pricing_plan_id' => 'nullable|exists:pricing,id',
-
-        ]);
+        $validator = Validator::make($request->all(), $this->adminUserRules(), $this->adminUserMessages());
         if ($validator->fails()) {
             return redirect(route('admin-users.create'))->withInput()
                 ->withErrors($validator);
@@ -164,14 +156,7 @@ class AdminUsersController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|email|unique:users,email,'. $id,
-            'mobile' => 'required|string|unique:users,mobile,'. $id,
-            'bio'    => 'required|string|max:500',
-            'pricing_plan_id' => 'nullable|exists:pricing,id',
-        ]);
+        $validator = Validator::make($request->all(), $this->adminUserRules($id), $this->adminUserMessages());
 
         if ($validator->fails()) {
             return redirect(route('admin-users.edit', ["admin_user" => $id]))->withInput()
@@ -238,5 +223,48 @@ class AdminUsersController extends Controller
         }
 
         return back()->withErrors('This user is not a blocked Admin.');
+    }
+
+    private function adminUserRules(?string $userId = null): array
+    {
+        $uniqueEmail = 'unique:users,email';
+        $uniqueMobile = 'unique:users,mobile';
+        if ($userId) {
+            $uniqueEmail .= ',' . $userId;
+            $uniqueMobile .= ',' . $userId;
+        }
+
+        return [
+            'first_name' => 'required|string|min:2|max:100',
+            'last_name' => 'required|string|min:1|max:100',
+            'email' => 'required|string|max:255|email|' . $uniqueEmail,
+            'mobile' => 'required|string|digits:10|' . $uniqueMobile,
+            'bio' => 'required|string|max:2000',
+            'designation' => 'nullable|string|max:150',
+            'tags' => 'nullable|string|max:255',
+            'website_url' => 'nullable|url|max:255',
+            'linkedin_url' => 'nullable|url|max:255',
+            'facebook_url' => 'nullable|url|max:255',
+            'instagram_url' => 'nullable|url|max:255',
+            'twitter_url' => 'nullable|url|max:255',
+            'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            'pricing_plan_id' => 'nullable|exists:pricing,id',
+        ];
+    }
+
+    private function adminUserMessages(): array
+    {
+        return [
+            'first_name.required' => 'Please enter first name!',
+            'first_name.min' => 'Please enter first name (at least 2 characters)!',
+            'last_name.required' => 'Please enter last name!',
+            'mobile.required' => 'Please enter contact number!',
+            'mobile.digits' => 'Please enter 10 digit numeric number!',
+            'website_url.url' => 'Please enter a valid URL starting with http:// or https://',
+            'linkedin_url.url' => 'Please enter a valid URL starting with http:// or https://',
+            'facebook_url.url' => 'Please enter a valid URL starting with http:// or https://',
+            'instagram_url.url' => 'Please enter a valid URL starting with http:// or https://',
+            'twitter_url.url' => 'Please enter a valid URL starting with http:// or https://',
+        ];
     }
 }

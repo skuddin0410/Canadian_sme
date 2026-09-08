@@ -2,18 +2,22 @@
 
 namespace App\Exports;
 
-use App\Models\User;
+use App\Models\Speaker;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
 class SpeakersExport implements FromCollection,  WithHeadings, WithMapping
 {
+    public function __construct(private readonly int $eventId)
+    {
+    }
+
     public function collection()
     {
-        return User::with('roles')
-            ->whereHas('roles', function ($q) {
-                $q->where('name', 'Speaker');
+        return Speaker::query()
+            ->whereHas('eventAndEntityLinks', function ($query) {
+                $query->where('event_id', $this->eventId);
             })
             ->orderBy('created_at', 'DESC')
             ->get();
@@ -28,13 +32,11 @@ class SpeakersExport implements FromCollection,  WithHeadings, WithMapping
             $user->mobile,
             $user->company,
             $user->designation,
-            $user->tags ,
             $user->website_url,
             $user->linkedin_url,
             $user->instagram_url,
             $user->facebook_url ,
             $user->twitter_url,
-            $user->mobile ,
             $user->bio,
 
             $user->created_at->format('Y-m-d H:i:s'),
@@ -50,13 +52,11 @@ class SpeakersExport implements FromCollection,  WithHeadings, WithMapping
             'Mobile',
             'Company',
             'Designation',
-            'Tags',
             'Website',
             'Linkedin',
             'Instagram',
             'Facebook',
             'Twitter',
-            'Mobile',
             'Bio',
             'Registered At',
         ];
