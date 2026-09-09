@@ -32,14 +32,23 @@ class EventController extends Controller
 
             if ($request->search) {
                 $events = $events->where(function ($query) use ($request) {
-                    $query->where('name', 'LIKE', '%' . $request->search . '%');
+                    $query->where('title', 'LIKE', '%' . $request->search . '%')
+                        ->orWhere('tags', 'LIKE', '%' . $request->search . '%');
                 });
             }
 
-            if ($request->category) {
-                $events = $events->where(function ($query) use ($request) {
-                    $query->where('category', $request->category);
-                });
+            if ($request->filled('category')) {
+                $category = Category::find($request->category);
+                if ($category) {
+                    $tagName = $category->name;
+                    $events = $events->where(function ($query) use ($category, $tagName) {
+                        $query->where('category_id', $category->id)
+                            ->orWhere('tags', $tagName)
+                            ->orWhere('tags', 'LIKE', $tagName . ',%')
+                            ->orWhere('tags', 'LIKE', '%,' . $tagName)
+                            ->orWhere('tags', 'LIKE', '%,' . $tagName . ',%');
+                    });
+                }
             }
 
             if ($request->filled('event_timing')) {
@@ -81,7 +90,8 @@ class EventController extends Controller
 
             return response($data);
         }
-        $catgories = Category::orderBy(DB::raw("ISNULL(categories.order), categories.order"), 'ASC')
+        $catgories = Category::whereIn('type', ['event', 'events', 'tags'])
+            ->orderBy(DB::raw("ISNULL(categories.order), categories.order"), 'ASC')
             ->orderBy('created_at', 'DESC')->get();
 
         return view('events.index', ["catgories" => $catgories]);
@@ -122,7 +132,7 @@ class EventController extends Controller
                 'url',
                 'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/'
             ],
-            'visibility' => 'required|in:public,private,unlisted',
+            'visibility' => 'required|in:listed,unlisted',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
             'meta_keywords' => 'nullable|string|max:1000',

@@ -14,7 +14,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Sponsors List</h5>
                     <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                       <a href="{{ route('sponsors.export') }}" class="btn btn-outline-primary btn-pill">Export</a>
+                       <a href="#" data-export-url="{{ route('sponsors.export') }}" class="btn btn-outline-primary btn-pill event-export">Export</a>
                      
                         <a href="{{ route('sponsors.create') }}" class="btn btn-primary dt-button create-new">
                                 <i class="bx bx-plus me-sm-1"></i> Add New
@@ -204,6 +204,18 @@ $(document).ready(function() {
             $(".spinner-border").fadeOut(300);
         });
     });
+});
+
+$(document).on('click', '.event-export', function (event) {
+    event.preventDefault();
+    const eventId = $('#users-search-filter-form [name="event_id"]').val();
+
+    if (!eventId) {
+        alert('Please select an event before exporting.');
+        return;
+    }
+
+    window.location.href = $(this).data('export-url') + '?event_id=' + encodeURIComponent(eventId);
 });
 </script>
 @endsection

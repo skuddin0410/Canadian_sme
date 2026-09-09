@@ -222,12 +222,31 @@ class HomeController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required',
-                'contact_number' => 'required',
+                'name' => 'required|string|min:2|max:100',
+                'lastname' => 'required|string|min:1|max:100',
+                'contact_number' => 'required|string|digits:10|unique:users,mobile,' . auth()->id(),
+                'designation' => 'nullable|string|max:150',
+                'website_url' => 'nullable|url|max:255',
+                'linkedin_url' => 'nullable|url|max:255',
+                'facebook_url' => 'nullable|url|max:255',
+                'instagram_url' => 'nullable|url|max:255',
+                'twitter_url' => 'nullable|url|max:255',
+                'image' => 'nullable|file|mimetypes:' . config('app.image_mime_types') . '|max:' . config('app.user_image_size'),
+            ], [
+                'name.required' => 'Please enter first name!',
+                'name.min' => 'Please enter first name (at least 2 characters)!',
+                'lastname.required' => 'Please enter last name!',
+                'contact_number.required' => 'Please enter contact number!',
+                'contact_number.digits' => 'Please enter 10 digit numeric number!',
+                'website_url.url' => 'Please enter a valid URL starting with http:// or https://',
+                'linkedin_url.url' => 'Please enter a valid URL starting with http:// or https://',
+                'facebook_url.url' => 'Please enter a valid URL starting with http:// or https://',
+                'instagram_url.url' => 'Please enter a valid URL starting with http:// or https://',
+                'twitter_url.url' => 'Please enter a valid URL starting with http:// or https://',
             ]);
 
              if($validator->fails()) {
-              return redirect()->route('change.account.information')->withError($validator->errors()->first());
+              return redirect()->route('change.account.information')->withInput()->withErrors($validator);
             }
 
 

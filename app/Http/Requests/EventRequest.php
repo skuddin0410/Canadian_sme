@@ -27,7 +27,7 @@ class EventRequest extends FormRequest
             'tags' => 'nullable|array',
             'tags.*' => 'string',
             'is_featured' => 'boolean',
-            'visibility' => 'required|in:public,private,unlisted',
+            'visibility' => 'required|in:listed,unlisted',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
             'meta_keywords' => 'nullable|string|max:1000',
