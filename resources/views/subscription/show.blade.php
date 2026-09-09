@@ -636,8 +636,8 @@
                     
                     <div class="log-changes">
                         @php
-                            $old = is_array($log->old_values) ? $log->old_values : json_decode($log->old_values, true);
-                            $new = is_array($log->new_values) ? $log->new_values : json_decode($log->new_values, true);
+                            $old = is_array($log->old_values) ? $log->old_values : (array) json_decode($log->old_values ?? '[]', true);
+                            $new = is_array($log->new_values) ? $log->new_values : (array) json_decode($log->new_values ?? '[]', true);
                             
                             $fields = [
                                 'price_id' => 'Pricing Plan',
@@ -648,20 +648,20 @@
                         @endphp
 
                         @foreach($fields as $field => $label)
-                            @if(isset($new[$field]) && $new[$field] != $old[$field])
+                            @if(isset($new[$field]) && (!array_key_exists($field, $old) || $new[$field] != $old[$field]))
                             <div class="change-pill">
                                 <span class="change-label">{{ $label }}</span>
                                 <div class="change-diff">
                                     @if($field == 'price_id')
                                         @php
-                                            $oldPrice = \App\Models\Pricing::find($old[$field])?->name ?? 'N/A';
+                                            $oldPrice = isset($old[$field]) ? (\App\Models\Pricing::find($old[$field])?->name ?? 'N/A') : 'N/A';
                                             $newPrice = \App\Models\Pricing::find($new[$field])?->name ?? 'N/A';
                                         @endphp
                                         <span class="old-val">{{ $oldPrice }}</span>
                                         <i class="fa fa-arrow-right diff-arrow"></i>
                                         <span class="new-val">{{ $newPrice }}</span>
                                     @else
-                                        <span class="old-val">{{ ucfirst($old[$field]) }}</span>
+                                        <span class="old-val">{{ isset($old[$field]) ? ucfirst($old[$field]) : 'N/A' }}</span>
                                         <i class="fa fa-arrow-right diff-arrow"></i>
                                         <span class="new-val">{{ ucfirst($new[$field]) }}</span>
                                     @endif
