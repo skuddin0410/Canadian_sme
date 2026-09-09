@@ -468,7 +468,7 @@
         </a>
         <div class="show-header-text">
             <h2>Subscription Details</h2>
-            <p>Viewing full record for subscription #{{ $subscription->user->name }}</p>
+            <p>Viewing full record for subscription #{{ $subscription->user->name ?? 'N/A' }}</p>
         </div>
     </div>
 
