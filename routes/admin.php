@@ -233,6 +233,11 @@ Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|A
     Route::get('/entity/{entityType}/{entityId}', [App\Http\Controllers\AuditController::class, 'entityLogs'])->name('audit.edit');
   });
 
+  Route::prefix('activity-logs')->name('admin.activity-logs.')->group(function () {
+    Route::get('/', [App\Http\Controllers\AdminActivityLogController::class, 'index'])->name('index');
+    Route::get('/{activityLog}', [App\Http\Controllers\AdminActivityLogController::class, 'show'])->name('show');
+  });
+
   Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
   Route::prefix('calendar')->group(function () {
     Route::get('/data', [CalendarController::class, 'getCalendarData']);

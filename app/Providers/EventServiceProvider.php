@@ -1,26 +1,33 @@
 <?php
+
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\Events\Failed;
-use App\Listeners\LogSuccessfulLogin;
+use App\Listeners\LogAdminAuthActivity;
 use App\Listeners\LogFailedLogin;
-use Illuminate\Support\ServiceProvider;
+use App\Listeners\LogSuccessfulLogin;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         Login::class => [
             LogSuccessfulLogin::class,
+            LogAdminAuthActivity::class . '@handleLogin',
+        ],
+        Logout::class => [
+            LogAdminAuthActivity::class . '@handleLogout',
         ],
         Failed::class => [
             LogFailedLogin::class,
+            LogAdminAuthActivity::class . '@handleFailed',
         ],
     ];
 
-    // Optionally disable auto-discovery
-    // protected function shouldDiscoverEvents(): bool
-    // {
-    //     return true;
-    // }
+    public function shouldDiscoverEvents(): bool
+    {
+        return false;
+    }
 }

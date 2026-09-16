@@ -396,9 +396,9 @@
                     <div data-i18n="newsletters">Email Template</div>
                 </a>
             </li>
-            <li class="menu-item {{ request()->is('admin/audit*') ? 'active open' : '' }}">
-                <a href="{{ route('audit.index') }}" class="menu-link">
-                    <div data-i18n="audit">Audit</div>
+            <li class="menu-item {{ request()->is('admin/activity-logs*') ? 'active open' : '' }}">
+                <a href="{{ route('admin.activity-logs.index') }}" class="menu-link">
+                    <div data-i18n="activity-log">Activity Log</div>
                 </a>
             </li>
 
