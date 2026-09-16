@@ -39,6 +39,24 @@ class AdminActivityLog extends Model
         return $this->belongsTo(User::class, 'actor_id');
     }
 
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'event_id');
+    }
+
+    public function getEventLabelAttribute(): string
+    {
+        if (!$this->event_id) {
+            return '—';
+        }
+
+        $title = $this->event?->title;
+
+        return $title !== null && $title !== ''
+            ? $title
+            : 'Unknown event';
+    }
+
     public function scopeVisibleTo(Builder $query, ?User $user = null): Builder
     {
         $user = $user ?: auth()->user();
@@ -120,16 +138,80 @@ class AdminActivityLog extends Model
 
     public function getModuleLabelAttribute(): string
     {
-        if (!$this->module) {
+        return self::labelForModule($this->resolved_module);
+    }
+
+    public function getResolvedModuleAttribute(): string
+    {
+        $route = (string) ($this->route_name ?? '');
+        $url = (string) ($this->url ?? '');
+        $module = (string) ($this->module ?? '');
+
+        // Old gallery actions were stored under event_guides because of URL path
+        if (
+            Str::contains($route, ['Gallery', 'gallery'])
+            || Str::contains($url, 'event-guides/gallery')
+            || Str::contains($url, 'delete-gallery-image')
+        ) {
+            return 'gallery';
+        }
+
+        $aliases = [
+            'speaker' => 'speakers',
+            'attendee_users' => 'attendees',
+            'exhibitor_users' => 'exhibitors',
+            'event-guides' => 'event_guides',
+        ];
+
+        return $aliases[$module] ?? ($module !== '' ? $module : 'admin');
+    }
+
+    /**
+     * Human-friendly title for lists / dashboard (never shows route names).
+     */
+    public function getDisplayDescriptionAttribute(): string
+    {
+        if ($this->module === 'auth' || $this->resolved_module === 'auth') {
+            return match ($this->action) {
+                'login' => 'Admin logged in',
+                'logout' => 'Admin logged out',
+                'login_failed' => 'Failed admin login attempt',
+                default => $this->cleanStoredDescription(),
+            };
+        }
+
+        $stored = $this->cleanStoredDescription();
+
+        // Rebuild old technical / awkward phrases like "Create on speaker (speaker.store)"
+        if (
+            $stored === ''
+            || preg_match('/^(Create|Update|Delete|Approve|Reject)\s+on\s+/i', $stored)
+            || preg_match('/\([a-z0-9_.\-]+\)$/i', (string) $this->description)
+        ) {
+            return \App\Support\AdminActivityLogger::friendlyActionPhrase(
+                (string) $this->action,
+                $this->resolved_module
+            );
+        }
+
+        return $stored;
+    }
+
+    public static function labelForModule(?string $module): string
+    {
+        if (!$module) {
             return 'General';
         }
 
         $labels = [
             'auth' => 'Authentication',
             'events' => 'Events',
+            'attendees' => 'Attendees',
             'attendee_users' => 'Attendees',
+            'exhibitors' => 'Exhibitors',
             'exhibitor_users' => 'Exhibitors',
             'speakers' => 'Speakers',
+            'speaker' => 'Speakers',
             'sponsors' => 'Sponsors',
             'email_templates' => 'Email Templates',
             'activity_logs' => 'Activity Logs',
@@ -140,12 +222,27 @@ class AdminActivityLog extends Model
             'settings' => 'Settings',
             'polls' => 'Polls',
             'gallery' => 'Gallery',
+            'event_guides' => 'Event Guides',
+            'event_tracks' => 'Event Tracks',
             'calendar' => 'Calendar',
             'notifications' => 'Notifications',
+            'users' => 'Users',
+            'user_groups' => 'User Groups',
+            'user_connections' => 'User Connections',
+            'landing_page' => 'Landing Page',
+            'navbar' => 'Navbar',
+            'pages' => 'Pages',
+            'categories' => 'Categories',
+            'roles' => 'Roles & Permissions',
+            'supports' => 'Support Requests',
+            'pricing' => 'Pricing',
+            'booths' => 'Booths',
+            'demo_requests' => 'Demo Requests',
+            'admin' => 'Admin',
         ];
 
-        return $labels[$this->module]
-            ?? ucwords(str_replace(['-', '_'], ' ', $this->module));
+        return $labels[$module]
+            ?? ucwords(str_replace(['-', '_'], ' ', $module));
     }
 
     public function getStatusLabelAttribute(): string
@@ -183,20 +280,26 @@ class AdminActivityLog extends Model
 
     public function getSummaryAttribute(): string
     {
-        if ($this->module === 'auth') {
+        if ($this->resolved_module === 'auth') {
             return match ($this->action) {
                 'login' => $this->actor_label . ' signed into the admin panel',
                 'logout' => $this->actor_label . ' signed out of the admin panel',
                 'login_failed' => 'Failed sign-in attempt' . ($this->actor_email ? ' for ' . $this->actor_email : ''),
-                default => $this->description,
+                default => $this->display_description,
             };
         }
 
-        $who = $this->actor_label;
-        $what = Str::lower($this->action_label);
-        $where = $this->module_label;
+        return $this->actor_label . ' · ' . $this->display_description;
+    }
 
-        return "{$who} {$what} something in {$where}";
+    private function cleanStoredDescription(): string
+    {
+        $desc = trim((string) ($this->description ?? ''));
+
+        // Strip technical route suffix: "Something (sponsors.update)"
+        $desc = preg_replace('/\s*\([a-z][a-z0-9_.\-]*\)\s*$/i', '', $desc) ?? $desc;
+
+        return trim($desc);
     }
 
     public function getBrowserLabelAttribute(): string
@@ -253,7 +356,7 @@ class AdminActivityLog extends Model
                 $rows[] = [
                     'group' => 'Related Record',
                     'label' => $this->humanizeKey((string) $key),
-                    'value' => $this->displayValue($value),
+                    'value' => $this->displayValueForKey((string) $key, $value),
                 ];
             }
         }
@@ -268,7 +371,7 @@ class AdminActivityLog extends Model
                 $rows[] = [
                     'group' => 'Submitted Data',
                     'label' => $this->humanizeKey((string) $key),
-                    'value' => $this->displayValue($value),
+                    'value' => $this->displayValueForKey((string) $key, $value),
                 ];
             }
         }
@@ -310,10 +413,10 @@ class AdminActivityLog extends Model
             $flat = [];
             foreach ($value as $k => $v) {
                 if (is_array($v) || is_object($v)) {
-                    $flat[] = $this->humanizeKey((string) $k) . ': ' . $this->displayValue($v);
+                    $flat[] = $this->humanizeKey((string) $k) . ': ' . $this->displayValueForKey((string) $k, $v);
                 } else {
                     $label = is_int($k) ? '' : $this->humanizeKey((string) $k) . ': ';
-                    $flat[] = $label . $this->displayValue($v);
+                    $flat[] = $label . $this->displayValueForKey((string) $k, $v);
                 }
             }
 
@@ -335,11 +438,56 @@ class AdminActivityLog extends Model
         return $string;
     }
 
+    private function displayValueForKey(string $key, mixed $value): string
+    {
+        $keyLower = strtolower($key);
+
+        if (in_array($keyLower, ['event_id', 'event'], true)) {
+            return $this->resolveEventName($value);
+        }
+
+        if (is_array($value) && in_array($keyLower, ['event_id', 'event_ids'], true)) {
+            $names = [];
+            foreach ($value as $item) {
+                $names[] = $this->resolveEventName($item);
+            }
+
+            return empty($names) ? '—' : implode(', ', $names);
+        }
+
+        return $this->displayValue($value);
+    }
+
+    private function resolveEventName(mixed $value): string
+    {
+        if (is_array($value)) {
+            $names = [];
+            foreach ($value as $item) {
+                $names[] = $this->resolveEventName($item);
+            }
+
+            return empty($names) ? '—' : implode(', ', $names);
+        }
+
+        if (is_object($value) && isset($value->title)) {
+            return (string) $value->title;
+        }
+
+        if (!is_numeric($value)) {
+            return $this->displayValue($value);
+        }
+
+        $event = Event::query()->find((int) $value);
+
+        return $event?->title ?: 'Unknown event';
+    }
+
     private function humanizeKey(string $key): string
     {
         $map = [
             'id' => 'ID',
-            'event_id' => 'Event ID',
+            'event_id' => 'Event',
+            'event' => 'Event',
             'user_id' => 'User ID',
             'email' => 'Email',
             'guard' => 'Auth Guard',

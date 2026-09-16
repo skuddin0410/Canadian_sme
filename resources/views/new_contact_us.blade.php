@@ -20,6 +20,27 @@
     <!-- css -->
     <link rel="stylesheet" href="./frontend/css/style_new.css">
     <link rel="stylesheet" href="{{ asset('frontend/css/developer.css') }}">
+    <style>
+        /* Honeypot: visually hidden from users, still present in DOM for bots */
+        .contact-hp {
+            position: absolute;
+            left: -10000px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        .contact-from-submit-btn.is-submitting {
+            opacity: 0.85;
+            pointer-events: none;
+            cursor: wait;
+        }
+        .contact-from-submit-btn .btn-loader {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -77,47 +98,68 @@
                             </div>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('contact-submit') }}">
+                    <form method="POST" action="{{ route('contact-submit') }}" id="contact-us-form">
                         @csrf
+                        {{-- Spam honeypot: leave empty. Bots often fill this; humans never see it. --}}
+                        <div class="contact-hp" aria-hidden="true">
+                            <label for="website">Website</label>
+                            <input type="text" name="website" id="website" value="" tabindex="-1" autocomplete="off">
+                        </div>
+                        <input type="hidden" name="_form_started" value="{{ encrypt(now()->timestamp) }}">
                         <div class="row gy-2 gy-lg-3">
 
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input name="name" class="type-text" type="text" placeholder="Your Name" required>
+                                    <input name="name" class="type-text" type="text" placeholder="Your Name" required value="{{ old('name') }}">
                                 </div>
                             </div>
 
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input name="location" class="type-text" type="text" placeholder="Location" required>
+                                    <input name="location" class="type-text" type="text" placeholder="Location" required value="{{ old('location') }}">
                                 </div>
                             </div>
 
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input name="email" class="type-email" type="email" placeholder="Email Address" required>
+                                    <input name="email" class="type-email" type="email" placeholder="Email Address" required value="{{ old('email') }}">
                                 </div>
                             </div>
 
                             <div class="col-xl-6">
                                 <div class="input-wrapper">
-                                    <input name="phone" class="type-phone" type="tel" placeholder="Phone" required>
+                                    <input name="phone" class="type-phone" type="tel" placeholder="Phone" required value="{{ old('phone') }}">
                                 </div>
                             </div>
 
                             <div class="col-xl-12">
                                 <div class="input-wrapper">
-                                    <input name="subject" class="type-text" type="text" placeholder="Enter Your Subject" required>
+                                    <input name="subject" class="type-text" type="text" placeholder="Enter Your Subject" required value="{{ old('subject') }}">
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <textarea name="description" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required></textarea>
+                                <textarea name="description" class="contact-textarea" rows="4" placeholder="Type Your Message Here" required>{{ old('description') }}</textarea>
                             </div>
+
+                            @if(config('services.recaptcha.site_key'))
+                            <div class="col-12">
+                                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                                @error('g-recaptcha-response')
+                                    <div class="text-danger small mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            @endif
 
                         </div>
 
-                        <button type="submit" class="heroBtn contact-from-submit-btn">Submit</button>
+                        <button type="submit" class="heroBtn contact-from-submit-btn" id="contact-submit-btn">
+                            <span class="btn-label">Submit</span>
+                            <span class="btn-loader d-none" aria-hidden="true">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Submitting...
+                            </span>
+                        </button>
                     </form>
 
                 </div>
@@ -137,6 +179,40 @@
     <!-- footer end -->
 
 
+
+    @if(config('services.recaptcha.site_key'))
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
+
+    <script>
+      (function () {
+        var form = document.getElementById('contact-us-form');
+        var btn = document.getElementById('contact-submit-btn');
+        if (!form || !btn) return;
+
+        var label = btn.querySelector('.btn-label');
+        var loader = btn.querySelector('.btn-loader');
+        var hasRecaptcha = {{ config('services.recaptcha.site_key') ? 'true' : 'false' }};
+
+        form.addEventListener('submit', function (e) {
+          if (hasRecaptcha && typeof grecaptcha !== 'undefined' && !grecaptcha.getResponse()) {
+            e.preventDefault();
+            alert('Please complete the CAPTCHA and try again.');
+            return;
+          }
+
+          if (btn.disabled) {
+            e.preventDefault();
+            return;
+          }
+
+          btn.disabled = true;
+          btn.classList.add('is-submitting');
+          if (label) label.classList.add('d-none');
+          if (loader) loader.classList.remove('d-none');
+        });
+      })();
+    </script>
 
     <!-- bootstrap js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

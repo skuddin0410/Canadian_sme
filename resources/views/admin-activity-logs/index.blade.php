@@ -40,7 +40,7 @@
                             <option value="">All Modules</option>
                             @foreach($moduleOptions as $moduleOption)
                                 <option value="{{ $moduleOption }}" {{ request('module') == $moduleOption ? 'selected' : '' }}>
-                                    {{ ucwords(str_replace(['_', '-'], ' ', $moduleOption)) }}
+                                    {{ \App\Models\AdminActivityLog::labelForModule($moduleOption) }}
                                 </option>
                             @endforeach
                         </select>
@@ -118,7 +118,8 @@
                                 </td>
                                 <td class="px-4 py-3">{{ $log->module_label }}</td>
                                 <td class="px-4 py-3">
-                                    <div class="fw-medium">{{ $log->summary }}</div>
+                                    <div class="fw-medium">{{ $log->display_description }}</div>
+                                    <small class="text-muted">{{ $log->summary }}</small>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div>{{ $log->actor_label }}</div>

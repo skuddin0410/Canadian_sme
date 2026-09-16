@@ -18,7 +18,30 @@ class AdminActivityLogController extends Controller
         }
 
         if ($request->filled('module')) {
-            $query->where('module', $request->module);
+            $module = $request->module;
+
+            if ($module === 'gallery') {
+                // Include older logs wrongly saved under event_guides
+                $query->where(function ($q) {
+                    $q->where('module', 'gallery')
+                        ->orWhere(function ($inner) {
+                            $inner->where('module', 'event_guides')
+                                ->where(function ($g) {
+                                    $g->where('route_name', 'like', '%Gallery%')
+                                        ->orWhere('url', 'like', '%event-guides/gallery%')
+                                        ->orWhere('url', 'like', '%delete-gallery-image%');
+                                });
+                        });
+                });
+            } elseif (in_array($module, ['speakers', 'speaker'], true)) {
+                $query->whereIn('module', ['speakers', 'speaker']);
+            } elseif (in_array($module, ['attendees', 'attendee_users'], true)) {
+                $query->whereIn('module', ['attendees', 'attendee_users']);
+            } elseif (in_array($module, ['exhibitors', 'exhibitor_users'], true)) {
+                $query->whereIn('module', ['exhibitors', 'exhibitor_users']);
+            } else {
+                $query->where('module', $module);
+            }
         }
 
         if ($request->filled('from')) {
@@ -48,7 +71,31 @@ class AdminActivityLogController extends Controller
 
         $baseVisible = AdminActivityLog::query()->visibleTo($user);
         $actionOptions = (clone $baseVisible)->select('action')->distinct()->orderBy('action')->pluck('action');
-        $moduleOptions = (clone $baseVisible)->select('module')->whereNotNull('module')->distinct()->orderBy('module')->pluck('module');
+        $moduleOptions = (clone $baseVisible)->select('module')->whereNotNull('module')->distinct()->orderBy('module')->pluck('module')
+            ->map(function ($module) {
+                // Normalize known aliases for the filter dropdown
+                return match ($module) {
+                    'speaker' => 'speakers',
+                    'attendee_users' => 'attendees',
+                    'exhibitor_users' => 'exhibitors',
+                    default => $module,
+                };
+            })
+            ->unique()
+            ->values();
+
+        // Ensure gallery appears even if only old event_guides gallery rows exist
+        $hasGallery = AdminActivityLog::query()->visibleTo($user)
+            ->where(function ($q) {
+                $q->where('module', 'gallery')
+                    ->orWhere('route_name', 'like', '%Gallery%')
+                    ->orWhere('url', 'like', '%event-guides/gallery%');
+            })
+            ->exists();
+        if ($hasGallery && !$moduleOptions->contains('gallery')) {
+            $moduleOptions->push('gallery');
+            $moduleOptions = $moduleOptions->sort()->values();
+        }
 
         $actors = collect();
         if (isSuperAdmin()) {
@@ -69,7 +116,7 @@ class AdminActivityLogController extends Controller
             403
         );
 
-        $activityLog->loadMissing('actor');
+        $activityLog->loadMissing(['actor', 'event']);
 
         return view('admin-activity-logs.show', ['log' => $activityLog]);
     }
