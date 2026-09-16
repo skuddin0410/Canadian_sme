@@ -128,7 +128,7 @@ Route::post('/verify-otp', [App\Http\Controllers\EventUserAuthController::class,
 
 Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
 
-Route::group(['middleware' => ['webauth', 'admin', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+Route::group(['middleware' => ['webauth', 'admin', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk', 'log.admin.activity']], function () {
 
     Route::prefix('admin')->group(function () {
         require __DIR__ . '/common.php'; //used by all users in web
@@ -143,6 +143,6 @@ Route::group(['middleware' => ['webauth', 'admin', 'role:Admin|Exhibitor|Represe
     });
 });
 
-Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk']], function () {
+Route::group(['middleware' => ['webauth', 'role:Admin|Exhibitor|Representative|Attendee|Speaker|Support Staff Or Helpdesk|Registration Desk', 'log.admin.activity']], function () {
     require __DIR__ . '/ticket.php';
 });

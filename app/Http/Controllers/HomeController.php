@@ -11,8 +11,7 @@ use Validator;
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use App\Models\Payment;
-use App\Models\AuditLog;
-use App\Models\UserLogin;
+use App\Models\AdminActivityLog;
 use App\Models\GeneralNotification;
 use App\Models\Page;
 use App\Models\Speaker;
@@ -87,14 +86,10 @@ class HomeController extends Controller
             }
             $exhibitorCount = $queryExhibitors->count();
 
-            // Logs
-            if ($isSuperAdmin) {
-                $logs = AuditLog::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
-                $loginlogs = UserLogin::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
-            } else {
-                $logs = AuditLog::with('user')->visibleTo($user)->orderBy('created_at', 'desc')->limit(5)->get();
-                $loginlogs = UserLogin::with('user')->where('user_id', $user->id)->orderBy('created_at', 'desc')->limit(5)->get();
-            }
+            // Logs — new Activity Log (admin take-actions + auth)
+            $activityQuery = AdminActivityLog::query()->visibleTo($user)->orderBy('created_at', 'desc');
+            $logs = (clone $activityQuery)->limit(5)->get();
+            $loginlogs = (clone $activityQuery)->where('module', 'auth')->limit(5)->get();
 
             // Events Count (based on Event model)
             $queryEvents = \App\Models\Event::query();
@@ -189,15 +184,8 @@ class HomeController extends Controller
 
         abort_unless($user && $user->hasRole('Admin'), 403);
 
-        $loginLogsQuery = UserLogin::with('user')->orderBy('created_at', 'desc');
-
-        if (!isSuperAdmin()) {
-            $loginLogsQuery->where('user_id', $user->id);
-        }
-
-        $loginLogs = $loginLogsQuery->paginate(15);
-
-        return view('login-activity.index', compact('loginLogs'));
+        // Login Activity is folded into the unified Activity Log (auth module)
+        return redirect()->route('admin.activity-logs.index', ['module' => 'auth']);
     }
 
     public function notifications()

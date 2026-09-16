@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
+    ->withEvents(discover: false)
     ->withMiddleware(function (Middleware $middleware) {
         $trustedProxies = env('TRUSTED_PROXIES', '*');
 
@@ -39,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'company.exists' => \App\Http\Middleware\EnsureCompanyExists::class,
             'admin' => \App\Http\Middleware\AdminOnly::class,
             'event.access' => \App\Http\Middleware\CheckEventAccess::class,
+            'log.admin.activity' => \App\Http\Middleware\LogAdminActivity::class,
         ]);
 
         $middleware->redirectGuestsTo(function (Request $request) {

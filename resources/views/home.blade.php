@@ -261,7 +261,7 @@
         <div class="card h-100">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0"><i class="bi bi-clock-history"></i> Recent Activity</h4>
-            <a href="{{ route('audit.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            <a href="{{ route('admin.activity-logs.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
           </div>
           <div class="card-body">
             <div class="list-group list-group-flush">
@@ -269,13 +269,15 @@
                 <div class="list-group-item">
                   <div class="d-flex justify-content-between align-items-start gap-3">
                     <div class="d-flex gap-3">
-                      <div class="rounded-circle bg-{{ $log->event_badge_class }} bg-opacity-10 text-{{ $log->event_badge_class }} d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
-                        <i class="bi {{ $log->event_icon }}" aria-hidden="true"></i>
+                      <div class="rounded-circle bg-{{ $log->action_badge_class }} bg-opacity-10 text-{{ $log->action_badge_class }} d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="bi bi-activity" aria-hidden="true"></i>
                       </div>
                       <div>
-                        <div class="fw-semibold">{{ $log->event_label }} {{ $log->entity_label }} #{{ $log->auditable_id }}</div>
-                        <div class="text-muted small">By {{ $log->actor_label }}</div>
-                        <div class="text-muted small">{{ $log->changed_fields_summary }}</div>
+                        <div class="fw-semibold">{{ $log->description }}</div>
+                        <div class="text-muted small">
+                          <span class="badge bg-{{ $log->action_badge_class }}">{{ $log->action_label }}</span>
+                          {{ $log->module_label }} · By {{ $log->actor_label }}
+                        </div>
                       </div>
                     </div>
                     <small class="text-muted text-nowrap">{{ $log->created_at->diffForHumans() }}</small>
@@ -293,17 +295,19 @@
         <div class="card h-100">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0"><i class="bi bi-box-arrow-in-right"></i> Login Activity</h4>
-            <a href="{{ route('login-activity.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            <a href="{{ route('admin.activity-logs.index', ['module' => 'auth']) }}" class="btn btn-sm btn-outline-primary">View All</a>
           </div>
           <div class="card-body">
             <div class="list-group list-group-flush">
               @forelse($loginlogs ?? [] as $log)
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                   <div>
-                    <i class="bi bi-person-check text-success me-2" aria-hidden="true"></i>
-                    <strong>{{ $log->user?->full_name ?? 'System' }} logged in</strong>
-                    on {{ $log->created_at->format('M d, Y') }},
-                    {{ $log->created_at->format('h:i A') }}
+                    <i class="bi bi-person-check text-{{ $log->action_badge_class }} me-2" aria-hidden="true"></i>
+                    <strong>{{ $log->actor_label }}</strong>
+                    — {{ $log->description }}
+                    <div class="text-muted small">
+                      {{ $log->created_at->format('M d, Y') }}, {{ $log->created_at->format('h:i A') }}
+                    </div>
                   </div>
                   <small class="text-muted">
                     <i class="bi bi-alarm me-1" aria-hidden="true"></i>{{ $log->created_at->diffForHumans() }}
