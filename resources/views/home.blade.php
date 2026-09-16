@@ -273,7 +273,7 @@
                         <i class="bi bi-activity" aria-hidden="true"></i>
                       </div>
                       <div>
-                        <div class="fw-semibold">{{ $log->description }}</div>
+                        <div class="fw-semibold">{{ $log->display_description }}</div>
                         <div class="text-muted small">
                           <span class="badge bg-{{ $log->action_badge_class }}">{{ $log->action_label }}</span>
                           {{ $log->module_label }} · By {{ $log->actor_label }}
@@ -304,7 +304,7 @@
                   <div>
                     <i class="bi bi-person-check text-{{ $log->action_badge_class }} me-2" aria-hidden="true"></i>
                     <strong>{{ $log->actor_label }}</strong>
-                    — {{ $log->description }}
+                    — {{ $log->display_description }}
                     <div class="text-muted small">
                       {{ $log->created_at->format('M d, Y') }}, {{ $log->created_at->format('h:i A') }}
                     </div>

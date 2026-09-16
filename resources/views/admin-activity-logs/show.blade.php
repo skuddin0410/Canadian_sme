@@ -70,7 +70,8 @@
                         <span class="badge bg-white text-dark border">{{ $log->module_label }}</span>
                         <span class="badge bg-{{ $log->status_badge_class }}">{{ $log->status_label }}</span>
                     </div>
-                    <h3 class="h4 mb-2 fw-semibold">{{ $log->summary }}</h3>
+                    <h3 class="h4 mb-2 fw-semibold">{{ $log->display_description }}</h3>
+                    <div class="text-muted mb-1">{{ $log->summary }}</div>
                     <div class="text-muted">
                         <i class="bi bi-calendar3 me-1"></i>
                         {{ $log->created_at?->format('l, M d, Y · h:i A') }}
@@ -123,7 +124,7 @@
                         </dd>
                         @if($log->event_id)
                             <dt>Related Event</dt>
-                            <dd>Event #{{ $log->event_id }}</dd>
+                            <dd>{{ $log->event_label }}</dd>
                         @endif
                     </dl>
                 </div>
@@ -171,7 +172,7 @@
             </div>
         </div>
     @empty
-        @if($log->module === 'auth')
+        @if($log->resolved_module === 'auth')
             <div class="card shadow-sm mb-4">
                 <div class="card-body text-muted">
                     <i class="bi bi-info-circle me-1"></i>
@@ -185,12 +186,12 @@
         <a href="{{ route('admin.activity-logs.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Back to List
         </a>
-        @if($log->module === 'auth')
+        @if($log->resolved_module === 'auth')
             <a href="{{ route('admin.activity-logs.index', ['module' => 'auth']) }}" class="btn btn-outline-primary">
                 All login activity
             </a>
-        @elseif($log->module)
-            <a href="{{ route('admin.activity-logs.index', ['module' => $log->module]) }}" class="btn btn-outline-primary">
+        @elseif($log->resolved_module)
+            <a href="{{ route('admin.activity-logs.index', ['module' => $log->resolved_module]) }}" class="btn btn-outline-primary">
                 Same section
             </a>
         @endif

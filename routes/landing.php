@@ -75,7 +75,9 @@ Route::prefix('cms')->group(function () {
     Route::get('/{slug}', [PageController::class, 'appContent']);
 });
 
-Route::post('/supports/submit', [SupportController::class, 'store'])->name('support.submit');
+Route::post('/supports/submit', [SupportController::class, 'store'])
+    ->middleware('throttle:3,10')
+    ->name('support.submit');
 Route::get('/supports', [SupportController::class, 'index'])->name('support.form');
 
 Route::get('/support', function () {
@@ -86,7 +88,9 @@ Route::get('/contact-us', function () {
     return view('new_contact_us'); // This will load the contact-us.blade.php view
 })->name('contact-us');
 
-Route::post('/contact-submit' , [SupportController::class,'store'])->name('contact-submit');
+Route::post('/contact-submit', [SupportController::class, 'store'])
+    ->middleware('throttle:3,10')
+    ->name('contact-submit');
 
 Route::get('/support/{slug}' , [ContactUsController::class,'index'])->name('support');
 Route::post('/support-submit/{slug}', [ContactUsController::class, 'store'])

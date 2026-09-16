@@ -36,6 +36,78 @@ class AdminActivityLogger
         'Registration Desk',
     ];
 
+    /** Route-name => friendly one-line description */
+    private const ROUTE_DESCRIPTIONS = [
+        'event-guides.uploadGallery' => 'Added a gallery item',
+        'event-guides.reorderGallery' => 'Reordered gallery items',
+        'event-guides.approveGalleryItem' => 'Approved a gallery item',
+        'event-guides.approveAllGalleryItems' => 'Approved all gallery items',
+        'event-guides.deleteGalleryImage' => 'Deleted a gallery image',
+        'events.clone' => 'Cloned an event',
+        'events.removePhoto' => 'Removed an event photo',
+        'events.floor-plan.update' => 'Updated event floor plan',
+        'exhibitor-users.approve' => 'Approved an exhibitor',
+        'exhibitor-users.assign-booth' => 'Assigned a booth to an exhibitor',
+        'attendee-users.allow-access' => 'Allowed attendee access',
+        'attendee-users.sendMail' => 'Sent email to an attendee',
+        'attendee-users.send-both' => 'Sent email and notification to an attendee',
+        'attendee-users.generateBadge' => 'Generated an attendee badge',
+        'attendee-users.bulkAction' => 'Ran a bulk action on attendees',
+        'speakers.allow-access' => 'Allowed speaker access',
+        'speakers.sendMail' => 'Sent email to a speaker',
+        'speaker.private-docs.delete' => 'Deleted a speaker private document',
+        'admin-users.unblock' => 'Unblocked an admin user',
+        'roles.assign.permission' => 'Updated role permissions',
+        'user_import' => 'Imported users',
+        'sendmail_to_user' => 'Sent a tracked email to a user',
+        'user-connections.send-mail' => 'Sent connection email',
+        'sponsors.export' => 'Exported sponsors',
+        'speaker.export' => 'Exported speakers',
+        'exhibitors.export' => 'Exported exhibitors',
+    ];
+
+    /** Route-name prefix / exact => module key */
+    private const ROUTE_MODULE_MAP = [
+        'event-guides.uploadGallery' => 'gallery',
+        'event-guides.reorderGallery' => 'gallery',
+        'event-guides.approveGalleryItem' => 'gallery',
+        'event-guides.approveAllGalleryItems' => 'gallery',
+        'event-guides.deleteGalleryImage' => 'gallery',
+        'event-guides.showGallery' => 'gallery',
+        'speaker.' => 'speakers',
+        'speakers.' => 'speakers',
+        'sponsors.' => 'sponsors',
+        'attendee-users.' => 'attendees',
+        'exhibitor-users.' => 'exhibitors',
+        'exhibitors.' => 'exhibitors',
+        'admin-users.' => 'admin_users',
+        'email-templates.' => 'email_templates',
+        'ticket-types.' => 'ticket_types',
+        'promo-codes.' => 'promo_codes',
+        'event-guides.' => 'event_guides',
+        'event-tracks.' => 'event_tracks',
+        'user-connections.' => 'user_connections',
+        'navbar-dynamic.' => 'navbar',
+        'admin.navbar-dynamic.' => 'navbar',
+        'admin.home-page.' => 'landing_page',
+        'admin.upload-image' => 'navbar',
+        'calendar.' => 'calendar',
+        'polls.' => 'polls',
+        'supports.' => 'supports',
+        'contact.' => 'supports',
+        'subscriptions.' => 'subscriptions',
+        'pricing.' => 'pricing',
+        'roles.' => 'roles',
+        'settings.' => 'settings',
+        'events.' => 'events',
+        'users.' => 'users',
+        'usergroup.' => 'user_groups',
+        'pages.' => 'pages',
+        'categories.' => 'categories',
+        'demo-requests.' => 'demo_requests',
+        'booths.' => 'booths',
+    ];
+
     public static function log(array $data): ?AdminActivityLog
     {
         try {
@@ -138,6 +210,11 @@ class AdminActivityLogger
             || $request->is('admin/*');
     }
 
+    public static function moduleLabel(string $module): string
+    {
+        return AdminActivityLog::labelForModule($module);
+    }
+
     private static function resolveAction(Request $request): string
     {
         $routeName = (string) optional($request->route())->getName();
@@ -155,7 +232,7 @@ class AdminActivityLogger
         if (Str::contains($routeName, ['store', 'create', 'clone', 'import', 'upload'])) {
             return 'create';
         }
-        if (Str::contains($routeName, ['update', 'edit', 'status', 'order', 'bulk'])) {
+        if (Str::contains($routeName, ['update', 'edit', 'status', 'order', 'bulk', 'reorder'])) {
             return 'update';
         }
 
@@ -169,16 +246,67 @@ class AdminActivityLogger
 
     private static function resolveModule(Request $request): string
     {
+        $routeName = (string) optional($request->route())->getName();
         $path = trim($request->path(), '/');
-        $segments = explode('/', $path);
 
+        // Gallery routes live under /event-guides/gallery but are not "Event Guide"
+        if (
+            Str::contains($path, 'event-guides/gallery')
+            || Str::contains($path, 'delete-gallery-image')
+            || Str::contains($routeName, ['uploadGallery', 'reorderGallery', 'approveGallery', 'deleteGallery', 'showGallery'])
+        ) {
+            return 'gallery';
+        }
+
+        if ($routeName !== '') {
+            if (isset(self::ROUTE_MODULE_MAP[$routeName])) {
+                return self::ROUTE_MODULE_MAP[$routeName];
+            }
+
+            foreach (self::ROUTE_MODULE_MAP as $prefix => $module) {
+                if (Str::endsWith($prefix, '.') && Str::startsWith($routeName, $prefix)) {
+                    return $module;
+                }
+            }
+        }
+
+        if (Str::startsWith($path, 'admin/home-page')) {
+            return 'landing_page';
+        }
+
+        if (Str::startsWith($path, 'admin/navbar-highlights') || $path === 'admin/upload-image') {
+            return 'navbar';
+        }
+
+        $segments = explode('/', $path);
         if (($segments[0] ?? null) === 'admin') {
             array_shift($segments);
         }
 
-        $module = $segments[0] ?? 'admin';
+        $raw = $segments[0] ?? 'admin';
 
-        return Str::of($module)->replace(['_', '-'], ' ')->slug('_')->toString() ?: 'admin';
+        // Normalize common plurals / aliases
+        $aliases = [
+            'speaker' => 'speakers',
+            'attendee-users' => 'attendees',
+            'exhibitor-users' => 'exhibitors',
+            'admin-users' => 'admin_users',
+            'email-templates' => 'email_templates',
+            'ticket-types' => 'ticket_types',
+            'promo-codes' => 'promo_codes',
+            'event-guides' => 'event_guides',
+            'event-tracks' => 'event_tracks',
+            'user-connections' => 'user_connections',
+            'usergroup' => 'user_groups',
+            'demo-requests' => 'demo_requests',
+            'navbar-highlights' => 'navbar',
+        ];
+
+        if (isset($aliases[$raw])) {
+            return $aliases[$raw];
+        }
+
+        return Str::of($raw)->replace(['_', '-'], ' ')->slug('_')->toString() ?: 'admin';
     }
 
     private static function resolveEventId(Request $request): ?int
@@ -204,14 +332,59 @@ class AdminActivityLogger
 
     private static function buildRequestDescription(Request $request, string $action, string $module): string
     {
-        $routeName = optional($request->route())->getName();
-        $label = ucfirst($action) . ' on ' . str_replace('_', ' ', $module);
+        $routeName = (string) optional($request->route())->getName();
 
-        if ($routeName) {
-            $label .= ' (' . $routeName . ')';
+        if ($routeName !== '' && isset(self::ROUTE_DESCRIPTIONS[$routeName])) {
+            return self::ROUTE_DESCRIPTIONS[$routeName];
         }
 
-        return $label;
+        return self::friendlyActionPhrase($action, $module);
+    }
+
+    public static function friendlyActionPhrase(string $action, string $module): string
+    {
+        $section = self::moduleLabel($module);
+        $singularHints = [
+            'speakers' => 'speaker',
+            'sponsors' => 'sponsor',
+            'attendees' => 'attendee',
+            'exhibitors' => 'exhibitor',
+            'events' => 'event',
+            'users' => 'user',
+            'admin_users' => 'admin user',
+            'gallery' => 'gallery item',
+            'event_guides' => 'event guide',
+            'event_tracks' => 'event track',
+            'ticket_types' => 'ticket type',
+            'promo_codes' => 'promo code',
+            'email_templates' => 'email template',
+            'polls' => 'poll',
+            'pages' => 'page',
+            'categories' => 'category',
+            'settings' => 'setting',
+            'subscriptions' => 'subscription',
+            'supports' => 'support request',
+            'user_groups' => 'user group',
+            'user_connections' => 'user connection',
+            'landing_page' => 'landing page content',
+            'navbar' => 'navbar item',
+            'calendar' => 'calendar item',
+            'roles' => 'role',
+            'pricing' => 'pricing plan',
+            'booths' => 'booth',
+            'demo_requests' => 'demo request',
+        ];
+
+        $target = $singularHints[$module] ?? Str::lower(Str::singular($section));
+
+        return match ($action) {
+            'create' => 'Added a ' . $target,
+            'update' => 'Updated a ' . $target,
+            'delete' => 'Deleted a ' . $target,
+            'approve' => 'Approved a ' . $target,
+            'reject' => 'Rejected a ' . $target,
+            default => ucfirst(str_replace('_', ' ', $action)) . ' in ' . $section,
+        };
     }
 
     private static function defaultDescription(array $data): string
@@ -219,7 +392,7 @@ class AdminActivityLogger
         $action = $data['action'] ?? 'action';
         $module = $data['module'] ?? 'admin';
 
-        return ucfirst(str_replace('_', ' ', $action)) . ' · ' . str_replace('_', ' ', $module);
+        return self::friendlyActionPhrase($action, $module);
     }
 
     private static function sanitize(array $data): array
