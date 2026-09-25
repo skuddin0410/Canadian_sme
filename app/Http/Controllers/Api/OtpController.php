@@ -118,31 +118,24 @@ class OtpController extends Controller
                 ], 429);
             }
 
-            $subject = 'Login OTP';
-            if (!empty($event?->title)) {
-                $subject .= ' - ' . $event->title;
-            }
+            $code = random_int(1000, 9999);
+            $expiresMinutes = 60;
 
-            $code = rand(1000, 9999);
-            $currentDateTime = Carbon::now();
-          
-                $otp = Otp::updateOrCreate(
-                    ['email' => $request->email],
-                    [
-                        'otp' => $code,
-                        'expired_at' => now()->addMinutes(60),
-                    ]
-                );
+            $otp = Otp::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'otp' => $code,
+                    'expired_at' => now()->addMinutes($expiresMinutes),
+                ]
+            );
 
-                // Mail::to($request->email)->send(new OtpMail($code)); //Subabrata da code for otp mail
+            Mail::to($request->email)->send(new OtpMail($code, $event, $expiresMinutes));
 
-                Mail::raw($code.' is your login OTP. Please ensure this as confidential. ' .env('APP_NAME'). ' will never call you to verify your OTP. Good Luck,', function($m) use ($request, $subject){ $m->to($request->email)->subject($subject); }); //My code for otp mail
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'OTP sent successfully to '.$request->email. '.',
-                    'data' => $otp,
-                ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully to '.$request->email. '.',
+                'data' => $otp,
+            ]);
 
             } catch (JWTException $e) {
                 Log::error('OTP Generation Error: ' . $e->getMessage());

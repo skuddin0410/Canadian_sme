@@ -1,4 +1,7 @@
-@include('emails.layout.header')
+@include('emails.layout.header', [
+    'platformBranding' => empty($payload['event']),
+    'event' => null,
+])
 
 <h3 style="margin-bottom:15px; color:#002364;">New inquiry received</h3>
 

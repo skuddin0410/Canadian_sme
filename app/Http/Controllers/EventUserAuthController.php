@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use App\Models\Otp;
+use App\Mail\OtpMail;
 
 
 class EventUserAuthController extends Controller
@@ -96,20 +97,15 @@ class EventUserAuthController extends Controller
             $event = Event::find($request->event_id);
         }
 
-        $subject = 'Login OTP';
-        if (!empty($event?->title)) {
-            $subject .= ' - ' . $event->title;
-        }
+        $code = random_int(1000, 9999);
+        $expiresMinutes = 10;
 
-        $code = rand(1000, 9999);
         Otp::updateOrCreate(
             ['email' => $email],
-            ['otp' => $code, 'expired_at' => now()->addMinutes(10)]
+            ['otp' => $code, 'expired_at' => now()->addMinutes($expiresMinutes)]
         );
 
-        Mail::raw($code . ' is your login OTP. Please ensure this as confidential. ' . config('app.name') . ' will never call you to verify your OTP.', function ($m) use ($email, $subject) {
-            $m->to($email)->subject($subject);
-        });
+        Mail::to($email)->send(new OtpMail($code, $event, $expiresMinutes));
 
         return response()->json(['success' => true, 'message' => 'OTP sent successfully to ' . $email]);
     }

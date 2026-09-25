@@ -38,6 +38,12 @@ class ContactQuery extends Mailable
     {
         return new Content(
             view: 'emails.contact_received',
+            with: [
+                'support' => $this->support,
+                'platformBranding' => true,
+                'event' => null,
+                'sponsor' => null,
+            ],
         );
     }
 

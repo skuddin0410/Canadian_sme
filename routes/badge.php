@@ -17,6 +17,4 @@ Route::resource('newbadges', NewBadgeController::class);
 Route::post(
     'newbadges/{newbadge}/save-layout',
     [NewBadgeController::class, 'saveLayout']
-);
-
-
+)->name('newbadges.saveLayout');

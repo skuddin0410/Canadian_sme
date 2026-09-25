@@ -31,16 +31,20 @@ Admin | Speaker Details
 
                         <div class="col-6 text-left mb-2">
                             <label for="profileImageInput">
+                              @if(!empty($user->photo) && !empty($user->photo->file_path))
                               <img id="profileImagePreview" 
-                                   src="{{!empty($user->photo) ? $user->photo->file_path : ''}}" 
+                                   src="{{ $user->photo->file_path }}" 
                                    class=" border border-2" 
                                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                              @endif
                             </label>
                         </div> 
 
                         <div class="col-4">
-                                 <img id="profileImagePreview" 
-                                   src="{{!empty($user->coverphoto) ? $user->coverphoto->file_path : ''}}" style="width:100%; object-fit: cover; cursor: pointer;">
+                            @if(!empty($user->coverphoto) && !empty($user->coverphoto->file_path))
+                                 <img id="coverImagePreview" 
+                                   src="{{ $user->coverphoto->file_path }}" style="width:100%; object-fit: cover; cursor: pointer;">
+                            @endif
                                  
                         </div>
    

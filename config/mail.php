@@ -116,4 +116,15 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    | Optional public brand URL for transactional emails.
+    | Use a real https domain — never localhost — so links are not spam signals.
+    */
+    'brand_url' => env('MAIL_BRAND_URL', 'https://eventzen.io'),
+
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS', 'support@eventzen.io'),
+        'name' => env('MAIL_REPLY_TO_NAME', env('MAIL_FROM_NAME', 'Eventzen')),
+    ],
+
 ];

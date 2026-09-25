@@ -2,51 +2,81 @@
 
 namespace App\Mail;
 
+use App\Models\Event;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
-class OtpMail extends Mailable implements ShouldQueue
+class OtpMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $otp;
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($otp)
+    public string $otp;
+    public ?Event $event;
+    public int $expiresMinutes;
+    public string $appName;
+    public string $brandUrl;
+
+    public function __construct(string|int $otp, ?Event $event = null, int $expiresMinutes = 10)
     {
-        $this->otp = $otp;
+        $this->otp = (string) $otp;
+        $this->event = $event;
+        $this->expiresMinutes = $expiresMinutes;
+
+        // Never use local/dev branding in transactional auth emails
+        $configuredName = trim((string) config('app.name', 'Eventzen'));
+        $this->appName = preg_replace('/\s+Local$/i', '', $configuredName) ?: 'Eventzen';
+        $this->brandUrl = rtrim((string) (config('mail.brand_url') ?: env('MAIL_BRAND_URL', 'https://eventzen.io')), '/');
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
+        $subject = $this->event?->title
+            ? "Your {$this->appName} verification code"
+            : "Your {$this->appName} verification code";
+
+        $fromAddress = (string) config('mail.from.address');
+        $replyTo = (string) (config('mail.reply_to.address') ?: env('MAIL_REPLY_TO_ADDRESS', 'support@eventzen.io'));
+
         return new Envelope(
-            subject: 'Otp',
+            from: new Address($fromAddress, $this->appName),
+            replyTo: [
+                new Address($replyTo, $this->appName . ' Support'),
+            ],
+            subject: $subject,
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: [
+                'X-Auto-Response-Suppress' => 'OOF, AutoReply',
+                'Auto-Submitted' => 'auto-generated',
+            ],
+        );
+    }
+
     public function content(): Content
     {
         return new Content(
-            view: 'emails.otp',
+            html: 'emails.otp',
+            text: 'emails.otp_plain',
+            with: [
+                'otp' => $this->otp,
+                'event' => $this->event,
+                'expiresMinutes' => $this->expiresMinutes,
+                'appName' => $this->appName,
+                'brandUrl' => $this->brandUrl,
+                'eventTitle' => $this->event?->title,
+            ],
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

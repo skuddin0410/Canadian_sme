@@ -1,4 +1,4 @@
-@include('emails.layout.header')
+@include('emails.layout.header', ['platformBranding' => true])
 
 <!--[if mso]><style>td, th { font-family: Arial, sans-serif !important; }</style><![endif]-->
 
