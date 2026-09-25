@@ -711,11 +711,11 @@ if (!function_exists('getEventIds')) {
             ->latest()
             ->first();
 
-        if ($subscription) {
-            return \App\Models\Event::where('subscription_id', $subscription->id)
-                ->pluck('id')
-                ->toArray();
-        }
+        // if ($subscription) {
+        //     return \App\Models\Event::where('subscription_id', $subscription->id)
+        //         ->pluck('id')
+        //         ->toArray();
+        // }
 
         return \App\Models\Event::where('created_by', $user->id)
             ->pluck('id')

@@ -64,6 +64,10 @@ class AdminActivityLogger
         'sponsors.export' => 'Exported sponsors',
         'speaker.export' => 'Exported speakers',
         'exhibitors.export' => 'Exported exhibitors',
+        'newbadges.store' => 'Created a new badge',
+        'newbadges.update' => 'Updated a badge',
+        'newbadges.destroy' => 'Deleted a badge',
+        'newbadges.saveLayout' => 'Saved badge layout',
     ];
 
     /** Route-name prefix / exact => module key */
@@ -106,6 +110,8 @@ class AdminActivityLogger
         'categories.' => 'categories',
         'demo-requests.' => 'demo_requests',
         'booths.' => 'booths',
+        'newbadges.' => 'badges',
+        'new.badges.' => 'badges',
     ];
 
     public static function log(array $data): ?AdminActivityLog
@@ -232,7 +238,7 @@ class AdminActivityLogger
         if (Str::contains($routeName, ['store', 'create', 'clone', 'import', 'upload'])) {
             return 'create';
         }
-        if (Str::contains($routeName, ['update', 'edit', 'status', 'order', 'bulk', 'reorder'])) {
+        if (Str::contains($routeName, ['update', 'edit', 'status', 'order', 'bulk', 'reorder', 'save'])) {
             return 'update';
         }
 

@@ -33,7 +33,14 @@ class LogAdminActivity
             return false;
         }
 
-        if (!$request->is('admin') && !$request->is('admin/*')) {
+        if (
+            !$request->is('admin') &&
+            !$request->is('admin/*') &&
+            !$request->is('newbadges') &&
+            !$request->is('newbadges/*') &&
+            !$request->is('new/badges') &&
+            !$request->is('new/badges/*')
+        ) {
             return false;
         }
 

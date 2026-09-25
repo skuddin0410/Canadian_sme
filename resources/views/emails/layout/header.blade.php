@@ -64,10 +64,25 @@
 </head>
 <body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;">
   @php
-    $mailEvent = $event ?? null;
-    $mailSponsor = $sponsor ?? null;
-    $headerImage = $mailEvent?->eventLogo?->file_path ?: $mailEvent?->photo?->file_path ?: asset('images/footer-logo.png');
-    $headerTitle = $mailEvent?->title ?: (getKeyValue('company_name')->value ?? config('app.name'));
+    $platformBranding = !empty($platformBranding);
+    $mailEvent = $platformBranding ? null : ($event ?? null);
+    $mailSponsor = $platformBranding ? null : ($sponsor ?? null);
+
+    // Site emails (Contact Us, etc.) must show Eventzen — not an event / company_name title
+    if ($platformBranding || !$mailEvent) {
+      $headerTitle = $headerBrandTitle
+        ?? config('app.name')
+        ?: 'Eventzen';
+      $headerImage = $headerBrandImage
+        ?? asset('images/footer-logo.png');
+    } else {
+      $headerImage = $mailEvent?->eventLogo?->file_path
+        ?: $mailEvent?->photo?->file_path
+        ?: asset('images/footer-logo.png');
+      $headerTitle = $mailEvent?->title
+        ?: (config('app.name') ?: 'Eventzen');
+    }
+
     $partnerLogo = $mailEvent?->emailBrandingLogo?->file_path ?: $mailSponsor?->logo?->file_path ?: $mailEvent?->sponsorBanner?->file_path;
     $partnerName = $mailEvent?->email_branding_name ?: $mailSponsor?->name;
     $partnerLabel = $mailEvent?->email_branding_type === 'powered_by'

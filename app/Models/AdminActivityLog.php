@@ -442,6 +442,10 @@ class AdminActivityLog extends Model
     {
         $keyLower = strtolower($key);
 
+        if (in_array($keyLower, ['newbadge', 'newbadge_id', 'badge_id'], true)) {
+            return $this->resolveBadgeName($value);
+        }
+
         if (in_array($keyLower, ['event_id', 'event'], true)) {
             return $this->resolveEventName($value);
         }
@@ -482,12 +486,35 @@ class AdminActivityLog extends Model
         return $event?->title ?: 'Unknown event';
     }
 
+    private function resolveBadgeName(mixed $value): string
+    {
+        if (is_array($value)) {
+            $names = [];
+            foreach ($value as $item) {
+                $names[] = $this->resolveBadgeName($item);
+            }
+            return empty($names) ? '—' : implode(', ', $names);
+        }
+
+        if (is_object($value) && isset($value->badge_name)) {
+            return (string) $value->badge_name;
+        }
+
+        if (!is_numeric($value)) {
+            return $this->displayValue($value);
+        }
+
+        $badge = \App\Models\NewBadge::query()->find((int) $value);
+        return $badge?->badge_name ?: 'Unknown badge (' . $value . ')';
+    }
+
     private function humanizeKey(string $key): string
     {
         $map = [
             'id' => 'ID',
             'event_id' => 'Event',
             'event' => 'Event',
+            'newbadge' => 'Badge',
             'user_id' => 'User ID',
             'email' => 'Email',
             'guard' => 'Auth Guard',

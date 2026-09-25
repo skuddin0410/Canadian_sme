@@ -30,14 +30,22 @@ class NewBadgeController extends Controller
         ]);
        
         $validated['created_by'] = auth()->id();
-        NewBadge::create($validated);
+        $badge = NewBadge::create($validated);
+        
+        \App\Models\GeneralNotification::create([
+            'user_id' => auth()->id(),
+            'event_id' => session('event_id', 1),
+            'title' => 'New Badge Created',
+            'body' => 'Badge "' . $badge->badge_name . '" has been created successfully.',
+            'is_read' => 0,
+        ]);
+
         return redirect()->route('newbadges.index');
     }
 
     public function show(NewBadge $newbadge)
     {   
         return view('DragAndDropBadge.show', compact('newbadge'));
-        //return $newbadge;
     }
 
     public function update(Request $request, NewBadge $newbadge)
@@ -52,12 +60,29 @@ class NewBadgeController extends Controller
 
         $newbadge->update($validated);
 
+        \App\Models\GeneralNotification::create([
+            'user_id' => auth()->id(),
+            'event_id' => session('event_id', 1),
+            'title' => 'Badge Updated',
+            'body' => 'Badge "' . $newbadge->badge_name . '" has been updated successfully.',
+            'is_read' => 0,
+        ]);
+
         return $newbadge;
     }
 
     public function destroy(NewBadge $newbadge)
     {
+        $badgeName = $newbadge->badge_name;
         $newbadge->delete();
+
+        \App\Models\GeneralNotification::create([
+            'user_id' => auth()->id(),
+            'event_id' => session('event_id', 1),
+            'title' => 'Badge Deleted',
+            'body' => 'Badge "' . $badgeName . '" has been deleted successfully.',
+            'is_read' => 0,
+        ]);
 
          return redirect()->route('newbadges.index');
     }
@@ -68,20 +93,24 @@ class NewBadgeController extends Controller
        $badge->layout = json_encode($request->elements);
        $badge->save();
 
+       \App\Models\GeneralNotification::create([
+           'user_id' => auth()->id(),
+           'event_id' => session('event_id', 1),
+           'title' => 'Badge Layout Saved',
+           'body' => 'Layout for badge "' . $badge->badge_name . '" has been saved.',
+           'is_read' => 0,
+       ]);
+
        return response()->json(['success' => true]);
     }
 
 
     public function generateBadgePdf(Request $request)
     {
-        // dd($request->all());
-        
         if($request->template_name)
             $badge = NewBadge::findOrFail($request->template_name);
-            // dd($badge);
         else
             $badge = NewBadge::latest()->first();
-            // dd($badge);
 
         $userIds = json_decode($request->user_ids, true);
         $users = User::whereIn('id', $userIds)->get();
