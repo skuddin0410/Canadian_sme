@@ -32,7 +32,8 @@
                         <img class="landing-page-logo" src="{{asset('/eventzen-logo.svg')}}" alt="">
                     </a>
                     <h2 class="h2-black mt-4 mb-3">
-                       {{$setting->title ?? ''}}
+                       <!-- {{$setting->title ?? ''}} -->
+                       CanadianSME Small Business Summit 2026
                     </h2>
                     <ul class="d-flex flex-column gap-2 m-0 p-0">
                         <li class="d-flex align-items-center gap-3">
@@ -41,7 +42,8 @@
                             </div>
                             @if(!empty($setting->date))
                             <p class="black-text-18">
-                                 {{ \Carbon\Carbon::parse($setting->date)->format('M d, Y') }}
+                                 <!-- {{ \Carbon\Carbon::parse($setting->date)->format('M d, Y') }} -->
+                                 Oct 13th, 2026
                             </p>
                             @endif
                         </li>
