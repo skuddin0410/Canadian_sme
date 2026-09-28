@@ -333,9 +333,14 @@ class UserController extends Controller
         $user = auth()->user();
 
         //  STEP 2: Get subscription
-        $subscription = Subscription::where('user_id', $user->id)
-            ->latest()
-            ->first();
+        // $subscription = Subscription::where('user_id', $user->id)
+        //     ->latest()
+        //     ->first(); //old part
+
+        $event = \App\Models\Event::findOrFail($eventId);
+        $subscription = Subscription::where('id', $event->subscription_id)
+            ->where('user_id', $user->id)
+            ->first(); //new part
 
         //  No subscription
         if (!$subscription) {
@@ -353,7 +358,11 @@ class UserController extends Controller
         }
 
         //  STEP 3: Check attendee limit
-        $currentCount = getMappedAttendeeCountByCreator((int) $user->id);
+        // $currentCount = getMappedAttendeeCountByCreator((int) $user->id); //old code
+        $currentCount = getMappedAttendeeCountBySubscription(
+            (int) $subscription->id
+        ); //new code
+
         $allowed = $subscription->attendee_count;
 
         if (($currentCount + $dataRows) > $allowed) {

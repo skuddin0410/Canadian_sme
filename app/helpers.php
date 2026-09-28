@@ -723,6 +723,38 @@ if (!function_exists('getEventIds')) {
     }
 }
 
+
+// if (!function_exists('getEventIdsAllSubscription')) {
+//     function getEventIdsAllSubscription()
+//     {
+//         $user = auth()->user();
+//         if (!$user) {
+//             return [];
+//         }
+
+//         if (isSuperAdmin()) {
+//             return \App\Models\Event::pluck('id')->toArray();
+//         }
+
+//         $subscription = Subscription::active()
+//             ->where('user_id', $user->id)
+//             ->latest()
+//             ->first();
+
+//         if ($subscription) {
+//             return \App\Models\Event::where('subscription_id', $subscription->id)
+//                 ->pluck('id')
+//                 ->toArray();
+//         }
+
+//         return \App\Models\Event::where('created_by', $user->id)
+//             ->pluck('id')
+//             ->toArray();
+//     }
+// }
+
+
+
 if (!function_exists('getMappedAttendeeCountByCreator')) {
     function getMappedAttendeeCountByCreator(int $userId): int
     {
@@ -731,6 +763,18 @@ if (!function_exists('getMappedAttendeeCountByCreator')) {
             ->where('event_and_entity_link.entity_type', 'users')
             ->where('events.created_by', $userId)
             ->distinct('event_and_entity_link.entity_id')
+            ->count('event_and_entity_link.entity_id');
+    }
+}
+
+if (!function_exists('getMappedAttendeeCountBySubscription')) {
+    function getMappedAttendeeCountBySubscription(int $subscriptionId): int
+    {
+        return DB::table('event_and_entity_link')
+            ->join('events', 'events.id', '=', 'event_and_entity_link.event_id')
+            ->where('event_and_entity_link.entity_type', 'users')
+            ->where('events.subscription_id', $subscriptionId)
+            ->distinct()
             ->count('event_and_entity_link.entity_id');
     }
 }
