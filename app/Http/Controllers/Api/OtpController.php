@@ -311,6 +311,7 @@ class OtpController extends Controller
             ]);
 
         } catch (JWTException $e) {
+            log::error('JWT Exception during OTP verification: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid OTP.',
