@@ -41,7 +41,8 @@
                                 <span class="black-text-18 mb-2">Speaker</span>
                                 <span class="small-heading-black fw-semibold">  
                                     @if($schedule->speakers->isNotEmpty())
-                                        {{ $schedule->speakers->pluck('name')->join(', ') }}
+                                        <!-- {{ $schedule->speakers->pluck('name')->join(', ') }} -->
+                                        {{ $schedule->speakers->map(fn($s) => "{$s->name} {$s->lastname}")->join(', ') }}  
                                     @else
                                         No speakers assigned
                                     @endif
