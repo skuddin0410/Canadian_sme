@@ -151,7 +151,7 @@ class OtpController extends Controller
     public function verify(Request $request)
     {  
         // log request all
-        // Log::info('Verify API Request', $request->all());
+        Log::info('Verify API Request', $request->all());
 
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email|max:255',
@@ -311,7 +311,7 @@ class OtpController extends Controller
             ]);
 
         } catch (JWTException $e) {
-            log::error('JWT Exception during OTP verification: ' . $e->getMessage());
+            Log::error('JWT Exception during OTP verification: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid OTP 2.',
