@@ -50,7 +50,8 @@
                     <!-- ///Subabrata da code/// -->
                     <div class="">
                         <span class="blue-text-18 mb-2">Event Name</span>
-                        <span class="small-heading-black fw-semibold">{{$exhibitor->event_name ?? 'CanadianSME Small Business Summit 2025'}}</span>
+                        <!-- <span class="small-heading-black fw-semibold">{{$exhibitor->event_name ?? 'CanadianSME Small Business Summit 2025'}}</span> -->
+                        <span class="small-heading-black fw-semibold">{{$event->title}}</span>
                     </div>
                     <!-- ///My code addition/// -->
                     <div>
