@@ -258,7 +258,7 @@ class OtpController extends Controller
             if (! $token ) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid OTP.',
+                    'message' => 'Invalid OTP 1.',
                 ], 401);
             }
             
@@ -314,7 +314,7 @@ class OtpController extends Controller
             log::error('JWT Exception during OTP verification: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid OTP.',
+                'message' => 'Invalid OTP 2.',
                 'error'   => $e->getMessage(),
             ], 500);
         }
