@@ -77,7 +77,8 @@
                         </div>
                         <div class="cell">
                             <div>
-                                <img class="h-100 w-100" src="{{asset('frontend/images/IMG_0024.jpg')}}?v={{ time() }}" alt="">
+                                <!-- <img class="h-100 w-100" src="{{asset('frontend/images/IMG_0024.jpg')}}?v={{ time() }}" alt=""> -->
+                                <img class="h-100 w-100" src="{{asset('apple-store.png')}}?v={{ time() }}" alt="">
                             </div>
                         </div>
                         <div class="cell">
@@ -93,7 +94,8 @@
             </div>
             <div class="right">
                 <!-- <img class="mobile-img" src="{{asset('frontend/images/mobile-image.svg')}}" alt=""> -->
-                <img class="mobile-img" src="{{asset('images/promo-event.png')}}" alt="">
+                <!-- <img class="mobile-img" src="{{asset('images/promo-event.png')}}" alt=""> -->
+                <img class="mobile-img" src="{{asset('Group 15.png')}}" alt="">
             </div>
         </div>
     </section>
