@@ -101,7 +101,7 @@
         <table role="presentation" class="container" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:8px; overflow:hidden;">
           
           <!-- Header -->
-          <tr>
+          <!-- <tr>
             <td bgcolor="#004fb8" style="padding:24px 28px 22px 28px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
@@ -126,6 +126,178 @@
                 </tr>
               </table>
             </td>
+          </tr> -->
+
+          <!-- Header -->
+          <tr>
+              <td
+                  bgcolor="#004fb8"
+                  style="padding:24px 28px 22px 28px;"
+              >
+                  <table
+                      role="presentation"
+                      width="100%"
+                      cellspacing="0"
+                      cellpadding="0"
+                      border="0"
+                      style="width:100%; border-collapse:collapse;"
+                  >
+                      <tr>
+
+                          <!-- LEFT LOGO -->
+                          <td
+                              width="215"
+                              valign="middle"
+                              style="
+                                  width:215px;
+                                  padding:0;
+                                  vertical-align:middle;
+                                  text-align:left;
+                              "
+                          >
+                              <img
+                                  src="{{ $headerImage }}"
+                                  alt="{{ $headerTitle }}"
+                                  width="215"
+                                  style="
+                                      display:block;
+                                      width:215px;
+                                      height:auto;
+                                      max-width:215px;
+                                      max-height:88px;
+                                      margin:0;
+                                      padding:0;
+                                      border:0;
+                                      outline:none;
+                                  "
+                              >
+                          </td>
+
+
+                          <!-- FLEXIBLE SPACE -->
+                          <td
+                              style="
+                                  width:auto;
+                                  padding:0;
+                                  font-size:0;
+                                  line-height:0;
+                              "
+                          >
+                              &nbsp;
+                          </td>
+
+
+                          <!-- RIGHT BLOCK -->
+                          <td
+                              width="180"
+                              valign="middle"
+                              style="
+                                  width:180px;
+                                  padding:0;
+                                  vertical-align:middle;
+                                  text-align:right;
+                              "
+                          >
+                              <table
+                                  role="presentation"
+                                  cellspacing="0"
+                                  cellpadding="0"
+                                  border="0"
+                                  align="right"
+                                  style="
+                                      border-collapse:collapse;
+                                      margin:0 0 0 auto;
+                                  "
+                              >
+                                  <tr>
+                                      <td
+                                          style="
+                                              padding:0;
+                                              vertical-align:middle;
+                                              text-align:right;
+                                          "
+                                      >
+
+                                          @if($mailEvent && $partnerLabel && ($partnerLogo || $partnerName))
+
+                                              <!-- BIG SPONSOR LOGO -->
+                                              @if($partnerLogo)
+                                                  <img
+                                                      src="{{ $partnerLogo }}"
+                                                      alt="{{ $partnerName ?: $partnerLabel }}"
+                                                      width="170"
+                                                      style="
+                                                          display:block;
+                                                          width:170px;
+                                                          max-width:170px;
+                                                          height:auto;
+                                                          max-height:70px;
+                                                          margin:0 0 5px auto;
+                                                          padding:0;
+                                                          border:0;
+                                                          outline:none;
+                                                      "
+                                                  >
+                                              @endif
+
+                                              <!-- LABEL -->
+                                              <p
+                                                  style="
+                                                      margin:0;
+                                                      padding:0;
+                                                      font-size:10px;
+                                                      line-height:14px;
+                                                      color:#ffffff;
+                                                      text-align:right;
+                                                  "
+                                              >
+                                                  {{ $partnerLabel }}
+                                              </p>
+
+                                              <!-- SMALL NAME -->
+                                              @if($partnerName)
+                                                  <p
+                                                      style="
+                                                          margin:0;
+                                                          padding:0;
+                                                          font-size:14px;
+                                                          line-height:18px;
+                                                          font-weight:600;
+                                                          color:#ffffff;
+                                                          text-align:right;
+                                                      "
+                                                  >
+                                                      {{ $partnerName }}
+                                                  </p>
+                                              @endif
+
+                                          @else
+
+                                              <!-- HEADER TITLE -->
+                                              <p
+                                                  style="
+                                                      margin:0;
+                                                      padding:0;
+                                                      font-size:23px;
+                                                      line-height:29px;
+                                                      font-weight:700;
+                                                      color:#ffffff;
+                                                      text-align:right;
+                                                  "
+                                              >
+                                                  {{ $headerTitle }}
+                                              </p>
+
+                                          @endif
+
+                                      </td>
+                                  </tr>
+                              </table>
+                          </td>
+
+                      </tr>
+                  </table>
+              </td>
           </tr>
 
           <!-- Content -->
