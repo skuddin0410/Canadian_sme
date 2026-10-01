@@ -30,6 +30,7 @@
                 <div class="left-inner">
                     <a href="https://eventzen.io">
                         <img class="landing-page-logo" src="{{asset('/eventzen-logo.svg')}}" alt="">
+                        <!-- <img class="landing-page-logo" src="{{asset('/EventzenSponserLogo.png')}}" alt=""> -->
                     </a>
                     <h2 class="h2-black mt-4 mb-3">
                        <!-- {{$setting->title ?? ''}} -->
