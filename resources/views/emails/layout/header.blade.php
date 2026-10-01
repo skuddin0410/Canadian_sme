@@ -63,7 +63,7 @@
   </style>
 </head>
 <body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;">
-  @php
+  <!-- @php
     $platformBranding = !empty($platformBranding);
     $mailEvent = $platformBranding ? null : ($event ?? null);
     $mailSponsor = $platformBranding ? null : ($sponsor ?? null);
@@ -92,7 +92,48 @@
         : ($mailSponsor
           ? (str_contains(strtolower((string) $mailSponsor->type), 'power') ? 'Powered by' : 'Sponsored by')
           : null));
-  @endphp
+  @endphp -->
+
+  @php
+    $mailEvent = $event ?? null;
+    // \Log::info('EVENT EMAIL BRANDING', [
+    //     'event_id' => $mailEvent?->id,
+    //     'branding_type' => $mailEvent?->email_branding_type,
+    //     'branding_name' => $mailEvent?->email_branding_name,
+    // ]);
+    $mailSponsor = $sponsor ?? null;
+
+    $headerImage = $mailEvent?->eventLogo?->file_path
+        ?: $mailEvent?->photo?->file_path
+        ?: asset('images/footer-logo.png');
+
+    $headerTitle = $mailEvent?->title
+        ?: (config('app.name') ?: 'Eventzen');
+
+    $partnerLogo = $mailEvent?->emailBrandingLogo?->file_path
+        ?: $mailSponsor?->logo?->file_path
+        ?: $mailEvent?->sponsorBanner?->file_path;
+
+    $partnerName = $mailEvent?->email_branding_name
+        ?: $mailSponsor?->name;
+
+    $partnerLabel = $mailEvent?->email_branding_type === 'powered_by'
+        ? 'Powered by'
+        : ($mailEvent?->email_branding_type === 'sponsored_by'
+            ? 'Sponsored by'
+            : ($mailEvent?->email_branding_type === 'presented_by'
+                ? 'Presented by'
+                : ($mailSponsor
+                    ? (str_contains(
+                        strtolower((string) $mailSponsor->type),
+                        'power'
+                    ) ? 'Powered by' : 'Sponsored by')
+                    : null
+                )
+            )
+        );
+      
+@endphp
 
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f4f6f8">
     <tr>

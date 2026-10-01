@@ -270,6 +270,7 @@
                           <option value="">No branding</option>
                           <option value="powered_by" {{ old('email_branding_type', $event->email_branding_type) === 'powered_by' ? 'selected' : '' }}>Powered by</option>
                           <option value="sponsored_by" {{ old('email_branding_type', $event->email_branding_type) === 'sponsored_by' ? 'selected' : '' }}>Sponsored by</option>
+                          <option value="presented_by" {{ old('email_branding_type', $event->email_branding_type) === 'presented_by' ? 'selected' : '' }}>Presented by</option>
                         </select>
                       </div>
                       <div class="col-md-6 mb-3">
