@@ -419,7 +419,7 @@ class FormBuilderController extends Controller
                     foreach ($users as $createdUser) {
                         try {
                             if (qrCode($createdUser->id)) {
-                                sendNotification("Welcome Email", $createdUser);
+                                // sendNotification("Welcome Email", $createdUser);
                             }
                         } catch (\Throwable $e) {
                             report($e);
