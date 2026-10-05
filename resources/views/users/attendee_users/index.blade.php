@@ -724,12 +724,12 @@
             });
 
             $(document).on("click", ".filterAppUsers", function() {
-                const searchVal = $('#search').val().trim();
-                loadUsers({
-                    search: searchVal,
+                const params = Object.assign({}, getCurrentScopePayload(), {
                     page: 1,
                     onsignal: 1
                 });
+
+                loadUsers(params);
             });
 
 
