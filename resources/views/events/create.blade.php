@@ -352,6 +352,7 @@
                     <option value="">No branding</option>
                     <option value="powered_by" {{ old('email_branding_type') === 'powered_by' ? 'selected' : '' }}>Powered by</option>
                     <option value="sponsored_by" {{ old('email_branding_type') === 'sponsored_by' ? 'selected' : '' }}>Sponsored by</option>
+                    <option value="app_sponsored_by" {{ old('email_branding_type') === 'app_sponsored_by' ? 'selected' : '' }}>App Sponsored by</option>
                     <option value="presented_by" {{ old('email_branding_type') === 'presented_by' ? 'selected' : '' }}>Presented by</option>
                   </select>
                 </div>

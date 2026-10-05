@@ -121,14 +121,17 @@
         ? 'Powered by'
         : ($mailEvent?->email_branding_type === 'sponsored_by'
             ? 'Sponsored by'
-            : ($mailEvent?->email_branding_type === 'presented_by'
-                ? 'Presented by'
-                : ($mailSponsor
-                    ? (str_contains(
-                        strtolower((string) $mailSponsor->type),
-                        'power'
-                    ) ? 'Powered by' : 'Sponsored by')
-                    : null
+            : ($mailEvent?->email_branding_type === 'app_sponsored_by'
+                ? 'App Sponsored by'
+                : ($mailEvent?->email_branding_type === 'presented_by'
+                    ? 'Presented by'
+                    : ($mailSponsor
+                        ? (str_contains(
+                            strtolower((string) $mailSponsor->type),
+                            'power'
+                        ) ? 'Powered by' : 'Sponsored by')
+                        : null
+                    )
                 )
             )
         );
