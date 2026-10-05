@@ -279,7 +279,7 @@ class PaymentController extends Controller
                 try {
                     notification($createdUser->id);
                     if (qrCode($createdUser->id)) {
-                        sendNotification("Welcome Email", $createdUser);
+                        // sendNotification("Welcome Email", $createdUser);
                     }
                 } catch (\Throwable $e) {
                     report($e);

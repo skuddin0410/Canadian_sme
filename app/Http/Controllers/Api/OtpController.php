@@ -277,7 +277,7 @@ class OtpController extends Controller
                 $user->refresh();
                 $qrGenerated = qrCode($user->id);
                 if (!empty($user->qr_code) && $qrGenerated) {
-                    sendNotification("Welcome Email", $user);
+                    // sendNotification("Welcome Email", $user);
                 }
             }
             if ($otp) {

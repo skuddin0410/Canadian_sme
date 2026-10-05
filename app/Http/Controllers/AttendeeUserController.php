@@ -434,7 +434,7 @@ class AttendeeUserController extends Controller
 
         if ($user) {
             if ($isNewUser) {
-                sendNotification("Welcome Email", $user);
+                // sendNotification("Welcome Email", $user);
             }
 
             if (empty($user->qr_code)) {
